@@ -1,7 +1,7 @@
 import Boom from '@hapi/boom';
 import Hapi, { ServerRoute } from '@hapi/hapi';
 import Joi from '@hapi/joi';
-import { ethers, Wallet } from 'ethers';
+import { ethers } from 'ethers';
 import jsonwebtoken from 'jsonwebtoken';
 import { Challenge } from '../../entity/Challenge';
 import { getDb } from '../../lib/db';
