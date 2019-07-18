@@ -33,7 +33,7 @@ deploy:
       - npx semantic-release
     on:
       all_branches: true
-      repo: databrokerdao/dxc
+      repo: DataBrokerDAO/dxc
 
 branches:
   except:
