@@ -5,6 +5,7 @@ import * as Sentry from '@sentry/node';
 import chalk from 'chalk';
 import dotenv from 'dotenv';
 import Path from 'path';
+import 'reflect-metadata';
 import { Connection, createConnection } from 'typeorm';
 import { version } from '../package.json';
 
@@ -147,6 +148,11 @@ async function run(connection: Connection) {
     defaultExtension: 'hbs',
   });
 
+  plugins.push(server.register({ plugin: require('./auth') }));
+  plugins.push(server.register({ plugin: require('./datasets') }));
+
+  await Promise.all(plugins);
+
   server.route({
     method: 'GET',
     options: {
@@ -158,9 +164,21 @@ async function run(connection: Connection) {
     path: '/',
   });
 
-  plugins.push(server.register({ plugin: require('./auth') }));
+  server.route({
+    method: 'GET',
+    options: {
+      auth: false,
+    },
+    path: '/{path*}',
+    handler: {
+      directory: {
+        path: '.',
+        index: true,
+        listing: true,
+      },
+    },
+  });
 
-  await Promise.all(plugins);
   console.info(
     chalk.red(`
 

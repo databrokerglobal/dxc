@@ -1,6 +1,5 @@
 import Hapi from '@hapi/hapi';
 import HapiAuthJwt2 from 'hapi-auth-jwt2';
-import 'reflect-metadata';
 import { route as authenticateRoute } from './routes/authenticate';
 import { route as challengeRoute } from './routes/challenge';
 import { route as signChallengeRoute } from './routes/sign-challenge';
