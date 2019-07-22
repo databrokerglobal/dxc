@@ -13,7 +13,6 @@ export const route: ServerRoute = {
   method: 'POST',
   path: '/datasets',
   options: {
-    // auth: 'jwt',
     tags: ['api'],
     description: 'Add a new dataset to this DXC',
     // notes: 'sss',

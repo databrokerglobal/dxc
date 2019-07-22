@@ -7,7 +7,6 @@ export const route: ServerRoute = {
   method: 'GET',
   path: '/datasets',
   options: {
-    // auth: 'jwt',
     tags: ['api'],
     description: 'List all the datasets in this DXC',
     // notes: 'sss',
