@@ -1,0 +1,27 @@
+sudo: required
+
+services:
+  - docker
+
+language: node_js
+
+node_js:
+   - '11'
+
+before_install:
+  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > ~/.npmrc
+  - npm i -g truffle ganache-cli
+  - ganache-cli -l 0xfffffffffff -i 1337 -m "robot robot robot robot robot robot robot robot robot robot robot robot" > /dev/null &
+
+deploy:
+  - provider: script
+    skip_cleanup: true
+    script:
+      - npx semantic-release
+    on:
+      all_branches: true
+      repo: settlemint/mint-boilerplate
+
+branches:
+  except:
+    - /^v\d+\.\d+\.\d+$/
