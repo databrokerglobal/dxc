@@ -133,7 +133,7 @@ async function run(connection: Connection) {
         cache: {
           expiresIn: 24 * 60 * 60 * 1000,
         },
-        pathPrefixSize: 1,
+        pathPrefixSize: 2,
       },
     })
   );
@@ -142,14 +142,31 @@ async function run(connection: Connection) {
     engines: { hbs: require('handlebars') },
     relativeTo: Path.resolve(__dirname, '../'),
     path: ['./templates'],
-    // partialsPath: ['templates/partials'],
-    // helpersPath: ['templates/helpers'],
-    // layoutPath: ['templates/layouts'],
     defaultExtension: 'hbs',
   });
 
-  plugins.push(server.register({ plugin: require('./auth') }));
-  plugins.push(server.register({ plugin: require('./datasets') }));
+  plugins.push(
+    server.register(
+      {
+        plugin: require('./auth'),
+      },
+      {
+        routes: {
+          prefix: '/v1',
+        },
+      }
+    )
+  );
+  plugins.push(
+    server.register(
+      { plugin: require('./datasets') },
+      {
+        routes: {
+          prefix: '/v1',
+        },
+      }
+    )
+  );
 
   await Promise.all(plugins);
 
