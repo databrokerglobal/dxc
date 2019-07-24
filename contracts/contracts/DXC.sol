@@ -1,40 +1,214 @@
 pragma solidity ^0.5.7;
+pragma experimental ABIEncoderV2;
 
 import "../node_modules/openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "../node_modules/openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "../node_modules/openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
 
 contract DXC is Ownable {
 
   using SafeMath for uint256;
+  using SafeERC20 for ERC20;
 
-  struct Deal {
-    address seller;
-    address buyer;
-    uint256 percentageSeller;
-    uint256 percentageDataBrokerDAO;
-    string did; // the did of the share
-    uint256 price; // in DTX wei
-    uint256 validUntil; // 0 means forever, all others are a timestamp
-    uint256 dtxDeposited; // in DTX wei
-    uint256 allowWithdrawAfter; // timestamp 30 days after start
-    bool claim; // if true, no withdrawal
-    bool claimArbitraged; // if true, allow buyer to withdraw
+  address DTX;
+  uint8 protocolPercentage = 5;
+
+  constructor(address DTXToken) public {
+    DTX = DTXToken;
   }
 
-  address public dataBrokerDAOWallet = 0xB682943Fa0408f74e87c53f405d394d9A8b715AE;
+  function changeProtocolPercentage(uint8 _protocolPercentage) public onlyOwner {
+    protocolPercentage = _protocolPercentage;
+  }
 
+  ///////////////////////////////////////////////////////////////////////////////////////
+  //// DTX Bank                                                                      ////
+  ///////////////////////////////////////////////////////////////////////////////////////
 
-// create deal
+  struct TokenAvailabiltity {
+    uint256 balance;
+    uint256 escrowOutgoing;
+    uint256 escrowIncoming;
+  }
 
-// isValid
+  struct Escrow {
+    uint256 amount;
+    uint256 releaseAfter;
+    address to;
+    address from;
+  }
 
-// canWithdraw
+  mapping(address => TokenAvailabiltity) public balances;
+  uint256 public totalBalance;
+  uint256 public totalEscrowed;
 
-// openClaim
+  event DepositDTX(address indexed from, uint256 amount);
+  event WithdrawDTX(address indexed to, uint256 amount);
+  event TransferDTX(address indexed from, address indexed to, uint256 value);
 
-// arbitrageClaim
+  function platformBalance() public view returns (uint256) {
+    return ERC20(DTX).balanceOf(address(this));
+  }
 
-// withdraw
+  function balanceOf(address owner) public view returns (uint256 balance, uint256 escrowOutgoing, uint256 escrowIncoming, uint256 available) {
+    balance = balances[owner].balance;
+    escrowOutgoing = balances[owner].escrowOutgoing;
+    escrowIncoming = balances[owner].escrowIncoming;
+    available = balances[owner].balance.sub(balances[owner].escrowOutgoing);
+  }
 
+  function convertFiatToToken(address to, uint256 amount) public onlyOwner {
+    balances[to].balance = balances[to].balance.add(amount);
+    totalBalance = totalBalance.add(amount);
+    emit DepositDTX(to, amount);
+  }
+
+  function deposit(uint256 amount) public {
+    require(ERC20(DTX).transferFrom(msg.sender, address(this), amount), "Not enough DTX tokens have been allowed");
+    balances[msg.sender].balance = balances[msg.sender].balance.add(amount);
+    totalBalance = totalBalance.add(amount);
+    emit DepositDTX(msg.sender, amount);
+  }
+
+  function withdraw() public {
+    (,,, uint256 available) = balanceOf(msg.sender);
+    require(ERC20(DTX).transferFrom(address(this), msg.sender, available), "Not enough DTX tokens available to withdraw, contact DataBrokerDAO!");
+    balances[msg.sender].balance = balances[msg.sender].balance.sub(available);
+    totalBalance = totalBalance.sub(available);
+    emit WithdrawDTX(msg.sender, available);
+  }
+
+  /**
+   * address(0) is the address we use for escrowed funds, they are tracked in escrowedDTX
+   */
+  function transfer(address from, address to, uint256 amount) internal {
+    (,,, uint256 available) = balanceOf(from);
+    require(amount <= available, "Not enough availalbe DTX to execute this transfer");
+    balances[from].balance = balances[from].balance.sub(amount);
+    balances[to].balance = balances[to].balance.add(amount);
+    emit TransferDTX(from, to, amount);
+  }
+
+  function escrow(
+    address owner,
+    uint8 ownerPercentage,
+    address publisher,
+    uint8 publisherPercentage,
+    address user,
+    address marketplace,
+    uint8 marketplacePercentage,
+    uint256 amount) internal
+  {
+    require(ownerPercentage+publisherPercentage+marketplacePercentage+protocolPercentage == 100, "All percentages need to add up to exactly 100");
+    balances[user].escrowOutgoing = balances[user].escrowOutgoing.add(amount);
+    totalEscrowed = totalEscrowed.add(amount);
+    balances[owner].escrowIncoming = balances[owner].escrowIncoming.add(amount.mul(ownerPercentage).div(100));
+    balances[publisher].escrowIncoming = balances[publisher].escrowIncoming.add(amount.mul(publisherPercentage).div(100));
+    balances[marketplace].escrowIncoming = balances[marketplace].escrowIncoming.add(amount.mul(marketplacePercentage).div(100));
+    uint256 protocolAmount = amount.sub((amount.mul(ownerPercentage).div(100)).add(amount.mul(publisherPercentage).div(100)).add(amount.mul(marketplacePercentage).div(100)));
+    balances[address(this)].escrowIncoming = balances[address(this)].escrowIncoming.add(protocolAmount);
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////////////
+  //// Deals                                                                         ////
+  ///////////////////////////////////////////////////////////////////////////////////////
+
+  struct Deal {
+    string did; // the did of the data share in question
+    address owner;
+    uint8 ownerPercentage;
+    address publisher;
+    uint8 publisherPercentage;
+    address user;
+    address marketplace;
+    uint8 marketplacePercentage;
+    uint256 amount;
+    uint256 validFrom; // 0 means forever, all others are a timestamp
+    uint256 validUntil; // 0 means forever, all others are a timestamp
+  }
+
+  Deal[] public deals;
+
+  event NewDeal(
+    uint256 dealIndex,
+    string did,
+    address owner,
+    address publisher,
+    address user,
+    address marketplace,
+    uint256 amount,
+    uint256 validFrom,
+    uint256 validUntil
+  );
+
+  function getAllDeals() public view returns (Deal[] memory) {
+    return deals;
+  }
+
+  function createDeal(
+    string memory did,
+    address owner,
+    uint8 ownerPercentage,
+    address publisher,
+    uint8 publisherPercentage,
+    address user,
+    address marketplace,
+    uint8 marketplacePercentage,
+    uint256 amount,
+    uint256 validFrom,
+    uint256 validUntil
+  ) public onlyOwner {
+    escrow(
+      owner,
+      ownerPercentage,
+      publisher,
+      publisherPercentage,
+      user,
+      marketplace,
+      marketplacePercentage,
+      amount
+    );
+    uint256 dealIndex = deals.push(Deal(
+      did,
+      owner,
+      ownerPercentage,
+      publisher,
+      publisherPercentage,
+      user,
+      marketplace,
+      marketplacePercentage,
+      amount,
+      validFrom,
+      validUntil
+    )) - 1;
+    emit NewDeal(
+      dealIndex,
+      did,
+      owner,
+      publisher,
+      user,
+      marketplace,
+      amount,
+      validFrom,
+      validUntil
+    );
+  }
+
+  function payout(uint256 dealIndex) public {
+    Deal memory deal = deals[dealIndex];
+    require(now >= deal.validFrom + 14 days, "Payouts can only happen 14 days after the start of the deal (validFrom)");
+    // release escrow
+    balances[deal.user].escrowOutgoing = balances[deal.user].escrowOutgoing.sub(deal.amount);
+    balances[deal.owner].escrowIncoming = balances[deal.owner].escrowIncoming.sub(deal.amount.mul(deal.ownerPercentage).div(100));
+    balances[deal.publisher].escrowIncoming = balances[deal.publisher].escrowIncoming.sub(deal.amount.mul(deal.publisherPercentage).div(100));
+    balances[deal.marketplace].escrowIncoming = balances[deal.marketplace].escrowIncoming.add(deal.amount.mul(deal.marketplacePercentage).div(100));
+    // transfer DTX
+    transfer(deal.user, deal.owner, deal.amount.mul(deal.ownerPercentage).div(100));
+    transfer(deal.user, deal.publisher, deal.amount.mul(deal.publisherPercentage).div(100));
+    transfer(deal.user, deal.marketplace, deal.amount.mul(deal.marketplacePercentage).div(100));
+    uint256 protocolAmount = deal.amount.sub((deal.amount.mul(deal.ownerPercentage).div(100)).add(deal.amount.mul(deal.publisherPercentage).div(100)).add(deal.amount.mul(deal.marketplacePercentage).div(100)));
+    transfer(deal.user, address(this), protocolAmount);
+  }
 
 }

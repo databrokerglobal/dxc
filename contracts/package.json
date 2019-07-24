@@ -1,5 +1,5 @@
 {
-  "name": "@settlemint/mint-boilerplate",
+  "name": "@databrokerdao/dxc-contracts",
   "version": "1.0.0",
   "description": "The boilerplate project setup for Mint enabled projects",
   "main": "truffle-config.js",
