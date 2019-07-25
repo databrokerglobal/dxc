@@ -75,12 +75,12 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.10+commit.5a6ea5b1\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":false,\"inputs\":[{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_amount\",\"type\":\"uint256\"}],\"name\":\"onTransfer\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"},{\"name\":\"_spender\",\"type\":\"address\"},{\"name\":\"_amount\",\"type\":\"uint256\"}],\"name\":\"onApprove\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"}],\"name\":\"proxyPayment\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":true,\"stateMutability\":\"payable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"The token controller contract must implement these functions\",\"methods\":{\"onApprove(address,address,uint256)\":{\"params\":{\"_amount\":\"The amount in the `approve()` call\",\"_owner\":\"The address that calls `approve()`\",\"_spender\":\"The spender in the `approve()` call\"},\"return\":\"False if the controller does not authorize the approval\"},\"onTransfer(address,address,uint256)\":{\"params\":{\"_amount\":\"The amount of the transfer\",\"_from\":\"The origin of the transfer\",\"_to\":\"The destination of the transfer\"},\"return\":\"False if the controller does not authorize the transfer\"},\"proxyPayment(address)\":{\"params\":{\"_owner\":\"The address that sent the ether to create tokens\"},\"return\":\"True if the ether is accepted, false if it throws\"}}},\"userdoc\":{\"methods\":{\"onApprove(address,address,uint256)\":{\"notice\":\"Notifies the controller about an approval allowing the  controller to react if desired\"},\"onTransfer(address,address,uint256)\":{\"notice\":\"Notifies the controller about a token transfer allowing the  controller to react if desired\"},\"proxyPayment(address)\":{\"notice\":\"Called when `_owner` sends ether to the MiniMe Token contract\"}}}},\"settings\":{\"compilationTarget\":{\"/Users/roderik/Development/databrokerdao-dxc/contracts/contracts/external/TokenController.sol\":\"TokenController\"},\"evmVersion\":\"byzantium\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/roderik/Development/databrokerdao-dxc/contracts/contracts/external/TokenController.sol\":{\"keccak256\":\"0xbb567fe61dd080643e8a3e318e139445d9e74fffadd619010e04fd3bdf947594\",\"urls\":[\"bzzr://3117907a825f682094271a2e7c52e216fc8e28b06988331ca9d3a611a245aa84\",\"dweb:/ipfs/QmTbk4H4LwbpddfsREWTTCznYWEhn5hjujfJQPpZgHYXKq\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.10+commit.5a6ea5b1\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":false,\"inputs\":[{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_amount\",\"type\":\"uint256\"}],\"name\":\"onTransfer\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"},{\"name\":\"_spender\",\"type\":\"address\"},{\"name\":\"_amount\",\"type\":\"uint256\"}],\"name\":\"onApprove\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"}],\"name\":\"proxyPayment\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":true,\"stateMutability\":\"payable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"The token controller contract must implement these functions\",\"methods\":{\"onApprove(address,address,uint256)\":{\"params\":{\"_amount\":\"The amount in the `approve()` call\",\"_owner\":\"The address that calls `approve()`\",\"_spender\":\"The spender in the `approve()` call\"},\"return\":\"False if the controller does not authorize the approval\"},\"onTransfer(address,address,uint256)\":{\"params\":{\"_amount\":\"The amount of the transfer\",\"_from\":\"The origin of the transfer\",\"_to\":\"The destination of the transfer\"},\"return\":\"False if the controller does not authorize the transfer\"},\"proxyPayment(address)\":{\"params\":{\"_owner\":\"The address that sent the ether to create tokens\"},\"return\":\"True if the ether is accepted, false if it throws\"}}},\"userdoc\":{\"methods\":{\"onApprove(address,address,uint256)\":{\"notice\":\"Notifies the controller about an approval allowing the  controller to react if desired\"},\"onTransfer(address,address,uint256)\":{\"notice\":\"Notifies the controller about a token transfer allowing the  controller to react if desired\"},\"proxyPayment(address)\":{\"notice\":\"Called when `_owner` sends ether to the MiniMe Token contract\"}}}},\"settings\":{\"compilationTarget\":{\"/Users/roderik/Development/databrokerdao-dxc/contracts/contracts/external/TokenController.sol\":\"TokenController\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/roderik/Development/databrokerdao-dxc/contracts/contracts/external/TokenController.sol\":{\"keccak256\":\"0x08959a8e35be3d37faa87ae398a446760924dab709545674432fda35484444f1\",\"urls\":[\"bzzr://c41dcfb4188c82c7a8d449cf91f5cf079897f68ab27240fc85fc30b0473eec17\",\"dweb:/ipfs/QmbDGvC6wVXtkyUiqGkdMJbjFMjue85AJLoSprhRec7tqv\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "pragma solidity ^0.5.10;\n\n/// @dev The token controller contract must implement these functions\ncontract TokenController {\n  /// @notice Called when `_owner` sends ether to the MiniMe Token contract\n  /// @param _owner The address that sent the ether to create tokens\n  /// @return True if the ether is accepted, false if it throws\n  function proxyPayment(address _owner) public payable returns(bool);\n\n  /// @notice Notifies the controller about a token transfer allowing the\n  ///  controller to react if desired\n  /// @param _from The origin of the transfer\n  /// @param _to The destination of the transfer\n  /// @param _amount The amount of the transfer\n  /// @return False if the controller does not authorize the transfer\n  function onTransfer(address _from, address _to, uint _amount) public returns(bool);\n\n  /// @notice Notifies the controller about an approval allowing the\n  ///  controller to react if desired\n  /// @param _owner The address that calls `approve()`\n  /// @param _spender The spender in the `approve()` call\n  /// @param _amount The amount in the `approve()` call\n  /// @return False if the controller does not authorize the approval\n  function onApprove(address _owner, address _spender, uint _amount) public\n      returns(bool);\n}\n",
+  "source": "pragma solidity ^0.5.0;\n\n/// @dev The token controller contract must implement these functions\ncontract TokenController {\n  /// @notice Called when `_owner` sends ether to the MiniMe Token contract\n  /// @param _owner The address that sent the ether to create tokens\n  /// @return True if the ether is accepted, false if it throws\n  function proxyPayment(address _owner) public payable returns(bool);\n\n  /// @notice Notifies the controller about a token transfer allowing the\n  ///  controller to react if desired\n  /// @param _from The origin of the transfer\n  /// @param _to The destination of the transfer\n  /// @param _amount The amount of the transfer\n  /// @return False if the controller does not authorize the transfer\n  function onTransfer(address _from, address _to, uint _amount) public returns(bool);\n\n  /// @notice Notifies the controller about an approval allowing the\n  ///  controller to react if desired\n  /// @param _owner The address that calls `approve()`\n  /// @param _spender The spender in the `approve()` call\n  /// @param _amount The amount in the `approve()` call\n  /// @return False if the controller does not authorize the approval\n  function onApprove(address _owner, address _spender, uint _amount) public\n      returns(bool);\n}\n",
   "sourcePath": "/Users/roderik/Development/databrokerdao-dxc/contracts/contracts/external/TokenController.sol",
   "ast": {
     "absolutePath": "/Users/roderik/Development/databrokerdao-dxc/contracts/contracts/external/TokenController.sol",
@@ -92,9 +92,9 @@
     "nodes": [
       {
         "id": 3325,
-        "literals": ["solidity", "^", "0.5", ".10"],
+        "literals": ["solidity", "^", "0.5", ".0"],
         "nodeType": "PragmaDirective",
-        "src": "0:24:8"
+        "src": "0:23:8"
       },
       {
         "baseContracts": [],
@@ -126,7 +126,7 @@
                   "name": "_owner",
                   "nodeType": "VariableDeclaration",
                   "scope": 3332,
-                  "src": "356:14:8",
+                  "src": "355:14:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -137,7 +137,7 @@
                     "id": 3326,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "356:7:8",
+                    "src": "355:7:8",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -148,7 +148,7 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "355:16:8"
+              "src": "354:16:8"
             },
             "returnParameters": {
               "id": 3331,
@@ -160,7 +160,7 @@
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "scope": 3332,
-                  "src": "395:4:8",
+                  "src": "394:4:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -171,7 +171,7 @@
                     "id": 3329,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "395:4:8",
+                    "src": "394:4:8",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -181,10 +181,10 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "394:6:8"
+              "src": "393:6:8"
             },
             "scope": 3355,
-            "src": "334:67:8",
+            "src": "333:67:8",
             "stateMutability": "payable",
             "superFunction": null,
             "visibility": "public"
@@ -208,7 +208,7 @@
                   "name": "_from",
                   "nodeType": "VariableDeclaration",
                   "scope": 3343,
-                  "src": "750:13:8",
+                  "src": "749:13:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -219,7 +219,7 @@
                     "id": 3333,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "750:7:8",
+                    "src": "749:7:8",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -235,7 +235,7 @@
                   "name": "_to",
                   "nodeType": "VariableDeclaration",
                   "scope": 3343,
-                  "src": "765:11:8",
+                  "src": "764:11:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -246,7 +246,7 @@
                     "id": 3335,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "765:7:8",
+                    "src": "764:7:8",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -262,7 +262,7 @@
                   "name": "_amount",
                   "nodeType": "VariableDeclaration",
                   "scope": 3343,
-                  "src": "778:12:8",
+                  "src": "777:12:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -273,7 +273,7 @@
                     "id": 3337,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "778:4:8",
+                    "src": "777:4:8",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -283,7 +283,7 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "749:42:8"
+              "src": "748:42:8"
             },
             "returnParameters": {
               "id": 3342,
@@ -295,7 +295,7 @@
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "scope": 3343,
-                  "src": "807:4:8",
+                  "src": "806:4:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -306,7 +306,7 @@
                     "id": 3340,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "807:4:8",
+                    "src": "806:4:8",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -316,10 +316,10 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "806:6:8"
+              "src": "805:6:8"
             },
             "scope": 3355,
-            "src": "730:83:8",
+            "src": "729:83:8",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
@@ -343,7 +343,7 @@
                   "name": "_owner",
                   "nodeType": "VariableDeclaration",
                   "scope": 3354,
-                  "src": "1182:14:8",
+                  "src": "1181:14:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -354,7 +354,7 @@
                     "id": 3344,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1182:7:8",
+                    "src": "1181:7:8",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -370,7 +370,7 @@
                   "name": "_spender",
                   "nodeType": "VariableDeclaration",
                   "scope": 3354,
-                  "src": "1198:16:8",
+                  "src": "1197:16:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -381,7 +381,7 @@
                     "id": 3346,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1198:7:8",
+                    "src": "1197:7:8",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -397,7 +397,7 @@
                   "name": "_amount",
                   "nodeType": "VariableDeclaration",
                   "scope": 3354,
-                  "src": "1216:12:8",
+                  "src": "1215:12:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -408,7 +408,7 @@
                     "id": 3348,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1216:4:8",
+                    "src": "1215:4:8",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -418,7 +418,7 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1181:48:8"
+              "src": "1180:48:8"
             },
             "returnParameters": {
               "id": 3353,
@@ -430,7 +430,7 @@
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "scope": 3354,
-                  "src": "1251:4:8",
+                  "src": "1250:4:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -441,7 +441,7 @@
                     "id": 3351,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1251:4:8",
+                    "src": "1250:4:8",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -451,20 +451,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1250:6:8"
+              "src": "1249:6:8"
             },
             "scope": 3355,
-            "src": "1163:94:8",
+            "src": "1162:94:8",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           }
         ],
         "scope": 3356,
-        "src": "96:1163:8"
+        "src": "95:1163:8"
       }
     ],
-    "src": "0:1260:8"
+    "src": "0:1259:8"
   },
   "legacyAST": {
     "absolutePath": "/Users/roderik/Development/databrokerdao-dxc/contracts/contracts/external/TokenController.sol",
@@ -476,9 +476,9 @@
     "nodes": [
       {
         "id": 3325,
-        "literals": ["solidity", "^", "0.5", ".10"],
+        "literals": ["solidity", "^", "0.5", ".0"],
         "nodeType": "PragmaDirective",
-        "src": "0:24:8"
+        "src": "0:23:8"
       },
       {
         "baseContracts": [],
@@ -510,7 +510,7 @@
                   "name": "_owner",
                   "nodeType": "VariableDeclaration",
                   "scope": 3332,
-                  "src": "356:14:8",
+                  "src": "355:14:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -521,7 +521,7 @@
                     "id": 3326,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "356:7:8",
+                    "src": "355:7:8",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -532,7 +532,7 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "355:16:8"
+              "src": "354:16:8"
             },
             "returnParameters": {
               "id": 3331,
@@ -544,7 +544,7 @@
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "scope": 3332,
-                  "src": "395:4:8",
+                  "src": "394:4:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -555,7 +555,7 @@
                     "id": 3329,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "395:4:8",
+                    "src": "394:4:8",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -565,10 +565,10 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "394:6:8"
+              "src": "393:6:8"
             },
             "scope": 3355,
-            "src": "334:67:8",
+            "src": "333:67:8",
             "stateMutability": "payable",
             "superFunction": null,
             "visibility": "public"
@@ -592,7 +592,7 @@
                   "name": "_from",
                   "nodeType": "VariableDeclaration",
                   "scope": 3343,
-                  "src": "750:13:8",
+                  "src": "749:13:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -603,7 +603,7 @@
                     "id": 3333,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "750:7:8",
+                    "src": "749:7:8",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -619,7 +619,7 @@
                   "name": "_to",
                   "nodeType": "VariableDeclaration",
                   "scope": 3343,
-                  "src": "765:11:8",
+                  "src": "764:11:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -630,7 +630,7 @@
                     "id": 3335,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "765:7:8",
+                    "src": "764:7:8",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -646,7 +646,7 @@
                   "name": "_amount",
                   "nodeType": "VariableDeclaration",
                   "scope": 3343,
-                  "src": "778:12:8",
+                  "src": "777:12:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -657,7 +657,7 @@
                     "id": 3337,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "778:4:8",
+                    "src": "777:4:8",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -667,7 +667,7 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "749:42:8"
+              "src": "748:42:8"
             },
             "returnParameters": {
               "id": 3342,
@@ -679,7 +679,7 @@
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "scope": 3343,
-                  "src": "807:4:8",
+                  "src": "806:4:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -690,7 +690,7 @@
                     "id": 3340,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "807:4:8",
+                    "src": "806:4:8",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -700,10 +700,10 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "806:6:8"
+              "src": "805:6:8"
             },
             "scope": 3355,
-            "src": "730:83:8",
+            "src": "729:83:8",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
@@ -727,7 +727,7 @@
                   "name": "_owner",
                   "nodeType": "VariableDeclaration",
                   "scope": 3354,
-                  "src": "1182:14:8",
+                  "src": "1181:14:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -738,7 +738,7 @@
                     "id": 3344,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1182:7:8",
+                    "src": "1181:7:8",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -754,7 +754,7 @@
                   "name": "_spender",
                   "nodeType": "VariableDeclaration",
                   "scope": 3354,
-                  "src": "1198:16:8",
+                  "src": "1197:16:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -765,7 +765,7 @@
                     "id": 3346,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1198:7:8",
+                    "src": "1197:7:8",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -781,7 +781,7 @@
                   "name": "_amount",
                   "nodeType": "VariableDeclaration",
                   "scope": 3354,
-                  "src": "1216:12:8",
+                  "src": "1215:12:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -792,7 +792,7 @@
                     "id": 3348,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1216:4:8",
+                    "src": "1215:4:8",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -802,7 +802,7 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1181:48:8"
+              "src": "1180:48:8"
             },
             "returnParameters": {
               "id": 3353,
@@ -814,7 +814,7 @@
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "scope": 3354,
-                  "src": "1251:4:8",
+                  "src": "1250:4:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -825,7 +825,7 @@
                     "id": 3351,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1251:4:8",
+                    "src": "1250:4:8",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -835,20 +835,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1250:6:8"
+              "src": "1249:6:8"
             },
             "scope": 3355,
-            "src": "1163:94:8",
+            "src": "1162:94:8",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           }
         ],
         "scope": 3356,
-        "src": "96:1163:8"
+        "src": "95:1163:8"
       }
     ],
-    "src": "0:1260:8"
+    "src": "0:1259:8"
   },
   "compiler": {
     "name": "solc",
@@ -856,7 +856,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-07-25T12:46:56.583Z",
+  "updatedAt": "2019-07-25T20:45:22.220Z",
   "devdoc": {
     "details": "The token controller contract must implement these functions",
     "methods": {
