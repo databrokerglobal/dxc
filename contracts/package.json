@@ -94,7 +94,6 @@
     ]
   },
   "dependencies": {
-    "@settlemint/mint-solidity": "^1.23.3",
     "@types/web3": "^1.0.19",
     "axios": "^0.19.0",
     "bn.js": "^5.0.0",
