@@ -30,12 +30,13 @@ jobs:
         - npm ci
         - npm run setup
         - npm run install
+        - npm run installall
       script:
-        - run-p -l build
+        - run-s -l build
         - npm run assemble
         - yes Y | docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
         - docker build --build-arg NPM_TOKEN=${NPM_TOKEN} --build-arg TESTING=true -t databrokerdao/dxc:${TRAVIS_BRANCH//[^a-zA-Z0-9]/} --cache-from databrokerdao/dxc:latest ./dapi
-        - docker push settlemint/mint:${TRAVIS_BRANCH//[^a-zA-Z0-9]/}
+        - docker push databrokerdao/dxc:${TRAVIS_BRANCH//[^a-zA-Z0-9]/}
     # Then run all the tests
     - stage: Testing
       name: Testing dapi

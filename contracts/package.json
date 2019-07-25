@@ -19,7 +19,6 @@
     "pretest": "npm run lint && npm run build",
     "watch": "nodemon --watch . --exec npm run test",
     "truffle": "truffle",
-    "prepublishOnly": "docker build --build-arg NPM_TOKEN=${NPM_TOKEN} -t settlemint/mint-boilerplate .",
     "solium": "solium",
     "preinstall": "find ./node_modules -type d -name '.git' | xargs rm -rf"
   },
