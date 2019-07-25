@@ -6,12 +6,12 @@ services:
 language: node_js
 
 node_js:
-   - '11'
+  - '11'
 
 before_install:
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > ~/.npmrc
-  - npm i -g truffle ganache-cli
-  - ganache-cli -l 0xfffffffffff -i 1337 -m "robot robot robot robot robot robot robot robot robot robot robot robot" > /dev/null &
+  - docker pull trufflesuite/ganache-cli:v6.4.3
+  - docker run -d -p 8545:8545 -p 7545:8545 --net host trufflesuite/ganache-cli:v6.4.3 -d --mnemonic 'robot robot robot robot robot robot robot robot robot robot robot robot' --defaultBalanceEther '500000000000000'
 
 deploy:
   - provider: script
@@ -20,7 +20,7 @@ deploy:
       - npx semantic-release
     on:
       all_branches: true
-      repo: settlemint/mint-boilerplate
+      repo: DataBrokerDAO/dxc
 
 branches:
   except:
