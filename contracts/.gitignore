@@ -6,3 +6,4 @@ coverage.json
 .DS_Store
 /types
 /dist
+/docs

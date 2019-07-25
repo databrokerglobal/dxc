@@ -13,7 +13,15 @@ require('ts-node/register');
 const HDWalletProvider = require('truffle-hdwallet-provider'); // eslint-disable-line
 
 module.exports = {
-  plugins: ['truffle-security'],
+  plugins: [
+    'truffle-security',
+    '@neos1/truffle-plugin-docs',
+    'truffle-plugin-verify',
+  ],
+
+  api_keys: {
+    etherscan: 'MY_API_KEY',
+  },
 
   test_file_extension_regexp: /.*\.ts$/,
   migrations_directory: './dist/migrations',
@@ -37,7 +45,7 @@ module.exports = {
 
     development: {
       host: '127.0.0.1', // Localhost (default: none)
-      port: 8545, // Standard Ethereum port (default: none)
+      port: 7545, // Standard Ethereum port (default: none)
       network_id: '*', // Any network (default: none)
       websockets: true, // Enable EventEmitter interface for web3 (default: false)
       // gas: 8500000,           // Gas sent with each transaction (default: ~6700000)
@@ -142,7 +150,7 @@ module.exports = {
   // Configure your compilers
   compilers: {
     solc: {
-      version: '0.5.8', // Fetch exact version from solc-bin (default: truffle's version)
+      version: '0.5.10', // Fetch exact version from solc-bin (default: truffle's version)
       // docker: true, // Use "0.5.4" you've installed locally with docker (default: false)
       settings: {
         // See the solidity docs for advice about optimization and evmVersion

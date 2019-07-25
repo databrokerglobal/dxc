@@ -9,6 +9,8 @@
     "function-max-lines": false,
     "space-after-comma": false,
     "no-empty-blocks": false,
-    "max-line-length": false
+    "max-line-length": false,
+    "mark-callable-contracts": false,
+    "not-rely-on-time": false
   }
 }

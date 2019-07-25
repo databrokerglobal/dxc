@@ -1,4 +1,4 @@
-pragma solidity ^0.5.7;
+pragma solidity ^0.5.10;
 pragma experimental ABIEncoderV2;
 
 import "../node_modules/openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -9,17 +9,26 @@ import "../node_modules/openzeppelin-solidity/contracts/token/ERC20/SafeERC20.so
 contract DXC is Ownable {
 
   using SafeMath for uint256;
+  using SafeMath for uint8;
   using SafeERC20 for ERC20;
 
-  address DTX;
-  uint8 protocolPercentage = 5;
+  ERC20 public dtxToken;
+  uint8 public protocolPercentage = 5;
 
-  constructor(address DTXToken) public {
-    DTX = DTXToken;
+  constructor(address token) public {
+    dtxToken = ERC20(token);
   }
+
+  ///////////////////////////////////////////////////////////////////////////////////////
+  //// Mofifiers for default settings                                                ////
+  ///////////////////////////////////////////////////////////////////////////////////////
 
   function changeProtocolPercentage(uint8 _protocolPercentage) public onlyOwner {
     protocolPercentage = _protocolPercentage;
+  }
+
+  function changeDTXToken(address token) public onlyOwner {
+    dtxToken = ERC20(token);
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////
@@ -48,7 +57,7 @@ contract DXC is Ownable {
   event TransferDTX(address indexed from, address indexed to, uint256 value);
 
   function platformBalance() public view returns (uint256) {
-    return ERC20(DTX).balanceOf(address(this));
+    return dtxToken.balanceOf(address(this));
   }
 
   function balanceOf(address owner) public view returns (uint256 balance, uint256 escrowOutgoing, uint256 escrowIncoming, uint256 available) {
@@ -65,7 +74,7 @@ contract DXC is Ownable {
   }
 
   function deposit(uint256 amount) public {
-    require(ERC20(DTX).transferFrom(msg.sender, address(this), amount), "Not enough DTX tokens have been allowed");
+    require(dtxToken.transferFrom(msg.sender, address(this), amount), "Not enough DTX tokens have been allowed");
     balances[msg.sender].balance = balances[msg.sender].balance.add(amount);
     totalBalance = totalBalance.add(amount);
     emit DepositDTX(msg.sender, amount);
@@ -73,7 +82,7 @@ contract DXC is Ownable {
 
   function withdraw() public {
     (,,, uint256 available) = balanceOf(msg.sender);
-    require(ERC20(DTX).transferFrom(address(this), msg.sender, available), "Not enough DTX tokens available to withdraw, contact DataBrokerDAO!");
+    require(dtxToken.transferFrom(address(this), msg.sender, available), "Not enough DTX tokens available to withdraw, contact DataBrokerDAO!");
     balances[msg.sender].balance = balances[msg.sender].balance.sub(available);
     totalBalance = totalBalance.sub(available);
     emit WithdrawDTX(msg.sender, available);
@@ -103,10 +112,11 @@ contract DXC is Ownable {
     require(ownerPercentage+publisherPercentage+marketplacePercentage+protocolPercentage == 100, "All percentages need to add up to exactly 100");
     balances[user].escrowOutgoing = balances[user].escrowOutgoing.add(amount);
     totalEscrowed = totalEscrowed.add(amount);
-    balances[owner].escrowIncoming = balances[owner].escrowIncoming.add(amount.mul(ownerPercentage).div(100));
-    balances[publisher].escrowIncoming = balances[publisher].escrowIncoming.add(amount.mul(publisherPercentage).div(100));
-    balances[marketplace].escrowIncoming = balances[marketplace].escrowIncoming.add(amount.mul(marketplacePercentage).div(100));
-    uint256 protocolAmount = amount.sub((amount.mul(ownerPercentage).div(100)).add(amount.mul(publisherPercentage).div(100)).add(amount.mul(marketplacePercentage).div(100)));
+    uint256 basePoint = amount.div(100);
+    balances[owner].escrowIncoming = balances[owner].escrowIncoming.add(basePoint.mul(ownerPercentage));
+    balances[publisher].escrowIncoming = balances[publisher].escrowIncoming.add(basePoint.mul(publisherPercentage));
+    balances[marketplace].escrowIncoming = balances[marketplace].escrowIncoming.add(basePoint.mul(marketplacePercentage));
+    uint256 protocolAmount = amount.sub((basePoint.mul(ownerPercentage)).add(basePoint.mul(publisherPercentage)).add(basePoint.mul(marketplacePercentage)));
     balances[address(this)].escrowIncoming = balances[address(this)].escrowIncoming.add(protocolAmount);
   }
 

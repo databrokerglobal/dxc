@@ -8,9 +8,10 @@
   },
   "scripts": {
     "build:truffle": "truffle compile",
-    "build:contracts": "typechain --target truffle './build/contracts/*.json'",
+    "build:contracts": "typechain --target truffle './build/contracts/*.json' && sed -i old -e 's/BigNumber/BN/g' -e '/bignumber\\.js/d' types/truffle-contracts/index.d.ts",
+    "build:docs": "truffle run docs",
     "build:ts": "tsc --declaration",
-    "build": "npm run build:truffle && npm run build:contracts && npm run build:ts",
+    "build": "npm run build:truffle && npm run build:contracts && npm run build:ts && npm run build:docs",
     "test": "truffle test",
     "lint:contracts": "solhint -f table \"contracts/**/*.sol\"",
     "lint:ts": "tslint -c tslint.json -p tsconfig.json",
@@ -33,6 +34,7 @@
   },
   "homepage": "https://settlemint.com",
   "devDependencies": {
+    "@neos1/truffle-plugin-docs": "^1.2.3",
     "@semantic-release/changelog": "^3.0.4",
     "@semantic-release/github": "^5.4.2",
     "@semantic-release/npm": "^5.1.13",
@@ -47,6 +49,7 @@
     "solhint": "^2.1.2",
     "truffle": "^5.0.28",
     "truffle-hdwallet-provider": "^1.0.14",
+    "truffle-plugin-verify": "^0.3.2",
     "truffle-typings": "^1.0.8",
     "ts-node": "^8.3.0",
     "tslint": "^5.18.0",
@@ -91,6 +94,12 @@
     ]
   },
   "dependencies": {
-    "@settlemint/mint-solidity": "^1.23.3"
+    "@settlemint/mint-solidity": "^1.23.3",
+    "@types/web3": "^1.0.19",
+    "axios": "^0.19.0",
+    "bn.js": "^5.0.0",
+    "chai": "^4.2.0",
+    "openzeppelin-test-helpers": "^0.4.0",
+    "web3": "^1.2.0"
   }
 }
