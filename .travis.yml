@@ -29,7 +29,6 @@ jobs:
       install:
         - npm ci
         - npm run setup
-        - npm run install
         - npm run installall
       script:
         - run-s -l build
