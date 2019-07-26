@@ -4,6 +4,6 @@
 /coverage
 coverage.json
 .DS_Store
-/types
+/types/truffle-contracts
 /dist
 /docs
