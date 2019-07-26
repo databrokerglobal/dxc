@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build:truffle": "truffle compile",
-    "build:contracts": "typechain --target truffle './build/contracts/*.json' && sed -i old -e 's/BigNumber/BN/g' -e '/bignumber\\.js/d' types/truffle-contracts/index.d.ts",
+    "build:contracts": "typechain --target truffle './build/contracts/*.json' && (sed -i old -e 's/BigNumber/BN/g' -e '/bignumber\\.js/d' types/truffle-contracts/index.d.ts || sed -i -e 's/BigNumber/BN/g' -e '/bignumber\\.js/d' types/truffle-contracts/index.d.ts)",
     "build:docs": "truffle run docs",
     "build:ts": "tsc --declaration",
     "build": "npm run build:truffle && npm run build:contracts && npm run build:ts && npm run build:docs",
