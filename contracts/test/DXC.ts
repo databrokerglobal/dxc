@@ -10,18 +10,22 @@ import {
   DTXTokenInstance,
   DXCContract,
   DXCInstance,
+  MiniMeTokenFactoryContract,
 } from '../types/truffle-contracts/index';
 import { getLatestQuote } from './helpers/getLatestQuote';
 
 const DXC: DXCContract = artifacts.require('DXC');
 const DTXToken: DTXTokenContract = artifacts.require('DTXToken');
+const MiniMeTokenFactory: MiniMeTokenFactoryContract = artifacts.require(
+  'MiniMeTokenFactory'
+);
 
 contract('DXC', (accounts: string[]) => {
   let amountOfDTXFor100USD: BN;
 
   before(async () => {
     const latestQuote: number = await getLatestQuote();
-    amountOfDTXFor100USD = new BN(100).div(new BN(latestQuote.toString()));
+    amountOfDTXFor100USD = new BN(100 / latestQuote);
   });
 
   beforeEach(async () => {
@@ -33,8 +37,12 @@ contract('DXC', (accounts: string[]) => {
     let dDXC: DXCInstance;
 
     beforeEach(async () => {
-      dDTXToken = await DTXToken.deployed();
+      const dMiniMeTokenFactory = await MiniMeTokenFactory.deployed();
+      dDTXToken = await DTXToken.new(dMiniMeTokenFactory.address);
       dDXC = await DXC.new(dDTXToken.address);
+      for (const address of accounts) {
+        await dDTXToken.generateTokens(address, web3.utils.toWei('1000000'));
+      }
     });
 
     it('create a new DXC', async () => {
@@ -61,17 +69,18 @@ contract('DXC', (accounts: string[]) => {
     let dDXC: DXCInstance;
 
     beforeEach(async () => {
-      dDTXToken = await DTXToken.deployed();
+      const dMiniMeTokenFactory = await MiniMeTokenFactory.deployed();
+      dDTXToken = await DTXToken.new(dMiniMeTokenFactory.address);
       dDXC = await DXC.new(dDTXToken.address);
-      dDTXToken.generateTokens(
-        dDXC.address,
-        web3.utils.toWei('100000', 'ether')
-      );
+      await dDTXToken.generateTokens(dDXC.address, web3.utils.toWei('1000000'));
+      for (const address of accounts) {
+        await dDTXToken.generateTokens(address, web3.utils.toWei('1000000'));
+      }
     });
 
     it('can have and read the platform balance', async () => {
       expect(await dDXC.platformBalance()).to.be.bignumber.equal(
-        web3.utils.toWei('100000', 'ether')
+        web3.utils.toWei('1000000')
       );
     });
 
@@ -83,9 +92,69 @@ contract('DXC', (accounts: string[]) => {
     it('can convert from fiat money', async () => {
       let balanceResult = await dDXC.balanceOf(accounts[1]);
       expect(balanceResult[0]).to.be.bignumber.equal(new BN(0));
-      await dDXC.convertFiatToToken(accounts[1], amountOfDTXFor100USD);
+      await dDXC.convertFiatToToken(
+        accounts[1],
+        web3.utils.toWei(amountOfDTXFor100USD)
+      );
       balanceResult = await dDXC.balanceOf(accounts[1]);
-      expect(balanceResult[0]).to.be.bignumber.equal(amountOfDTXFor100USD);
+      expect(balanceResult[0]).to.be.bignumber.equal(
+        web3.utils.toWei(amountOfDTXFor100USD)
+      );
+    });
+
+    it('can deposit DTX tokens', async () => {
+      let balanceResult = await dDXC.balanceOf(accounts[1]);
+      expect(balanceResult[0]).to.be.bignumber.equal(new BN(0));
+      await dDTXToken.approve(
+        dDXC.address,
+        web3.utils.toWei(amountOfDTXFor100USD),
+        { from: accounts[1] }
+      );
+      const allowanceResult = await dDTXToken.allowance(
+        accounts[1],
+        dDXC.address
+      );
+      expect(allowanceResult).to.be.bignumber.equal(
+        web3.utils.toWei(amountOfDTXFor100USD)
+      );
+      await dDXC.deposit(web3.utils.toWei(amountOfDTXFor100USD), {
+        from: accounts[1],
+      });
+      balanceResult = await dDXC.balanceOf(accounts[1]);
+      expect(balanceResult[0]).to.be.bignumber.equal(
+        web3.utils.toWei(amountOfDTXFor100USD)
+      );
+    });
+
+    it('can withdraw DTX tokens', async () => {
+      // deposit first, equal to the test above
+      let balanceResult = await dDXC.balanceOf(accounts[1]);
+      expect(balanceResult[0]).to.be.bignumber.equal(new BN(0));
+      await dDTXToken.approve(
+        dDXC.address,
+        web3.utils.toWei(amountOfDTXFor100USD),
+        { from: accounts[1] }
+      );
+      const allowanceResult = await dDTXToken.allowance(
+        accounts[1],
+        dDXC.address
+      );
+      expect(allowanceResult).to.be.bignumber.equal(
+        web3.utils.toWei(amountOfDTXFor100USD)
+      );
+      await dDXC.deposit(web3.utils.toWei(amountOfDTXFor100USD), {
+        from: accounts[1],
+      });
+      balanceResult = await dDXC.balanceOf(accounts[1]);
+      expect(balanceResult[0]).to.be.bignumber.equal(
+        web3.utils.toWei(amountOfDTXFor100USD)
+      );
+      // now withdraw
+      await dDXC.withdraw({
+        from: accounts[1],
+      });
+      balanceResult = await dDXC.balanceOf(accounts[1]);
+      expect(balanceResult[0]).to.be.bignumber.equal(new BN(0));
     });
   });
 

@@ -36,15 +36,15 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.10+commit.5a6ea5b1\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":false,\"inputs\":[{\"name\":\"_newController\",\"type\":\"address\"}],\"name\":\"changeController\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"controller\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"}],\"devdoc\":{\"methods\":{\"changeController(address)\":{\"params\":{\"_newController\":\"The new controller of the contract\"}}}},\"userdoc\":{\"methods\":{\"changeController(address)\":{\"notice\":\"Changes the controller of the contract\"}}}},\"settings\":{\"compilationTarget\":{\"/Users/roderik/Development/databrokerdao-dxc/contracts/contracts/external/Controlled.sol\":\"Controlled\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/roderik/Development/databrokerdao-dxc/contracts/contracts/external/Controlled.sol\":{\"keccak256\":\"0x1a9a754c4dfdf2f18efc3113675b6fe400a5e0b5be406a2bcf31771e014dbdbb\",\"urls\":[\"bzzr://bcb87ec8597b68db96911e71d2415152b84bcad7bc0eeb440d0f7f5957f103c7\",\"dweb:/ipfs/QmTM8wuuzARFev46eyMNg716hNrLCGPSmZySnpMDQN6re4\"]}},\"version\":1}",
-  "bytecode": "0x608060405234801561001057600080fd5b50600080546001600160a01b0319163317905560fa806100316000396000f3fe6080604052348015600f57600080fd5b506004361060325760003560e01c80633cebb823146037578063f77c479114605c575b600080fd5b605a60048036036020811015604b57600080fd5b50356001600160a01b0316607e565b005b606260b6565b604080516001600160a01b039092168252519081900360200190f35b6000546001600160a01b03163314609457600080fd5b600080546001600160a01b0319166001600160a01b0392909216919091179055565b6000546001600160a01b03168156fea265627a7a723058202021aa2284a1a010914a6917b1d0988d0dcc3c978d10d4aaaff645315200378564736f6c634300050a0032",
-  "deployedBytecode": "0x6080604052348015600f57600080fd5b506004361060325760003560e01c80633cebb823146037578063f77c479114605c575b600080fd5b605a60048036036020811015604b57600080fd5b50356001600160a01b0316607e565b005b606260b6565b604080516001600160a01b039092168252519081900360200190f35b6000546001600160a01b03163314609457600080fd5b600080546001600160a01b0319166001600160a01b0392909216919091179055565b6000546001600160a01b03168156fea265627a7a723058202021aa2284a1a010914a6917b1d0988d0dcc3c978d10d4aaaff645315200378564736f6c634300050a0032",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.10+commit.5a6ea5b1\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":false,\"inputs\":[{\"name\":\"_newController\",\"type\":\"address\"}],\"name\":\"changeController\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"controller\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"}],\"devdoc\":{\"methods\":{\"changeController(address)\":{\"params\":{\"_newController\":\"The new controller of the contract\"}}}},\"userdoc\":{\"methods\":{\"changeController(address)\":{\"notice\":\"Changes the controller of the contract\"}}}},\"settings\":{\"compilationTarget\":{\"/Users/roderik/Development/dxc/contracts/contracts/external/Controlled.sol\":\"Controlled\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/roderik/Development/dxc/contracts/contracts/external/Controlled.sol\":{\"keccak256\":\"0x1a9a754c4dfdf2f18efc3113675b6fe400a5e0b5be406a2bcf31771e014dbdbb\",\"urls\":[\"bzzr://bcb87ec8597b68db96911e71d2415152b84bcad7bc0eeb440d0f7f5957f103c7\",\"dweb:/ipfs/QmTM8wuuzARFev46eyMNg716hNrLCGPSmZySnpMDQN6re4\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b50600080546001600160a01b0319163317905560fa806100316000396000f3fe6080604052348015600f57600080fd5b506004361060325760003560e01c80633cebb823146037578063f77c479114605c575b600080fd5b605a60048036036020811015604b57600080fd5b50356001600160a01b0316607e565b005b606260b6565b604080516001600160a01b039092168252519081900360200190f35b6000546001600160a01b03163314609457600080fd5b600080546001600160a01b0319166001600160a01b0392909216919091179055565b6000546001600160a01b03168156fea265627a7a72305820ff393b13a1d61839ea56b1396d697077bdba9a84be65c11e3c297d18aff3e69f64736f6c634300050a0032",
+  "deployedBytecode": "0x6080604052348015600f57600080fd5b506004361060325760003560e01c80633cebb823146037578063f77c479114605c575b600080fd5b605a60048036036020811015604b57600080fd5b50356001600160a01b0316607e565b005b606260b6565b604080516001600160a01b039092168252519081900360200190f35b6000546001600160a01b03163314609457600080fd5b600080546001600160a01b0319166001600160a01b0392909216919091179055565b6000546001600160a01b03168156fea265627a7a72305820ff393b13a1d61839ea56b1396d697077bdba9a84be65c11e3c297d18aff3e69f64736f6c634300050a0032",
   "sourceMap": "25:534:3:-;;;271:48;8:9:-1;5:2;;;30:1;27;20:12;5:2;-1:-1;294:10:3;:23;;-1:-1:-1;;;;;;294:23:3;307:10;294:23;;;25:534;;;;;;",
   "deployedSourceMap": "25:534:3:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;25:534:3;;;;;;;;;;;;;;;;;;;;;;;;439:118;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;-1:-1;439:118:3;-1:-1:-1;;;;;439:118:3;;:::i;:::-;;233:33;;;:::i;:::-;;;;-1:-1:-1;;;;;233:33:3;;;;;;;;;;;;;;439:118;212:10;;-1:-1:-1;;;;;212:10:3;198;:24;190:33;;;;;;525:10;:27;;-1:-1:-1;;;;;;525:27:3;-1:-1:-1;;;;;525:27:3;;;;;;;;;;439:118::o;233:33::-;;;-1:-1:-1;;;;;233:33:3;;:::o",
   "source": "pragma solidity ^0.5.0;\n\ncontract Controlled {\n  /// @notice The address of the controller is the only address that can call\n  ///  a function with this modifier\n  modifier onlyController { require(msg.sender == controller); _; }\n\n  address payable public controller;\n\n  constructor() public { controller = msg.sender;}\n\n  /// @notice Changes the controller of the contract\n  /// @param _newController The new controller of the contract\n  function changeController(address payable _newController) public onlyController {\n    controller = _newController;\n  }\n}\n",
-  "sourcePath": "/Users/roderik/Development/databrokerdao-dxc/contracts/contracts/external/Controlled.sol",
+  "sourcePath": "/Users/roderik/Development/dxc/contracts/contracts/external/Controlled.sol",
   "ast": {
-    "absolutePath": "/Users/roderik/Development/databrokerdao-dxc/contracts/contracts/external/Controlled.sol",
+    "absolutePath": "/Users/roderik/Development/dxc/contracts/contracts/external/Controlled.sol",
     "exportedSymbols": {
       "Controlled": [953]
     },
@@ -453,7 +453,7 @@
     "src": "0:560:3"
   },
   "legacyAST": {
-    "absolutePath": "/Users/roderik/Development/databrokerdao-dxc/contracts/contracts/external/Controlled.sol",
+    "absolutePath": "/Users/roderik/Development/dxc/contracts/contracts/external/Controlled.sol",
     "exportedSymbols": {
       "Controlled": [953]
     },
@@ -867,7 +867,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-07-25T20:45:22.157Z",
+  "updatedAt": "2019-07-27T19:53:16.470Z",
   "devdoc": {
     "methods": {
       "changeController(address)": {

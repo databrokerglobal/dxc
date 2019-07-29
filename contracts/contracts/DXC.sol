@@ -74,7 +74,8 @@ contract DXC is Ownable {
   }
 
   function deposit(uint256 amount) public {
-    require(dtxToken.transferFrom(msg.sender, address(this), amount), "Not enough DTX tokens have been allowed");
+    require(dtxToken.balanceOf(msg.sender) >= amount, "Sender has too little DTX to make this transaction work");
+    require(dtxToken.transferFrom(msg.sender, address(this), amount), "DTX transfer failed, probably too little allowance");
     balances[msg.sender].balance = balances[msg.sender].balance.add(amount);
     totalBalance = totalBalance.add(amount);
     emit DepositDTX(msg.sender, amount);
@@ -82,7 +83,7 @@ contract DXC is Ownable {
 
   function withdraw() public {
     (,,, uint256 available) = balanceOf(msg.sender);
-    require(dtxToken.transferFrom(address(this), msg.sender, available), "Not enough DTX tokens available to withdraw, contact DataBrokerDAO!");
+    require(dtxToken.transfer(msg.sender, available), "Not enough DTX tokens available to withdraw, contact DataBrokerDAO!");
     balances[msg.sender].balance = balances[msg.sender].balance.sub(available);
     totalBalance = totalBalance.sub(available);
     emit WithdrawDTX(msg.sender, available);
