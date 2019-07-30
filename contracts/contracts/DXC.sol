@@ -141,7 +141,7 @@ contract DXC is Ownable {
 
   Deal[] public dealsList;
 
-  mapping(string => Deal[]) didToDeals;
+  mapping(string => Deal[]) public didToDeals;
 
   event NewDeal(
     uint256 dealIndex,
