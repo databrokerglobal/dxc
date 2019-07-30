@@ -139,9 +139,9 @@ contract DXC is Ownable {
     uint256 validUntil; // 0 means forever, all others are a timestamp
   }
 
-  Deal[] public deals;
+  Deal[] public dealsList;
 
-  mapping(string => uint256) didToIndex;
+  mapping(string => Deal[]) didToDeals;
 
   event NewDeal(
     uint256 dealIndex,
@@ -156,11 +156,15 @@ contract DXC is Ownable {
   );
 
   function allDeals() public view returns (Deal[] memory) {
-    return deals;
+    return dealsList;
   }
 
-  function deal(string memory did) public view returns (Deal memory){
-    return deals[didToIndex[did]];
+  function deal(uint256 index) public view returns (Deal memory){
+    return dealsList[index];
+  }
+
+  function deals(string memory did) public view returns (Deal[] memory){
+    return didToDeals[did];
   }
 
   function createDeal(
@@ -186,7 +190,7 @@ contract DXC is Ownable {
       marketplacePercentage,
       amount
     );
-    uint256 dealIndex = deals.push(Deal(
+    Deal memory newDeal = Deal(
       did,
       owner,
       ownerPercentage,
@@ -198,8 +202,9 @@ contract DXC is Ownable {
       amount,
       validFrom,
       validUntil
-    )) - 1;
-    didToIndex[did] = dealIndex;
+    );
+    uint256 dealIndex = dealsList.push(newDeal) - 1;
+    didToDeals[did].push(newDeal);
     emit NewDeal(
       dealIndex,
       did,
@@ -214,7 +219,7 @@ contract DXC is Ownable {
   }
 
   function payout(uint256 dealIndex) public {
-    Deal memory _deal = deals[dealIndex];
+    Deal memory _deal = dealsList[dealIndex];
     require(now >= _deal.validFrom + 14 days, "Payouts can only happen 14 days after the start of the deal (validFrom)");
     // release escrow
     balances[_deal.user].escrowOutgoing = balances[_deal.user].escrowOutgoing.sub(_deal.amount);
