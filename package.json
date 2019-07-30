@@ -22,7 +22,7 @@
     "test": "run-p --print-label test:*",
     "test:contracts": "cd contracts && npm run test && cd ..",
     "test:dapi": "cd dapi && npm run test && cd ..",
-    "assemble": "rm -Rf dapi/contracts; mkdir -p dapi/contracts; mv contracts/build dapi/contracts/artifacts; mv contracts/types/* dapi/src/types/",
+    "assemble": "rm -Rf dapi/contracts; mkdir -p dapi/contracts; cp -R contracts/build/contracts dapi/contracts/artifacts; cp -r contracts/types/* dapi/src/types/",
     "semantic-release": "semantic-release",
     "prepublishOnly": "VERSION=`cat package.json | jq \".version\"`; cd dapi; cat package.json | jq \".version = ${VERSION}\" > package-new.json && mv package-new.json package.json && cd .. && docker build --build-arg NPM_TOKEN=${NPM_TOKEN} --cache-from databrokerdao/dxc:latest -t databroker/dxc ./dapi"
   },

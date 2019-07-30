@@ -6,8 +6,7 @@ import fs from 'fs';
 import Path from 'path';
 import { DataSet } from '../../entity/DataSet';
 import { getDb } from '../../lib/db';
-
-const chroot = '/var/dxc/datasets';
+import { chroot } from '../../lib/variables';
 
 export const route: ServerRoute = {
   method: 'POST',
@@ -23,7 +22,7 @@ export const route: ServerRoute = {
           .example('did:dxc:localhost:12345'),
         path: Joi.string()
           .required()
-          .example('sponsorlogo_vlaio.zip')
+          .example('aantal_ton_vervoerd_op_de_waterwegen_in_vlaanderen.xml')
           .description(
             `This should point to a dataset on the local datasetsystem in ${chroot}, mounted as a volume to the Docker container`
           ),
@@ -55,7 +54,9 @@ export const route: ServerRoute = {
   },
   async handler(request: Hapi.Request, h: Hapi.ResponseToolkit) {
     if (!fs.existsSync(Path.resolve(chroot))) {
-      fs.mkdirSync(Path.resolve(chroot));
+      fs.mkdirSync(Path.resolve(chroot), {
+        recursive: true,
+      });
     }
 
     const datasetRepository = getDb(request).getRepository(DataSet);

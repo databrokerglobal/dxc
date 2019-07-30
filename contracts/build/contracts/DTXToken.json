@@ -1269,12 +1269,12 @@
         }
       },
       "links": {},
-      "address": "0x926423c4F2Aa60f95Dd05668f4DAB404B9FC3144",
-      "transactionHash": "0xcd6c8aed1965d5e3903ecd69706ebf6e5444df3190b5ac4f599e817d1bf6e698"
+      "address": "0x49F26db582EFa5EeC275570d73b5258322fA5F28",
+      "transactionHash": "0x5c1e82d6d8f3e12be1883aafdfd9c71b2b1d365886faa9627db79a8b7c1d5064"
     }
   },
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-07-30T15:31:01.074Z",
+  "updatedAt": "2019-07-30T15:42:35.174Z",
   "devdoc": {
     "methods": {
       "allowance(address,address)": {

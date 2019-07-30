@@ -19,7 +19,7 @@ async function performMigration(
     await dDTXToken.approve(dDXC.address, web3.utils.toWei('500000'));
     await dDXC.deposit(web3.utils.toWei('500000'));
     await dDXC.createDeal(
-      'did:dxc:12345',
+      'did:dxc:localhost:12345',
       '0x31523eb4bca1ebac3054b12d0306ac8ce5ce3f94',
       70,
       '0xdaf6a9f21d464dcf24fa29c5230507085217cab4',
@@ -32,7 +32,7 @@ async function performMigration(
       Math.floor(Date.now() / 1000) + 3600 * 24 * 30
     );
     await dDXC.createDeal(
-      'did:dxc:12345',
+      'did:dxc:localhost:12345',
       '0x31523eb4bca1ebac3054b12d0306ac8ce5ce3f94',
       70,
       '0xdaf6a9f21d464dcf24fa29c5230507085217cab4',
@@ -45,7 +45,7 @@ async function performMigration(
       Math.floor(Date.now() / 1000) + 3600 * 24 * 30
     );
     await dDXC.createDeal(
-      'did:dxc:12346',
+      'did:dxc:localhost:12346',
       '0x31523eb4bca1ebac3054b12d0306ac8ce5ce3f94',
       70,
       '0xdaf6a9f21d464dcf24fa29c5230507085217cab4',

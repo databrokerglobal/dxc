@@ -5860,12 +5860,12 @@
     "8995": {
       "events": {},
       "links": {},
-      "address": "0xc4c3C810946FB09A3f69C67009323c48ce33926F",
-      "transactionHash": "0x299920abf3274447cb309a1e9e0c6defc36c81bb655eb0538674157f71d326ba"
+      "address": "0x161c3264Bab1eE3Ce06c60b73254BCF32710D8A4",
+      "transactionHash": "0xf93c3cab2b615c6aa2d3f39cf09effe84c7ac210cd47d777b5169cf07cd3050e"
     }
   },
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-07-30T15:18:55.925Z",
+  "updatedAt": "2019-07-30T15:41:46.027Z",
   "devdoc": {
     "author": "Stefan George - <stefan.george@consensys.net>",
     "methods": {

@@ -27738,12 +27738,12 @@
         }
       },
       "links": {},
-      "address": "0x8e828a0dE94b738eF83012D19EFEeD2FF41cEF25",
-      "transactionHash": "0x389ab55f7888eb367a52b552d85397b9a8dd56ee8e6b7865da116896936904f2"
+      "address": "0xD36A03082D4B9f6567D41208cDFf7F458015c233",
+      "transactionHash": "0xe861efe8130d65e61ca40cb177dc26fe770be0e74748533cad1488e06cbcb1ae"
     }
   },
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-07-30T15:31:01.084Z",
+  "updatedAt": "2019-07-30T15:42:35.183Z",
   "devdoc": {
     "methods": {
       "isOwner()": {

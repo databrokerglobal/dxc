@@ -33,7 +33,9 @@ export const route: ServerRoute = {
           items: Joi.array().items({
             did: Joi.string(),
             path: Joi.string(),
-            hash: Joi.string().optional(),
+            hash: Joi.string()
+              .allow(null)
+              .optional(),
           }),
         }),
       },

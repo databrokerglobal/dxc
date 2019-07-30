@@ -17,6 +17,11 @@ export const route: ServerRoute = {
     description: 'Modify a dataset in this DXC',
     // notes: 'sss',
     validate: {
+      params: {
+        did: Joi.string()
+          .required()
+          .example('did:dxc:localhost:12345'),
+      },
       payload: {
         path: Joi.string()
           .required()
@@ -58,7 +63,7 @@ export const route: ServerRoute = {
     const datasetRepository = getDb(request).getRepository(DataSet);
 
     const existingDataSet = await datasetRepository.findOne({
-      did: (request.payload as any).did,
+      did: (request.params as any).did,
     });
     if (!existingDataSet) {
       return Boom.conflict(
