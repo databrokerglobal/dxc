@@ -142,6 +142,7 @@ contract DXC is Ownable {
   Deal[] public dealsList;
 
   mapping(string => Deal[]) public didToDeals;
+  mapping(address => Deal[]) public userToDeals;
 
   event NewDeal(
     uint256 dealIndex,
@@ -155,16 +156,26 @@ contract DXC is Ownable {
     uint256 validUntil
   );
 
-  function allDeals() public view returns (Deal[] memory) {
+  function allDeals() external view returns (Deal[] memory) {
     return dealsList;
   }
 
-  function deal(uint256 index) public view returns (Deal memory){
+  function deal(uint256 index) external view returns (Deal memory){
     return dealsList[index];
   }
 
-  function deals(string memory did) public view returns (Deal[] memory){
+  function deals(string calldata did) external view returns (Deal[] memory){
     return didToDeals[did];
+  }
+
+  function hasAccessToDiD(string calldata did, address user) external view returns (bool){
+    bool accessToDid = false;
+    for (uint256 i = 0; i < userToDeals[user].length; i++){
+      if (keccak256(abi.encode(userToDeals[user][i].did)) == keccak256(abi.encode(did)) && userToDeals[user][i].validUntil > now){
+        return true;
+      }
+    }
+    return accessToDid;
   }
 
   function createDeal(
@@ -205,6 +216,7 @@ contract DXC is Ownable {
     );
     uint256 dealIndex = dealsList.push(newDeal) - 1;
     didToDeals[did].push(newDeal);
+    userToDeals[user].push(newDeal);
     emit NewDeal(
       dealIndex,
       did,

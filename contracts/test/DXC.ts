@@ -366,6 +366,39 @@ contract('DXC', (accounts: string[]) => {
       const deals = await dDXC.deals('did:dxc:12345');
       expect(deals).to.be.length(2);
     });
+
+    it('can signal access to a did', async () => {
+      await dDXC.createDeal(
+        'did:dxc:12345',
+        accounts[3],
+        new BN('70'),
+        accounts[2],
+        new BN('10'),
+        accounts[1],
+        accounts[0],
+        new BN('15'),
+        web3.utils.toWei(amountOfDTXFor(50)),
+        Math.floor(Date.now() / 1000),
+        Math.floor(Date.now() / 1000) + 3600 * 24 * 30
+      );
+      await dDXC.createDeal(
+        'did:dxc:12345',
+        accounts[3],
+        new BN('70'),
+        accounts[2],
+        new BN('10'),
+        accounts[1],
+        accounts[0],
+        new BN('15'),
+        web3.utils.toWei(amountOfDTXFor(50)),
+        Math.floor(Date.now() / 1000),
+        Math.floor(Date.now() / 1000) + 3600 * 24 * 30
+      );
+      let access = await dDXC.hasAccessToDiD('did:dxc:12345', accounts[1]);
+      expect(access).to.be.equal(true);
+      access = await dDXC.hasAccessToDiD('did:dxc:12345', accounts[6]);
+      expect(access).to.be.equal(false);
+    });
   });
 });
 
