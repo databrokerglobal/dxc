@@ -319,7 +319,6 @@ contract('DXC', (accounts: string[]) => {
         Math.floor(Date.now() / 1000),
         Math.floor(Date.now() / 1000) + 3600 * 24 * 30
       );
-
       const deals = await dDXC.allDeals();
       expect(deals.length).to.be.equal(1);
     });

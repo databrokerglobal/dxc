@@ -214,19 +214,19 @@ contract DXC is Ownable {
   }
 
   function payout(uint256 dealIndex) public {
-    Deal memory deal = deals[dealIndex];
-    require(now >= deal.validFrom + 14 days, "Payouts can only happen 14 days after the start of the deal (validFrom)");
+    Deal memory _deal = deals[dealIndex];
+    require(now >= _deal.validFrom + 14 days, "Payouts can only happen 14 days after the start of the deal (validFrom)");
     // release escrow
-    balances[deal.user].escrowOutgoing = balances[deal.user].escrowOutgoing.sub(deal.amount);
-    balances[deal.owner].escrowIncoming = balances[deal.owner].escrowIncoming.sub(deal.amount.mul(deal.ownerPercentage).div(100));
-    balances[deal.publisher].escrowIncoming = balances[deal.publisher].escrowIncoming.sub(deal.amount.mul(deal.publisherPercentage).div(100));
-    balances[deal.marketplace].escrowIncoming = balances[deal.marketplace].escrowIncoming.add(deal.amount.mul(deal.marketplacePercentage).div(100));
+    balances[_deal.user].escrowOutgoing = balances[_deal.user].escrowOutgoing.sub(_deal.amount);
+    balances[_deal.owner].escrowIncoming = balances[_deal.owner].escrowIncoming.sub(_deal.amount.mul(_deal.ownerPercentage).div(100));
+    balances[_deal.publisher].escrowIncoming = balances[_deal.publisher].escrowIncoming.sub(_deal.amount.mul(_deal.publisherPercentage).div(100));
+    balances[_deal.marketplace].escrowIncoming = balances[_deal.marketplace].escrowIncoming.add(_deal.amount.mul(_deal.marketplacePercentage).div(100));
     // transfer DTX
-    transfer(deal.user, deal.owner, deal.amount.mul(deal.ownerPercentage).div(100));
-    transfer(deal.user, deal.publisher, deal.amount.mul(deal.publisherPercentage).div(100));
-    transfer(deal.user, deal.marketplace, deal.amount.mul(deal.marketplacePercentage).div(100));
-    uint256 protocolAmount = deal.amount.sub((deal.amount.mul(deal.ownerPercentage).div(100)).add(deal.amount.mul(deal.publisherPercentage).div(100)).add(deal.amount.mul(deal.marketplacePercentage).div(100)));
-    transfer(deal.user, address(this), protocolAmount);
+    transfer(_deal.user, _deal.owner, _deal.amount.mul(_deal.ownerPercentage).div(100));
+    transfer(_deal.user, _deal.publisher, _deal.amount.mul(_deal.publisherPercentage).div(100));
+    transfer(_deal.user, _deal.marketplace, _deal.amount.mul(_deal.marketplacePercentage).div(100));
+    uint256 protocolAmount = _deal.amount.sub((_deal.amount.mul(_deal.ownerPercentage).div(100)).add(_deal.amount.mul(_deal.publisherPercentage).div(100)).add(_deal.amount.mul(_deal.marketplacePercentage).div(100)));
+    transfer(_deal.user, address(this), protocolAmount);
   }
 
 }
