@@ -141,6 +141,8 @@ contract DXC is Ownable {
 
   Deal[] public deals;
 
+  mapping(string => uint256) didToIndex;
+
   event NewDeal(
     uint256 dealIndex,
     string did,
@@ -153,8 +155,12 @@ contract DXC is Ownable {
     uint256 validUntil
   );
 
-  function getAllDeals() public view returns (Deal[] memory) {
+  function allDeals() public view returns (Deal[] memory) {
     return deals;
+  }
+
+  function deal(string memory did) public view returns (Deal memory){
+    return deals[didToIndex[did]];
   }
 
   function createDeal(
@@ -193,6 +199,7 @@ contract DXC is Ownable {
       validFrom,
       validUntil
     )) - 1;
+    didToIndex[did] = dealIndex;
     emit NewDeal(
       dealIndex,
       did,

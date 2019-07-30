@@ -21,11 +21,14 @@ const MiniMeTokenFactory: MiniMeTokenFactoryContract = artifacts.require(
 );
 
 contract('DXC', (accounts: string[]) => {
-  let amountOfDTXFor100USD: BN;
+  let latestQuote: number;
+
+  function amountOfDTXFor(amountInUSD: number) {
+    return new BN(amountInUSD / latestQuote);
+  }
 
   before(async () => {
-    const latestQuote: number = await getLatestQuote();
-    amountOfDTXFor100USD = new BN(100 / latestQuote);
+    latestQuote = await getLatestQuote();
   });
 
   beforeEach(async () => {
@@ -40,9 +43,9 @@ contract('DXC', (accounts: string[]) => {
       const dMiniMeTokenFactory = await MiniMeTokenFactory.deployed();
       dDTXToken = await DTXToken.new(dMiniMeTokenFactory.address);
       dDXC = await DXC.new(dDTXToken.address);
-      for (const address of accounts) {
-        await dDTXToken.generateTokens(address, web3.utils.toWei('1000000'));
-      }
+      await dDTXToken.generateTokens(dDXC.address, web3.utils.toWei('1000000'));
+      await dDTXToken.generateTokens(accounts[0], web3.utils.toWei('1000000'));
+      await dDTXToken.generateTokens(accounts[1], web3.utils.toWei('1000000'));
     });
 
     it('create a new DXC', async () => {
@@ -64,7 +67,7 @@ contract('DXC', (accounts: string[]) => {
     });
   });
 
-  describe('DXC bank', async () => {
+  describe('Getting DTX token in the bank', async () => {
     let dDTXToken: DTXTokenInstance;
     let dDXC: DXCInstance;
 
@@ -73,9 +76,8 @@ contract('DXC', (accounts: string[]) => {
       dDTXToken = await DTXToken.new(dMiniMeTokenFactory.address);
       dDXC = await DXC.new(dDTXToken.address);
       await dDTXToken.generateTokens(dDXC.address, web3.utils.toWei('1000000'));
-      for (const address of accounts) {
-        await dDTXToken.generateTokens(address, web3.utils.toWei('1000000'));
-      }
+      await dDTXToken.generateTokens(accounts[0], web3.utils.toWei('1000000'));
+      await dDTXToken.generateTokens(accounts[1], web3.utils.toWei('1000000'));
     });
 
     it('can have and read the platform balance', async () => {
@@ -94,12 +96,32 @@ contract('DXC', (accounts: string[]) => {
       expect(balanceResult[0]).to.be.bignumber.equal(new BN(0));
       await dDXC.convertFiatToToken(
         accounts[1],
-        web3.utils.toWei(amountOfDTXFor100USD)
+        web3.utils.toWei(amountOfDTXFor(100))
       );
       balanceResult = await dDXC.balanceOf(accounts[1]);
       expect(balanceResult[0]).to.be.bignumber.equal(
-        web3.utils.toWei(amountOfDTXFor100USD)
+        web3.utils.toWei(amountOfDTXFor(100))
       );
+    });
+
+    it('cannot convert from fiat money if the user is not the owner', async () => {
+      let balanceResult = await dDXC.balanceOf(accounts[1]);
+      expect(balanceResult[0]).to.be.bignumber.equal(new BN(0));
+      try {
+        await dDXC.convertFiatToToken(
+          accounts[1],
+          web3.utils.toWei(amountOfDTXFor(100)),
+          { from: accounts[9] }
+        );
+        assert(false, 'Test succeeded when it should have failed');
+      } catch (error) {
+        assert(
+          error.reason === 'Ownable: caller is not the owner',
+          error.reason
+        );
+      }
+      balanceResult = await dDXC.balanceOf(accounts[1]);
+      expect(balanceResult[0]).to.be.bignumber.equal(new BN(0));
     });
 
     it('can deposit DTX tokens', async () => {
@@ -107,7 +129,7 @@ contract('DXC', (accounts: string[]) => {
       expect(balanceResult[0]).to.be.bignumber.equal(new BN(0));
       await dDTXToken.approve(
         dDXC.address,
-        web3.utils.toWei(amountOfDTXFor100USD),
+        web3.utils.toWei(amountOfDTXFor(100)),
         { from: accounts[1] }
       );
       const allowanceResult = await dDTXToken.allowance(
@@ -115,72 +137,203 @@ contract('DXC', (accounts: string[]) => {
         dDXC.address
       );
       expect(allowanceResult).to.be.bignumber.equal(
-        web3.utils.toWei(amountOfDTXFor100USD)
+        web3.utils.toWei(amountOfDTXFor(100))
       );
-      await dDXC.deposit(web3.utils.toWei(amountOfDTXFor100USD), {
+      await dDXC.deposit(web3.utils.toWei(amountOfDTXFor(100)), {
         from: accounts[1],
       });
       balanceResult = await dDXC.balanceOf(accounts[1]);
       expect(balanceResult[0]).to.be.bignumber.equal(
-        web3.utils.toWei(amountOfDTXFor100USD)
+        web3.utils.toWei(amountOfDTXFor(100))
       );
     });
 
-    it('can withdraw DTX tokens', async () => {
-      // deposit first, equal to the test above
+    it('cannot deposit DTX tokens if the allowance is too little', async () => {
       let balanceResult = await dDXC.balanceOf(accounts[1]);
       expect(balanceResult[0]).to.be.bignumber.equal(new BN(0));
-      await dDTXToken.approve(
-        dDXC.address,
-        web3.utils.toWei(amountOfDTXFor100USD),
-        { from: accounts[1] }
-      );
+      await dDTXToken.approve(dDXC.address, new BN('5'), { from: accounts[1] });
       const allowanceResult = await dDTXToken.allowance(
         accounts[1],
         dDXC.address
       );
+      expect(allowanceResult).to.be.bignumber.equal(new BN('5'));
+      try {
+        await dDXC.deposit(web3.utils.toWei(amountOfDTXFor(100)), {
+          from: accounts[1],
+        });
+      } catch (error) {
+        assert(
+          error.reason === 'DTX transfer failed, probably too little allowance',
+          error.reason
+        );
+      }
+      balanceResult = await dDXC.balanceOf(accounts[1]);
+      expect(balanceResult[0]).to.be.bignumber.equal(new BN(0));
+    });
+
+    it('cannot deposit DTX tokens if their is not enough DTX available', async () => {
+      let balanceResult = await dDXC.balanceOf(accounts[3]);
+      expect(balanceResult[0]).to.be.bignumber.equal(new BN(0));
+      await dDTXToken.approve(
+        dDXC.address,
+        web3.utils.toWei(amountOfDTXFor(100)),
+        { from: accounts[3] }
+      );
+      const allowanceResult = await dDTXToken.allowance(
+        accounts[3],
+        dDXC.address
+      );
       expect(allowanceResult).to.be.bignumber.equal(
-        web3.utils.toWei(amountOfDTXFor100USD)
+        web3.utils.toWei(amountOfDTXFor(100))
       );
-      await dDXC.deposit(web3.utils.toWei(amountOfDTXFor100USD), {
-        from: accounts[1],
-      });
-      balanceResult = await dDXC.balanceOf(accounts[1]);
-      expect(balanceResult[0]).to.be.bignumber.equal(
-        web3.utils.toWei(amountOfDTXFor100USD)
-      );
-      // now withdraw
-      await dDXC.withdraw({
-        from: accounts[1],
-      });
-      balanceResult = await dDXC.balanceOf(accounts[1]);
+      try {
+        await dDXC.deposit(web3.utils.toWei(amountOfDTXFor(100)), {
+          from: accounts[3],
+        });
+      } catch (error) {
+        assert(
+          error.reason ===
+            'Sender has too little DTX to make this transaction work',
+          error.reason
+        );
+      }
+      balanceResult = await dDXC.balanceOf(accounts[3]);
       expect(balanceResult[0]).to.be.bignumber.equal(new BN(0));
     });
   });
 
-  // describe('a grouping of tests', async () => {
-  //   beforeEach(async () => {
-  //     // handle setup before each test in this group
-  //   });
+  describe('Get DTX tokens out of the bank', async () => {
+    let dDTXToken: DTXTokenInstance;
+    let dDXC: DXCInstance;
 
-  //   it('describe your test here', async () => {
-  //     // test here
-  //   });
+    beforeEach(async () => {
+      const dMiniMeTokenFactory = await MiniMeTokenFactory.deployed();
+      dDTXToken = await DTXToken.new(dMiniMeTokenFactory.address);
+      dDXC = await DXC.new(dDTXToken.address);
+      await dDTXToken.generateTokens(dDXC.address, web3.utils.toWei('1000000'));
+      await dDTXToken.generateTokens(accounts[0], web3.utils.toWei('1000000'));
+      await dDTXToken.generateTokens(accounts[1], web3.utils.toWei('1000000'));
+      await dDTXToken.approve(
+        dDXC.address,
+        web3.utils.toWei(amountOfDTXFor(100)),
+        { from: accounts[1] }
+      );
+      await dDTXToken.allowance(accounts[1], dDXC.address);
+      await dDXC.deposit(web3.utils.toWei(amountOfDTXFor(100)), {
+        from: accounts[1],
+      });
+    });
 
-  //   it('this is a test for a failure', async () => {
-  //     try {
-  //       // here you call a contract function
-  //       const fakeError = new Error('fake error');
-  //       (fakeError as any).reason =
-  //         'here you define the revert message you expect';
-  //       throw fakeError;
-  //       assert(false, 'Test succeeded when it should have failed');
-  //     } catch (error) {
-  //       assert(
-  //         error.reason === 'here you define the revert message you expect',
-  //         error.reason
-  //       );
-  //     }
-  //   });
-  // });
+    it('can withdraw DTX tokens', async () => {
+      await dDXC.withdraw({
+        from: accounts[1],
+      });
+      const balanceResult = await dDXC.balanceOf(accounts[1]);
+      expect(balanceResult[0]).to.be.bignumber.equal(new BN(0));
+    });
+  });
+
+  describe('Manage deals', async () => {
+    let dDTXToken: DTXTokenInstance;
+    let dDXC: DXCInstance;
+
+    beforeEach(async () => {
+      const dMiniMeTokenFactory = await MiniMeTokenFactory.deployed();
+      dDTXToken = await DTXToken.new(dMiniMeTokenFactory.address);
+      dDXC = await DXC.new(dDTXToken.address);
+      await dDTXToken.generateTokens(dDXC.address, web3.utils.toWei('1000000'));
+      await dDTXToken.generateTokens(accounts[0], web3.utils.toWei('1000000'));
+      await dDTXToken.generateTokens(accounts[1], web3.utils.toWei('1000000'));
+      await dDTXToken.approve(
+        dDXC.address,
+        web3.utils.toWei(amountOfDTXFor(100)),
+        { from: accounts[1] }
+      );
+      await dDTXToken.allowance(accounts[1], dDXC.address);
+      await dDXC.deposit(web3.utils.toWei(amountOfDTXFor(100)), {
+        from: accounts[1],
+      });
+    });
+
+    it('can create a new deal only when the percentages add up to 100', async () => {
+      try {
+        await dDXC.createDeal(
+          'did:dxc:12345',
+          accounts[1],
+          new BN('70'),
+          accounts[2],
+          new BN('10'),
+          accounts[3],
+          accounts[0],
+          new BN('10'),
+          web3.utils.toWei(amountOfDTXFor(50)),
+          Math.floor(Date.now() / 1000),
+          Math.floor(Date.now() / 1000) + 3600 * 24 * 30
+        );
+      } catch (error) {
+        assert(
+          error.reason === 'All percentages need to add up to exactly 100',
+          error.reason
+        );
+      }
+    });
+
+    it('can create a new deal', async () => {
+      const { logs } = await dDXC.createDeal(
+        'did:dxc:12345',
+        accounts[3],
+        new BN('70'),
+        accounts[2],
+        new BN('10'),
+        accounts[1],
+        accounts[0],
+        new BN('15'),
+        web3.utils.toWei(amountOfDTXFor(50)),
+        Math.floor(Date.now() / 1000),
+        Math.floor(Date.now() / 1000) + 3600 * 24 * 30
+      );
+      expect(testEvent(logs, 'NewDeal', 'did', 'did:dxc:12345'));
+      const balanceResult = await dDXC.balanceOf(accounts[1]);
+      expect(balanceResult[0]).to.be.bignumber.equal(
+        web3.utils.toWei(amountOfDTXFor(100))
+      );
+      expect(balanceResult[1]).to.be.bignumber.equal(
+        web3.utils.toWei(amountOfDTXFor(50))
+      );
+      expect(balanceResult[3]).to.be.bignumber.equal(
+        web3.utils.toWei(amountOfDTXFor(100).sub(amountOfDTXFor(50)))
+      );
+    });
+
+    it('can list all deals', async () => {
+      await dDXC.createDeal(
+        'did:dxc:12345',
+        accounts[3],
+        new BN('70'),
+        accounts[2],
+        new BN('10'),
+        accounts[1],
+        accounts[0],
+        new BN('15'),
+        web3.utils.toWei(amountOfDTXFor(50)),
+        Math.floor(Date.now() / 1000),
+        Math.floor(Date.now() / 1000) + 3600 * 24 * 30
+      );
+
+      const deals = await dDXC.allDeals();
+      expect(deals.length).to.be.equal(1);
+    });
+  });
 });
+
+function testEvent(
+  logs: Truffle.TransactionLog[],
+  eventName: string,
+  field: string,
+  value: any
+) {
+  return (
+    logs.filter(log => log.event === eventName && log.args[field] === value)
+      .length > 0
+  );
+}
