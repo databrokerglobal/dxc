@@ -1,9 +1,10 @@
-sudo: required
+language: node_js
 
 services:
   - docker
 
-language: node_js
+git:
+  depth: false
 
 cache:
   directories:
@@ -14,27 +15,55 @@ notifications:
     rooms:
       - settlemint:5QuOPa3Z4kJbfbNIgei0asur#mint
 
-node_js:
-  - '11'
-
-before_install:
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > ~/.npmrc
-
-script:
-  - npm run build
-
-install:
-  - npm ci
-
-deploy:
-  - provider: script
-    skip_cleanup: true
-    script:
-      - npx semantic-release
-    on:
-      all_branches: true
-      repo: databrokerdao/dxc
-
 branches:
   except:
     - /^v\d+\.\d+\.\d+$/
+
+jobs:
+  include:
+    # First build so we can work even though the tests fail, also build in dev mode for more speed in building
+    - stage: Building
+      name: Building dxc:testing containers
+      node_js: 11
+      install:
+        - npm ci
+        - npm run setup
+        - npm run installall
+      script:
+        - run-s -l build
+        - npm run assemble
+        - yes Y | docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+        - docker build --build-arg NPM_TOKEN=${NPM_TOKEN} --build-arg TESTING=true -t databrokerdao/dxc:${TRAVIS_BRANCH//[^a-zA-Z0-9]/} --cache-from databrokerdao/dxc:latest ./dapi
+        - docker push databrokerdao/dxc:${TRAVIS_BRANCH//[^a-zA-Z0-9]/}
+    # Then run all the tests
+    - stage: Testing
+      name: Testing dapi
+      node_js: 11
+      install:
+        - npm ci
+        - npm run setup
+        - npm run install:dapi
+      script: npm run test:dapi
+    - stage: Testing
+      node_js: 11
+      name: Testing contracts
+      install:
+        - npm ci
+        - npm run setup
+        - npm run install:contracts
+        - docker pull trufflesuite/ganache-cli:v6.4.3
+        - docker run -d -p 8545:8545 -p 7545:8545 trufflesuite/ganache-cli:v6.4.3 -d --mnemonic 'robot robot robot robot robot robot robot robot robot robot robot robot' --defaultBalanceEther '500000000000000'
+      script: npm run test:contracts
+    # Lastly, build production builds
+    - stage: Building production
+      if: branch = master
+      name: Building mint
+      node_js: 11
+      install:
+        - npm ci
+        - npm run setup
+        - nom run install
+      script:
+        - run build
+        - npm run assemble
+        - npx semantic-release

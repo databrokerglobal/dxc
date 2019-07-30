@@ -8,50 +8,34 @@
   "bugs": {
     "url": "https://github.com/databrokerdao/dxc/issues"
   },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "homepage": "https://databrokerdao.com",
   "scripts": {
-    "build-ts": "tsc --declaration",
-    "watch": "tsc -w --declaration",
-    "tslint": "tslint -c tslint.json -p tsconfig.json",
-    "pretest": "npm run tslint",
-    "build": "npm run build-ts",
-    "test": "jest --forceExit --runInBand --detectOpenHandles --coverage --verbose",
+    "setup": "run-s --print-label setup:*",
+    "setup:privatenpm": "npm config set \"//registry.npmjs.org/:_authToken\" ${NPM_TOKEN}",
+    "setup:fontawesome": "npm config set \"@fortawesome:registry\" https://npm.fontawesome.com/ && npm config set \"//npm.fontawesome.com/:_authToken\" 544BB5A6-F30A-4B09-8A35-F8DC7580BD4E",
+    "installall": "run-p --print-label install:*",
+    "install:contracts": "cd contracts && npm ci && cd ..",
+    "install:dapi": "cd dapi && npm ci && cd ..",
+    "build": "run-s --print-label build:*",
+    "build:contracts": "cd contracts && npm run build && cd ..",
+    "build:dapi": "cd dapi && npm run build && cd ..",
+    "test": "run-p --print-label test:*",
+    "test:contracts": "cd contracts && npm run test && cd ..",
+    "test:dapi": "cd dapi && npm run test && cd ..",
+    "assemble": "rm -Rf dapi/contracts; mkdir -p dapi/contracts; cp -R contracts/build/contracts dapi/contracts/artifacts; cp -r contracts/types/* dapi/src/types/",
     "semantic-release": "semantic-release",
-    "prepublishOnly": "docker build --build-arg NPM_TOKEN=${NPM_TOKEN} -t databroker/dxc .",
-    "start": "node --trace-warnings --max-old-space-size=8192 dist/index.js",
-    "start:testing": "node --trace-warnings --max-old-space-size=8192 --inspect=0.0.0.0:9222 dist/index.js",
-    "dev": "ts-node-dev --ignore-watch node_modules --trace-warnings --respawn --transpileOnly --inspect=0.0.0.0:9222 --max-old-space-size=8192 src/index.ts"
+    "prepublishOnly": "VERSION=`cat package.json | jq \".version\"`; cd dapi; cat package.json | jq \".version = ${VERSION}\" > package-new.json && mv package-new.json package.json && cd .. && docker build --build-arg NPM_TOKEN=${NPM_TOKEN} --cache-from databrokerdao/dxc:latest -t databroker/dxc ./dapi"
   },
-  "files": [
-    "dist",
-    "public",
-    "templates"
-  ],
-  "homepage": "https://github.com/settlemint/mint-dapi",
   "dependencies": {
-    "@hapi/boom": "^7.4.2",
-    "@hapi/good": "^8.2.0",
-    "@hapi/good-console": "^8.1.0",
-    "@hapi/good-squeeze": "^5.2.0",
-    "@hapi/hapi": "^18.3.1",
-    "@hapi/inert": "^5.2.1",
-    "@hapi/joi": "^15.1.0",
-    "@hapi/vision": "^5.5.2",
-    "@sentry/node": "^5.5.0",
-    "@types/jsonwebtoken": "^8.3.2",
-    "bip39": "^3.0.2",
-    "chalk": "^2.4.2",
-    "dotenv": "^8.0.0",
-    "ethers": "^4.0.33",
-    "handlebars": "^4.1.2",
-    "hapi-auth-jwt2": "^8.6.1",
-    "hapi-sentry": "^2.0.2",
-    "hapi-swagger": "^10.0.2",
-    "jsonwebtoken": "^8.5.1",
-    "reflect-metadata": "^0.1.13",
-    "sqlite3": "^4.0.9",
-    "typeorm": "^0.2.18"
+    "npm-run-all": "^4.1.5",
+    "semantic-release-docker": "^2.2.0"
+  },
+  "devDependencies": {
+    "@semantic-release/changelog": "^3.0.4",
+    "@semantic-release/github": "^5.4.2",
+    "@semantic-release/npm": "^5.1.13",
+    "semantic-release": "^15.13.18",
+    "travis-deploy-once": "^5.0.11"
   },
   "publishConfig": {
     "access": "restricted"
@@ -75,28 +59,5 @@
     "success": [
       "@semantic-release/github"
     ]
-  },
-  "devDependencies": {
-    "@semantic-release/changelog": "^3.0.4",
-    "@semantic-release/github": "^5.4.2",
-    "@semantic-release/npm": "^5.1.13",
-    "@types/chalk": "^2.2.0",
-    "@types/dotenv": "^6.1.1",
-    "@types/hapi__hapi": "^18.2.5",
-    "@types/hapi__inert": "^5.2.0",
-    "@types/hapi__vision": "^5.5.0",
-    "@types/node": "^12.6.2",
-    "jest": "^24.8.0",
-    "jest-environment-node": "^24.8.0",
-    "prettier": "^1.18.2",
-    "semantic-release": "^15.13.18",
-    "semantic-release-docker": "^2.2.0",
-    "ts-jest": "^24.0.2",
-    "ts-node": "^8.3.0",
-    "ts-node-dev": "^1.0.0-pre.40",
-    "tslint": "^5.18.0",
-    "tslint-config-prettier": "^1.18.0",
-    "tslint-consistent-codestyle": "^1.15.1",
-    "typescript": "^3.5.3"
   }
 }

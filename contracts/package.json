@@ -1,0 +1,105 @@
+{
+  "name": "@databrokerdao/dxc-contracts",
+  "version": "1.0.0",
+  "description": "The boilerplate project setup for Mint enabled projects",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "build:truffle": "truffle compile",
+    "build:contracts": "typechain --target truffle './build/contracts/*.json' && (sed -i old -e 's/BigNumber/BN/g' -e '/bignumber\\.js/d' types/truffle-contracts/index.d.ts || sed -i -e 's/BigNumber/BN/g' -e '/bignumber\\.js/d' types/truffle-contracts/index.d.ts)",
+    "build:docs": "truffle run docs",
+    "build:ts": "tsc --declaration",
+    "build": "npm run build:truffle && npm run build:contracts && npm run build:ts && npm run build:docs",
+    "test": "truffle test",
+    "lint:contracts": "solhint -f table \"contracts/**/*.sol\"",
+    "lint:ts": "tslint -c tslint.json -p tsconfig.json",
+    "lint": "npm run lint:contracts && npm run lint:ts",
+    "pretest": "npm run lint && npm run build",
+    "watch": "nodemon --watch . --exec npm run test",
+    "truffle": "truffle",
+    "solium": "solium",
+    "preinstall": "find ./node_modules -type d -name '.git' | xargs rm -rf"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/settlemint/mint-boilerplate.git"
+  },
+  "author": "SettleMint <hello@settlemint.com>",
+  "license": "SEE LICENSE IN mint-license.txt",
+  "bugs": {
+    "url": "https://github.com/settlemint/mint/issues"
+  },
+  "homepage": "https://settlemint.com",
+  "devDependencies": {
+    "@neos1/truffle-plugin-docs": "^1.2.4",
+    "@semantic-release/changelog": "^3.0.4",
+    "@semantic-release/github": "^5.4.2",
+    "@semantic-release/npm": "^5.1.13",
+    "eth-gas-reporter": "^0.2.8",
+    "husky": "^3.0.2",
+    "lint-staged": "^9.2.1",
+    "nodemon": "^1.19.1",
+    "prettier": "^1.18.2",
+    "semantic-release": "^15.13.18",
+    "semantic-release-docker": "^2.2.0",
+    "solc": "^0.5.10",
+    "solhint": "^2.1.2",
+    "truffle": "^5.0.29",
+    "truffle-hdwallet-provider": "^1.0.15",
+    "truffle-plugin-verify": "^0.3.2",
+    "truffle-security": "^1.5.2",
+    "truffle-typings": "^1.0.8",
+    "ts-node": "^8.3.0",
+    "tslint": "^5.18.0",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-consistent-codestyle": "^1.15.1",
+    "tsutils": "^3.14.1",
+    "typechain": "^0.3.19",
+    "typescript": "^3.5.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,json,css}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "publishConfig": {
+    "access": "restricted"
+  },
+  "release": {
+    "verifyConditions": [
+      "@semantic-release/npm",
+      "semantic-release-docker"
+    ],
+    "prepare": [
+      "@semantic-release/npm"
+    ],
+    "publish": [
+      "@semantic-release/npm",
+      "@semantic-release/github",
+      {
+        "path": "semantic-release-docker",
+        "name": "settlemint/mint-boilerplate"
+      }
+    ],
+    "success": [
+      "@semantic-release/github"
+    ]
+  },
+  "dependencies": {
+    "@types/web3": "^1.0.19",
+    "axios": "^0.19.0",
+    "bn.js": "^5.0.0",
+    "chai": "^4.2.0",
+    "openzeppelin-solidity": "^2.3.0",
+    "openzeppelin-test-helpers": "^0.4.1",
+    "web3": "^1.2.0"
+  }
+}
