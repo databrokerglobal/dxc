@@ -2,7 +2,6 @@ language: node_js
 
 services:
   - docker
-  - mongodb
 
 git:
   depth: false
@@ -52,6 +51,8 @@ jobs:
         - npm ci
         - npm run setup
         - npm run install:contracts
+        - docker pull trufflesuite/ganache-cli:v6.4.3
+        - docker run -d -p 8545:8545 -p 7545:8545 --net host trufflesuite/ganache-cli:v6.4.3 -d --mnemonic 'robot robot robot robot robot robot robot robot robot robot robot robot' --defaultBalanceEther '500000000000000'
       script: npm run test:contracts
     # Lastly, build production builds
     - stage: Building production

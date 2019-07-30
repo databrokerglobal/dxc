@@ -83,9 +83,9 @@ contract DXC is Ownable {
 
   function withdraw() public {
     (,,, uint256 available) = balanceOf(msg.sender);
-    require(dtxToken.transfer(msg.sender, available), "Not enough DTX tokens available to withdraw, contact DataBrokerDAO!");
     balances[msg.sender].balance = balances[msg.sender].balance.sub(available);
     totalBalance = totalBalance.sub(available);
+    require(dtxToken.transfer(msg.sender, available), "Not enough DTX tokens available to withdraw, contact DataBrokerDAO!");
     emit WithdrawDTX(msg.sender, available);
   }
 
@@ -94,9 +94,9 @@ contract DXC is Ownable {
    */
   function transfer(address from, address to, uint256 amount) internal {
     (,,, uint256 available) = balanceOf(from);
-    require(amount <= available, "Not enough availalbe DTX to execute this transfer");
     balances[from].balance = balances[from].balance.sub(amount);
     balances[to].balance = balances[to].balance.add(amount);
+    require(amount <= available, "Not enough availalbe DTX to execute this transfer");
     emit TransferDTX(from, to, amount);
   }
 
