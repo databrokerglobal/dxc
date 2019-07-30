@@ -27605,14 +27605,145 @@
   },
   "networks": {
     "8995": {
-      "events": {},
+      "events": {
+        "0x4b19cef4d67ff9acd5ce891a32f323842b26f39c024bdd00047e1b74be2aea8f": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "from",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "DepositDTX",
+          "type": "event",
+          "signature": "0x4b19cef4d67ff9acd5ce891a32f323842b26f39c024bdd00047e1b74be2aea8f"
+        },
+        "0xc28ed4035491dd3fc975f4d0a41ab56de1a5402b03b6c69a5265b65d1c7906dc": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "to",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "WithdrawDTX",
+          "type": "event",
+          "signature": "0xc28ed4035491dd3fc975f4d0a41ab56de1a5402b03b6c69a5265b65d1c7906dc"
+        },
+        "0x53129ad8bfbcb17159505d8d2b4fd53b6df72ef4a1651fa36883270be476cc44": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "from",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "to",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "value",
+              "type": "uint256"
+            }
+          ],
+          "name": "TransferDTX",
+          "type": "event",
+          "signature": "0x53129ad8bfbcb17159505d8d2b4fd53b6df72ef4a1651fa36883270be476cc44"
+        },
+        "0xc03dfb2e53cc7a9868a03b235858db6648c1e9f761c1756dd70d8c96f10fde95": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "dealIndex",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "did",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "name": "owner",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "publisher",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "user",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "marketplace",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "amount",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "validFrom",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "validUntil",
+              "type": "uint256"
+            }
+          ],
+          "name": "NewDeal",
+          "type": "event",
+          "signature": "0xc03dfb2e53cc7a9868a03b235858db6648c1e9f761c1756dd70d8c96f10fde95"
+        },
+        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
+          "type": "event",
+          "signature": "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0"
+        }
+      },
       "links": {},
       "address": "0x8e828a0dE94b738eF83012D19EFEeD2FF41cEF25",
       "transactionHash": "0x389ab55f7888eb367a52b552d85397b9a8dd56ee8e6b7865da116896936904f2"
     }
   },
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-07-30T15:19:05.535Z",
+  "updatedAt": "2019-07-30T15:31:01.084Z",
   "devdoc": {
     "methods": {
       "isOwner()": {

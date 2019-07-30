@@ -1179,14 +1179,102 @@
   },
   "networks": {
     "8995": {
-      "events": {},
+      "events": {
+        "0xf931edb47c50b4b4104c187b5814a9aef5f709e17e2ecf9617e860cacade929c": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "_token",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "_controller",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "_amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "ClaimedTokens",
+          "type": "event",
+          "signature": "0xf931edb47c50b4b4104c187b5814a9aef5f709e17e2ecf9617e860cacade929c"
+        },
+        "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "_from",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "_to",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "_amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "Transfer",
+          "type": "event",
+          "signature": "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+        },
+        "0x086c875b377f900b07ce03575813022f05dd10ed7640b5282cf6d3c3fc352ade": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "_cloneToken",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "_snapshotBlock",
+              "type": "uint256"
+            }
+          ],
+          "name": "NewCloneToken",
+          "type": "event",
+          "signature": "0x086c875b377f900b07ce03575813022f05dd10ed7640b5282cf6d3c3fc352ade"
+        },
+        "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "_owner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "_spender",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "_amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "Approval",
+          "type": "event",
+          "signature": "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925"
+        }
+      },
       "links": {},
       "address": "0x926423c4F2Aa60f95Dd05668f4DAB404B9FC3144",
       "transactionHash": "0xcd6c8aed1965d5e3903ecd69706ebf6e5444df3190b5ac4f599e817d1bf6e698"
     }
   },
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-07-30T15:19:05.527Z",
+  "updatedAt": "2019-07-30T15:31:01.074Z",
   "devdoc": {
     "methods": {
       "allowance(address,address)": {
