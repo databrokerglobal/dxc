@@ -16,7 +16,7 @@
     "tslint": "tslint -c tslint.json -p tsconfig.json",
     "pretest": "npm run tslint",
     "build": "npm run build-ts",
-    "test": "jest --forceExit --runInBand --detectOpenHandles --coverage --verbose",
+    "test": "jest --forceExit --runInBand --detectOpenHandles --coverage --verbose --passWithNoTests",
     "semantic-release": "semantic-release",
     "start": "node --trace-warnings --max-old-space-size=8192 dist/index.js",
     "start:testing": "node --trace-warnings --max-old-space-size=8192 --inspect=0.0.0.0:9222 dist/index.js",
