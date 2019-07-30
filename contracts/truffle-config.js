@@ -67,7 +67,7 @@ module.exports = {
       gasPrice: '0',
       network_id: '8995',
       websockets: true,
-      production: true,
+      production: false,
     },
     minttestnet: {
       provider: () => {
@@ -158,7 +158,7 @@ module.exports = {
           enabled: true,
           runs: 200,
         },
-        evmVersion: 'petersburg',
+        evmVersion: 'byzantium',
       },
     },
   },
