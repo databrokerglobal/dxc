@@ -35,6 +35,19 @@ jobs:
         - yes Y | docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
         - docker build --build-arg NPM_TOKEN=${NPM_TOKEN} --build-arg TESTING=true -t databrokerdao/dxc:${TRAVIS_BRANCH//[^a-zA-Z0-9]/} --cache-from databrokerdao/dxc:latest ./dapi
         - docker push databrokerdao/dxc:${TRAVIS_BRANCH//[^a-zA-Z0-9]/}
+    - stage: Building
+      name: Building papi:testing containers
+      node_js: 11
+      install:
+        - npm ci
+        - npm run setup
+        - npm run installall
+      script:
+        - run-s -l build
+        - npm run assemble
+        - yes Y | docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+        - docker build --build-arg NPM_TOKEN=${NPM_TOKEN} --build-arg TESTING=true -t databrokerdao/papi:${TRAVIS_BRANCH//[^a-zA-Z0-9]/} --cache-from databrokerdao/papi:latest ./papi
+        - docker push databrokerdao/papi:${TRAVIS_BRANCH//[^a-zA-Z0-9]/}
     # Then run all the tests
     - stage: Testing
       name: Testing dapi
@@ -43,6 +56,14 @@ jobs:
         - npm ci
         - npm run setup
         - npm run install:dapi
+      script: npm run test:dapi
+    - stage: Testing
+      name: Testing papi
+      node_js: 11
+      install:
+        - npm ci
+        - npm run setup
+        - npm run install:papi
       script: npm run test:dapi
     - stage: Testing
       node_js: 11

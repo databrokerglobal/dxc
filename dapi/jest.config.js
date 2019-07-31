@@ -14,4 +14,5 @@ module.exports = {
   setupFilesAfterEnv: ['./jest.setup.js'],
   testMatch: ['**/test/**/*.test.(ts|js)'],
   preset: 'ts-jest',
+  collectCoverage: true,
 };

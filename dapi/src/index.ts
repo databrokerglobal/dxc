@@ -21,7 +21,9 @@ process.on('unhandledRejection', reason => {
 
 // Start the webserver
 
-async function run(connection: Connection) {
+async function run() {
+  const connection = await createConnection();
+
   dotenv.config();
   if (process.env.MONITORING_SENTRY) {
     Sentry.init({
@@ -73,6 +75,15 @@ async function run(connection: Connection) {
       })
     );
   }
+
+  plugins.push(
+    server.register({
+      plugin: require('hapi-dev-errors'),
+      options: {
+        showErrors: process.env.NODE_ENV !== 'production',
+      },
+    })
+  );
 
   plugins.push(server.register([Vision, Inert]));
 
@@ -168,6 +179,19 @@ async function run(connection: Connection) {
     )
   );
 
+  // if (process.env.ENABLE_PLATFORM_ENDPOINTS) {
+  //   plugins.push(
+  //     server.register(
+  //       { plugin: require('./platform') },
+  //       {
+  //         routes: {
+  //           prefix: '/v1',
+  //         },
+  //       }
+  //     )
+  //   );
+  // }
+
   await Promise.all(plugins);
 
   server.route({
@@ -221,8 +245,8 @@ async function run(connection: Connection) {
   } catch (error) {
     console.error(error);
   }
+
+  return server;
 }
 
-createConnection().then(async connection => {
-  run(connection);
-});
+export const runningServer: Promise<Server> = run();
