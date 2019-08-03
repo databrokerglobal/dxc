@@ -86,6 +86,7 @@ async function run() {
   );
 
   plugins.push(server.register([Vision, Inert]));
+  plugins.push( server.register({ plugin: require('blipp'), options: { showAuth: true } }));
 
   plugins.push(
     server.register({
@@ -178,6 +179,8 @@ async function run() {
       }
     )
   );
+
+
 
   // if (process.env.ENABLE_PLATFORM_ENDPOINTS) {
   //   plugins.push(

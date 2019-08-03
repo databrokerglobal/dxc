@@ -24,3 +24,34 @@ export async function checkAccess(did: string, address: string) {
   }
   return hasAccess;
 }
+
+export async function recordDeal(
+  did: string,
+  owner: string,
+  ownerPercentage: number,
+  publisher: string,
+  publisherPercentage: number,
+  user: string,
+  marketplace: string,
+  marketplacePercentage: number,
+  amount: number,
+  validFrom: number,
+  validUntil: number
+) {
+  await dxcContract.createDeal(
+    did,
+    owner,
+    ownerPercentage,
+    publisher,
+    publisherPercentage,
+    user,
+    marketplace,
+    marketplacePercentage,
+    amount,
+    validFrom,
+    validUntil
+  );
+
+  const index = 1;
+  return index;
+}
