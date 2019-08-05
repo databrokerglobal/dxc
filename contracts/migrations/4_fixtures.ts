@@ -15,6 +15,7 @@ async function performMigration(
     const dDTXToken = await DTXToken.deployed();
     const dDXC = await DXC.deployed();
     await dDTXToken.generateTokens(dDXC.address, web3.utils.toWei('1000000'));
+    await dDXC.platformDeposit(web3.utils.toWei('1000000'));
     await dDTXToken.generateTokens(accounts[0], web3.utils.toWei('1000000'));
     await dDTXToken.approve(dDXC.address, web3.utils.toWei('500000'));
     await dDXC.deposit(web3.utils.toWei('500000'));

@@ -60,16 +60,16 @@ contract DXC is Ownable {
     return dtxToken.balanceOf(address(this));
   }
 
-  function balanceOf(address owner) public view returns (uint256 balance, uint256 escrowOutgoing, uint256 escrowIncoming, uint256 available) {
+  function balanceOf(address owner) public view returns (uint256 balance, uint256 escrowOutgoing, uint256 escrowIncoming, uint256 available, uint256 globalBalance) {
     balance = balances[owner].balance;
     escrowOutgoing = balances[owner].escrowOutgoing;
     escrowIncoming = balances[owner].escrowIncoming;
     available = balances[owner].balance.sub(balances[owner].escrowOutgoing);
+    globalBalance = dtxToken.balanceOf(owner);
   }
 
   function convertFiatToToken(address to, uint256 amount) public onlyOwner {
-    balances[to].balance = balances[to].balance.add(amount);
-    totalBalance = totalBalance.add(amount);
+    transfer(address(this), to, amount);
     emit DepositDTX(to, amount);
   }
 
@@ -81,22 +81,27 @@ contract DXC is Ownable {
     emit DepositDTX(msg.sender, amount);
   }
 
+  function platformDeposit(uint256 amount) public onlyOwner {
+    balances[address(this)].balance = balances[address(this)].balance.add(amount);
+  }
+
   function withdraw() public {
-    (,,, uint256 available) = balanceOf(msg.sender);
+    (,,, uint256 available,) = balanceOf(msg.sender);
     balances[msg.sender].balance = balances[msg.sender].balance.sub(available);
     totalBalance = totalBalance.sub(available);
     require(dtxToken.transfer(msg.sender, available), "Not enough DTX tokens available to withdraw, contact DataBrokerDAO!");
     emit WithdrawDTX(msg.sender, available);
   }
 
-  /**
-   * address(0) is the address we use for escrowed funds, they are tracked in escrowedDTX
-   */
+  function platformTokenWithdraw(uint256 amount) public onlyOwner {
+    dtxToken.transfer(owner(), amount);
+  }
+
   function transfer(address from, address to, uint256 amount) internal {
-    (,,, uint256 available) = balanceOf(from);
+    (,,, uint256 available,) = balanceOf(from);
+    require(amount <= available, "Not enough available DTX to execute this transfer");
     balances[from].balance = balances[from].balance.sub(amount);
     balances[to].balance = balances[to].balance.add(amount);
-    require(amount <= available, "Not enough availalbe DTX to execute this transfer");
     emit TransferDTX(from, to, amount);
   }
 

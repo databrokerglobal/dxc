@@ -1,6 +1,11 @@
 import Hapi, { ServerRoute } from '@hapi/hapi';
 import Joi from '@hapi/joi';
-import { dealsForAddress, recordDeal } from '../../lib/deal';
+import {
+  balanceOfUser,
+  dealsForAddress,
+  depositFromFiat,
+  recordDeal,
+} from '../../lib/deal';
 
 export const path = '/platform/deal/dataset';
 
@@ -107,7 +112,12 @@ export const route: ServerRoute = {
       amount,
       validFrom,
       validUntil,
+      payment,
     } = request.payload as any;
+
+    if (payment === 'fiat') {
+      depositFromFiat(user, amount);
+    }
 
     await recordDeal(
       did,
@@ -123,6 +133,9 @@ export const route: ServerRoute = {
       validUntil
     );
 
-    return dealsForAddress(user);
+    return {
+      deals: await dealsForAddress(user),
+      balances: await balanceOfUser(user),
+    };
   },
 };
