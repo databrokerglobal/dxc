@@ -1,5 +1,7 @@
 import Hapi from '@hapi/hapi';
+import { Wallet } from 'ethers';
 import HapiAuthJwt2 from 'hapi-auth-jwt2';
+import { platformMnemonic } from '../lib/variables';
 import { route as authenticateRoute } from './routes/authenticate';
 import { route as burnerWalletRoute } from './routes/burnerwallet';
 import { route as challengeRoute } from './routes/challenge';
@@ -14,6 +16,17 @@ export async function register(server: Hapi.Server) {
     key: process.env.JWT_SECRET || 's3cr3t',
     validate: async (decoded, request) => {
       return { isValid: true };
+    },
+    verifyOptions: { algorithms: ['HS256'] },
+  });
+
+  server.auth.strategy('jwtadmin', 'jwt', {
+    key: process.env.JWT_SECRET || 's3cr3t',
+    validate: async (decoded, request) => {
+      const wallet = Wallet.fromMnemonic(platformMnemonic);
+      return {
+        isValid: (decoded as any).ethereumAddress === wallet.address,
+      };
     },
     verifyOptions: { algorithms: ['HS256'] },
   });

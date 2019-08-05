@@ -856,7 +856,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-07-30T15:18:16.347Z",
+  "updatedAt": "2019-08-04T08:32:26.520Z",
   "devdoc": {
     "details": "The token controller contract must implement these functions",
     "methods": {

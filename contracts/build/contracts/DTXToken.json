@@ -1178,6 +1178,100 @@
     "version": "0.5.10+commit.5a6ea5b1.Emscripten.clang"
   },
   "networks": {
+    "1337": {
+      "events": {
+        "0xf931edb47c50b4b4104c187b5814a9aef5f709e17e2ecf9617e860cacade929c": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "_token",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "_controller",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "_amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "ClaimedTokens",
+          "type": "event",
+          "signature": "0xf931edb47c50b4b4104c187b5814a9aef5f709e17e2ecf9617e860cacade929c"
+        },
+        "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "_from",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "_to",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "_amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "Transfer",
+          "type": "event",
+          "signature": "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+        },
+        "0x086c875b377f900b07ce03575813022f05dd10ed7640b5282cf6d3c3fc352ade": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "_cloneToken",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "_snapshotBlock",
+              "type": "uint256"
+            }
+          ],
+          "name": "NewCloneToken",
+          "type": "event",
+          "signature": "0x086c875b377f900b07ce03575813022f05dd10ed7640b5282cf6d3c3fc352ade"
+        },
+        "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "_owner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "_spender",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "_amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "Approval",
+          "type": "event",
+          "signature": "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925"
+        }
+      },
+      "links": {},
+      "address": "0x02Bdf18F1C0bEE76170FBC997dF14ecEec6ACDe2",
+      "transactionHash": "0x39aa4934e819ffdca94c8076d64c3e3c9d87ec1c38406774f665dafb91ed4765"
+    },
     "8995": {
       "events": {
         "0xf931edb47c50b4b4104c187b5814a9aef5f709e17e2ecf9617e860cacade929c": {
@@ -1274,7 +1368,7 @@
     }
   },
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-07-30T15:42:35.174Z",
+  "updatedAt": "2019-08-05T12:27:03.816Z",
   "devdoc": {
     "methods": {
       "allowance(address,address)": {

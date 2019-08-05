@@ -4,7 +4,7 @@ import * as bip39 from 'bip39';
 import crypto from 'crypto';
 import { Wallet } from 'ethers';
 
-export const path = '/auth/burnerwallet';
+export const path = '/platform/auth/burnerwallet';
 
 export const route: ServerRoute = {
   method: 'POST',

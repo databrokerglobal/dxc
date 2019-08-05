@@ -86,7 +86,9 @@ async function run() {
   );
 
   plugins.push(server.register([Vision, Inert]));
-  plugins.push( server.register({ plugin: require('blipp'), options: { showAuth: true } }));
+  plugins.push(
+    server.register({ plugin: require('blipp'), options: { showAuth: true } })
+  );
 
   plugins.push(
     server.register({
@@ -133,6 +135,7 @@ async function run() {
             email: 'hello@databrokerdao.com',
           },
         },
+        basePath: '/v1',
         swaggerUI: false,
         documentationPage: false,
         securityDefinitions: {
@@ -169,7 +172,12 @@ async function run() {
       }
     )
   );
-  plugins.push(
+
+  await Promise.all(plugins);
+
+  const routePlugins = [];
+
+  routePlugins.push(
     server.register(
       { plugin: require('./datasets') },
       {
@@ -180,22 +188,20 @@ async function run() {
     )
   );
 
+  if (process.env.ENABLE_PLATFORM_ENDPOINTS) {
+    routePlugins.push(
+      server.register(
+        { plugin: require('./platform') },
+        {
+          routes: {
+            prefix: '/v1',
+          },
+        }
+      )
+    );
+  }
 
-
-  // if (process.env.ENABLE_PLATFORM_ENDPOINTS) {
-  //   plugins.push(
-  //     server.register(
-  //       { plugin: require('./platform') },
-  //       {
-  //         routes: {
-  //           prefix: '/v1',
-  //         },
-  //       }
-  //     )
-  //   );
-  // }
-
-  await Promise.all(plugins);
+  await Promise.all(routePlugins);
 
   server.route({
     method: 'GET',

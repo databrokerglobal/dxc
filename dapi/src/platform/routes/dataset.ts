@@ -1,8 +1,6 @@
 import Hapi, { ServerRoute } from '@hapi/hapi';
 import Joi from '@hapi/joi';
-import * as bip39 from 'bip39';
-import crypto from 'crypto';
-import { Wallet } from 'ethers';
+import { dealsForAddress, recordDeal } from '../../lib/deal';
 
 export const path = '/platform/deal/dataset';
 
@@ -10,16 +8,65 @@ export const route: ServerRoute = {
   method: 'POST',
   path,
   options: {
+    auth: 'jwtadmin',
     tags: ['api'],
     description: 'Purchase a dataset',
     // notes: 'sss',
     validate: {
-      query: {
+      payload: {
         payment: Joi.string()
           .optional()
           .allow(['fiat', 'dtx'])
           .example('fiat')
           .default('fiat'),
+        did: Joi.string()
+          .required()
+          .example('did:dxc:localhost:12345'),
+        owner: Joi.string()
+          .required()
+          .example('0xA74de4DbB12130c5A5e98233D05200d3dE0da7d6'),
+        ownerPercentage: Joi.number()
+          .required()
+          .max(100)
+          .min(0)
+          .precision(0)
+          .example(80),
+        publisher: Joi.string()
+          .required()
+          .example('0xA74de4DbB12130c5A5e98233D05200d3dE0da7d6'),
+        publisherPercentage: Joi.number()
+          .required()
+          .max(100)
+          .min(0)
+          .precision(0)
+          .example(10),
+        user: Joi.string()
+          .required()
+          .example('0xA74de4DbB12130c5A5e98233D05200d3dE0da7d6'),
+        marketplace: Joi.string()
+          .required()
+          .example('0xA74de4DbB12130c5A5e98233D05200d3dE0da7d6'),
+        marketplacePercentage: Joi.number()
+          .required()
+          .max(100)
+          .min(0)
+          .precision(0)
+          .example(5),
+        amount: Joi.number()
+          .required()
+          .min(0)
+          .example(500000)
+          .precision(0),
+        validFrom: Joi.number()
+          .min(0)
+          .precision(0)
+          .required()
+          .example(Math.ceil(Date.now() / 1000)),
+        validUntil: Joi.number()
+          .min(0)
+          .precision(0)
+          .required()
+          .example(Math.ceil(Date.now() / 1000) + 24 * 60 * 60 * 30),
       },
     },
     // response: {
@@ -48,8 +95,34 @@ export const route: ServerRoute = {
     // },
   },
   async handler(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-    const dxc =
+    const {
+      did,
+      owner,
+      ownerPercentage,
+      publisher,
+      publisherPercentage,
+      user,
+      marketplace,
+      marketplacePercentage,
+      amount,
+      validFrom,
+      validUntil,
+    } = request.payload as any;
 
+    await recordDeal(
+      did,
+      owner,
+      ownerPercentage,
+      publisher,
+      publisherPercentage,
+      user,
+      marketplace,
+      marketplacePercentage,
+      amount,
+      validFrom,
+      validUntil
+    );
 
+    return dealsForAddress(user);
   },
 };

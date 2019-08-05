@@ -5857,6 +5857,12 @@
     "version": "0.5.10+commit.5a6ea5b1.Emscripten.clang"
   },
   "networks": {
+    "1337": {
+      "events": {},
+      "links": {},
+      "address": "0x4784a348017FB42421b4d04911DF040272802cad",
+      "transactionHash": "0x9169726c098a758180c436c49acb1876c97ed0a64f7dbcdb39ebe87a16d0ab45"
+    },
     "8995": {
       "events": {},
       "links": {},
@@ -5865,7 +5871,7 @@
     }
   },
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-07-30T15:41:46.027Z",
+  "updatedAt": "2019-08-05T12:27:02.727Z",
   "devdoc": {
     "author": "Stefan George - <stefan.george@consensys.net>",
     "methods": {

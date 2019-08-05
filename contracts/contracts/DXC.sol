@@ -164,8 +164,12 @@ contract DXC is Ownable {
     return dealsList[index];
   }
 
-  function deals(string calldata did) external view returns (Deal[] memory){
+  function dealsForDID(string calldata did) external view returns (Deal[] memory){
     return didToDeals[did];
+  }
+
+  function dealsForAddress(address user) external view returns (Deal[] memory){
+    return userToDeals[user];
   }
 
   function hasAccessToDiD(string calldata did, address user) external view returns (bool){
