@@ -41,11 +41,14 @@ jobs:
       name: Testing dapi
       node_js: 11
       install:
+        - docker pull trufflesuite/ganache-cli:v6.4.3
+        - docker run -d -p 8545:8545 -p 7545:8545 trufflesuite/ganache-cli:v6.4.3 -d --mnemonic 'peace keep hawk vote spoon shield income ride dentist roast suffer space' --defaultBalanceEther '500000000000000'
         - npm ci
         - npm run setup
         - npm run installall
         - run-s -l build:contracts
         - npm run assemble
+        - cp dapi/.env-example dapi/.env
       script: npm run test:dapi
     - stage: Testing
       node_js: 11
@@ -55,7 +58,7 @@ jobs:
         - npm run setup
         - npm run install:contracts
         - docker pull trufflesuite/ganache-cli:v6.4.3
-        - docker run -d -p 8545:8545 -p 7545:8545 trufflesuite/ganache-cli:v6.4.3 -d --mnemonic 'robot robot robot robot robot robot robot robot robot robot robot robot' --defaultBalanceEther '500000000000000'
+        - docker run -d -p 8545:8545 -p 7545:8545 trufflesuite/ganache-cli:v6.4.3 -d --mnemonic 'peace keep hawk vote spoon shield income ride dentist roast suffer space' --defaultBalanceEther '500000000000000'
       script: npm run test:contracts
     # Lastly, build production builds
     - stage: Building production
