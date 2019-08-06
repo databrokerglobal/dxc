@@ -1269,8 +1269,8 @@
         }
       },
       "links": {},
-      "address": "0xFf27b213ADA9B9390F7c61bc5970a6Ac57a0a479",
-      "transactionHash": "0x33a1dac913e4e7c57e389ccbb42277e108d750d49c63ecb9ca2994d34dd0ce4c"
+      "address": "0xBC13Eb6500ee60602BD29146531f8e05354cFC9C",
+      "transactionHash": "0xbf108712e63a9eda9f943b15078d24f89c2b51cbad4532adb10884622628c06c"
     },
     "8995": {
       "events": {
@@ -1368,7 +1368,7 @@
     }
   },
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-08-05T20:45:42.719Z",
+  "updatedAt": "2019-08-06T07:40:38.076Z",
   "devdoc": {
     "methods": {
       "allowance(address,address)": {
