@@ -1,18 +1,8 @@
-import { BigNumber, Contract, providers, utils, Wallet } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import { abi } from '../../contracts/artifacts/DXC.json';
 import { getLatestQuote } from '../lib/getLatestQuote';
-import { DXCInstance } from '../types/truffle-contracts/index';
+import { dxcContract, provider } from './ethers';
 import { IAbiMethodInputOrOutput } from './responseFormatter';
-import { contractAddress, networkUrl, platformMnemonic } from './variables';
-
-const provider = new providers.JsonRpcProvider(networkUrl);
-const platformWallet = Wallet.fromMnemonic(platformMnemonic);
-const connectedPlatformWallet = platformWallet.connect(provider);
-const dxcContract: DXCInstance = new Contract(
-  contractAddress,
-  abi,
-  connectedPlatformWallet
-) as any;
 
 export async function balanceOfUser(user: string) {
   const response = await dxcContract.balanceOf(user);
