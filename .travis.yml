@@ -46,14 +46,6 @@ jobs:
         - npm run install:dapi
       script: npm run test:dapi
     - stage: Testing
-      name: Testing papi
-      node_js: 11
-      install:
-        - npm ci
-        - npm run setup
-        - npm run install:papi
-      script: npm run test:dapi
-    - stage: Testing
       node_js: 11
       name: Testing contracts
       install:
