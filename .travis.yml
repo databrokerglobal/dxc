@@ -43,7 +43,9 @@ jobs:
       install:
         - npm ci
         - npm run setup
-        - npm run install:dapi
+        - npm run installall
+        - run-s -l build:contracts
+        - npm run assemble
       script: npm run test:dapi
     - stage: Testing
       node_js: 11
