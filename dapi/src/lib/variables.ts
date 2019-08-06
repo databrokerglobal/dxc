@@ -7,3 +7,7 @@ export const networkUrl =
 
 export const contractAddress =
   DXC.networks[process.env.NETWORK_ID || 1].address;
+
+export const platformMnemonic =
+  process.env.PLATFORM_MNEMONIC ||
+  'robot robot robot robot robot robot robot robot robot robot robot robot';

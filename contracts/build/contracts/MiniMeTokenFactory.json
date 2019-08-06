@@ -29487,6 +29487,12 @@
     "version": "0.5.10+commit.5a6ea5b1.Emscripten.clang"
   },
   "networks": {
+    "1337": {
+      "events": {},
+      "links": {},
+      "address": "0xd57390c40D28C5c2102bBC05c8b2911865112998",
+      "transactionHash": "0x9c17c9a259115ec2f08ff55137561ff75ac02445fa8ae95a3daf46df8bdc6c5b"
+    },
     "8995": {
       "events": {},
       "links": {},
@@ -29495,7 +29501,7 @@
     }
   },
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-07-30T15:41:46.015Z",
+  "updatedAt": "2019-08-06T09:40:23.652Z",
   "devdoc": {
     "details": "This contract is used to generate clone contracts from a contract.  In solidity this is the way to create a contract from a contract of the  same class",
     "methods": {

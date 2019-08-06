@@ -30033,7 +30033,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-07-30T15:18:16.315Z",
+  "updatedAt": "2019-08-04T08:32:26.481Z",
   "devdoc": {
     "details": "The actual token contract, the default controller is the msg.sender  that deploys the contract, so usually this token will be deployed by a  token controller contract, which Giveth will call a \"Campaign\"",
     "methods": {

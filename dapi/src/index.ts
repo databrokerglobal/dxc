@@ -21,7 +21,9 @@ process.on('unhandledRejection', reason => {
 
 // Start the webserver
 
-async function run(connection: Connection) {
+async function run() {
+  const connection = await createConnection();
+
   dotenv.config();
   if (process.env.MONITORING_SENTRY) {
     Sentry.init({
@@ -74,7 +76,19 @@ async function run(connection: Connection) {
     );
   }
 
+  plugins.push(
+    server.register({
+      plugin: require('hapi-dev-errors'),
+      options: {
+        showErrors: process.env.NODE_ENV !== 'production',
+      },
+    })
+  );
+
   plugins.push(server.register([Vision, Inert]));
+  plugins.push(
+    server.register({ plugin: require('blipp'), options: { showAuth: true } })
+  );
 
   plugins.push(
     server.register({
@@ -121,6 +135,7 @@ async function run(connection: Connection) {
             email: 'hello@databrokerdao.com',
           },
         },
+        basePath: '/v1',
         swaggerUI: false,
         documentationPage: false,
         securityDefinitions: {
@@ -157,7 +172,12 @@ async function run(connection: Connection) {
       }
     )
   );
-  plugins.push(
+
+  await Promise.all(plugins);
+
+  const routePlugins = [];
+
+  routePlugins.push(
     server.register(
       { plugin: require('./datasets') },
       {
@@ -168,7 +188,20 @@ async function run(connection: Connection) {
     )
   );
 
-  await Promise.all(plugins);
+  if (process.env.ENABLE_PLATFORM_ENDPOINTS) {
+    routePlugins.push(
+      server.register(
+        { plugin: require('./platform') },
+        {
+          routes: {
+            prefix: '/v1',
+          },
+        }
+      )
+    );
+  }
+
+  await Promise.all(routePlugins);
 
   server.route({
     method: 'GET',
@@ -221,8 +254,8 @@ async function run(connection: Connection) {
   } catch (error) {
     console.error(error);
   }
+
+  return server;
 }
 
-createConnection().then(async connection => {
-  run(connection);
-});
+export const runningServer: Promise<Server> = run();
