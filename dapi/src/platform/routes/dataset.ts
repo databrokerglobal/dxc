@@ -7,7 +7,7 @@ import {
   recordDeal,
 } from '../../lib/deal';
 
-export const path = '/platform/deal/dataset';
+export const path = '/platform/deal/datasets';
 
 export const route: ServerRoute = {
   method: 'POST',
@@ -60,7 +60,7 @@ export const route: ServerRoute = {
         amount: Joi.number()
           .required()
           .min(0)
-          .example(500000)
+          .example(50)
           .precision(0),
         validFrom: Joi.number()
           .min(0)
@@ -74,30 +74,55 @@ export const route: ServerRoute = {
           .example(Math.ceil(Date.now() / 1000) + 24 * 60 * 60 * 30),
       },
     },
-    // response: {
-    //   status: {
-    //     200: Joi.object().keys({
-    //       mnemonic: Joi.string()
-    //         .description(
-    //           '12 words that translate into your private key. Backup!'
-    //         )
-    //         .example(
-    //           'panda live confirm tray topic join idea chief resist mixture frame market'
-    //         ),
-    //       ethereumAddress: Joi.string()
-    //         .regex(/^0x[0-9a-fA-F]{40}$/)
-    //         .required()
-    //         .description('your Ethereum address')
-    //         .example('0xD71512DA14b031f8A6cea83C94308db6c90510c5'),
-    //       privateKey: Joi.string()
-    //         .required()
-    //         .description('the private key for the address')
-    //         .example(
-    //           '0xd0fd7debd0f4ec45698db553c5894cf912bed2b331dd404963ddf5b402b3eb59'
-    //         ),
-    //     }),
-    //   },
-    // },
+    response: {
+      status: {
+        200: Joi.object().keys({
+          deals: Joi.array().items({
+            did: Joi.string().example('did:dxc:localhost:12345'),
+            owner: Joi.string().example(
+              '0xA74de4DbB12130c5A5e98233D05200d3dE0da7d6'
+            ),
+            ownerPercentage: Joi.number()
+              .max(100)
+              .min(0)
+              .precision(0)
+              .example(80),
+            publisher: Joi.string().example(
+              '0xA74de4DbB12130c5A5e98233D05200d3dE0da7d6'
+            ),
+            publisherPercentage: Joi.number()
+              .max(100)
+              .min(0)
+              .precision(0)
+              .example(10),
+            user: Joi.string().example(
+              '0xA74de4DbB12130c5A5e98233D05200d3dE0da7d6'
+            ),
+            marketplace: Joi.string().example(
+              '0xA74de4DbB12130c5A5e98233D05200d3dE0da7d6'
+            ),
+            marketplacePercentage: Joi.number()
+              .max(100)
+              .min(0)
+              .precision(0)
+              .example(5),
+            amount: Joi.string().example('500000'),
+            validFrom: Joi.string().example('1565031871'),
+            validUntil: Joi.string().example('1567623871'),
+          }),
+          balances: {
+            address: Joi.string().example(
+              '0xA74de4DbB12130c5A5e98233D05200d3dE0da7d6'
+            ),
+            balance: Joi.string().example('148143086000000000000000000'),
+            escrowOutgoing: Joi.string().example('3000000'),
+            escrowIncoming: Joi.string().example('2850000'),
+            available: Joi.string().example('148143085999999999997000000'),
+            globalBalance: Joi.string().example('0'),
+          },
+        }),
+      },
+    },
   },
   async handler(request: Hapi.Request, h: Hapi.ResponseToolkit) {
     const {
@@ -135,7 +160,10 @@ export const route: ServerRoute = {
 
     return {
       deals: await dealsForAddress(user),
-      balances: await balanceOfUser(user),
+      balances: {
+        address: user,
+        ...(await balanceOfUser(user)),
+      },
     };
   },
 };

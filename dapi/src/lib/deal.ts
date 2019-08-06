@@ -68,6 +68,25 @@ export async function dealsForAddress(address: string) {
   const method = abi.find(
     (abiMethod: IAbiMethodInputOrOutput) => abiMethod.name === 'dealsForAddress'
   );
+  return formatItems(response, method);
+}
+
+function formatItems(
+  response: Array<{
+    did: string;
+    owner: string;
+    ownerPercentage: any;
+    publisher: string;
+    publisherPercentage: any;
+    user: string;
+    marketplace: string;
+    marketplacePercentage: any;
+    amount: any;
+    validFrom: any;
+    validUntil: any;
+  }>,
+  method: any
+) {
   const items = [];
   for (const item of response) {
     const formattedItem = {};
@@ -81,4 +100,12 @@ export async function dealsForAddress(address: string) {
     items.push(formattedItem);
   }
   return items;
+}
+
+export async function dealsForDID(did: string) {
+  const response = await dxcContract.dealsForDID(did);
+  const method = abi.find(
+    (abiMethod: IAbiMethodInputOrOutput) => abiMethod.name === 'dealsForDID'
+  );
+  return formatItems(response, method);
 }

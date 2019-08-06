@@ -226,6 +226,15 @@ contract DXC is Ownable {
     uint256 dealIndex = dealsList.push(newDeal) - 1;
     didToDeals[did].push(newDeal);
     userToDeals[user].push(newDeal);
+    if( owner != user) {
+      userToDeals[owner].push(newDeal);
+    }
+    if(publisher != owner && publisher != user){
+      userToDeals[publisher].push(newDeal);
+    }
+    if(marketplace != owner && marketplace != user && marketplace != publisher){
+      userToDeals[marketplace].push(newDeal);
+    }
     emit NewDeal(
       dealIndex,
       did,

@@ -29490,8 +29490,8 @@
     "1337": {
       "events": {},
       "links": {},
-      "address": "0x2C2192Ec48e01C993186A137D93A8bB645CF20c0",
-      "transactionHash": "0x2998a5c6a797d2850f03732baa0fa5cc3c1cbb496fc9a479edacd41e2568aaf8"
+      "address": "0xd57390c40D28C5c2102bBC05c8b2911865112998",
+      "transactionHash": "0x9c17c9a259115ec2f08ff55137561ff75ac02445fa8ae95a3daf46df8bdc6c5b"
     },
     "8995": {
       "events": {},
@@ -29501,7 +29501,7 @@
     }
   },
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-08-06T07:40:36.894Z",
+  "updatedAt": "2019-08-06T09:40:23.652Z",
   "devdoc": {
     "details": "This contract is used to generate clone contracts from a contract.  In solidity this is the way to create a contract from a contract of the  same class",
     "methods": {

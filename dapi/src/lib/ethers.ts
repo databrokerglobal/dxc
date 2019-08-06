@@ -15,6 +15,7 @@ export const dxcContract: DXCInstance = new Contract(
 const baseNonce = provider.getTransactionCount(platformWallet.getAddress());
 let nonceOffset = 0;
 
-export function getNonce() {
-  return baseNonce.then((nonce: number) => nonce + nonceOffset++);
+export async function getNonce() {
+  const nonce = await baseNonce;
+  return nonce + nonceOffset++;
 }
