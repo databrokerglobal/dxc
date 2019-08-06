@@ -30,8 +30,9 @@ jobs:
         - npm run setup
         - npm run installall
       script:
-        - run-s -l build
+        - run-s -l build:contracts
         - npm run assemble
+        - run-s -l build:dapi
         - yes Y | docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
         - docker build --build-arg NPM_TOKEN=${NPM_TOKEN} --build-arg TESTING=true -t databrokerdao/dxc:${TRAVIS_BRANCH//[^a-zA-Z0-9]/} --cache-from databrokerdao/dxc:latest ./dapi
         - docker push databrokerdao/dxc:${TRAVIS_BRANCH//[^a-zA-Z0-9]/}
