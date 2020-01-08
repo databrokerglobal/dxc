@@ -1,0 +1,17 @@
+{
+  "extends": "solhint:recommended",
+  "rules": {
+    "indent": ["error", 2],
+    "bracket-align": false,
+    "compiler-fixed": false,
+    "no-simple-event-func-name": false,
+    "two-lines-top-level-separator": false,
+    "function-max-lines": false,
+    "space-after-comma": false,
+    "no-empty-blocks": false,
+    "max-line-length": false,
+    "mark-callable-contracts": false,
+    "not-rely-on-time": false,
+    "compiler-version": false
+  }
+}
