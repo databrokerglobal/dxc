@@ -9,6 +9,7 @@ import (
 	"github.com/labstack/echo"
 )
 
+// Upload file controller
 func Upload(c echo.Context) error {
 	// Read form fields
 	name := c.FormValue("name")
