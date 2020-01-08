@@ -2,7 +2,6 @@ package files
 
 import (
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 
@@ -19,28 +18,33 @@ func Upload(c echo.Context) error {
 	// Read file
 	//-----------
 
-	// Source
+	// Source - File stream from upload
 	file, err := c.FormFile("file")
 	if err != nil {
 		return err
 	}
+
+	// Open file to return its data source
 	src, err := file.Open()
 	if err != nil {
 		return err
 	}
 	defer src.Close()
 
-	// Destination
-	dst, err := os.Create(file.Filename)
+	// Open same file in the mounted docker volume
+	from, err := os.Open(fmt.Sprintf("/var/files/%s", file.Filename))
 	if err != nil {
 		return err
 	}
-	defer dst.Close()
+	defer from.Close()
 
-	// Copy
-	if _, err = io.Copy(dst, src); err != nil {
+	// Read some bytes from opened file in volume
+	b1 := make([]byte, 22)
+	n1, err := from.Read(b1)
+	if err != nil {
 		return err
 	}
 
-	return c.HTML(http.StatusOK, fmt.Sprintf("<p>File %s uploaded successfully with fields name=%s and email=%s.</p>", file.Filename, name, email))
+	// Return succes message
+	return c.HTML(http.StatusOK, fmt.Sprintf("<p>File %s uploaded successfully with fields name=%s and email=%s and working file_snippet=%s.</p>", file.Filename, name, email, string(b1[:n1])))
 }

@@ -6,6 +6,6 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - /Users/adrienblavier/Documents/settlemint/dxc/go-api:/var/lab/files
+      - /Users/adrienblavier/Documents/settlemint/dxc/go-api:/var/files
     ports:
       - '8080:1323'
