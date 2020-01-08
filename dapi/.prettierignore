@@ -1,5 +1,0 @@
-package.json
-package-lock.json
-templates/swagger.html
-src/templates/swagger.hbs
-*.hbs
