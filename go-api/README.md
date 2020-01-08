@@ -3,7 +3,7 @@
 ## How to run
 
 - Docker: docker-compose up -d --> navigate to localhost:8080
-- go build && ./dxc --> navigate to localhost:1323 (volume matching won't work though :) )
+- Local executable: go build && ./dxc --> navigate to localhost:1323 (volume matching won't work though :) )
 
 ## TODO
 
