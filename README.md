@@ -4,14 +4,29 @@
 
 <img style="float: center;" src="./public/assets/dxc-architecture.svg">
 
-## How to run unit test
+## How to run unit tests
 
-`go test -v -race ./...`
+```
+$ go test -v -race ./...
+
+```
 
 ## How to run
 
-- Docker: docker-compose up -d --> navigate to localhost:8080
-- Local executable: go build && ./dxc --> navigate to localhost:1323
+### Docker
+
+```
+$ docker-compose up -d 
+
+```
+Navigate to localhost:8080
+
+### Local
+```
+$ go build && ./dxc
+
+```
+Navigate to localhost:1323
 
 ## To Do
 
