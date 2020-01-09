@@ -13,7 +13,7 @@ func Test_compareHashes(t *testing.T) {
 		want bool
 	}{
 		{"Case 1: two exact same strings", args{[]byte("test"), []byte("test")}, true},
-		{"Case 2: two exact same strings", args{[]byte("foo"), []byte("bar")}, false},
+		{"Case 2: two different strings", args{[]byte("foo"), []byte("bar")}, false},
 		{"Case 3: double nil", args{[]byte(nil), []byte(nil)}, true},
 	}
 	for _, tt := range tests {
