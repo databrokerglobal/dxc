@@ -8,7 +8,6 @@
 
 ```
 $ go test -v -race ./...
-
 ```
 
 ## How to run
@@ -17,14 +16,12 @@ $ go test -v -race ./...
 
 ```
 $ docker-compose up -d 
-
 ```
 Navigate to localhost:8080
 
 ### Local
 ```
 $ go build && ./dxc
-
 ```
 Navigate to localhost:1323
 
