@@ -7,16 +7,26 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/labstack/echo"
+	"github.com/spf13/afero"
 )
 
 // Creates a new file upload http request with extra params
-func newfileUploadRequest(uri string, params map[string]string, paramName, path string) *http.Request {
-	file, err := os.Open(path)
+func newfileMockUploadRequest(uri string, params map[string]string, paramName string) *http.Request {
+	// mock io lib
+	var appFs = afero.NewMemMapFs()
+
+	// create dir
+	appFs.MkdirAll("/tmp", 0755)
+	afero.WriteFile(appFs, "/tmp/testfile", []byte("tesfile"), 0644)
+
+	// test file path
+	filePath := "/tmp/testfile"
+
+	file, err := appFs.Open(filePath)
 	if err != nil {
 		return nil
 	}
@@ -24,7 +34,7 @@ func newfileUploadRequest(uri string, params map[string]string, paramName, path 
 
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
-	part, err := writer.CreateFormFile(paramName, filepath.Base(path))
+	part, err := writer.CreateFormFile(paramName, filepath.Base(filePath))
 	if err != nil {
 		return nil
 	}
@@ -65,16 +75,13 @@ func mockUpload(c echo.Context) error {
 
 // Test of file upload route
 func TestUpload(t *testing.T) {
-	// test file in local dir to use
-	filePath := "/Users/adrienblavier/Documents/settlemint/dxc/test.txt"
-
 	formParams := map[string]string{
 		"name":  "adrien",
 		"email": "example@mail.com",
 	}
 
 	e := echo.New()
-	req := newfileUploadRequest("/upload", formParams, "file", filePath)
+	req := newfileMockUploadRequest("/upload", formParams, "file")
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	err := mockUpload(c)
