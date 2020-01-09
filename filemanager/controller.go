@@ -1,4 +1,4 @@
-package files
+package filemanager
 
 import (
 	"fmt"

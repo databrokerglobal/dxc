@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/joho/godotenv"
 
-	"github.com/databrokerglobal/dxc/files"
+	"github.com/databrokerglobal/dxc/filemanager"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
@@ -25,7 +25,7 @@ func main() {
 	// Static index.html route, serve html
 	e.Static("/", "public")
 	// Upload file route
-	e.POST("/upload", files.Upload)
+	e.POST("/upload", filemanager.Upload)
 
 	// Loading env file
 	err := godotenv.Load()
