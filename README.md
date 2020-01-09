@@ -2,7 +2,7 @@
 
 ## Architecture MVP #1
 
-<img style="float: center;" src="./assets/dxc-architecture.svg">
+<img style="float: center;" src="./public/assets/dxc-architecture.svg">
 
 ## How to run
 
