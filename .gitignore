@@ -19,3 +19,6 @@
 
 ## Test text file
 test.txt
+
+## env file
+.env
