@@ -2,40 +2,25 @@ package files
 
 import (
 	"fmt"
-	"net/http"
+	"mime/multipart"
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/labstack/echo"
 )
 
-// Upload file controller
-func Upload(c echo.Context) error {
-	// Read form fields
-	name := c.FormValue("name")
-	email := c.FormValue("email")
-
-	//-----------
-	// Read file
-	//-----------
-
-	// Source - File stream from upload
-	file, err := c.FormFile("file")
-	if err != nil {
-		return err
-	}
-
+// ReadFile read a multipart uploaded file from controller
+func readFile(file *multipart.FileHeader) (string, error) {
 	// Open file to return its data source
 	src, err := file.Open()
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer src.Close()
 
 	// Load env files
 	err = godotenv.Load()
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	// Load file path
@@ -49,7 +34,7 @@ func Upload(c echo.Context) error {
 	// Open same file in the mounted docker volume (or just local dir if go_env=development)
 	from, err := os.Open(fmt.Sprintf("%s/%s", filePath, file.Filename))
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer from.Close()
 
@@ -57,9 +42,10 @@ func Upload(c echo.Context) error {
 	b1 := make([]byte, 22)
 	n1, err := from.Read(b1)
 	if err != nil {
-		return err
+		return "", err
 	}
+	var fileSnippet string
+	fileSnippet = string(b1[:n1])
 
-	// Return succes message
-	return c.HTML(http.StatusOK, fmt.Sprintf("<p>File %s uploaded successfully with fields name=%s and email=%s and working file_snippet=%s.</p>", file.Filename, name, email, string(b1[:n1])))
+	return fileSnippet, nil
 }

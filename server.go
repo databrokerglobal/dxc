@@ -11,6 +11,8 @@ import (
 func main() {
 	e := echo.New()
 
+	// Hide startup banner
+	e.HideBanner = true
 	// Load the echo logger
 	e.Use(middleware.Logger())
 	// Pevents api from crashing if panic
