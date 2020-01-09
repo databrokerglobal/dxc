@@ -58,8 +58,11 @@ func parseFile(file *multipart.FileHeader) error {
 	return nil
 }
 
-// because the file can be of type os.File (local dir) or multipart.File (uploaded file)
-// we pass the io.Reader interface as argument which implements the Read method for both types
+// Read 22 first bytes and return them
+/*
+   Because the file can be of type os.File (local dir) or multipart.File (uploaded file),
+	 we pass the io.Reader interface as an argument which has the Read method used for both types.
+*/
 func readBytes(file io.Reader) ([]byte, error) {
 	b1 := make([]byte, 22)
 	n1, err := file.Read(b1)

@@ -23,7 +23,7 @@ func Upload(c echo.Context) error {
 		return err
 	}
 
-	// Go fetch file from docker volume (or local dir if dev env), read some bytes and return them
+	// Read file, then open mirror file in dir, read it and check if same file
 	err = parseFile(file)
 	if err != nil {
 		return err
