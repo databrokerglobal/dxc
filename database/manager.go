@@ -51,6 +51,16 @@ func (m *Manager) GetFile(n string) (f *File, err error) {
 	return
 }
 
+// GetFiles Get all files query
+func (m *Manager) GetFiles() (fs *[]File, err error) {
+	files := []File{}
+	m.db.Table("files").Find(&files)
+	if errs := m.db.GetErrors(); len(errs) > 0 {
+		err = errs[0]
+	}
+	return &files, nil
+}
+
 // File Struct
 type File struct {
 	gorm.Model

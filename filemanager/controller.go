@@ -12,9 +12,6 @@ import (
 
 // Upload file controller
 func Upload(c echo.Context) error {
-	// Read form fields
-	name := c.FormValue("name")
-
 	// Source - File stream from upload
 	file, err := c.FormFile("file")
 	if err != nil {
@@ -27,10 +24,10 @@ func Upload(c echo.Context) error {
 		return err
 	}
 
-	err = createOneFile(&database.File{Name: name})
+	err = createOneFile(&database.File{Name: file.Filename})
 
 	// Return succes message
-	return c.HTML(http.StatusOK, fmt.Sprintf("<p>File %s uploaded successfully with field name=%s. File checksum result: OK</p>", file.Filename, name))
+	return c.HTML(http.StatusOK, fmt.Sprintf("<p>File %s uploaded successfully. File checksum result: OK</p>", file.Filename))
 }
 
 // Download a file

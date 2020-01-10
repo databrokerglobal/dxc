@@ -8,15 +8,18 @@ import (
 )
 
 type IndexData struct {
-	Files []database.File
+	Files *[]database.File
 }
 
 // IndexHandler render index html
 func IndexHandler(c echo.Context) error {
-	file := database.File{Name: "Test"}
+	files, err := getAllFiles()
+	if err != nil {
+		return err
+	}
 
 	data := IndexData{
-		Files: []database.File{file},
+		Files: files,
 	}
 
 	return c.Render(http.StatusOK, "data", data)
