@@ -44,11 +44,12 @@ func (m *Manager) CreateFile(f *File) (err error) {
 
 // GetFile Query
 func (m *Manager) GetFile(n string) (f *File, err error) {
-	m.db.Where(&File{Name: n}).First(&f)
+	file := File{}
+	m.db.Where(&File{Name: n}).First(&file)
 	if errs := m.db.GetErrors(); len(errs) > 0 {
 		err = errs[0]
 	}
-	return
+	return &file, nil
 }
 
 // GetFiles Get all files query

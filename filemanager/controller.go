@@ -33,7 +33,7 @@ func Upload(c echo.Context) error {
 // Download a file
 func Download(c echo.Context) error {
 	// Read form field
-	name := c.FormValue("name")
+	name := c.QueryParam("name")
 
 	_, err := getOneFile(name)
 	if err != nil {
@@ -51,5 +51,5 @@ func Download(c echo.Context) error {
 		filePath = "/var/files"
 	}
 
-	return c.File(fmt.Sprintf("%s/%s", filePath, name))
+	return c.Attachment(fmt.Sprintf("%s/%s", filePath, name), name)
 }

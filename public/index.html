@@ -18,7 +18,7 @@
     {{if .Files}}
     <ul>
       {{range .Files}}
-      <li>{{.Name}}</li>
+      <li><a href="/download?name={{.Name}}">{{ .Name }}</a></li>
       {{end}}
     </ul>
     {{else}}
