@@ -2,8 +2,9 @@ package filemanager
 
 import (
 	"bytes"
-	"fmt"
+	"errors"
 	"io"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
@@ -14,77 +15,128 @@ import (
 	"github.com/spf13/afero"
 )
 
+// mock io lib
+var appFs = afero.NewMemMapFs()
+
 // Creates a new file upload http request with extra params
-func newfileMockUploadRequest(uri string, params map[string]string, paramName string) *http.Request {
-	// mock io lib
-	var appFs = afero.NewMemMapFs()
+func newfileUploadRequest(uri string, paramName string, mockFile []byte) *http.Request {
+	var body *bytes.Buffer
+	var writer *multipart.Writer
 
-	// create dir
-	appFs.MkdirAll("/tmp", 0755)
-	afero.WriteFile(appFs, "/tmp/testfile", []byte("tesfile"), 0644)
+	// case if file is nil or has size = 0
+	if mockFile == nil {
+		// create dir
+		appFs.MkdirAll("/tmp", 0755)
+		afero.WriteFile(appFs, "/tmp/testfile", mockFile, 0644)
 
-	// test file path
-	filePath := "/tmp/testfile"
+		// test file path
+		filePath := "/tmp/testfile"
 
-	file, err := appFs.Open(filePath)
+		file, err := appFs.Open(filePath)
+		if err != nil {
+			return nil
+		}
+		defer file.Close()
+
+		body = &bytes.Buffer{}
+		writer = multipart.NewWriter(body)
+		_, err = writer.CreateFormFile("file", filepath.Base(file.Name()))
+
+		if err != nil {
+			log.Fatal(err)
+		}
+		writer.Close()
+
+		// normal flow
+	} else {
+		// create dir
+		appFs.MkdirAll("/tmp", 0755)
+		afero.WriteFile(appFs, "/tmp/testfile", mockFile, 0644)
+
+		// test file path
+		filePath := "/tmp/testfile"
+
+		file, err := appFs.Open(filePath)
+		if err != nil {
+			return nil
+		}
+		defer file.Close()
+
+		body = &bytes.Buffer{}
+		writer = multipart.NewWriter(body)
+		part, err := writer.CreateFormFile("file", filepath.Base(file.Name()))
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		io.Copy(part, file)
+		writer.Close()
+	}
+
+	request := httptest.NewRequest("POST", "/upload", body)
+	request.Header.Add("Content-Type", writer.FormDataContentType())
+
+	return request
+}
+
+func createRequestAndCallUploadMockHandler(url string, param string, file []byte) error {
+	e := echo.New()
+
+	req := newfileUploadRequest(url, param, file)
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+
+	err := MockUpload(c)
+
 	if err != nil {
-		return nil
-	}
-	defer file.Close()
-
-	body := &bytes.Buffer{}
-	writer := multipart.NewWriter(body)
-	part, err := writer.CreateFormFile(paramName, filepath.Base(filePath))
-	if err != nil {
-		return nil
-	}
-	_, err = io.Copy(part, file)
-
-	for key, val := range params {
-		_ = writer.WriteField(key, val)
-	}
-	err = writer.Close()
-	if err != nil {
-		return nil
+		return err
 	}
 
-	req := httptest.NewRequest(http.MethodPost, uri, body)
-	req.Header.Set("Content-Type", writer.FormDataContentType())
-	return req
+	return nil
 }
 
 // Upload file controller
-func mockUpload(c echo.Context) error {
-	// Read form fields
-	name := c.FormValue("name")
-
-	//-----------
-	// Read file
-	//-----------
-
+func MockUpload(c echo.Context) error {
 	// Source - File stream from upload
 	file, err := c.FormFile("file")
+	if file.Size == 0 {
+		return errors.New("File is empty")
+	}
 	if err != nil {
 		return err
 	}
 
 	// Return succes message
-	return c.HTML(http.StatusOK, fmt.Sprintf("<p>File %s uploaded successfully with field name=%s. File checksum result: OK</p>", file.Filename, name))
+	return nil
 }
 
 // Test of file upload route
 func TestUpload(t *testing.T) {
-	formParams := map[string]string{
-		"name": "Text File 1",
+
+	type args struct {
+		url   string
+		param string
+		file  []byte
 	}
 
-	e := echo.New()
-	req := newfileMockUploadRequest("/upload", formParams, "file")
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
-	err := mockUpload(c)
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{"Case 1: all normal", args{url: "/upload", param: "file", file: []byte("Test")}, true},
+		{"Case 2: empty file", args{url: "/upload", param: "file", file: nil}, false},
+	}
 
-	if err != nil {
-		t.Errorf("Test failed: %s", err)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := createRequestAndCallUploadMockHandler(tt.args.url, tt.args.param, tt.args.file)
+			res := err == nil
+			if res != tt.want {
+				t.Errorf("Mock upload handler test case %s failed: %v", tt.name, err)
+			}
+		})
 	}
 }

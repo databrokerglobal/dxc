@@ -14,17 +14,23 @@ import (
 func Upload(c echo.Context) error {
 	// Source - File stream from upload
 	file, err := c.FormFile("file")
+	if file.Size == 0 {
+		return c.String(http.StatusBadRequest, fmt.Sprint("File invalid or empty"))
+	}
 	if err != nil {
-		return err
+		return c.String(http.StatusBadRequest, fmt.Sprint("File invalid or empty"))
 	}
 
 	// Read file, then open mirror file in dir, read it and check if same file
 	err = parseFile(file)
 	if err != nil {
-		return err
+		return c.String(http.StatusNotFound, "File not found, is the uploaded file in the rigth directory or correctly bound to your docker volume?")
 	}
 
 	err = createOneFile(&database.File{Name: file.Filename})
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Error inserting file metadata in database")
+	}
 
 	// Return succes message
 	return c.HTML(http.StatusOK, fmt.Sprintf("<p>File %s uploaded successfully. File checksum result: OK</p>", file.Filename))
