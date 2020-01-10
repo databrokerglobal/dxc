@@ -57,7 +57,6 @@ func newfileMockUploadRequest(uri string, params map[string]string, paramName st
 func mockUpload(c echo.Context) error {
 	// Read form fields
 	name := c.FormValue("name")
-	email := c.FormValue("email")
 
 	//-----------
 	// Read file
@@ -70,14 +69,13 @@ func mockUpload(c echo.Context) error {
 	}
 
 	// Return succes message
-	return c.HTML(http.StatusOK, fmt.Sprintf("<p>File %s uploaded successfully with fields name=%s and email=%s. File checksum result: OK</p>", file.Filename, name, email))
+	return c.HTML(http.StatusOK, fmt.Sprintf("<p>File %s uploaded successfully with field name=%s. File checksum result: OK</p>", file.Filename, name))
 }
 
 // Test of file upload route
 func TestUpload(t *testing.T) {
 	formParams := map[string]string{
-		"name":  "adrien",
-		"email": "example@mail.com",
+		"name": "Text File 1",
 	}
 
 	e := echo.New()

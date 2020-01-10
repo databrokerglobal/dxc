@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/databrokerglobal/dxc/database"
 	"github.com/labstack/echo"
 )
 
@@ -11,7 +12,6 @@ import (
 func Upload(c echo.Context) error {
 	// Read form fields
 	name := c.FormValue("name")
-	email := c.FormValue("email")
 
 	//-----------
 	// Read file
@@ -29,6 +29,8 @@ func Upload(c echo.Context) error {
 		return err
 	}
 
+	err = createOneFile(&database.File{Name: name})
+
 	// Return succes message
-	return c.HTML(http.StatusOK, fmt.Sprintf("<p>File %s uploaded successfully with fields name=%s and email=%s. File checksum result: OK</p>", file.Filename, name, email))
+	return c.HTML(http.StatusOK, fmt.Sprintf("<p>File %s uploaded successfully with field name=%s. File checksum result: OK</p>", file.Filename, name))
 }
