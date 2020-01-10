@@ -23,6 +23,7 @@ func init() {
 		log.Println("Testing: omitting database init")
 		return
 	}
+
 	db, err := gorm.Open("sqlite3", "./database/dxc.db")
 	if err != nil {
 		log.Fatal("Error connecting to database")

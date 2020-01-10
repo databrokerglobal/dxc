@@ -26,6 +26,8 @@ func main() {
 	e.Static("/", "public")
 	// Upload file route
 	e.POST("/upload", filemanager.Upload)
+	// Download file route
+	e.GET("/download", filemanager.Download)
 
 	// Loading env file
 	err := godotenv.Load()
