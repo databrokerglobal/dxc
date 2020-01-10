@@ -43,11 +43,11 @@ func Download(c echo.Context) error {
 
 	_, err := getOneFile(name)
 	if err != nil {
-		return err
+		return c.String(http.StatusNotFound, "File not found")
 	}
 
 	if err = godotenv.Load(); err != nil {
-		return err
+		return c.String(http.StatusInternalServerError, "Error loading env variables")
 	}
 
 	var filePath string
