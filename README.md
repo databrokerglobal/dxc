@@ -26,6 +26,7 @@ GO_ENV=production
 LOCAL_FILES_DIR=/path/to/files
 ```
 
+Run
 ```
 $ docker-compose build
 $ docker-compose up -d 
@@ -46,6 +47,7 @@ GO_ENV=development
 LOCAL_FILES_DIR=/path/to/files
 ```
 
+Run
 ```
 $ go build && ./dxc
 ```
@@ -59,3 +61,5 @@ Navigate to localhost:1323
 - [x] Nice error handling when file doesn't match
 - [x] Store the upload event in db
 - [ ] Unit test the crap out of it
+- [ ] Change name of file if same filename but not same content
+- [ ] More clever file checker -> no delete but flag in db?
