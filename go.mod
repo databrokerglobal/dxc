@@ -3,7 +3,9 @@ module github.com/databrokerglobal/dxc
 go 1.12
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.4.0
 	github.com/ethereum/go-ethereum v1.9.9
+	github.com/jinzhu/gorm v1.9.12
 	github.com/joho/godotenv v1.3.0
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/gommon v0.3.0 // indirect

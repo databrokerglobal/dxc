@@ -22,3 +22,5 @@ test.txt
 
 ## env file
 .env
+
+*.db

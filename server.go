@@ -4,8 +4,11 @@ import (
 	"github.com/joho/godotenv"
 
 	"github.com/databrokerglobal/dxc/filemanager"
+	"github.com/databrokerglobal/dxc/templating"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+
+	"html/template"
 )
 
 func main() {
@@ -18,14 +21,25 @@ func main() {
 	// Pevents api from crashing if panic
 	e.Use(middleware.Recover())
 
+	////////////////////////
+	// Template Renderer //
+	///////////////////////
+
+	t := &templating.Template{
+		Templates: template.Must(template.ParseGlob("public/*.html")),
+	}
+	e.Renderer = t
+
 	////////////
 	// ROUTES //
 	////////////
 
 	// Static index.html route, serve html
-	e.Static("/", "public")
+	e.GET("/", templating.IndexHandler)
 	// Upload file route
 	e.POST("/upload", filemanager.Upload)
+	// Download file route
+	e.GET("/download", filemanager.Download)
 
 	// Loading env file
 	err := godotenv.Load()

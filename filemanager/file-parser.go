@@ -26,25 +26,16 @@ func parseFile(file *multipart.FileHeader) error {
 		return err
 	}
 
-	// Load file path
-	var filePath string
-	if os.Getenv("GO_ENV") == "development" {
-		filePath = os.Getenv("LOCAL_FILES_DIR")
-	} else {
-		filePath = "/var/files"
-	}
-
-	// Open same file in the mounted docker volume (or just local dir if go_env=development)
-	from, err := os.Open(fmt.Sprintf("%s/%s", filePath, file.Filename))
-	if err != nil {
-		return err
-	}
-	defer from.Close()
-
 	uploadedFileSnippet, err := readBytes(src)
 	if err != nil {
 		return err
 	}
+
+	from, err := open(file.Filename)
+	if err != nil {
+		return err
+	}
+	defer from.Close()
 
 	localFileSnippet, err := readBytes(from)
 	if err != nil {
@@ -78,4 +69,28 @@ func compareHashes(file1 []byte, file2 []byte) bool {
 	hash2 := crypto.Keccak256(file2)
 
 	return string(hash1) == string(hash2)
+}
+
+// open file
+func open(filename string) (*os.File, error) {
+	// Load env files
+	err := godotenv.Load()
+	if err != nil {
+		return nil, err
+	}
+
+	// Load file path
+	var filePath string
+	if os.Getenv("GO_ENV") == "development" {
+		filePath = os.Getenv("LOCAL_FILES_DIR")
+	} else {
+		filePath = "/var/files"
+	}
+
+	// Open same file in the mounted docker volume (or just local dir if go_env=development)
+	from, err := os.Open(fmt.Sprintf("%s/%s", filePath, filename))
+	if err != nil {
+		return nil, err
+	}
+	return from, nil
 }
