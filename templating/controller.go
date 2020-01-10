@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo"
 )
 
+// IndexData file list template generator
 type IndexData struct {
 	Files *[]database.File
 }
