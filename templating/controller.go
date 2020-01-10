@@ -15,7 +15,7 @@ type IndexData struct {
 func IndexHandler(c echo.Context) error {
 	files, err := getAllFiles()
 	if err != nil {
-		return err
+		return c.String(http.StatusNotFound, "No file metadata stored in the database")
 	}
 
 	data := IndexData{
