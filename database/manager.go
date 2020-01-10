@@ -62,6 +62,15 @@ func (m *Manager) GetFiles() (fs *[]File, err error) {
 	return &files, nil
 }
 
+// DeleteFile delete a file
+func (m *Manager) DeleteFile(fileName string) (err error) {
+	m.db.Delete(&File{Name: fileName})
+	if errs := m.db.GetErrors(); len(errs) > 0 {
+		err = errs[0]
+	}
+	return
+}
+
 // File Struct
 type File struct {
 	gorm.Model
