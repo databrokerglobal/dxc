@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "inlineSources": true,
+    "incremental": true,
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "target": "ES2017",
+    "noImplicitAny": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "moduleResolution": "node",
+    "outDir": "dist",
+    "baseUrl": ".",
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "strict": true,
+    "resolveJsonModule": true
+  },
+  "plugins": [
+    {
+      "name": "typescript-tslint-plugin"
+    }
+  ],
+  "include": [
+    "./scripts",
+    "./test",
+    "./migrations"
+  ],
+  "files": [
+    "./buidler.config.ts",
+    "./node_modules/@nomiclabs/buidler-ethers/src/type-extensions.d.ts",
+    "./node_modules/buidler-typechain/src/type-extensions.d.ts"
+  ]
+}
