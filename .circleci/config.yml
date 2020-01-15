@@ -36,7 +36,7 @@ jobs: # basic units of work in a run
     docker: # run the steps with Docker
       - image: circleci/node:10.16.3 # ...with this image as the primary container; this is where all `steps` will ru
     steps: # a collection of executable commands d
-      - run: cd ethereum
+      - run: cd ~/ethereum
       - run:
           name: update-npm
           command: 'sudo npm install -g npm@latest'
