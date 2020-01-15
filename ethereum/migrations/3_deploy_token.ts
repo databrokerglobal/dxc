@@ -1,11 +1,11 @@
 // Generated with typechain: typechain --target=truffle "./build/**/*.json"
 import {
   OwnedUpgradeabilityProxyContract,
-  TokenUpgradeContract,
+  TokenContract,
 } from '../types/truffle-contracts';
-const TokenUpgrade: TokenUpgradeContract = artifacts.require(
-  './TokenUpgrade.sol'
-);
+import { encodeCall } from './utils/encodeCall';
+
+const Token: TokenContract = artifacts.require('./Token.sol');
 const OwnedUpgradeabilityProxy: OwnedUpgradeabilityProxyContract = artifacts.require(
   './OwnedUpgradeabilityProxy.sol'
 );
@@ -18,15 +18,38 @@ async function performMigration (
   // Is proxy deployed?
   const dOwnedUpgradeabilityProxy = await OwnedUpgradeabilityProxy.deployed();
 
-  // deploy ogic contract here
-  await deployer.deploy(TokenUpgrade);
-  const dTokenUpgrade = await TokenUpgrade.deployed();
-
-  // upgrade or initialize proxy with logic contract address
-  await dOwnedUpgradeabilityProxy.upgradeTo(dTokenUpgrade.address);
+  // deploy logic contract here
+  await deployer.deploy(Token);
+  const dToken = await Token.deployed();
 
   // re run constructor or init logic since proxy strorage is oblivious to it
-  await dTokenUpgrade.initialize(accounts[0]);
+  // encode the function call needed (function name, contract address, function param(s))
+  const initializeData = encodeCall(
+    'initialize',
+    [`address`],
+    [`${accounts[0]}`]
+  );
+
+  // Initialize data in function call
+  await dOwnedUpgradeabilityProxy.upgradeToAndCall(
+    dToken.address,
+    initializeData,
+    { from: accounts[0] }
+  );
+
+  /*
+    Now that a proxy is set interact with the target contract as follows:
+
+    const logicContractFromProxy = await logicContract.at(addressOfProxyContract)
+    await logicContract.method();
+
+    Upgrading:
+
+    deployer.deploy(newContract) // new contract must extend previous one
+
+    await OwnedUpgradeabilityProxy.upgradeTo(newAddress)
+
+  */
 }
 
 module.exports = (deployer: any, network: string, accounts: string[]) => {

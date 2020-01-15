@@ -23,6 +23,7 @@
     "@nomiclabs/buidler-ethers": "^1.0.1",
     "@nomiclabs/buidler-solhint": "^1.0.1",
     "@types/chai": "^4.2.7",
+    "@types/ethereumjs-abi": "^0.6.3",
     "@types/faker": "^4.1.8",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.12.17",
@@ -30,6 +31,7 @@
     "chai": "^4.2.0",
     "dayjs": "^1.8.17",
     "ethereum-waffle": "^2.1.1",
+    "ethereumjs-abi": "^0.6.8",
     "ethers": "^4.0.40",
     "faker": "^4.1.0",
     "ipfs-api": "^26.1.2",
@@ -51,7 +53,8 @@
     "typechain-target-ethers": "^1.0.3",
     "typechain-target-truffle": "^1.0.2",
     "typechain-target-web3-v1": "^1.0.3",
-    "web3": "^1.2.4"
+    "web3": "^1.2.4",
+    "web3-utils": "^1.2.4"
   },
   "devDependencies": {
     "@nomiclabs/buidler": "^1.0.2",
