@@ -33,7 +33,7 @@ jobs: # basic units of work in a run
       - store_test_results: # Upload test results for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
           path: /tmp/test-results
   build_and_test_truffle: # runs not using Workflows must have a `build` job as entry point
-    working_directory: ~/ethereum # directory where steps will run
+    working_directory: ~/dxc/ethereum # directory where steps will run
     docker: # run the steps with Docker
       - image: circleci/node:10.16.3 # ...with this image as the primary container; this is where all `steps` will ru
     steps: # a collection of executable commands
