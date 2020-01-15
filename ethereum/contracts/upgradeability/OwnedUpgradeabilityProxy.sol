@@ -1,6 +1,6 @@
 pragma solidity ^0.5.11;
 
-import './UpgradeabilityProxy.sol';
+import "./UpgradeabilityProxy.sol";
 
 /**
  * @title OwnedUpgradeabilityProxy
@@ -15,7 +15,7 @@ contract OwnedUpgradeabilityProxy is UpgradeabilityProxy {
   event ProxyOwnershipTransferred(address previousOwner, address newOwner);
 
   // Storage position of the owner of the contract
-  bytes32 private constant proxyOwnerPosition = keccak256("org.zeppelinos.proxy.owner");
+  bytes32 private constant PROXY_OWNER_POSITION = keccak256("dxc.proxy.owner");
 
   /**
   * @dev the constructor sets the original owner of the contract to the sender account.
@@ -37,7 +37,7 @@ contract OwnedUpgradeabilityProxy is UpgradeabilityProxy {
    * @return the address of the owner
    */
   function proxyOwner() public view returns (address owner) {
-    bytes32 position = proxyOwnerPosition;
+    bytes32 position = PROXY_OWNER_POSITION;
     assembly {
       owner := sload(position)
     }
@@ -47,7 +47,7 @@ contract OwnedUpgradeabilityProxy is UpgradeabilityProxy {
    * @dev Sets the address of the owner
    */
   function setUpgradeabilityOwner(address newProxyOwner) internal {
-    bytes32 position = proxyOwnerPosition;
+    bytes32 position = PROXY_OWNER_POSITION;
     assembly {
       sstore(position, newProxyOwner)
     }
@@ -78,7 +78,7 @@ contract OwnedUpgradeabilityProxy is UpgradeabilityProxy {
    * @param data represents the msg.data to bet sent in the low level call. This parameter may include the function
    * signature of the implementation to be called with the needed payload
    */
-  function upgradeToAndCall(address implementation, bytes memory data) payable public onlyProxyOwner {
+  function upgradeToAndCall(address implementation, bytes memory data) public payable onlyProxyOwner {
     upgradeTo(implementation);
     (bool success,) = implementation.delegatecall(data);
     require(success);

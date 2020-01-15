@@ -1,6 +1,6 @@
 pragma solidity ^0.5.11;
 
-import './Proxy.sol';
+import "./Proxy.sol";
 
 /**
  * @title UpgradeabilityProxy
@@ -14,7 +14,7 @@ contract UpgradeabilityProxy is Proxy {
   event Upgraded(address indexed implementation);
 
   // Storage position of the address of the current implementation
-  bytes32 private constant implementationPosition = keccak256("org.zeppelinos.proxy.implementation");
+  bytes32 private constant IMPLEMENTATION_POSITION = keccak256("dxc.proxy.implementation");
 
   /**
    * @dev Constructor function
@@ -26,7 +26,7 @@ contract UpgradeabilityProxy is Proxy {
    * @return address of the current implementation
    */
   function implementation() public view returns (address impl) {
-    bytes32 position = implementationPosition;
+    bytes32 position = IMPLEMENTATION_POSITION;
     assembly {
       impl := sload(position)
     }
@@ -37,7 +37,7 @@ contract UpgradeabilityProxy is Proxy {
    * @param newImplementation address representing the new implementation to be set
    */
   function setImplementation(address newImplementation) internal {
-    bytes32 position = implementationPosition;
+    bytes32 position = IMPLEMENTATION_POSITION;
     assembly {
       sstore(position, newImplementation)
     }

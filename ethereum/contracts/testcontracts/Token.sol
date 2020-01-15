@@ -1,13 +1,13 @@
 pragma solidity ^0.5.11;
 
-import '../ownership/Ownable.sol';
-import '../utils/SafeMath.sol';
+import "../ownership/Ownable.sol";
+import "../utils/SafeMath.sol";
 
 /**
- * @title Token_V0
+ * @title Token
  * @dev Version 0 of a token to show upgradeability.
  */
-contract Token_V0 is Ownable {
+contract Token is Ownable {
   using SafeMath for uint256;
 
   event Transfer(address indexed from, address indexed to, uint256 value);
@@ -69,7 +69,7 @@ contract Token_V0 is Ownable {
   }
 
   function decreaseApproval(address spender, uint256 subtractedValue) public {
-    uint oldValue = _allowances[msg.sender][spender];
+    uint256 oldValue = _allowances[msg.sender][spender];
     if (subtractedValue > oldValue) {
       _allowances[msg.sender][spender] = 0;
     } else {

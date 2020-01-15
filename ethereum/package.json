@@ -1,7 +1,7 @@
 {
-  "name": "@settlemint/colruyt-biovarken",
+  "name": "@databrokerglobal/dxc",
   "version": "1.0.0",
-  "description": "Colruyt Biovarken Project",
+  "description": "DXC",
   "main": "truffle-config.js",
   "scripts": {
     "compile": "npx buidler typechain && npx truffle compile --all && npx typechain --target truffle './build/contracts/*.json'",
@@ -9,20 +9,19 @@
     "test": "npx buidler test",
     "migrate": "npx truffle compile -all && npx typechain --target truffle './build/contracts/*.json' && tsc --declaration && npx truffle migrate"
   },
-  "author": "SettleMint <hello@settlemint.com>",
+  "author": "Databroker",
   "license": "SEE LICENSE IN mint-license.txt",
   "bugs": {
-    "url": "https://github.com/settlemint/colruyt-biovarken/issues"
+    "url": "https://github.com/databrokerglobal/dxc/issues"
   },
-  "homepage": "https://settlemint.com",
+  "homepage": "https://databroker.online/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/settlemint/colruyt-biovarken.git"
+    "url": "https://github.com/databrokerglobal/dxc.git"
   },
   "dependencies": {
     "@nomiclabs/buidler-ethers": "^1.0.1",
     "@nomiclabs/buidler-solhint": "^1.0.1",
-    "@settlemint/mint-solidity": "^5.11.0",
     "@types/chai": "^4.2.7",
     "@types/faker": "^4.1.8",
     "@types/mocha": "^5.2.7",
