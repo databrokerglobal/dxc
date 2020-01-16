@@ -33,10 +33,12 @@ jobs: # basic units of work in a run
       - store_test_results: # Upload test results for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
           path: /tmp/test-results
   build_and_test_truffle: # runs not using Workflows must have a `build` job as entry point
+    working_directory: ~/dxc/ethereum
     docker: # run the steps with Docker
       - image: circleci/node:10.16.3 # ...with this image as the primary container; this is where all `steps` will ru
-    steps: # a collection of executable commands d
-      - run: cd ./ethereum
+    steps: # a collection of executable commands
+      - checkout:
+        path: ~/dxc
       - run:
           name: update-npm
           command: 'sudo npm install -g npm@latest'
