@@ -4,6 +4,7 @@ import (
 	"github.com/joho/godotenv"
 
 	"github.com/databrokerglobal/dxc/filemanager"
+	"github.com/databrokerglobal/dxc/products"
 	"github.com/databrokerglobal/dxc/templating"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -22,7 +23,7 @@ func main() {
 	e.Use(middleware.Recover())
 
 	////////////////////////
-	// Template Renderer //
+	// Template Renderer //)
 	///////////////////////
 
 	t := &templating.Template{
@@ -34,12 +35,17 @@ func main() {
 	// ROUTES //
 	////////////
 
+	// FILES
 	// Static index.html route, serve html
 	e.GET("/", templating.IndexHandler)
 	// Upload file route
 	e.POST("/upload", filemanager.Upload)
 	// Download file route
 	e.GET("/download", filemanager.Download)
+
+	// PRODUCTS
+	e.POST("/product", products.AddOne)
+	e.GET("/product/:name", products.GetOne)
 
 	// Loading env file
 	err := godotenv.Load()
