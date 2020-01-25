@@ -14,7 +14,6 @@ func init() {
 		log.Println("Testing: omitting database init")
 		return
 	}
-
 	fmt.Println("Checking file integrity...")
 	files, err := database.DB.GetFiles()
 	if err != nil {
@@ -26,4 +25,5 @@ func init() {
 			database.DB.DeleteFile(file.Name)
 		}
 	}
+	defer fmt.Println("Finished checking file integrity")
 }

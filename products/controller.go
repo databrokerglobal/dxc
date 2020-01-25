@@ -1,7 +1,11 @@
 package products
 
 import (
+	"fmt"
+	"io/ioutil"
 	"net/http"
+	"regexp"
+	"strings"
 
 	"github.com/databrokerglobal/dxc/database"
 	"github.com/google/uuid"
@@ -22,6 +26,14 @@ func AddOne(c echo.Context) error {
 
 	if len(p.Type) == 0 {
 		return c.String(http.StatusBadRequest, "400: producttype missing")
+	}
+
+	if len(p.Host) == 0 {
+		return c.String(http.StatusBadRequest, "400: host missing")
+	}
+
+	if strings.Split(p.Host, "")[len(p.Host)-1] == "/" {
+		p.Host = strings.TrimSuffix(p.Host, "/")
 	}
 
 	tempuuid, err := uuid.NewRandom()
@@ -48,4 +60,74 @@ func GetOne(c echo.Context) error {
 		return err
 	}
 	return c.JSON(http.StatusOK, p)
+}
+
+// RedirectToHost based on product uuid path check if api or stream and subsequently redirect
+func RedirectToHost(c echo.Context) error {
+	slice := strings.Split(c.Request().RequestURI, "/")
+
+	var p *database.Product
+
+	// Check if string in path matches uuid regex, is valid uuid and matches product that is type API or STREAM
+	for _, str := range slice {
+
+		match, err := regexp.MatchString(`[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}`, str)
+		if err != nil {
+			return c.String(http.StatusNoContent, "")
+		}
+
+		if match {
+			_, err := uuid.Parse(str)
+			if err != nil {
+				return c.String(http.StatusNoContent, "")
+			}
+
+			p, err = getOneProduct(str)
+			if err != nil {
+				return c.String(http.StatusNoContent, "")
+			}
+
+			if p.Type == "" {
+				return c.String(http.StatusNoContent, "")
+			}
+
+			if p.Host == "" {
+				return c.String(http.StatusNoContent, "")
+			}
+
+			if p.Name == "" {
+				return c.String(http.StatusNoContent, "")
+			}
+
+			if p.Type == "FILE" {
+				return c.String(http.StatusNoContent, "")
+			}
+
+			if c.Request().Method == "GET" {
+				// replace first encounter of product uuid
+				requestURI := strings.Replace(c.Request().RequestURI, p.UUID, "", 1)
+
+				// strip any double slashes, -1 means for every encounter
+				strings.Replace(requestURI, "//", "/", -1)
+
+				requestURL := []string{p.Host, requestURI}
+				fmt.Println("HOST REQUEST", strings.Join(requestURL, ""))
+
+				resp, err := http.Get(strings.Join(requestURL, ""))
+				if err != nil {
+					c.String(http.StatusGatewayTimeout, fmt.Sprintf("Upstream server response timeout: %v", err))
+				}
+
+				defer resp.Body.Close()
+				body, err := ioutil.ReadAll(resp.Body)
+				if err != nil {
+					c.String(http.StatusInternalServerError, fmt.Sprintf("Error reading response body: %v", err))
+				}
+
+				return c.Blob(resp.StatusCode, resp.Header.Get("Content-Type"), body)
+			}
+		}
+	}
+
+	return c.String(http.StatusNoContent, "")
 }

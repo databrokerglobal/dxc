@@ -14,4 +14,5 @@ type Product struct {
 	Name string `json:"name"`
 	Type string `json:"producttype"`
 	UUID string `json:"uuid"`
+	Host string `json:"host"`
 }

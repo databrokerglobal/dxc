@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/joho/godotenv"
+	"net/http"
 
 	"github.com/databrokerglobal/dxc/filemanager"
 	"github.com/databrokerglobal/dxc/products"
@@ -11,6 +12,10 @@ import (
 
 	"html/template"
 )
+
+func h(c echo.Context) error {
+	return c.String(http.StatusOK, c.Request().RequestURI)
+}
 
 func main() {
 	e := echo.New()
@@ -45,7 +50,9 @@ func main() {
 
 	// PRODUCTS
 	e.POST("/product", products.AddOne)
-	e.GET("/product/:name", products.GetOne)
+	e.GET("/product/:uuid", products.GetOne)
+
+	e.Any("/*", products.RedirectToHost)
 
 	// Loading env file
 	err := godotenv.Load()
@@ -54,5 +61,5 @@ func main() {
 	}
 
 	// Log stuff if port is busy f.e.
-	e.Logger.Fatal(e.Start(":1323"))
+	e.Logger.Fatal(e.Start(":1324"))
 }
