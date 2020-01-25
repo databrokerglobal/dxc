@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/joho/godotenv"
-	"net/http"
 
 	"github.com/databrokerglobal/dxc/filemanager"
 	"github.com/databrokerglobal/dxc/products"
@@ -13,12 +12,12 @@ import (
 	"html/template"
 )
 
-func h(c echo.Context) error {
-	return c.String(http.StatusOK, c.Request().RequestURI)
-}
-
 func main() {
 	e := echo.New()
+
+	//////////////////////////
+	// Middleware          //
+	////////////////////////
 
 	// Hide startup banner
 	e.HideBanner = true
@@ -52,6 +51,7 @@ func main() {
 	e.POST("/product", products.AddOne)
 	e.GET("/product/:uuid", products.GetOne)
 
+	// PRODUCTS Request Redirect
 	e.Any("/*", products.RedirectToHost)
 
 	// Loading env file
@@ -61,5 +61,5 @@ func main() {
 	}
 
 	// Log stuff if port is busy f.e.
-	e.Logger.Fatal(e.Start(":1324"))
+	e.Logger.Fatal(e.Start(":1323"))
 }
