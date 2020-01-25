@@ -39,9 +39,11 @@ func main() {
 	// ROUTES //
 	////////////
 
-	// FILES
+	// Templating
 	// Static index.html route, serve html
 	e.GET("/", templating.IndexHandler)
+
+	// FILES
 	// Upload file route
 	e.POST("/upload", filemanager.Upload)
 	// Download file route
