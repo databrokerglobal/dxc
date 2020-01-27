@@ -60,6 +60,10 @@ Navigate to localhost:1323
 - [x] Upload file and make it match with file in volume
 - [x] Nice error handling when file doesn't match
 - [x] Store the upload event in db
-- [ ] Unit test the crap out of it
+- [x] Unit test the crap out of it
+- [x] Add/Get products
+- [x] Request redirect to Host API (GET)
+- [ ] Request redirect to Host API (POST)
 - [ ] Change name of file if same filename but not same content
 - [ ] More clever file checker -> no delete but flag in db?
+- [ ] Fully functional UI
