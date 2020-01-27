@@ -57,8 +57,13 @@ func GetOne(c echo.Context) error {
 	p, err := getOneProduct(uuid)
 
 	if err != nil {
-		return err
+		return c.String(http.StatusInternalServerError, "Error retrieving item from database")
 	}
+
+	if p == nil {
+		return c.String(http.StatusNotFound, "Product not found")
+	}
+
 	return c.JSON(http.StatusOK, p)
 }
 
@@ -87,15 +92,7 @@ func RedirectToHost(c echo.Context) error {
 				return c.String(http.StatusNoContent, "")
 			}
 
-			if p.Type == "" {
-				return c.String(http.StatusNoContent, "")
-			}
-
-			if p.Host == "" {
-				return c.String(http.StatusNoContent, "")
-			}
-
-			if p.Name == "" {
+			if p == nil {
 				return c.String(http.StatusNoContent, "")
 			}
 
@@ -111,7 +108,6 @@ func RedirectToHost(c echo.Context) error {
 				strings.Replace(requestURI, "//", "/", -1)
 
 				requestURL := []string{p.Host, requestURI}
-				fmt.Println("HOST REQUEST", strings.Join(requestURL, ""))
 
 				resp, err := http.Get(strings.Join(requestURL, ""))
 				if err != nil {
