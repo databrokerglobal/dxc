@@ -92,6 +92,10 @@ func RedirectToHost(c echo.Context) error {
 				return c.String(http.StatusNoContent, "")
 			}
 
+			if p.Name == "" {
+				return c.String(http.StatusNoContent, "")
+			}
+
 			if p == nil {
 				return c.String(http.StatusNoContent, "")
 			}
@@ -102,14 +106,13 @@ func RedirectToHost(c echo.Context) error {
 
 			if c.Request().Method == "GET" {
 				// replace first encounter of product uuid
-				requestURI := strings.Replace(c.Request().RequestURI, p.UUID, "", 1)
+				requestURI := strings.TrimPrefix(strings.Replace(c.Request().RequestURI, p.UUID, "", 1), "/")
 
-				// strip any double slashes, -1 means for every encounter
-				strings.Replace(requestURI, "//", "/", -1)
+				requestURLSlice := []string{p.Host, requestURI}
 
-				requestURL := []string{p.Host, requestURI}
+				requestURL := strings.Join(requestURLSlice, "")
 
-				resp, err := http.Get(strings.Join(requestURL, ""))
+				resp, err := http.Get(requestURL)
 				if err != nil {
 					c.String(http.StatusGatewayTimeout, fmt.Sprintf("Upstream server response timeout: %v", err))
 				}
