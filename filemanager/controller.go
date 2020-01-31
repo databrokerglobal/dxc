@@ -27,7 +27,7 @@ func Upload(c echo.Context) error {
 		return c.String(http.StatusNotFound, "File not found, is the uploaded file in the rigth directory or correctly bound to your docker volume?")
 	}
 
-	err = createOneFile(&database.File{Name: file.Filename})
+	err = database.DB.CreateFile(&database.File{Name: file.Filename})
 	if err != nil {
 		return c.String(http.StatusInternalServerError, "Error inserting file metadata in database")
 	}
@@ -41,7 +41,7 @@ func Download(c echo.Context) error {
 	// Read form field
 	name := c.QueryParam("name")
 
-	_, err := getOneFile(name)
+	_, err := database.DB.GetFile(name)
 	if err != nil {
 		return c.String(http.StatusNotFound, "File not found")
 	}
