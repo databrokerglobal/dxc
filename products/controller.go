@@ -105,11 +105,11 @@ func checkProduct(p *database.Product) int {
 	return status
 }
 
-func parseRequestURL(c echo.Context, p *database.Product) string {
+func parseRequestURL(requestURI string, p *database.Product) string {
 	// replace first encounter of product uuid
-	requestURI := strings.TrimPrefix(strings.Replace(c.Request().RequestURI, p.UUID, "", 1), "/")
+	newRequestURI := strings.TrimPrefix(strings.Replace(requestURI, p.UUID, "", 1), "/")
 
-	requestURLSlice := []string{p.Host, requestURI}
+	requestURLSlice := []string{p.Host, newRequestURI}
 
 	requestURL := strings.Join(requestURLSlice, "")
 
@@ -164,7 +164,7 @@ func RedirectToHost(c echo.Context) error {
 
 			if c.Request().Method == "GET" {
 
-				requestURL := parseRequestURL(c, p)
+				requestURL := parseRequestURL(c.Request().RequestURI, p)
 
 				resp, err := http.Get(requestURL)
 				if err != nil {

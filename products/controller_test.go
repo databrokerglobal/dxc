@@ -2,6 +2,7 @@ package products
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -267,6 +268,67 @@ func Test_checkProduct(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := checkProduct(tt.args.p); got != tt.want {
 				t.Errorf("checkProduct() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func makeProduct(name string, pType string, host string) *database.Product {
+	return &database.Product{
+		Name: name,
+		Type: pType,
+		UUID: uuid.New().String(),
+		Host: host,
+	}
+}
+
+func Test_parseRequestURL(t *testing.T) {
+	p := makeProduct("test", "API", "http://localhost:4000")
+
+	type args struct {
+		requestURI string
+		p          *database.Product
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{"First pass", args{
+			requestURI: fmt.Sprintf("/%s/add", p.UUID),
+			p:          p,
+		}, "http://localhost:4000/add"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := parseRequestURL(tt.args.requestURI, tt.args.p); got != tt.want {
+				t.Errorf("parseRequestURL() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_matchingUUID(t *testing.T) {
+	type args struct {
+		str string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    bool
+		wantErr bool
+	}{
+		{"First pass", args{str: "hello"}, false, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := matchingUUID(tt.args.str)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("matchingUUID() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("matchingUUID() = %v, want %v", got, tt.want)
 			}
 		})
 	}
