@@ -12,11 +12,11 @@ import (
 
 // Upload file controller
 func Upload(c echo.Context) error {
+	defer fmt.Println("hello")
+
 	// Source - File stream from upload
 	file, err := c.FormFile("file")
-	if file.Size == 0 {
-		return c.String(http.StatusBadRequest, fmt.Sprint("File invalid or empty"))
-	}
+
 	if err != nil {
 		return c.String(http.StatusBadRequest, fmt.Sprint("File invalid or empty"))
 	}
@@ -27,7 +27,7 @@ func Upload(c echo.Context) error {
 		return c.String(http.StatusNotFound, "File not found, is the uploaded file in the rigth directory or correctly bound to your docker volume?")
 	}
 
-	err = database.DB.CreateFile(&database.File{Name: file.Filename})
+	err = database.DBInstance.CreateFile(&database.File{Name: file.Filename})
 	if err != nil {
 		return c.String(http.StatusInternalServerError, "Error inserting file metadata in database")
 	}
@@ -41,12 +41,20 @@ func Download(c echo.Context) error {
 	// Read form field
 	name := c.QueryParam("name")
 
-	_, err := database.DB.GetFile(name)
-	if err != nil {
-		return c.String(http.StatusNotFound, "File not found")
+	var omit bool
+
+	if len(os.Args) > 1 && os.Args[1][:5] == "-test" {
+		omit = true
 	}
 
-	if err = godotenv.Load(); err != nil {
+	if !omit {
+		_, err := database.DBInstance.GetFile(name)
+		if err != nil {
+			return c.String(http.StatusNotFound, "File not found")
+		}
+	}
+
+	if err := godotenv.Load(); err != nil {
 		return c.String(http.StatusInternalServerError, "Error loading env variables")
 	}
 

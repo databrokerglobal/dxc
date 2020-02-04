@@ -43,7 +43,7 @@ func AddOne(c echo.Context) error {
 
 	p.UUID = tempuuid.String()
 
-	if err := database.DB.CreateProduct(p); err != nil {
+	if err := database.DBInstance.CreateProduct(p); err != nil {
 		return err
 	}
 
@@ -54,7 +54,7 @@ func AddOne(c echo.Context) error {
 func GetOne(c echo.Context) error {
 	uuid := c.Param("uuid")
 
-	p, err := database.DB.GetProduct(uuid)
+	p, err := database.DBInstance.GetProduct(uuid)
 
 	if err != nil {
 		return c.String(http.StatusInternalServerError, "Error retrieving item from database")
@@ -87,7 +87,7 @@ func RedirectToHost(c echo.Context) error {
 				return c.String(http.StatusNoContent, "")
 			}
 
-			p, err = database.DB.GetProduct(str)
+			p, err = database.DBInstance.GetProduct(str)
 			if err != nil {
 				return c.String(http.StatusNoContent, "")
 			}
