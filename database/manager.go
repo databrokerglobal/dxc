@@ -20,13 +20,14 @@ type Manager struct {
 // satisfy the Repository interface type
 // This allows us to create new Managers using any driver
 // TIP: DB() method on a gorm db return a db of type *sql.DB should you need it
-func NewRepository(db *sql.DB) Repository {
+func NewRepository(db *gorm.DB) Repository {
 	return &Manager{DB: db}
 }
 
 // DBInstance database instance
 var DBInstance Manager
 
+// Init Singleton
 func init() {
 	if len(os.Args) > 1 && os.Args[1][:5] == "-test" {
 		log.Println("Testing: omitting database init")
