@@ -7,7 +7,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/databrokerglobal/dxc/database"
 	"github.com/databrokerglobal/dxc/utils"
+	"github.com/google/uuid"
 	"github.com/labstack/echo"
 	"github.com/stretchr/testify/assert"
 )
@@ -200,7 +202,7 @@ func TestGetOne(t *testing.T) {
 	}
 }
 
-func generateRedirectRequest() echo.Context {
+func generateRedirectRequest(method string) echo.Context {
 	c := utils.GenerateTestEchoRequest(http.MethodGet, "/eb5cefe0-891c-40c2-a36d-c2d81e1aeb3d", nil)
 	return c
 }
@@ -214,12 +216,57 @@ func TestRedirectToHost(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		{"First pass", args{generateRedirectRequest()}, false},
+		{"First pass", args{generateRedirectRequest(http.MethodGet)}, false},
+		{"Post method", args{generateRedirectRequest(http.MethodPost)}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := RedirectToHost(tt.args.c); (err != nil) != tt.wantErr {
 				t.Errorf("RedirectToHost() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_checkProduct(t *testing.T) {
+	type args struct {
+		p *database.Product
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{"first pass", args{p: &database.Product{
+			Name: "plc number 1231323",
+			Type: "API",
+			UUID: uuid.New().String(),
+			Host: "http://localhost:4000",
+		}}, 100},
+		{"product is of type file", args{p: &database.Product{
+			Name: "plc number 1231323",
+			Type: "FILE",
+			UUID: uuid.New().String(),
+			Host: "http://localhost:4000",
+		}}, 204},
+		{"product is of empty type", args{p: &database.Product{
+			Name: "plc number 1231323",
+			Type: "",
+			UUID: uuid.New().String(),
+			Host: "http://localhost:4000",
+		}}, 204},
+		{"product has no name", args{p: &database.Product{
+			Name: "",
+			Type: "API",
+			UUID: uuid.New().String(),
+			Host: "http://localhost:4000",
+		}}, 204},
+		{"product is nil", args{p: nil}, 204},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := checkProduct(tt.args.p); got != tt.want {
+				t.Errorf("checkProduct() = %v, want %v", got, tt.want)
 			}
 		})
 	}
