@@ -1,5 +1,5 @@
 #! /bin/bash
 
  go test ./... --coverprofile outfile  &&
- go tool cover -html=outfile -o cover.html &&
+ go tool cover -html=outfile -o ./test/coverage.html &&
  rm outfile

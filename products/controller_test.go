@@ -4,11 +4,9 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
-	"regexp"
 	"strings"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/labstack/echo"
 	"github.com/stretchr/testify/assert"
 )
@@ -161,77 +159,6 @@ func TestGetOneMock(t *testing.T) {
 	}
 }
 
-// RedirectToHost based on product uuid path check if api or stream and subsequently redirect
-func MockRedirectToHost(c echo.Context) (string, error) {
-	slice := strings.Split(c.Request().RequestURI, "/")
-
-	var p *testProduct
-
-	// Check if string in path matches uuid regex, is valid uuid and matches product that is type API or STREAM
-	for _, str := range slice {
-
-		match, err := regexp.MatchString(`[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}`, str)
-		if err != nil {
-			return "", c.String(http.StatusNoContent, "")
-		}
-
-		if match {
-			_, err := uuid.Parse(str)
-			if err != nil {
-				return "", c.String(http.StatusNoContent, "")
-			}
-
-			p = mockDB[str]
-
-			if err != nil {
-				return "", c.String(http.StatusNoContent, "")
-			}
-
-			if p == nil {
-				return "", c.String(http.StatusNoContent, "")
-			}
-
-			if p.Type == "FILE" {
-				return "", c.String(http.StatusNoContent, "")
-			}
-
-			if c.Request().Method == "GET" {
-				// replace first encounter of product uuid
-				requestURI := strings.Replace(c.Request().RequestURI, p.UUID, "", 1)
-
-				// strip any double slashes, -1 means for every encounter
-				strings.Replace(requestURI, "//", "/", -1)
-
-				requestURL := []string{p.Host, requestURI}
-
-				return strings.Join(requestURL, ""), nil
-			}
-		}
-	}
-
-	return "", c.String(http.StatusNoContent, "")
-}
-
-func TestRedirectToHost(t *testing.T) {
-	type args struct {
-		c echo.Context
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if _, err := MockRedirectToHost(tt.args.c); (err != nil) != tt.wantErr {
-				t.Errorf("RedirectToHost() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
 func TestAddOne(t *testing.T) {
 	type args struct {
 		c echo.Context
@@ -267,6 +194,26 @@ func TestGetOne(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := GetOne(tt.args.c); (err != nil) != tt.wantErr {
 				t.Errorf("GetOne() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestRedirectToHost(t *testing.T) {
+	type args struct {
+		c echo.Context
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := RedirectToHost(tt.args.c); (err != nil) != tt.wantErr {
+				t.Errorf("RedirectToHost() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
