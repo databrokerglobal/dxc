@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/databrokerglobal/dxc/utils"
 	"github.com/labstack/echo"
 	"github.com/stretchr/testify/assert"
 )
@@ -199,6 +200,11 @@ func TestGetOne(t *testing.T) {
 	}
 }
 
+func generateRedirectRequest() echo.Context {
+	c := utils.GenerateTestEchoRequest(http.MethodGet, "/eb5cefe0-891c-40c2-a36d-c2d81e1aeb3d", nil)
+	return c
+}
+
 func TestRedirectToHost(t *testing.T) {
 	type args struct {
 		c echo.Context
@@ -208,7 +214,7 @@ func TestRedirectToHost(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{"First pass", args{generateRedirectRequest()}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

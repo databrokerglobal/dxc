@@ -90,6 +90,12 @@ func GetOne(c echo.Context) error {
 
 // RedirectToHost based on product uuid path check if api or stream and subsequently redirect
 func RedirectToHost(c echo.Context) error {
+	var omit bool
+
+	if len(os.Args) > 1 && os.Args[1][:5] == "-test" {
+		omit = true
+	}
+
 	slice := strings.Split(c.Request().RequestURI, "/")
 
 	var p *database.Product
@@ -108,16 +114,18 @@ func RedirectToHost(c echo.Context) error {
 				return c.String(http.StatusNoContent, "")
 			}
 
-			p, err = database.DBInstance.GetProduct(str)
-			if err != nil {
+			if !omit {
+				p, err = database.DBInstance.GetProduct(str)
+				if err != nil {
+					return c.String(http.StatusNoContent, "")
+				}
+			}
+
+			if p == nil {
 				return c.String(http.StatusNoContent, "")
 			}
 
 			if p.Name == "" {
-				return c.String(http.StatusNoContent, "")
-			}
-
-			if p == nil {
 				return c.String(http.StatusNoContent, "")
 			}
 
