@@ -140,7 +140,7 @@ func GetOneMock(c echo.Context) error {
 	return c.JSON(http.StatusOK, p)
 }
 
-func TestGetOne(t *testing.T) {
+func TestGetOneMock(t *testing.T) {
 	type args struct {
 		c echo.Context
 	}
@@ -227,6 +227,46 @@ func TestRedirectToHost(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if _, err := MockRedirectToHost(tt.args.c); (err != nil) != tt.wantErr {
 				t.Errorf("RedirectToHost() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestAddOne(t *testing.T) {
+	type args struct {
+		c echo.Context
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"First pass", args{generateAddOneRequest("{\"name\":\"PLC123\",\"producttype\":\"API\",\"uuid\":\"eb5cefe0-891c-40c2-a36d-c2d81e1aeb3d\",\"host\":\"http://localhost:3100\"}\n")}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := AddOne(tt.args.c); (err != nil) != tt.wantErr {
+				t.Errorf("AddOne() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestGetOne(t *testing.T) {
+	type args struct {
+		c echo.Context
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"First pass", args{generateGetOneRequest("eb5cefe0-891c-40c2-a36d-c2d81e1aeb3d")}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := GetOne(tt.args.c); (err != nil) != tt.wantErr {
+				t.Errorf("GetOne() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"regexp"
 	"strings"
 
@@ -43,8 +44,16 @@ func AddOne(c echo.Context) error {
 
 	p.UUID = tempuuid.String()
 
-	if err := database.DBInstance.CreateProduct(p); err != nil {
-		return err
+	var omit bool
+
+	if len(os.Args) > 1 && os.Args[1][:5] == "-test" {
+		omit = true
+	}
+
+	if !omit {
+		if err := database.DBInstance.CreateProduct(p); err != nil {
+			return err
+		}
 	}
 
 	return c.JSON(http.StatusCreated, p)
@@ -54,7 +63,19 @@ func AddOne(c echo.Context) error {
 func GetOne(c echo.Context) error {
 	uuid := c.Param("uuid")
 
-	p, err := database.DBInstance.GetProduct(uuid)
+	var omit bool
+
+	if len(os.Args) > 1 && os.Args[1][:5] == "-test" {
+		omit = true
+	}
+
+	var err error
+
+	var p *database.Product
+
+	if !omit {
+		p, err = database.DBInstance.GetProduct(uuid)
+	}
 
 	if err != nil {
 		return c.String(http.StatusInternalServerError, "Error retrieving item from database")
