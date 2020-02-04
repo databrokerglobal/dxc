@@ -26,3 +26,5 @@ test.txt
 *.db
 
 node_modules/
+
+.idea

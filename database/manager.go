@@ -15,6 +15,15 @@ type Manager struct {
 	DB *gorm.DB
 }
 
+// NewRepository func
+// We can return a Manager struct because all it's methods
+// satisfy the Repository interface type
+// This allows us to create new Managers using any driver
+// TIP: DB() method on a gorm db return a db of type *sql.DB should you need it
+func NewRepository(db *sql.DB) Repository {
+	return &Manager{DB: db}
+}
+
 // DBInstance database instance
 var DBInstance Manager
 
