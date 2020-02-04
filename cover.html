@@ -1,0 +1,527 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/databrokerglobal/dxc/filemanager/controller.go (42.3%)</option>
+				
+				<option value="file1">github.com/databrokerglobal/dxc/filemanager/file-checker.go (25.0%)</option>
+				
+				<option value="file2">github.com/databrokerglobal/dxc/filemanager/file-parser.go (7.7%)</option>
+				
+				<option value="file3">github.com/databrokerglobal/dxc/products/controller.go (35.8%)</option>
+				
+				<option value="file4">github.com/databrokerglobal/dxc/templating/controller.go (81.8%)</option>
+				
+				<option value="file5">github.com/databrokerglobal/dxc/templating/renderer.go (100.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package filemanager
+
+import (
+        "fmt"
+        "net/http"
+        "os"
+
+        "github.com/databrokerglobal/dxc/database"
+        "github.com/joho/godotenv"
+        "github.com/labstack/echo"
+)
+
+// Upload file controller
+func Upload(c echo.Context) error <span class="cov8" title="1">{
+        defer fmt.Println("hello")
+
+        // Source - File stream from upload
+        file, err := c.FormFile("file")
+
+        if err != nil </span><span class="cov8" title="1">{
+                return c.String(http.StatusBadRequest, fmt.Sprint("File invalid or empty"))
+        }</span>
+
+        // Read file, then open mirror file in dir, read it and check if same file
+        <span class="cov0" title="0">err = parseFile(file)
+        if err != nil </span><span class="cov0" title="0">{
+                return c.String(http.StatusNotFound, "File not found, is the uploaded file in the rigth directory or correctly bound to your docker volume?")
+        }</span>
+
+        <span class="cov0" title="0">err = database.DBInstance.CreateFile(&amp;database.File{Name: file.Filename})
+        if err != nil </span><span class="cov0" title="0">{
+                return c.String(http.StatusInternalServerError, "Error inserting file metadata in database")
+        }</span>
+
+        // Return succes message
+        <span class="cov0" title="0">return c.HTML(http.StatusOK, fmt.Sprintf("&lt;p&gt;File %s uploaded successfully. File checksum result: OK&lt;/p&gt;", file.Filename))</span>
+}
+
+// Download a file
+func Download(c echo.Context) error <span class="cov8" title="1">{
+        // Read form field
+        name := c.QueryParam("name")
+
+        var omit bool
+
+        if len(os.Args) &gt; 1 &amp;&amp; os.Args[1][:5] == "-test" </span><span class="cov8" title="1">{
+                omit = true
+        }</span>
+
+        <span class="cov8" title="1">if !omit </span><span class="cov0" title="0">{
+                _, err := database.DBInstance.GetFile(name)
+                if err != nil </span><span class="cov0" title="0">{
+                        return c.String(http.StatusNotFound, "File not found")
+                }</span>
+        }
+
+        <span class="cov8" title="1">if err := godotenv.Load(); err != nil </span><span class="cov8" title="1">{
+                return c.String(http.StatusInternalServerError, "Error loading env variables")
+        }</span>
+
+        <span class="cov0" title="0">var filePath string
+        if os.Getenv("GO_ENV") == "development" </span><span class="cov0" title="0">{
+                filePath = os.Getenv("LOCAL_FILES_DIR")
+        }</span> else<span class="cov0" title="0"> {
+                filePath = "/var/files"
+        }</span>
+
+        <span class="cov0" title="0">return c.Attachment(fmt.Sprintf("%s/%s", filePath, name), name)</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package filemanager
+
+import (
+        "fmt"
+        "log"
+        "os"
+
+        "github.com/databrokerglobal/dxc/database"
+)
+
+// Check if file is still on disk, if not delete from
+func init() <span class="cov8" title="1">{
+        if len(os.Args) &gt; 1 &amp;&amp; os.Args[1][:5] == "-test" </span><span class="cov8" title="1">{
+                log.Println("Testing: omitting database init")
+                return
+        }</span>
+        <span class="cov0" title="0">fmt.Println("Checking file integrity...")
+        files, err := database.DBInstance.GetFiles()
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatal(err)
+        }</span>
+        <span class="cov0" title="0">for _, file := range *files </span><span class="cov0" title="0">{
+                _, err := open(file.Name)
+                if err != nil </span><span class="cov0" title="0">{
+                        database.DBInstance.DeleteFile(file.Name)
+                }</span>
+        }
+        <span class="cov0" title="0">defer fmt.Println("Finished checking file integrity")</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package filemanager
+
+import (
+        "errors"
+        "fmt"
+        "io"
+        "mime/multipart"
+        "os"
+
+        "github.com/ethereum/go-ethereum/crypto"
+        "github.com/joho/godotenv"
+)
+
+// ReadFile read a multipart uploaded file from controller
+func parseFile(file *multipart.FileHeader) error <span class="cov0" title="0">{
+        // Open file to return its data source
+        src, err := file.Open()
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">defer src.Close()
+
+        // Load env files
+        err = godotenv.Load()
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">uploadedFileSnippet, err := readBytes(src)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">from, err := open(file.Filename)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">defer from.Close()
+
+        localFileSnippet, err := readBytes(from)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">if matches := CompareHashes(uploadedFileSnippet, localFileSnippet); !matches </span><span class="cov0" title="0">{
+                return errors.New("Files don't match")
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+// Read 22 first bytes and return them
+/*
+   Because the file can be of type os.File (local dir) or multipart.File (uploaded file),
+         we pass the io.Reader interface as an argument which has the Read method used for both types.
+*/
+func readBytes(file io.Reader) ([]byte, error) <span class="cov0" title="0">{
+        b1 := make([]byte, 22)
+        n1, err := file.Read(b1)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">return b1[:n1], nil</span>
+}
+
+// CompareHashes checking if hashes are identical
+func CompareHashes(file1 []byte, file2 []byte) bool <span class="cov8" title="1">{
+        hash1 := crypto.Keccak256(file1)
+        hash2 := crypto.Keccak256(file2)
+
+        return string(hash1) == string(hash2)
+}</span>
+
+// open file
+func open(filename string) (*os.File, error) <span class="cov0" title="0">{
+        // Load env files
+        err := godotenv.Load()
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        // Load file path
+        <span class="cov0" title="0">var filePath string
+        if os.Getenv("GO_ENV") == "development" </span><span class="cov0" title="0">{
+                filePath = os.Getenv("LOCAL_FILES_DIR")
+        }</span> else<span class="cov0" title="0"> {
+                filePath = "/var/files"
+        }</span>
+
+        // Open same file in the mounted docker volume (or just local dir if go_env=development)
+        <span class="cov0" title="0">from, err := os.Open(fmt.Sprintf("%s/%s", filePath, filename))
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">return from, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package products
+
+import (
+        "fmt"
+        "io/ioutil"
+        "net/http"
+        "os"
+        "regexp"
+        "strings"
+
+        "github.com/databrokerglobal/dxc/database"
+        "github.com/google/uuid"
+        "github.com/labstack/echo"
+)
+
+// AddOne product
+func AddOne(c echo.Context) error <span class="cov8" title="1">{
+        p := new(database.Product)
+
+        if err := c.Bind(p); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">if len(p.Name) == 0 </span><span class="cov0" title="0">{
+                return c.String(http.StatusBadRequest, "400: name missing")
+        }</span>
+
+        <span class="cov8" title="1">if len(p.Type) == 0 </span><span class="cov0" title="0">{
+                return c.String(http.StatusBadRequest, "400: producttype missing")
+        }</span>
+
+        <span class="cov8" title="1">if len(p.Host) == 0 </span><span class="cov0" title="0">{
+                return c.String(http.StatusBadRequest, "400: host missing")
+        }</span>
+
+        <span class="cov8" title="1">if strings.Split(p.Host, "")[len(p.Host)-1] == "/" </span><span class="cov0" title="0">{
+                p.Host = strings.TrimSuffix(p.Host, "/")
+        }</span>
+
+        <span class="cov8" title="1">tempuuid, err := uuid.NewRandom()
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">p.UUID = tempuuid.String()
+
+        var omit bool
+
+        if len(os.Args) &gt; 1 &amp;&amp; os.Args[1][:5] == "-test" </span><span class="cov8" title="1">{
+                omit = true
+        }</span>
+
+        <span class="cov8" title="1">if !omit </span><span class="cov0" title="0">{
+                if err := database.DBInstance.CreateProduct(p); err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+        }
+
+        <span class="cov8" title="1">return c.JSON(http.StatusCreated, p)</span>
+}
+
+// GetOne product
+func GetOne(c echo.Context) error <span class="cov8" title="1">{
+        uuid := c.Param("uuid")
+
+        var omit bool
+
+        if len(os.Args) &gt; 1 &amp;&amp; os.Args[1][:5] == "-test" </span><span class="cov8" title="1">{
+                omit = true
+        }</span>
+
+        <span class="cov8" title="1">var err error
+
+        var p *database.Product
+
+        if !omit </span><span class="cov0" title="0">{
+                p, err = database.DBInstance.GetProduct(uuid)
+        }</span>
+
+        <span class="cov8" title="1">if err != nil </span><span class="cov0" title="0">{
+                return c.String(http.StatusInternalServerError, "Error retrieving item from database")
+        }</span>
+
+        <span class="cov8" title="1">if p == nil </span><span class="cov8" title="1">{
+                return c.String(http.StatusNotFound, "Product not found")
+        }</span>
+
+        <span class="cov0" title="0">return c.JSON(http.StatusOK, p)</span>
+}
+
+// RedirectToHost based on product uuid path check if api or stream and subsequently redirect
+func RedirectToHost(c echo.Context) error <span class="cov0" title="0">{
+        slice := strings.Split(c.Request().RequestURI, "/")
+
+        var p *database.Product
+
+        // Check if string in path matches uuid regex, is valid uuid and matches product that is type API or STREAM
+        for _, str := range slice </span><span class="cov0" title="0">{
+
+                match, err := regexp.MatchString(`[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}`, str)
+                if err != nil </span><span class="cov0" title="0">{
+                        return c.String(http.StatusNoContent, "")
+                }</span>
+
+                <span class="cov0" title="0">if match </span><span class="cov0" title="0">{
+                        _, err := uuid.Parse(str)
+                        if err != nil </span><span class="cov0" title="0">{
+                                return c.String(http.StatusNoContent, "")
+                        }</span>
+
+                        <span class="cov0" title="0">p, err = database.DBInstance.GetProduct(str)
+                        if err != nil </span><span class="cov0" title="0">{
+                                return c.String(http.StatusNoContent, "")
+                        }</span>
+
+                        <span class="cov0" title="0">if p.Name == "" </span><span class="cov0" title="0">{
+                                return c.String(http.StatusNoContent, "")
+                        }</span>
+
+                        <span class="cov0" title="0">if p == nil </span><span class="cov0" title="0">{
+                                return c.String(http.StatusNoContent, "")
+                        }</span>
+
+                        <span class="cov0" title="0">if p.Type == "FILE" </span><span class="cov0" title="0">{
+                                return c.String(http.StatusNoContent, "")
+                        }</span>
+
+                        <span class="cov0" title="0">if c.Request().Method == "GET" </span><span class="cov0" title="0">{
+                                // replace first encounter of product uuid
+                                requestURI := strings.TrimPrefix(strings.Replace(c.Request().RequestURI, p.UUID, "", 1), "/")
+
+                                requestURLSlice := []string{p.Host, requestURI}
+
+                                requestURL := strings.Join(requestURLSlice, "")
+
+                                resp, err := http.Get(requestURL)
+                                if err != nil </span><span class="cov0" title="0">{
+                                        c.String(http.StatusGatewayTimeout, fmt.Sprintf("Upstream server response timeout: %v", err))
+                                }</span>
+
+                                <span class="cov0" title="0">defer resp.Body.Close()
+                                body, err := ioutil.ReadAll(resp.Body)
+                                if err != nil </span><span class="cov0" title="0">{
+                                        c.String(http.StatusInternalServerError, fmt.Sprintf("Error reading response body: %v", err))
+                                }</span>
+
+                                <span class="cov0" title="0">return c.Blob(resp.StatusCode, resp.Header.Get("Content-Type"), body)</span>
+                        }
+                }
+        }
+
+        <span class="cov0" title="0">return c.String(http.StatusNoContent, "")</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package templating
+
+import (
+        "net/http"
+        "os"
+
+        "github.com/databrokerglobal/dxc/database"
+        "github.com/labstack/echo"
+)
+
+// IndexData file list template generator
+type IndexData struct {
+        Files *[]database.File
+}
+
+// IndexHandler render index html
+func IndexHandler(c echo.Context) error <span class="cov8" title="1">{
+        var omit bool
+
+        if len(os.Args) &gt; 1 &amp;&amp; os.Args[1][:5] == "-test" </span><span class="cov8" title="1">{
+                omit = true
+        }</span>
+
+        <span class="cov8" title="1">var files *[]database.File
+        var err error
+
+        if !omit </span><span class="cov0" title="0">{
+                files, err = database.DBInstance.GetFiles()
+        }</span>
+
+        <span class="cov8" title="1">if err != nil </span><span class="cov0" title="0">{
+                return c.String(http.StatusNotFound, "No file metadata stored in the database")
+        }</span>
+
+        <span class="cov8" title="1">data := IndexData{
+                Files: files,
+        }
+
+        return c.Render(http.StatusOK, "data", data)</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package templating
+
+import (
+        "html/template"
+        "io"
+
+        "github.com/labstack/echo"
+)
+
+// Template struct
+type Template struct {
+        Templates *template.Template
+}
+
+// Render template renderer
+func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error <span class="cov8" title="1">{
+        return t.Templates.ExecuteTemplate(w, name, data)
+}</span>
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

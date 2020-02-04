@@ -19,7 +19,7 @@ jobs: # basic units of work in a run
       - run:
           name: Run unit tests
           # Store the results of our tests in the $TEST_RESULTS directory
-          command: go test -v -race ./...
+          command: chmod +x ./run-tests.sh && ./run-tests.sh
 
       - save_cache: # Store cache in the /go/pkg directory
           key: v1-pkg-cache
