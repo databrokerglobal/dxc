@@ -54,17 +54,27 @@
 			<div id="nav">
 				<select id="files">
 				
-				<option value="file0">github.com/databrokerglobal/dxc/filemanager/controller.go (42.3%)</option>
+				<option value="file0">github.com/databrokerglobal/dxc/database/any-time.go (100.0%)</option>
 				
-				<option value="file1">github.com/databrokerglobal/dxc/filemanager/file-checker.go (25.0%)</option>
+				<option value="file1">github.com/databrokerglobal/dxc/database/files.go (77.8%)</option>
 				
-				<option value="file2">github.com/databrokerglobal/dxc/filemanager/file-parser.go (7.7%)</option>
+				<option value="file2">github.com/databrokerglobal/dxc/database/manager.go (36.4%)</option>
 				
-				<option value="file3">github.com/databrokerglobal/dxc/products/controller.go (65.4%)</option>
+				<option value="file3">github.com/databrokerglobal/dxc/database/products.go (77.8%)</option>
 				
-				<option value="file4">github.com/databrokerglobal/dxc/templating/controller.go (81.8%)</option>
+				<option value="file4">github.com/databrokerglobal/dxc/database/provide-mock-db.go (80.0%)</option>
 				
-				<option value="file5">github.com/databrokerglobal/dxc/templating/renderer.go (100.0%)</option>
+				<option value="file5">github.com/databrokerglobal/dxc/filemanager/controller.go (42.3%)</option>
+				
+				<option value="file6">github.com/databrokerglobal/dxc/filemanager/file-checker.go (25.0%)</option>
+				
+				<option value="file7">github.com/databrokerglobal/dxc/filemanager/file-parser.go (7.7%)</option>
+				
+				<option value="file8">github.com/databrokerglobal/dxc/products/controller.go (65.4%)</option>
+				
+				<option value="file9">github.com/databrokerglobal/dxc/templating/controller.go (81.8%)</option>
+				
+				<option value="file10">github.com/databrokerglobal/dxc/templating/renderer.go (100.0%)</option>
 				
 				</select>
 			</div>
@@ -78,7 +88,183 @@
 		</div>
 		<div id="content">
 		
-		<pre class="file" id="file0" style="display: none">package filemanager
+		<pre class="file" id="file0" style="display: none">package database
+
+import (
+        "database/sql/driver"
+        "time"
+)
+
+// AnyTime struct
+type AnyTime struct{}
+
+// Match satisfies sqlmock.Argument interface
+func (a AnyTime) Match(v driver.Value) bool <span class="cov8" title="1">{
+        _, ok := v.(time.Time)
+        return ok
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package database
+
+// CreateFile Query
+func (m *Manager) CreateFile(f *File) (err error) <span class="cov8" title="1">{
+        m.DB.Create(f)
+        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
+                err = errs[0]
+        }</span>
+        <span class="cov8" title="1">return</span>
+}
+
+// GetFile Query
+func (m *Manager) GetFile(n string) (f *File, err error) <span class="cov8" title="1">{
+        file := File{}
+        m.DB.Where(&amp;File{Name: n}).First(&amp;file)
+        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
+                err = errs[0]
+        }</span>
+        <span class="cov8" title="1">return &amp;file, nil</span>
+}
+
+// GetFiles Get all files query
+func (m *Manager) GetFiles() (fs *[]File, err error) <span class="cov8" title="1">{
+        files := []File{}
+        m.DB.Table("files").Find(&amp;files)
+        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
+                err = errs[0]
+        }</span>
+        <span class="cov8" title="1">return &amp;files, nil</span>
+}
+
+// DeleteFile delete a file
+func (m *Manager) DeleteFile(fileName string) (err error) <span class="cov8" title="1">{
+        m.DB.Delete(&amp;File{Name: fileName})
+        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
+                err = errs[0]
+        }</span>
+        <span class="cov8" title="1">return</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package database
+
+import (
+        "log"
+        "os"
+
+        "github.com/jinzhu/gorm"
+
+        // loading the sqlite dialect
+        _ "github.com/jinzhu/gorm/dialects/sqlite"
+)
+
+// Manager manage db connection
+type Manager struct {
+        DB *gorm.DB
+}
+
+// NewRepository func
+// We can return a Manager struct because all it's methods
+// satisfy the Repository interface type
+// This allows us to create new Managers using any driver
+// TIP: DB() method on a gorm db return a db of type *sql.DB should you need it
+func NewRepository(db *gorm.DB) Repository <span class="cov8" title="1">{
+        return &amp;Manager{DB: db}
+}</span>
+
+// DBInstance database instance
+var DBInstance Manager
+
+// Init Singleton
+func init() <span class="cov8" title="1">{
+        if len(os.Args) &gt; 1 &amp;&amp; os.Args[1][:5] == "-test" </span><span class="cov8" title="1">{
+                log.Println("Testing: omitting database init")
+                return
+        }</span>
+
+        <span class="cov0" title="0">db, err := gorm.Open("sqlite3", "./database/dxc.db")
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatal("Error connecting to database")
+        }</span>
+        <span class="cov0" title="0">DBInstance = Manager{db}
+        DBInstance.DB.LogMode(true)
+        DBInstance.DB.AutoMigrate(&amp;File{})
+        DBInstance.DB.AutoMigrate(&amp;Product{})</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package database
+
+// CreateProduct Query
+func (m *Manager) CreateProduct(p *Product) (err error) <span class="cov8" title="1">{
+        m.DB.Create(p)
+        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
+                err = errs[0]
+        }</span>
+        <span class="cov8" title="1">return</span>
+}
+
+// GetProduct Query
+func (m *Manager) GetProduct(u string) (p *Product, err error) <span class="cov8" title="1">{
+        product := Product{}
+        m.DB.Where(&amp;Product{UUID: u}).First(&amp;product)
+        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
+                err = errs[0]
+        }</span>
+        <span class="cov8" title="1">return &amp;product, nil</span>
+}
+
+// GetProducts Get all Products query
+func (m *Manager) GetProducts() (ps *[]Product, err error) <span class="cov8" title="1">{
+        products := []Product{}
+        m.DB.Table("Products").Find(&amp;products)
+        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
+                err = errs[0]
+        }</span>
+        <span class="cov8" title="1">return &amp;products, nil</span>
+}
+
+// DeleteProduct delete a Product
+func (m *Manager) DeleteProduct(ProductName string) (err error) <span class="cov8" title="1">{
+        m.DB.Delete(&amp;Product{Name: ProductName})
+        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
+                err = errs[0]
+        }</span>
+        <span class="cov8" title="1">return</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package database
+
+import (
+        "fmt"
+
+        "github.com/DATA-DOG/go-sqlmock"
+        "github.com/jinzhu/gorm"
+)
+
+var (
+        dsnCount int64
+)
+
+func provideMockDB() (sqlmock.Sqlmock, *gorm.DB, Repository) <span class="cov8" title="1">{
+        dsn := fmt.Sprintf("sqlmock_db_%d", dsnCount)
+        _, mock, err := sqlmock.NewWithDSN(dsn)
+        if err != nil </span><span class="cov0" title="0">{
+                panic(err)</span>
+        }
+        <span class="cov8" title="1">mockGorm, err := gorm.Open("sqlmock", dsn)
+        if err != nil </span><span class="cov0" title="0">{
+                panic(err)</span>
+        }
+        <span class="cov8" title="1">mgr := NewRepository(mockGorm)
+        dsnCount++
+
+        return mock, mockGorm, mgr</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package filemanager
 
 import (
         "fmt"
@@ -149,7 +335,7 @@ func Download(c echo.Context) error <span class="cov8" title="1">{
 }
 </pre>
 		
-		<pre class="file" id="file1" style="display: none">package filemanager
+		<pre class="file" id="file6" style="display: none">package filemanager
 
 import (
         "fmt"
@@ -180,7 +366,7 @@ func init() <span class="cov8" title="1">{
 }
 </pre>
 		
-		<pre class="file" id="file2" style="display: none">package filemanager
+		<pre class="file" id="file7" style="display: none">package filemanager
 
 import (
         "errors"
@@ -278,7 +464,7 @@ func open(filename string) (*os.File, error) <span class="cov0" title="0">{
 }
 </pre>
 		
-		<pre class="file" id="file3" style="display: none">package products
+		<pre class="file" id="file8" style="display: none">package products
 
 import (
         "fmt"
@@ -466,7 +652,7 @@ func RedirectToHost(c echo.Context) error <span class="cov8" title="1">{
 }
 </pre>
 		
-		<pre class="file" id="file4" style="display: none">package templating
+		<pre class="file" id="file9" style="display: none">package templating
 
 import (
         "net/http"
@@ -508,7 +694,7 @@ func IndexHandler(c echo.Context) error <span class="cov8" title="1">{
 }
 </pre>
 		
-		<pre class="file" id="file5" style="display: none">package templating
+		<pre class="file" id="file10" style="display: none">package templating
 
 import (
         "html/template"
