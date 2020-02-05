@@ -1,6 +1,8 @@
 package database
 
-import "github.com/jinzhu/gorm"
+import (
+	"github.com/jinzhu/gorm"
+)
 
 // File Struct
 type File struct {
