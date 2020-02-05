@@ -396,3 +396,32 @@ func Test_trimLastSlash(t *testing.T) {
 		})
 	}
 }
+
+func Test_buildProxyRequest(t *testing.T) {
+	type args struct {
+		c        echo.Context
+		r        *http.Request
+		protocol string
+		host     string
+	}
+	tests := []struct {
+		name string
+		args args
+		want *http.Request
+	}{
+		{"First pass", args{
+			c:        utils.GenerateTestEchoRequest(http.MethodGet, "/", nil),
+			r:        utils.GenerateTestEchoRequest(http.MethodGet, "/", nil).Request(),
+			protocol: "http",
+			host:     "localhost:4000",
+		}, utils.GenerateTestEchoRequest(http.MethodGet, "/", nil).Request()},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := buildProxyRequest(tt.args.c, tt.args.r, tt.args.protocol, tt.args.host)
+			if got.URL.Host != tt.args.host {
+				t.Errorf("buildProxyRequest() request host is = %s, want %s", got.URL.Host, tt.args.host)
+			}
+		})
+	}
+}
