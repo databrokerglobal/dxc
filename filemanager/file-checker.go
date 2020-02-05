@@ -15,14 +15,14 @@ func init() {
 		return
 	}
 	fmt.Println("Checking file integrity...")
-	files, err := database.DB.GetFiles()
+	files, err := database.DBInstance.GetFiles()
 	if err != nil {
 		log.Fatal(err)
 	}
 	for _, file := range *files {
 		_, err := open(file.Name)
 		if err != nil {
-			database.DB.DeleteFile(file.Name)
+			database.DBInstance.DeleteFile(file.Name)
 		}
 	}
 	defer fmt.Println("Finished checking file integrity")

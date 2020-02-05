@@ -42,7 +42,7 @@ func parseFile(file *multipart.FileHeader) error {
 		return err
 	}
 
-	if matches := compareHashes(uploadedFileSnippet, localFileSnippet); !matches {
+	if matches := CompareHashes(uploadedFileSnippet, localFileSnippet); !matches {
 		return errors.New("Files don't match")
 	}
 
@@ -63,8 +63,8 @@ func readBytes(file io.Reader) ([]byte, error) {
 	return b1[:n1], nil
 }
 
-// checking if hashes are identical
-func compareHashes(file1 []byte, file2 []byte) bool {
+// CompareHashes checking if hashes are identical
+func CompareHashes(file1 []byte, file2 []byte) bool {
 	hash1 := crypto.Keccak256(file1)
 	hash2 := crypto.Keccak256(file2)
 

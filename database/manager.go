@@ -12,12 +12,22 @@ import (
 
 // Manager manage db connection
 type Manager struct {
-	db *gorm.DB
+	DB *gorm.DB
 }
 
-// DB database instance
-var DB Manager
+// NewRepository func
+// We can return a Manager struct because all it's methods
+// satisfy the Repository interface type
+// This allows us to create new Managers using any driver
+// TIP: DB() method on a gorm db return a db of type *sql.DB should you need it
+func NewRepository(db *gorm.DB) Repository {
+	return &Manager{DB: db}
+}
 
+// DBInstance database instance
+var DBInstance Manager
+
+// Init Singleton
 func init() {
 	if len(os.Args) > 1 && os.Args[1][:5] == "-test" {
 		log.Println("Testing: omitting database init")
@@ -28,8 +38,8 @@ func init() {
 	if err != nil {
 		log.Fatal("Error connecting to database")
 	}
-	DB = Manager{db}
-	DB.db.LogMode(true)
-	DB.db.AutoMigrate(&File{})
-	DB.db.AutoMigrate(&Product{})
+	DBInstance = Manager{db}
+	DBInstance.DB.LogMode(true)
+	DBInstance.DB.AutoMigrate(&File{})
+	DBInstance.DB.AutoMigrate(&Product{})
 }

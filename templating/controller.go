@@ -2,6 +2,7 @@ package templating
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/databrokerglobal/dxc/database"
 	"github.com/labstack/echo"
@@ -14,7 +15,19 @@ type IndexData struct {
 
 // IndexHandler render index html
 func IndexHandler(c echo.Context) error {
-	files, err := getAllFiles()
+	var omit bool
+
+	if len(os.Args) > 1 && os.Args[1][:5] == "-test" {
+		omit = true
+	}
+
+	var files *[]database.File
+	var err error
+
+	if !omit {
+		files, err = database.DBInstance.GetFiles()
+	}
+
 	if err != nil {
 		return c.String(http.StatusNotFound, "No file metadata stored in the database")
 	}

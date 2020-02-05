@@ -23,7 +23,7 @@ func main() {
 	e.HideBanner = true
 	// Load the echo logger
 	e.Use(middleware.Logger())
-	// Pevents api from crashing if panic
+	// Prevents api from crashing if panic
 	e.Use(middleware.Recover())
 
 	////////////////////////

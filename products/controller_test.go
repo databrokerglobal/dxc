@@ -2,12 +2,14 @@ package products
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"regexp"
 	"strings"
 	"testing"
 
+	"github.com/databrokerglobal/dxc/database"
+	"github.com/databrokerglobal/dxc/utils"
 	"github.com/google/uuid"
 	"github.com/labstack/echo"
 	"github.com/stretchr/testify/assert"
@@ -140,7 +142,7 @@ func GetOneMock(c echo.Context) error {
 	return c.JSON(http.StatusOK, p)
 }
 
-func TestGetOne(t *testing.T) {
+func TestGetOneMock(t *testing.T) {
 	type args struct {
 		c echo.Context
 	}
@@ -161,55 +163,49 @@ func TestGetOne(t *testing.T) {
 	}
 }
 
-// RedirectToHost based on product uuid path check if api or stream and subsequently redirect
-func MockRedirectToHost(c echo.Context) (string, error) {
-	slice := strings.Split(c.Request().RequestURI, "/")
-
-	var p *testProduct
-
-	// Check if string in path matches uuid regex, is valid uuid and matches product that is type API or STREAM
-	for _, str := range slice {
-
-		match, err := regexp.MatchString(`[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}`, str)
-		if err != nil {
-			return "", c.String(http.StatusNoContent, "")
-		}
-
-		if match {
-			_, err := uuid.Parse(str)
-			if err != nil {
-				return "", c.String(http.StatusNoContent, "")
-			}
-
-			p = mockDB[str]
-
-			if err != nil {
-				return "", c.String(http.StatusNoContent, "")
-			}
-
-			if p == nil {
-				return "", c.String(http.StatusNoContent, "")
-			}
-
-			if p.Type == "FILE" {
-				return "", c.String(http.StatusNoContent, "")
-			}
-
-			if c.Request().Method == "GET" {
-				// replace first encounter of product uuid
-				requestURI := strings.Replace(c.Request().RequestURI, p.UUID, "", 1)
-
-				// strip any double slashes, -1 means for every encounter
-				strings.Replace(requestURI, "//", "/", -1)
-
-				requestURL := []string{p.Host, requestURI}
-
-				return strings.Join(requestURL, ""), nil
-			}
-		}
+func TestAddOne(t *testing.T) {
+	type args struct {
+		c echo.Context
 	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"First pass", args{generateAddOneRequest("{\"name\":\"PLC123\",\"producttype\":\"API\",\"uuid\":\"eb5cefe0-891c-40c2-a36d-c2d81e1aeb3d\",\"host\":\"http://localhost:3100\"}\n")}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := AddOne(tt.args.c); (err != nil) != tt.wantErr {
+				t.Errorf("AddOne() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
 
-	return "", c.String(http.StatusNoContent, "")
+func TestGetOne(t *testing.T) {
+	type args struct {
+		c echo.Context
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"First pass", args{generateGetOneRequest("eb5cefe0-891c-40c2-a36d-c2d81e1aeb3d")}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := GetOne(tt.args.c); (err != nil) != tt.wantErr {
+				t.Errorf("GetOne() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func generateRedirectRequest(method string) echo.Context {
+	c := utils.GenerateTestEchoRequest(http.MethodGet, "/eb5cefe0-891c-40c2-a36d-c2d81e1aeb3d", nil)
+	return c
 }
 
 func TestRedirectToHost(t *testing.T) {
@@ -221,12 +217,109 @@ func TestRedirectToHost(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{"First pass", args{generateRedirectRequest(http.MethodGet)}, false},
+		{"Post method", args{generateRedirectRequest(http.MethodPost)}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if _, err := MockRedirectToHost(tt.args.c); (err != nil) != tt.wantErr {
+			if err := RedirectToHost(tt.args.c); (err != nil) != tt.wantErr {
 				t.Errorf("RedirectToHost() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_checkProduct(t *testing.T) {
+	type args struct {
+		p *database.Product
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{"first pass", args{p: &database.Product{
+			Name: "plc number 1231323",
+			Type: "API",
+			UUID: uuid.New().String(),
+			Host: "http://localhost:4000",
+		}}, 100},
+		{"product is of type file", args{p: &database.Product{
+			Name: "plc number 1231323",
+			Type: "FILE",
+			UUID: uuid.New().String(),
+			Host: "http://localhost:4000",
+		}}, 204},
+		{"product is of empty type", args{p: &database.Product{
+			Name: "plc number 1231323",
+			Type: "",
+			UUID: uuid.New().String(),
+			Host: "http://localhost:4000",
+		}}, 204},
+		{"product has no name", args{p: &database.Product{
+			Name: "",
+			Type: "API",
+			UUID: uuid.New().String(),
+			Host: "http://localhost:4000",
+		}}, 204},
+		{"product is nil", args{p: nil}, 204},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := checkProduct(tt.args.p); got != tt.want {
+				t.Errorf("checkProduct() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_parseRequestURL(t *testing.T) {
+	p := utils.MakeProduct("test", "API", "http://localhost:4000")
+
+	type args struct {
+		requestURI string
+		p          *database.Product
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{"First pass", args{
+			requestURI: fmt.Sprintf("/%s/add", p.UUID),
+			p:          p,
+		}, "http://localhost:4000/add"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := parseRequestURL(tt.args.requestURI, tt.args.p); got != tt.want {
+				t.Errorf("parseRequestURL() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_matchingUUID(t *testing.T) {
+	type args struct {
+		str string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    bool
+		wantErr bool
+	}{
+		{"First pass", args{str: "hello"}, false, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := matchingUUID(tt.args.str)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("matchingUUID() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("matchingUUID() = %v, want %v", got, tt.want)
 			}
 		})
 	}
