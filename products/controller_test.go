@@ -244,25 +244,25 @@ func Test_checkProduct(t *testing.T) {
 			UUID: uuid.New().String(),
 			Host: "http://localhost:4000",
 		}}, 100},
-		{"product is of type file", args{p: &database.Product{
-			Name: "plc number 1231323",
+		{"product has empty name", args{p: &database.Product{
+			Name: "",
 			Type: "FILE",
 			UUID: uuid.New().String(),
 			Host: "http://localhost:4000",
-		}}, 204},
+		}}, 400},
 		{"product is of empty type", args{p: &database.Product{
 			Name: "plc number 1231323",
 			Type: "",
 			UUID: uuid.New().String(),
 			Host: "http://localhost:4000",
-		}}, 204},
-		{"product has no name", args{p: &database.Product{
-			Name: "",
+		}}, 400},
+		{"product has no host", args{p: &database.Product{
+			Name: "Stuff",
 			Type: "API",
 			UUID: uuid.New().String(),
-			Host: "http://localhost:4000",
-		}}, 204},
-		{"product is nil", args{p: nil}, 204},
+			Host: "",
+		}}, 400},
+		{"product is nil", args{p: nil}, 400},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -320,6 +320,78 @@ func Test_matchingUUID(t *testing.T) {
 			}
 			if got != tt.want {
 				t.Errorf("matchingUUID() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_checkProductForRedirect(t *testing.T) {
+	type args struct {
+		p *database.Product
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{"first pass", args{p: &database.Product{
+			Name: "plc number 1231323",
+			Type: "API",
+			UUID: uuid.New().String(),
+			Host: "http://localhost:4000",
+		}}, 100},
+		{"Is a FILE", args{p: &database.Product{
+			Name: "plc number 1231323",
+			Type: "FILE",
+			UUID: uuid.New().String(),
+			Host: "http://localhost:4000",
+		}}, 204},
+		{"product has empty name", args{p: &database.Product{
+			Name: "",
+			Type: "FILE",
+			UUID: uuid.New().String(),
+			Host: "http://localhost:4000",
+		}}, 204},
+		{"product is of empty type", args{p: &database.Product{
+			Name: "plc number 1231323",
+			Type: "",
+			UUID: uuid.New().String(),
+			Host: "http://localhost:4000",
+		}}, 204},
+		{"product has no host", args{p: &database.Product{
+			Name: "Stuff",
+			Type: "API",
+			UUID: uuid.New().String(),
+			Host: "",
+		}}, 204},
+		{"product is nil", args{p: nil}, 204},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := checkProductForRedirect(tt.args.p); got != tt.want {
+				t.Errorf("checkProductForRedirect() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_trimLastSlash(t *testing.T) {
+	type args struct {
+		host string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{"No trailing slash", args{host: "http://localhost:4000"}, "http://localhost:4000"},
+		{"1 trailing slash", args{host: "http://localhost:4000/"}, "http://localhost:4000"},
+		{"what are you doing?", args{host: "http://localhost:4000////////"}, "http://localhost:4000"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := trimLastSlash(tt.args.host); got != tt.want {
+				t.Errorf("trimLastSlash() = %v, want %v", got, tt.want)
 			}
 		})
 	}
