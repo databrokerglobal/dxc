@@ -13,6 +13,14 @@ import (
 	"github.com/labstack/echo"
 )
 
+func trimLastSlash(host string) (h string) {
+	h = host
+	for strings.Split(h, "")[len(h)-1] == "/" {
+		h = strings.TrimSuffix(h, "/")
+	}
+	return h
+}
+
 // AddOne product
 func AddOne(c echo.Context) error {
 	p := new(database.Product)
@@ -21,21 +29,12 @@ func AddOne(c echo.Context) error {
 		return err
 	}
 
-	if len(p.Name) == 0 {
-		return c.String(http.StatusBadRequest, "400: name missing")
+	if status := checkProduct(p); status == http.StatusBadRequest {
+		return c.String(http.StatusBadRequest, "")
 	}
 
-	if len(p.Type) == 0 {
-		return c.String(http.StatusBadRequest, "400: producttype missing")
-	}
-
-	if len(p.Host) == 0 {
-		return c.String(http.StatusBadRequest, "400: host missing")
-	}
-
-	if strings.Split(p.Host, "")[len(p.Host)-1] == "/" {
-		p.Host = strings.TrimSuffix(p.Host, "/")
-	}
+	newHost := trimLastSlash(p.Host)
+	p.Host = newHost
 
 	tempuuid, err := uuid.NewRandom()
 	if err != nil {
@@ -92,10 +91,29 @@ func checkProduct(p *database.Product) int {
 	var status int
 	switch {
 	case p == nil:
+		status = http.StatusBadRequest
+	case p.Name == "":
+		status = http.StatusBadRequest
+	case p.Type == "":
+		status = http.StatusBadRequest
+	case p.Host == "":
+		status = http.StatusBadRequest
+	default:
+		status = http.StatusContinue
+	}
+	return status
+}
+
+func checkProductForRedirect(p *database.Product) int {
+	var status int
+	switch {
+	case p == nil:
 		status = http.StatusNoContent
 	case p.Name == "":
 		status = http.StatusNoContent
 	case p.Type == "":
+		status = http.StatusNoContent
+	case p.Host == "":
 		status = http.StatusNoContent
 	case p.Type == "FILE":
 		status = http.StatusNoContent
@@ -158,29 +176,38 @@ func RedirectToHost(c echo.Context) error {
 				}
 			}
 
-			if status := checkProduct(p); status == http.StatusNoContent {
+			if status := checkProductForRedirect(p); status == http.StatusNoContent {
 				return c.String(http.StatusNoContent, "")
 			}
 
-			if c.Request().Method == "GET" {
+			if err := performNakedRequest(c, p); err != nil {
 
-				requestURL := parseRequestURL(c.Request().RequestURI, p)
-
-				resp, err := http.Get(requestURL)
-				if err != nil {
-					c.String(http.StatusGatewayTimeout, fmt.Sprintf("Upstream server response timeout: %v", err))
-				}
-
-				defer resp.Body.Close()
-				body, err := ioutil.ReadAll(resp.Body)
-				if err != nil {
-					c.String(http.StatusInternalServerError, fmt.Sprintf("Error reading response body: %v", err))
-				}
-
-				return c.Blob(resp.StatusCode, resp.Header.Get("Content-Type"), body)
 			}
 		}
 	}
 
 	return c.String(http.StatusNoContent, "")
+}
+
+func performNakedRequest(c echo.Context, p *database.Product) error {
+	switch c.Request().Method {
+	case "GET":
+		requestURL := parseRequestURL(c.Request().RequestURI, p)
+
+		resp, err := http.Get(requestURL)
+		if err != nil {
+			return c.String(http.StatusGatewayTimeout, fmt.Sprintf("Upstream server response timeout: %v", err))
+		}
+
+		defer resp.Body.Close()
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return c.String(http.StatusInternalServerError, fmt.Sprintf("Error reading response body: %v", err))
+		}
+
+		return c.Blob(resp.StatusCode, resp.Header.Get("Content-Type"), body)
+
+	case "POST":
+	}
+	return nil
 }
