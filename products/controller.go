@@ -190,6 +190,7 @@ func RedirectToHost(c echo.Context) error {
 	return c.String(http.StatusNoContent, "")
 }
 
+// Take a request and build a proxy request from a host string with a certain protocol (http or https here)
 func buildProxyRequest(c echo.Context, r *http.Request, protocol string, host string) *http.Request {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {

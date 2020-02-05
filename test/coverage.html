@@ -70,7 +70,7 @@
 				
 				<option value="file7">github.com/databrokerglobal/dxc/filemanager/file-parser.go (7.7%)</option>
 				
-				<option value="file8">github.com/databrokerglobal/dxc/products/controller.go (65.4%)</option>
+				<option value="file8">github.com/databrokerglobal/dxc/products/controller.go (69.2%)</option>
 				
 				<option value="file9">github.com/databrokerglobal/dxc/templating/controller.go (81.8%)</option>
 				
@@ -467,6 +467,7 @@ func open(filename string) (*os.File, error) <span class="cov0" title="0">{
 		<pre class="file" id="file8" style="display: none">package products
 
 import (
+        "bytes"
         "fmt"
         "io/ioutil"
         "net/http"
@@ -479,6 +480,14 @@ import (
         "github.com/labstack/echo"
 )
 
+func trimLastSlash(host string) (h string) <span class="cov8" title="1">{
+        h = host
+        for strings.Split(h, "")[len(h)-1] == "/" </span><span class="cov8" title="1">{
+                h = strings.TrimSuffix(h, "/")
+        }</span>
+        <span class="cov8" title="1">return h</span>
+}
+
 // AddOne product
 func AddOne(c echo.Context) error <span class="cov8" title="1">{
         p := new(database.Product)
@@ -487,23 +496,14 @@ func AddOne(c echo.Context) error <span class="cov8" title="1">{
                 return err
         }</span>
 
-        <span class="cov8" title="1">if len(p.Name) == 0 </span><span class="cov0" title="0">{
-                return c.String(http.StatusBadRequest, "400: name missing")
+        <span class="cov8" title="1">if status := checkProduct(p); status == http.StatusBadRequest </span><span class="cov0" title="0">{
+                return c.String(http.StatusBadRequest, "")
         }</span>
 
-        <span class="cov8" title="1">if len(p.Type) == 0 </span><span class="cov0" title="0">{
-                return c.String(http.StatusBadRequest, "400: producttype missing")
-        }</span>
+        <span class="cov8" title="1">newHost := trimLastSlash(p.Host)
+        p.Host = newHost
 
-        <span class="cov8" title="1">if len(p.Host) == 0 </span><span class="cov0" title="0">{
-                return c.String(http.StatusBadRequest, "400: host missing")
-        }</span>
-
-        <span class="cov8" title="1">if strings.Split(p.Host, "")[len(p.Host)-1] == "/" </span><span class="cov0" title="0">{
-                p.Host = strings.TrimSuffix(p.Host, "/")
-        }</span>
-
-        <span class="cov8" title="1">tempuuid, err := uuid.NewRandom()
+        tempuuid, err := uuid.NewRandom()
         if err != nil </span><span class="cov0" title="0">{
                 return err
         }</span>
@@ -558,10 +558,29 @@ func checkProduct(p *database.Product) int <span class="cov8" title="1">{
         var status int
         switch </span>{
         case p == nil:<span class="cov8" title="1">
+                status = http.StatusBadRequest</span>
+        case p.Name == "":<span class="cov8" title="1">
+                status = http.StatusBadRequest</span>
+        case p.Type == "":<span class="cov8" title="1">
+                status = http.StatusBadRequest</span>
+        case p.Host == "":<span class="cov8" title="1">
+                status = http.StatusBadRequest</span>
+        default:<span class="cov8" title="1">
+                status = http.StatusContinue</span>
+        }
+        <span class="cov8" title="1">return status</span>
+}
+
+func checkProductForRedirect(p *database.Product) int <span class="cov8" title="1">{
+        var status int
+        switch </span>{
+        case p == nil:<span class="cov8" title="1">
                 status = http.StatusNoContent</span>
         case p.Name == "":<span class="cov8" title="1">
                 status = http.StatusNoContent</span>
         case p.Type == "":<span class="cov8" title="1">
+                status = http.StatusNoContent</span>
+        case p.Host == "":<span class="cov8" title="1">
                 status = http.StatusNoContent</span>
         case p.Type == "FILE":<span class="cov8" title="1">
                 status = http.StatusNoContent</span>
@@ -624,31 +643,70 @@ func RedirectToHost(c echo.Context) error <span class="cov8" title="1">{
                                 }</span>
                         }
 
-                        <span class="cov8" title="1">if status := checkProduct(p); status == http.StatusNoContent </span><span class="cov8" title="1">{
+                        <span class="cov8" title="1">if status := checkProductForRedirect(p); status == http.StatusNoContent </span><span class="cov8" title="1">{
                                 return c.String(http.StatusNoContent, "")
                         }</span>
 
-                        <span class="cov0" title="0">if c.Request().Method == "GET" </span><span class="cov0" title="0">{
+                        <span class="cov0" title="0">r := buildProxyRequest(c, c.Request(), "http", p.Host)
 
-                                requestURL := parseRequestURL(c.Request().RequestURI, p)
-
-                                resp, err := http.Get(requestURL)
-                                if err != nil </span><span class="cov0" title="0">{
-                                        c.String(http.StatusGatewayTimeout, fmt.Sprintf("Upstream server response timeout: %v", err))
-                                }</span>
-
-                                <span class="cov0" title="0">defer resp.Body.Close()
-                                body, err := ioutil.ReadAll(resp.Body)
-                                if err != nil </span><span class="cov0" title="0">{
-                                        c.String(http.StatusInternalServerError, fmt.Sprintf("Error reading response body: %v", err))
-                                }</span>
-
-                                <span class="cov0" title="0">return c.Blob(resp.StatusCode, resp.Header.Get("Content-Type"), body)</span>
-                        }
+                        err = executeRequest(c, r)</span>
                 }
         }
 
         <span class="cov0" title="0">return c.String(http.StatusNoContent, "")</span>
+}
+
+func buildProxyRequest(c echo.Context, r *http.Request, protocol string, host string) *http.Request <span class="cov8" title="1">{
+        body, err := ioutil.ReadAll(r.Body)
+        if err != nil </span><span class="cov0" title="0">{
+                c.String(http.StatusInternalServerError, err.Error())
+                return nil
+        }</span>
+
+        // if body is of multipart type, reassign it here
+        <span class="cov8" title="1">r.Body = ioutil.NopCloser(bytes.NewReader(body))
+
+        // build new url
+        url := fmt.Sprintf("%s://%s%s", protocol, host, r.RequestURI)
+
+        proxyReq, err := http.NewRequest(r.Method, url, bytes.NewReader(body))
+        if err != nil </span><span class="cov0" title="0">{
+                c.String(http.StatusInternalServerError, err.Error())
+                return nil
+        }</span>
+
+        // Copy header, filter logic could be added later
+        <span class="cov8" title="1">proxyReq.Header = make(http.Header)
+        for index, value := range r.Header </span><span class="cov0" title="0">{
+                proxyReq.Header[index] = value
+        }</span>
+
+        <span class="cov8" title="1">return proxyReq</span>
+}
+
+func executeRequest(c echo.Context, r *http.Request) error <span class="cov0" title="0">{
+
+        // Instantiate http client
+        client := http.Client{}
+
+        resp, err := client.Do(r)
+        if err != nil </span><span class="cov0" title="0">{
+                return c.String(http.StatusBadGateway, err.Error())
+        }</span>
+
+        // Read body
+        <span class="cov0" title="0">stream, err := ioutil.ReadAll(resp.Body)
+        if err != nil </span><span class="cov0" title="0">{
+                if err != nil </span><span class="cov0" title="0">{
+                        c.String(http.StatusInternalServerError, err.Error())
+                        return nil
+                }</span>
+        }
+
+        // Close reader when response is returned
+        <span class="cov0" title="0">defer resp.Body.Close()
+
+        return c.Blob(resp.StatusCode, resp.Header.Get("Content-Type"), stream)</span>
 }
 </pre>
 		

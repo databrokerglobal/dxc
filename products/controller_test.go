@@ -409,7 +409,7 @@ func Test_buildProxyRequest(t *testing.T) {
 		args args
 		want *http.Request
 	}{
-		{"First pass", args{
+		{"New host must be correctly allocated to proxied request", args{
 			c:        utils.GenerateTestEchoRequest(http.MethodGet, "/", nil),
 			r:        utils.GenerateTestEchoRequest(http.MethodGet, "/", nil).Request(),
 			protocol: "http",
