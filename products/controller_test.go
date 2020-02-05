@@ -273,17 +273,8 @@ func Test_checkProduct(t *testing.T) {
 	}
 }
 
-func makeProduct(name string, pType string, host string) *database.Product {
-	return &database.Product{
-		Name: name,
-		Type: pType,
-		UUID: uuid.New().String(),
-		Host: host,
-	}
-}
-
 func Test_parseRequestURL(t *testing.T) {
-	p := makeProduct("test", "API", "http://localhost:4000")
+	p := utils.MakeProduct("test", "API", "http://localhost:4000")
 
 	type args struct {
 		requestURI string
