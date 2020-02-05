@@ -1,6 +1,7 @@
 package products
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -180,34 +181,64 @@ func RedirectToHost(c echo.Context) error {
 				return c.String(http.StatusNoContent, "")
 			}
 
-			if err := performNakedRequest(c, p); err != nil {
+			r := buildProxyRequest(c, c.Request(), "http", p.Host)
 
-			}
+			err = executeRequest(c, r)
 		}
 	}
 
 	return c.String(http.StatusNoContent, "")
 }
 
-func performNakedRequest(c echo.Context, p *database.Product) error {
-	switch c.Request().Method {
-	case "GET":
-		requestURL := parseRequestURL(c.Request().RequestURI, p)
-
-		resp, err := http.Get(requestURL)
-		if err != nil {
-			return c.String(http.StatusGatewayTimeout, fmt.Sprintf("Upstream server response timeout: %v", err))
-		}
-
-		defer resp.Body.Close()
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return c.String(http.StatusInternalServerError, fmt.Sprintf("Error reading response body: %v", err))
-		}
-
-		return c.Blob(resp.StatusCode, resp.Header.Get("Content-Type"), body)
-
-	case "POST":
+func buildProxyRequest(c echo.Context, r *http.Request, protocol string, host string) *http.Request {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return nil
 	}
-	return nil
+
+	// if body is of multipart type, reassign it here
+	r.Body = ioutil.NopCloser(bytes.NewReader(body))
+
+	// build new url
+	url := fmt.Sprintf("%s://%s%s", protocol, host, r.RequestURI)
+
+	proxyReq, err := http.NewRequest(r.Method, url, bytes.NewReader(body))
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return nil
+	}
+
+	// Copy header, filter logic could be added later
+	proxyReq.Header = make(http.Header)
+	for index, value := range r.Header {
+		proxyReq.Header[index] = value
+	}
+
+	return proxyReq
+}
+
+func executeRequest(c echo.Context, r *http.Request) error {
+
+	// Instantiate http client
+	client := http.Client{}
+
+	resp, err := client.Do(r)
+	if err != nil {
+		return c.String(http.StatusBadGateway, err.Error())
+	}
+
+	// Read body
+	stream, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		if err != nil {
+			c.String(http.StatusInternalServerError, err.Error())
+			return nil
+		}
+	}
+
+	// Close reader when response is returned
+	defer resp.Body.Close()
+
+	return c.Blob(resp.StatusCode, resp.Header.Get("Content-Type"), stream)
 }
