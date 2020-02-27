@@ -8,7 +8,7 @@ import (
 
 var appFs = afero.NewMemMapFs()
 
-// CreateMockFile Creates a new file upload http request with extra params
+// CreateMockFile : Creates a mock file for testing purposes
 func CreateMockFile(mockFile []byte) *bytes.Buffer {
 	var body *bytes.Buffer
 

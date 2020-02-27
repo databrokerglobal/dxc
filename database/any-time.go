@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+// Struct that mocks date time objects for testing
+
 // AnyTime struct
 type AnyTime struct{}
 
