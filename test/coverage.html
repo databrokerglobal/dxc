@@ -66,7 +66,7 @@
 				
 				<option value="file5">github.com/databrokerglobal/dxc/filemanager/controller.go (42.3%)</option>
 				
-				<option value="file6">github.com/databrokerglobal/dxc/filemanager/file-checker.go (25.0%)</option>
+				<option value="file6">github.com/databrokerglobal/dxc/filemanager/file-checker.go (15.8%)</option>
 				
 				<option value="file7">github.com/databrokerglobal/dxc/filemanager/file-parser.go (7.7%)</option>
 				
@@ -94,6 +94,8 @@ import (
         "database/sql/driver"
         "time"
 )
+
+// Struct that mocks date time objects for testing
 
 // AnyTime struct
 type AnyTime struct{}
@@ -325,7 +327,7 @@ func Download(c echo.Context) error <span class="cov8" title="1">{
         }</span>
 
         <span class="cov0" title="0">var filePath string
-        if os.Getenv("GO_ENV") == "development" </span><span class="cov0" title="0">{
+        if os.Getenv("GO_ENV") == "local" </span><span class="cov0" title="0">{
                 filePath = os.Getenv("LOCAL_FILES_DIR")
         }</span> else<span class="cov0" title="0"> {
                 filePath = "/var/files"
@@ -351,7 +353,15 @@ func init() <span class="cov8" title="1">{
                 log.Println("Testing: omitting database init")
                 return
         }</span>
-        <span class="cov0" title="0">fmt.Println("Checking file integrity...")
+
+        // Start up a go routine for file checking
+        <span class="cov0" title="0">go CheckingFiles()</span>
+}
+
+// CheckingFiles Delete files that are not in directory anymore, restore files that were deleted but now back in their directory
+func CheckingFiles() <span class="cov0" title="0">{
+
+        fmt.Println("Checking file integrity...")
         files, err := database.DBInstance.GetFiles()
         if err != nil </span><span class="cov0" title="0">{
                 log.Fatal(err)
@@ -362,6 +372,21 @@ func init() <span class="cov8" title="1">{
                         database.DBInstance.DeleteFile(file.Name)
                 }</span>
         }
+
+        // Checking if previously deleted files are back up
+        <span class="cov0" title="0">var deletedFiles []database.File
+        // Unscoped includes soft deleted files in the query
+        // Raw allows you to do SQL queries directly
+        database.DBInstance.DB.Unscoped().Raw(`SELECT * FROM files WHERE deleted_at IS NOT NULL`).Find(&amp;deletedFiles)
+
+        for _, deletedFile := range deletedFiles </span><span class="cov0" title="0">{
+                _, err = open(deletedFile.Name)
+                if err == nil </span><span class="cov0" title="0">{
+                        // if file opened successfully remove the soft deletion
+                        database.DBInstance.DB.Unscoped().Model(&amp;deletedFile).Update("deleted_at", nil)
+                }</span>
+        }
+
         <span class="cov0" title="0">defer fmt.Println("Finished checking file integrity")</span>
 }
 </pre>
@@ -449,13 +474,13 @@ func open(filename string) (*os.File, error) <span class="cov0" title="0">{
 
         // Load file path
         <span class="cov0" title="0">var filePath string
-        if os.Getenv("GO_ENV") == "development" </span><span class="cov0" title="0">{
+        if os.Getenv("GO_ENV") == "local" </span><span class="cov0" title="0">{
                 filePath = os.Getenv("LOCAL_FILES_DIR")
         }</span> else<span class="cov0" title="0"> {
                 filePath = "/var/files"
         }</span>
 
-        // Open same file in the mounted docker volume (or just local dir if go_env=development)
+        // Open same file in the mounted docker volume (or just local dir if go_env=local)
         <span class="cov0" title="0">from, err := os.Open(fmt.Sprintf("%s/%s", filePath, filename))
         if err != nil </span><span class="cov0" title="0">{
                 return nil, err
@@ -656,6 +681,7 @@ func RedirectToHost(c echo.Context) error <span class="cov8" title="1">{
         <span class="cov0" title="0">return c.String(http.StatusNoContent, "")</span>
 }
 
+// Take a request and build a proxy request from a host string with a certain protocol (http or https here)
 func buildProxyRequest(c echo.Context, r *http.Request, protocol string, host string) *http.Request <span class="cov8" title="1">{
         body, err := ioutil.ReadAll(r.Body)
         if err != nil </span><span class="cov0" title="0">{

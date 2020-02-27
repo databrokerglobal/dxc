@@ -59,7 +59,7 @@ func Download(c echo.Context) error {
 	}
 
 	var filePath string
-	if os.Getenv("GO_ENV") == "development" {
+	if os.Getenv("GO_ENV") == "local" {
 		filePath = os.Getenv("LOCAL_FILES_DIR")
 	} else {
 		filePath = "/var/files"

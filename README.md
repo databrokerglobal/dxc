@@ -18,19 +18,21 @@ Environment var:
 
 ```
 # Runtime env
-## development = no docker
-## production = docker
-GO_ENV=production
+## local = not dockerized
+## docker = docker
+GO_ENV=docker
 
 # File directories
 LOCAL_FILES_DIR=/path/to/files
 ```
 
 Run
+
 ```
 $ docker-compose build
-$ docker-compose up -d 
+$ docker-compose up -d
 ```
+
 Navigate to localhost:8080
 
 ### Local
@@ -39,18 +41,20 @@ Environment var:
 
 ```
 # Runtime env
-## development = no docker
-## production = docker
-GO_ENV=development
+## local = no docker
+## docker = docker
+GO_ENV=local
 
 # File directories
 LOCAL_FILES_DIR=/path/to/files
 ```
 
 Run
+
 ```
 $ go build && ./dxc
 ```
+
 Navigate to localhost:1323
 
 ## To Do
@@ -63,7 +67,6 @@ Navigate to localhost:1323
 - [x] Unit test the crap out of it
 - [x] Add/Get products
 - [x] Request redirect to Host API (GET)
-- [ ] Request redirect to Host API (POST)
-- [ ] Change name of file if same filename but not same content
-- [ ] More clever file checker -> no delete but flag in db?
+- [x] Request redirect to Host API (POST)
+- [x] More clever file checker, files can be restored
 - [ ] Fully functional UI

@@ -81,13 +81,13 @@ func open(filename string) (*os.File, error) {
 
 	// Load file path
 	var filePath string
-	if os.Getenv("GO_ENV") == "development" {
+	if os.Getenv("GO_ENV") == "local" {
 		filePath = os.Getenv("LOCAL_FILES_DIR")
 	} else {
 		filePath = "/var/files"
 	}
 
-	// Open same file in the mounted docker volume (or just local dir if go_env=development)
+	// Open same file in the mounted docker volume (or just local dir if go_env=local)
 	from, err := os.Open(fmt.Sprintf("%s/%s", filePath, filename))
 	if err != nil {
 		return nil, err
