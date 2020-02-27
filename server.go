@@ -5,11 +5,8 @@ import (
 
 	"github.com/databrokerglobal/dxc/filemanager"
 	"github.com/databrokerglobal/dxc/products"
-	"github.com/databrokerglobal/dxc/templating"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-
-	"html/template"
 )
 
 func main() {
@@ -26,22 +23,13 @@ func main() {
 	// Prevents api from crashing if panic
 	e.Use(middleware.Recover())
 
-	////////////////////////
-	// Template Renderer //)
-	///////////////////////
-
-	t := &templating.Template{
-		Templates: template.Must(template.ParseGlob("public/*.html")),
-	}
-	e.Renderer = t
-
 	////////////
 	// ROUTES //
 	////////////
 
 	// Templating
 	// Static index.html route, serve html
-	e.GET("/", templating.IndexHandler)
+	e.Static("/", "ui/build")
 
 	// FILES
 	// Upload file route
@@ -54,7 +42,7 @@ func main() {
 	e.GET("/product/:uuid", products.GetOne)
 
 	// PRODUCTS Request Redirect
-	e.Any("/*", products.RedirectToHost)
+	e.Any("api/*", products.RedirectToHost)
 
 	// Loading env file
 	err := godotenv.Load()
