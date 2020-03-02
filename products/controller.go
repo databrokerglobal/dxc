@@ -59,6 +59,19 @@ func AddOne(c echo.Context) error {
 	return c.JSON(http.StatusCreated, p)
 }
 
+// GetAll return all products
+func GetAll(c echo.Context) error {
+	var ps *[]database.Product
+
+	ps, err := database.DBInstance.GetProducts()
+
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Error retrieving item from database")
+	}
+
+	return c.JSON(http.StatusOK, ps)
+}
+
 // GetOne product
 func GetOne(c echo.Context) error {
 	uuid := c.Param("uuid")

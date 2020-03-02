@@ -23,6 +23,12 @@ func main() {
 	// Prevents api from crashing if panic
 	e.Use(middleware.Recover())
 
+	// CORS
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"http://localhost:3000"},
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+	}))
+
 	////////////
 	// ROUTES //
 	////////////
@@ -40,6 +46,7 @@ func main() {
 	// PRODUCTS
 	e.POST("/product", products.AddOne)
 	e.GET("/product/:uuid", products.GetOne)
+	e.GET("/products", products.GetAll)
 
 	// PRODUCTS Request Redirect
 	e.Any("api/*", products.RedirectToHost)
