@@ -37,6 +37,10 @@ func AddOne(c echo.Context) error {
 	newHost := trimLastSlash(p.Host)
 	p.Host = newHost
 
+	if p.Type == "FILE" {
+		p.Host = "N/A"
+	}
+
 	tempuuid, err := uuid.NewRandom()
 	if err != nil {
 		return err

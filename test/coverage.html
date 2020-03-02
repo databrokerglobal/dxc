@@ -70,11 +70,7 @@
 				
 				<option value="file7">github.com/databrokerglobal/dxc/filemanager/file-parser.go (7.7%)</option>
 				
-				<option value="file8">github.com/databrokerglobal/dxc/products/controller.go (69.2%)</option>
-				
-				<option value="file9">github.com/databrokerglobal/dxc/templating/controller.go (81.8%)</option>
-				
-				<option value="file10">github.com/databrokerglobal/dxc/templating/renderer.go (100.0%)</option>
+				<option value="file8">github.com/databrokerglobal/dxc/products/controller.go (65.8%)</option>
 				
 				</select>
 			</div>
@@ -528,7 +524,11 @@ func AddOne(c echo.Context) error <span class="cov8" title="1">{
         <span class="cov8" title="1">newHost := trimLastSlash(p.Host)
         p.Host = newHost
 
-        tempuuid, err := uuid.NewRandom()
+        if p.Type == "FILE" </span><span class="cov0" title="0">{
+                p.Host = "N/A"
+        }</span>
+
+        <span class="cov8" title="1">tempuuid, err := uuid.NewRandom()
         if err != nil </span><span class="cov0" title="0">{
                 return err
         }</span>
@@ -548,6 +548,19 @@ func AddOne(c echo.Context) error <span class="cov8" title="1">{
         }
 
         <span class="cov8" title="1">return c.JSON(http.StatusCreated, p)</span>
+}
+
+// GetAll return all products
+func GetAll(c echo.Context) error <span class="cov0" title="0">{
+        var ps *[]database.Product
+
+        ps, err := database.DBInstance.GetProducts()
+
+        if err != nil </span><span class="cov0" title="0">{
+                return c.String(http.StatusInternalServerError, "Error retrieving item from database")
+        }</span>
+
+        <span class="cov0" title="0">return c.JSON(http.StatusOK, ps)</span>
 }
 
 // GetOne product
@@ -734,68 +747,6 @@ func executeRequest(c echo.Context, r *http.Request) error <span class="cov0" ti
 
         return c.Blob(resp.StatusCode, resp.Header.Get("Content-Type"), stream)</span>
 }
-</pre>
-		
-		<pre class="file" id="file9" style="display: none">package templating
-
-import (
-        "net/http"
-        "os"
-
-        "github.com/databrokerglobal/dxc/database"
-        "github.com/labstack/echo"
-)
-
-// IndexData file list template generator
-type IndexData struct {
-        Files *[]database.File
-}
-
-// IndexHandler render index html
-func IndexHandler(c echo.Context) error <span class="cov8" title="1">{
-        var omit bool
-
-        if len(os.Args) &gt; 1 &amp;&amp; os.Args[1][:5] == "-test" </span><span class="cov8" title="1">{
-                omit = true
-        }</span>
-
-        <span class="cov8" title="1">var files *[]database.File
-        var err error
-
-        if !omit </span><span class="cov0" title="0">{
-                files, err = database.DBInstance.GetFiles()
-        }</span>
-
-        <span class="cov8" title="1">if err != nil </span><span class="cov0" title="0">{
-                return c.String(http.StatusNotFound, "No file metadata stored in the database")
-        }</span>
-
-        <span class="cov8" title="1">data := IndexData{
-                Files: files,
-        }
-
-        return c.Render(http.StatusOK, "data", data)</span>
-}
-</pre>
-		
-		<pre class="file" id="file10" style="display: none">package templating
-
-import (
-        "html/template"
-        "io"
-
-        "github.com/labstack/echo"
-)
-
-// Template struct
-type Template struct {
-        Templates *template.Template
-}
-
-// Render template renderer
-func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error <span class="cov8" title="1">{
-        return t.Templates.ExecuteTemplate(w, name, data)
-}</span>
 </pre>
 		
 		</div>
