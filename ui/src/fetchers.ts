@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const PORT = 1323;
-const HOST = `http://localhost:${PORT}`;
+const LOCAL_PORT = 1323;
+export const LOCAL_HOST = `http://localhost:${LOCAL_PORT}`;
 
-export const fetcher = (ROUTE: string) => axios(`${HOST}${ROUTE}`);
+export const fetcher = (ROUTE: string) => axios(`${LOCAL_HOST}${ROUTE}`);
