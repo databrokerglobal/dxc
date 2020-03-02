@@ -12,7 +12,6 @@ import (
 
 // Upload file controller
 func Upload(c echo.Context) error {
-	defer fmt.Println("hello")
 
 	// Source - File stream from upload
 	file, err := c.FormFile("file")
