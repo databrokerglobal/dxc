@@ -1,7 +1,8 @@
 import React from "react";
 import { Form, Field, FormikProps, withFormik, FormikErrors } from "formik";
 import axios from "axios";
-import { LOCAL_HOST } from "./fetchers";
+import { LOCAL_HOST, fetcher } from "./fetchers";
+import useSWR from "swr";
 
 interface IProduct {
   ID: string;
@@ -142,3 +143,14 @@ export const ProductAdd = () => (
     <ProductForm />
   </div>
 );
+
+export const ProductComponent = () => {
+  const { data, error } = useSWR("/products", fetcher);
+  return (
+    <div style={{ margin: "3%" }}>
+      {data?.data ? ProductsList(data.data) : <p>Loading...</p>}
+      {error ? <p>{error}</p> : null}
+      <ProductAdd />
+    </div>
+  );
+};

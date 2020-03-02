@@ -39,9 +39,10 @@ func main() {
 
 	// FILES
 	// Upload file route
-	e.POST("/upload", filemanager.Upload)
+	e.POST("/files/upload", filemanager.Upload)
 	// Download file route
-	e.GET("/download", filemanager.Download)
+	e.GET("/files/download", filemanager.Download)
+	e.GET("/files", filemanager.GetAll)
 
 	// PRODUCTS
 	e.POST("/product", products.AddOne)
