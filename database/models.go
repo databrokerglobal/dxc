@@ -18,5 +18,5 @@ type Product struct {
 	Type string `json:"producttype"`
 	UUID string `json:"uuid"`
 	Host string `json:"host"`
-	File File   `gorm:"foreignkey:ProductName"`
+	File []File `gorm:"foreignkey:ProductName"`
 }
