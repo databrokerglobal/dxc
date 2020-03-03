@@ -12,7 +12,7 @@ interface IProduct {
   producttype: string;
   uuid?: string;
   host: string;
-  files: IFile[];
+  Files: IFile[];
 }
 
 interface IProductFormValues {
@@ -44,6 +44,19 @@ export const ProductsList = (data: IProduct[]) => (
         <li>Name: {p.name}</li>
         <li>Type: {p.producttype}</li>
         <li>Host: {p.host}</li>
+        {p.Files?.length > 0 ? (
+          <li>
+            Files:
+            {p.Files.map((file: IFile) => (
+              <ul>
+                <li>{file.name}</li>
+              </ul>
+            ))}
+          </li>
+        ) : null}
+        {p.Files?.length === 0 && p.producttype === "FILE" && (
+          <li style={{ color: "red" }}>File: linked file not found...</li>
+        )}
       </div>
     ))}
   </div>
