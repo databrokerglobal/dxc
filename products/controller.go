@@ -34,19 +34,22 @@ func AddOne(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "")
 	}
 
-	newHost := trimLastSlash(p.Host)
-	p.Host = newHost
-
 	if p.Type == "FILE" {
 		p.Host = "N/A"
 	}
 
-	tempuuid, err := uuid.NewRandom()
-	if err != nil {
-		return err
+	if p.Type != "FILE" {
+		newHost := trimLastSlash(p.Host)
+		p.Host = newHost
 	}
 
-	p.UUID = tempuuid.String()
+	if p.UUID == "" {
+		tempuuid, err := uuid.NewRandom()
+		if err != nil {
+			return err
+		}
+		p.UUID = tempuuid.String()
+	}
 
 	var omit bool
 

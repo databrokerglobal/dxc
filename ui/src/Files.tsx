@@ -4,8 +4,8 @@ import useSWR from "swr";
 import { FormikProps, Form, withFormik } from "formik";
 import axios, { AxiosResponse } from "axios";
 
-interface IFile {
-  ID: string;
+export interface IFile {
+  ID?: string;
   name: string;
 }
 
