@@ -1,6 +1,6 @@
 import React from "react";
 import { Form, Field, FormikProps, withFormik } from "formik";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { LOCAL_HOST, fetcher } from "./fetchers";
 import useSWR from "swr";
 import { IFile } from "./Files";
@@ -21,6 +21,7 @@ interface IProductFormValues {
   host: string;
   file?: IFile;
   error?: string;
+  message?: string;
 }
 
 export const ProductsList = (data: IProduct[]) => (
@@ -48,8 +49,8 @@ export const ProductsList = (data: IProduct[]) => (
           <li>
             Files:
             {p.Files.map((file: IFile) => (
-              <ul>
-                <li>{file.name}</li>
+              <ul key={p.ID}>
+                <li key={file.ID}>{file.name}</li>
               </ul>
             ))}
           </li>
@@ -61,6 +62,8 @@ export const ProductsList = (data: IProduct[]) => (
     ))}
   </div>
 );
+
+let resp: AxiosResponse;
 
 const InnerProductForm = (props: FormikProps<IProductFormValues>) => {
   const { errors, isSubmitting } = props;
@@ -184,9 +187,20 @@ const InnerProductForm = (props: FormikProps<IProductFormValues>) => {
           </div>
         )}
       </div>
-      <button type="submit" disabled={isSubmitting} style={{ marginTop: "1%" }}>
-        Submit
-      </button>
+      {!resp && (
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          style={{ marginTop: "1%" }}
+        >
+          Submit
+        </button>
+      )}
+      {resp && (
+        <p
+          style={{ color: "green", fontSize: "11px" }}
+        >{`Success: ${resp.status} ${resp.statusText}`}</p>
+      )}
       <p style={{ color: "red", fontSize: "11px" }}>{errors.error}</p>
     </Form>
   );
@@ -226,7 +240,8 @@ const ProductForm = withFormik<{}, IProductFormValues>({
         if (data.producttype !== "FILE") {
           delete data.files;
         }
-        await axios.post(`${LOCAL_HOST}/product`, data);
+        resp = await axios.post(`${LOCAL_HOST}/product`, data);
+        console.log(resp);
         formikBag.setSubmitting(false);
       }
     } catch (err) {
