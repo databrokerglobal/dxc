@@ -169,21 +169,28 @@ const InnerProductForm = (props: FormikProps<IProductFormValues>) => {
             >
               File:
             </label>
-            <Select
-              style={{ minWidth: "auto" }}
-              styles={{ container: base => ({ ...base, flex: 1 }) }}
-              name="file"
-              as="select"
-              options={options}
-              onChange={v =>
-                props.setValues({
-                  name: props.values.name,
-                  producttype: props.values.producttype,
-                  host: props.values.host,
-                  file: (v as any).value
-                })
-              }
-            />
+            {Object.values(options).length > 0 && (
+              <Select
+                style={{ minWidth: "auto" }}
+                styles={{ container: base => ({ ...base, flex: 1 }) }}
+                name="file"
+                as="select"
+                options={options}
+                onChange={v =>
+                  props.setValues({
+                    name: props.values.name,
+                    producttype: props.values.producttype,
+                    host: props.values.host,
+                    file: (v as any).value
+                  })
+                }
+              />
+            )}
+            {Object.values(options).length === 0 && (
+              <p style={{ fontSize: "12px", color: "red" }}>
+                No files available. Please add a file first...
+              </p>
+            )}
           </div>
         )}
       </div>
