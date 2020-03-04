@@ -10,9 +10,9 @@ The data exchange controller has three parts:
 
 ## How to run
 
-### Docker
+### Environment variables (.env file):
 
-Environment var:
+Docker
 
 ```
 # Runtime env
@@ -24,7 +24,7 @@ GO_ENV=docker
 LOCAL_FILES_DIR=/path/to/files
 ```
 
-Run
+Run the container
 
 ```
 $ docker-compose build
@@ -33,7 +33,7 @@ $ docker-compose up -d
 
 Navigate to localhost:8080
 
-### Local
+Local
 
 Environment var:
 
