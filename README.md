@@ -12,7 +12,7 @@ The data exchange controller has three parts:
 
 ### Environment variables (.env file):
 
-Docker
+- Docker
 
 ```
 # Runtime env
@@ -33,9 +33,7 @@ $ docker-compose up -d
 
 Navigate to localhost:8080
 
-Local
-
-Environment var:
+- Local
 
 ```
 # Runtime env
