@@ -28,3 +28,7 @@ test.txt
 node_modules/
 
 .idea
+
+build/
+
+dxc_build_*/

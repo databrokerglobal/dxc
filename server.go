@@ -35,7 +35,7 @@ func main() {
 
 	// Templating
 	// Static index.html route, serve html
-	e.Static("/", "ui/build")
+	e.Static("/", "build")
 
 	// FILES
 	// Upload file route
