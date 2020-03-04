@@ -58,6 +58,7 @@ $ go run server.go
 $ cd ui
 $ npm i
 $ npm start
+$ navigate to localhost:3000
 ```
 
 ## How to build
@@ -66,6 +67,7 @@ $ npm start
 $ ./build-script.sh
 $ cd dxc_build_dir
 $ ./dxc
+$ navigate to localhost:1323
 ```
 
 ## How to run unit tests
@@ -101,3 +103,6 @@ After running the test script an outfile is converted into a coverage.html file 
 - [ ] Authentication
 - [ ] Smart contracts
 - [ ] Support for streaming protocols
+- [ ] Docker update
+- [ ] Download file button in UI
+- [ ] Delete file / product button in UI
