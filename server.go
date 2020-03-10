@@ -5,11 +5,8 @@ import (
 
 	"github.com/databrokerglobal/dxc/filemanager"
 	"github.com/databrokerglobal/dxc/products"
-	"github.com/databrokerglobal/dxc/templating"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-
-	"html/template"
 )
 
 func main() {
@@ -26,14 +23,11 @@ func main() {
 	// Prevents api from crashing if panic
 	e.Use(middleware.Recover())
 
-	////////////////////////
-	// Template Renderer //)
-	///////////////////////
-
-	t := &templating.Template{
-		Templates: template.Must(template.ParseGlob("public/*.html")),
-	}
-	e.Renderer = t
+	// CORS
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"http://localhost:3000"},
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+	}))
 
 	////////////
 	// ROUTES //
@@ -41,20 +35,22 @@ func main() {
 
 	// Templating
 	// Static index.html route, serve html
-	e.GET("/", templating.IndexHandler)
+	e.Static("/", "build")
 
 	// FILES
 	// Upload file route
-	e.POST("/upload", filemanager.Upload)
+	e.POST("/files/upload", filemanager.Upload)
 	// Download file route
-	e.GET("/download", filemanager.Download)
+	e.GET("/files/download", filemanager.Download)
+	e.GET("/files", filemanager.GetAll)
 
 	// PRODUCTS
 	e.POST("/product", products.AddOne)
 	e.GET("/product/:uuid", products.GetOne)
+	e.GET("/products", products.GetAll)
 
 	// PRODUCTS Request Redirect
-	e.Any("/*", products.RedirectToHost)
+	e.Any("api/*", products.RedirectToHost)
 
 	// Loading env file
 	err := godotenv.Load()

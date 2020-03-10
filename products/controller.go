@@ -34,15 +34,22 @@ func AddOne(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "")
 	}
 
-	newHost := trimLastSlash(p.Host)
-	p.Host = newHost
-
-	tempuuid, err := uuid.NewRandom()
-	if err != nil {
-		return err
+	if p.Type == "FILE" {
+		p.Host = "N/A"
 	}
 
-	p.UUID = tempuuid.String()
+	if p.Type != "FILE" {
+		newHost := trimLastSlash(p.Host)
+		p.Host = newHost
+	}
+
+	if p.UUID == "" {
+		tempuuid, err := uuid.NewRandom()
+		if err != nil {
+			return err
+		}
+		p.UUID = tempuuid.String()
+	}
 
 	var omit bool
 
@@ -57,6 +64,19 @@ func AddOne(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusCreated, p)
+}
+
+// GetAll return all products
+func GetAll(c echo.Context) error {
+	var ps *[]database.Product
+
+	ps, err := database.DBInstance.GetProducts()
+
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Error retrieving item from database")
+	}
+
+	return c.JSON(http.StatusOK, ps)
 }
 
 // GetOne product

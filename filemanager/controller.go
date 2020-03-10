@@ -12,7 +12,6 @@ import (
 
 // Upload file controller
 func Upload(c echo.Context) error {
-	defer fmt.Println("hello")
 
 	// Source - File stream from upload
 	file, err := c.FormFile("file")
@@ -66,4 +65,17 @@ func Download(c echo.Context) error {
 	}
 
 	return c.Attachment(fmt.Sprintf("%s/%s", filePath, name), name)
+}
+
+// GetAll get all files
+func GetAll(c echo.Context) error {
+	var fs *[]database.File
+
+	fs, err := database.DBInstance.GetFiles()
+
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Error retrieving item from database")
+	}
+
+	return c.JSON(http.StatusOK, fs)
 }

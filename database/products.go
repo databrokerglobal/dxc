@@ -22,10 +22,7 @@ func (m *Manager) GetProduct(u string) (p *Product, err error) {
 // GetProducts Get all Products query
 func (m *Manager) GetProducts() (ps *[]Product, err error) {
 	products := []Product{}
-	m.DB.Table("Products").Find(&products)
-	if errs := m.DB.GetErrors(); len(errs) > 0 {
-		err = errs[0]
-	}
+	m.DB.Table("Products").Preload("Files").Find(&products)
 	return &products, nil
 }
 

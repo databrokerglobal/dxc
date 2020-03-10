@@ -34,7 +34,7 @@ func init() {
 		return
 	}
 
-	db, err := gorm.Open("sqlite3", "./database/dxc.db")
+	db, err := gorm.Open("sqlite3", "./dxc.db")
 	if err != nil {
 		log.Fatal("Error connecting to database")
 	}
