@@ -1,28 +1,14 @@
-import { BuidlerConfig, usePlugin } from '@nomiclabs/buidler/config';
-import waffleDefaultAccounts from 'ethereum-waffle/dist/config/defaultAccounts';
+import {usePlugin} from '@nomiclabs/buidler/config';
 
 // tslint:disable-next-line: no-default-import
 import solcconfig from './solcconfig.json';
 
-usePlugin('@nomiclabs/buidler-ethers');
-usePlugin('@nomiclabs/buidler-solhint');
-usePlugin('buidler-typechain');
 usePlugin('@nomiclabs/buidler-truffle5');
+usePlugin('@nomiclabs/buidler-solhint');
 
-const config: BuidlerConfig = {
+const config = {
   defaultNetwork: 'buidlerevm',
   solc: solcconfig,
-  typechain: {
-    target: 'ethers',
-  },
-  networks: {
-    buidlerevm: {
-      accounts: waffleDefaultAccounts.map(acc => ({
-        balance: acc.balance,
-        privateKey: acc.secretKey,
-      })),
-    },
-  },
   analytics: {
     enabled: false,
   },

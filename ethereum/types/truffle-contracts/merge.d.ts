@@ -9,14 +9,10 @@ declare global {
   namespace Truffle {
     interface Artifacts {
       require(name: "Migrations"): TruffleContracts.MigrationsContract;
-      require(name: "Ownable"): TruffleContracts.OwnableContract;
       require(
         name: "OwnedUpgradeabilityProxy"
       ): TruffleContracts.OwnedUpgradeabilityProxyContract;
       require(name: "Proxy"): TruffleContracts.ProxyContract;
-      require(name: "Token_V0"): TruffleContracts.Token_V0Contract;
-      require(name: "Token"): TruffleContracts.TokenContract;
-      require(name: "TokenUpgrade"): TruffleContracts.TokenUpgradeContract;
       require(
         name: "UpgradeabilityProxy"
       ): TruffleContracts.UpgradeabilityProxyContract;

@@ -1,34 +1,42 @@
 {
   "compilerOptions": {
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "composite": true,
     "sourceMap": true,
     "inlineSources": true,
-    "incremental": true,
-    "module": "commonjs",
-    "esModuleInterop": true,
-    "target": "ES2017",
+    "declaration": true,
     "noImplicitAny": true,
+    "esModuleInterop": true,
     "suppressImplicitAnyIndexErrors": true,
     "moduleResolution": "node",
-    "outDir": "dist",
-    "baseUrl": ".",
     "skipLibCheck": true,
+    "module": "commonjs",
+    "target": "es2018",
+    "allowJs": false,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
     "strictNullChecks": true,
-    "strict": true,
-    "resolveJsonModule": true
+    "strictBindCallApply": true
   },
-  "plugins": [
-    {
-      "name": "typescript-tslint-plugin"
-    }
-  ],
   "include": [
     "./scripts",
     "./test",
     "./migrations"
   ],
+  "exclude": [
+    "dist/**/*"
+  ],
   "files": [
     "./buidler.config.ts",
-    "./node_modules/@nomiclabs/buidler-ethers/src/type-extensions.d.ts",
-    "./node_modules/buidler-typechain/src/type-extensions.d.ts"
+    "./node_modules/@nomiclabs/buidler-truffle5/src/type-extensions.d.ts",
+    "./node_modules/@nomiclabs/buidler-web3/src/type-extensions.d.ts",
+    "./solcconfig.json"
   ]
 }
