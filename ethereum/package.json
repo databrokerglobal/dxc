@@ -20,7 +20,7 @@
     "url": "https://github.com/databrokerglobal/dxc.git"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "3.0.0-beta.0",
+    "@openzeppelin/contracts": "2.5.0",
     "dayjs": "^1.8.21",
     "faker": "^4.1.0"
   },

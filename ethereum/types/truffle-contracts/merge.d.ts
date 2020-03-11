@@ -8,11 +8,29 @@ import * as TruffleContracts from ".";
 declare global {
   namespace Truffle {
     interface Artifacts {
+      require(
+        name: "ApproveAndCallFallBack"
+      ): TruffleContracts.ApproveAndCallFallBackContract;
+      require(name: "Controlled"): TruffleContracts.ControlledContract;
+      require(name: "DTXToken"): TruffleContracts.DTXTokenContract;
+      require(name: "DXC"): TruffleContracts.DXCContract;
+      require(name: "ERC20Token"): TruffleContracts.ERC20TokenContract;
       require(name: "Migrations"): TruffleContracts.MigrationsContract;
+      require(name: "MiniMeToken"): TruffleContracts.MiniMeTokenContract;
+      require(
+        name: "MiniMeTokenFactory"
+      ): TruffleContracts.MiniMeTokenFactoryContract;
+      require(name: "MultiSigWallet"): TruffleContracts.MultiSigWalletContract;
+      require(
+        name: "MultiSigWalletWithDailyLimit"
+      ): TruffleContracts.MultiSigWalletWithDailyLimitContract;
       require(
         name: "OwnedUpgradeabilityProxy"
       ): TruffleContracts.OwnedUpgradeabilityProxyContract;
       require(name: "Proxy"): TruffleContracts.ProxyContract;
+      require(
+        name: "TokenController"
+      ): TruffleContracts.TokenControllerContract;
       require(
         name: "UpgradeabilityProxy"
       ): TruffleContracts.UpgradeabilityProxyContract;
