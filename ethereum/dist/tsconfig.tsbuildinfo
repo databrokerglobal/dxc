@@ -490,8 +490,8 @@
         "signature": "7185c75f0b599a5636b0559967d0c70053828c24307bfbea24dbeb9cbb5d7e1f"
       },
       "../types/truffle-contracts/index.d.ts": {
-        "version": "278d74ef4864c46cd02fc294a8fe32a4fbf4f28a4b168e7f2aaf4f3ca6205f86",
-        "signature": "278d74ef4864c46cd02fc294a8fe32a4fbf4f28a4b168e7f2aaf4f3ca6205f86"
+        "version": "9da933046d50efcc33f6d8aed1ffbde2cc251a993a4cf623b08a91c67ad130d4",
+        "signature": "9da933046d50efcc33f6d8aed1ffbde2cc251a993a4cf623b08a91c67ad130d4"
       },
       "../test/migrations.ts": {
         "version": "95fdfdf3c0450b2fec8da586a3740cae8e1983bb60e709dc4fe87bc61b849e6f",
@@ -2587,16 +2587,16 @@
       "../node_modules/web3/node_modules/web3-shh/types/index.d.ts",
       "../node_modules/web3/types/index.d.ts",
       "../node_modules/truffle-typings/index.d.ts",
-      "../types/truffle-contracts/index.d.ts",
-      "../test/migrations.ts",
-      "../migrations/1_initial_migration.ts",
-      "../migrations/3_deploy_dxc.ts",
       "../node_modules/@types/faker/index.d.ts",
       "../node_modules/@types/lru-cache/index.d.ts",
       "../node_modules/@types/mkdirp/index.d.ts",
       "../node_modules/@types/prettier/index.d.ts",
       "../node_modules/@types/resolve/index.d.ts",
-      "../migrations/2_deploy_dtx_mimime.ts"
+      "../types/truffle-contracts/index.d.ts",
+      "../test/migrations.ts",
+      "../migrations/1_initial_migration.ts",
+      "../migrations/2_deploy_dtx_mimime.ts",
+      "../migrations/3_deploy_dxc.ts"
     ]
   },
   "version": "3.8.3"

@@ -1,14 +1,13 @@
 pragma solidity ^0.5.0;
 pragma experimental ABIEncoderV2;
 
-import "@openzeppelin/contracts/ownership/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "../upgradeability/OwnedUpgradeabilityProxy.sol";
 
-contract DXC is Ownable, OwnedUpgradeabilityProxy {
 
+contract DXC is OwnedUpgradeabilityProxy {
   using SafeMath for uint256;
   using SafeMath for uint8;
   using SafeERC20 for ERC20;
@@ -24,11 +23,14 @@ contract DXC is Ownable, OwnedUpgradeabilityProxy {
   //// Mofifiers for default settings                                                ////
   ///////////////////////////////////////////////////////////////////////////////////////
 
-  function changeProtocolPercentage(uint8 _protocolPercentage) public onlyOwner {
+  function changeProtocolPercentage(uint8 _protocolPercentage)
+    public
+    onlyProxyOwner
+  {
     protocolPercentage = _protocolPercentage;
   }
 
-  function changeDTXToken(address token) public onlyOwner {
+  function changeDTXToken(address token) public onlyProxyOwner {
     dtxToken = ERC20(token);
   }
 
@@ -61,7 +63,17 @@ contract DXC is Ownable, OwnedUpgradeabilityProxy {
     return dtxToken.balanceOf(address(this));
   }
 
-  function balanceOf(address owner) public view returns (uint256 balance, uint256 escrowOutgoing, uint256 escrowIncoming, uint256 available, uint256 globalBalance) {
+  function balanceOf(address owner)
+    public
+    view
+    returns (
+      uint256 balance,
+      uint256 escrowOutgoing,
+      uint256 escrowIncoming,
+      uint256 available,
+      uint256 globalBalance
+    )
+  {
     balance = balances[owner].balance;
     escrowOutgoing = balances[owner].escrowOutgoing;
     escrowIncoming = balances[owner].escrowIncoming;
@@ -69,38 +81,55 @@ contract DXC is Ownable, OwnedUpgradeabilityProxy {
     globalBalance = dtxToken.balanceOf(owner);
   }
 
-  function convertFiatToToken(address to, uint256 amount) public onlyOwner {
+  function convertFiatToToken(address to, uint256 amount)
+    public
+    onlyProxyOwner
+  {
     transfer(address(this), to, amount);
     emit DepositDTX(to, amount);
   }
 
   function deposit(uint256 amount) public {
-    require(dtxToken.balanceOf(msg.sender) >= amount, "Sender has too little DTX to make this transaction work");
-    require(dtxToken.transferFrom(msg.sender, address(this), amount), "DTX transfer failed, probably too little allowance");
+    require(
+      dtxToken.balanceOf(msg.sender) >= amount,
+      "Sender has too little DTX to make this transaction work"
+    );
+    require(
+      dtxToken.transferFrom(msg.sender, address(this), amount),
+      "DTX transfer failed, probably too little allowance"
+    );
     balances[msg.sender].balance = balances[msg.sender].balance.add(amount);
     totalBalance = totalBalance.add(amount);
     emit DepositDTX(msg.sender, amount);
   }
 
-  function platformDeposit(uint256 amount) public onlyOwner {
-    balances[address(this)].balance = balances[address(this)].balance.add(amount);
+  function platformDeposit(uint256 amount) public onlyProxyOwner {
+    balances[address(this)].balance = balances[address(this)].balance.add(
+      amount
+    );
   }
 
   function withdraw() public {
-    (,,, uint256 available,) = balanceOf(msg.sender);
+    (, , , uint256 available, ) = balanceOf(msg.sender);
     balances[msg.sender].balance = balances[msg.sender].balance.sub(available);
     totalBalance = totalBalance.sub(available);
-    require(dtxToken.transfer(msg.sender, available), "Not enough DTX tokens available to withdraw, contact DataBrokerDAO!");
+    require(
+      dtxToken.transfer(msg.sender, available),
+      "Not enough DTX tokens available to withdraw, contact DataBrokerDAO!"
+    );
     emit WithdrawDTX(msg.sender, available);
   }
 
-  function platformTokenWithdraw(uint256 amount) public onlyOwner {
-    dtxToken.transfer(owner(), amount);
+  function platformTokenWithdraw(uint256 amount) public onlyProxyOwner {
+    dtxToken.transfer(proxyOwner(), amount);
   }
 
   function transfer(address from, address to, uint256 amount) internal {
-    (,,, uint256 available,) = balanceOf(from);
-    require(amount <= available, "Not enough available DTX to execute this transfer");
+    (, , , uint256 available, ) = balanceOf(from);
+    require(
+      amount <= available,
+      "Not enough available DTX to execute this transfer"
+    );
     balances[from].balance = balances[from].balance.sub(amount);
     balances[to].balance = balances[to].balance.add(amount);
     emit TransferDTX(from, to, amount);
@@ -114,17 +143,36 @@ contract DXC is Ownable, OwnedUpgradeabilityProxy {
     address user,
     address marketplace,
     uint8 marketplacePercentage,
-    uint256 amount) internal
-  {
-    require(ownerPercentage+publisherPercentage+marketplacePercentage+protocolPercentage == 100, "All percentages need to add up to exactly 100");
+    uint256 amount
+  ) internal {
+    require(
+      ownerPercentage +
+        publisherPercentage +
+        marketplacePercentage +
+        protocolPercentage ==
+        100,
+      "All percentages need to add up to exactly 100"
+    );
     balances[user].escrowOutgoing = balances[user].escrowOutgoing.add(amount);
     totalEscrowed = totalEscrowed.add(amount);
     uint256 basePoint = amount.div(100);
-    balances[owner].escrowIncoming = balances[owner].escrowIncoming.add(basePoint.mul(ownerPercentage));
-    balances[publisher].escrowIncoming = balances[publisher].escrowIncoming.add(basePoint.mul(publisherPercentage));
-    balances[marketplace].escrowIncoming = balances[marketplace].escrowIncoming.add(basePoint.mul(marketplacePercentage));
-    uint256 protocolAmount = amount.sub((basePoint.mul(ownerPercentage)).add(basePoint.mul(publisherPercentage)).add(basePoint.mul(marketplacePercentage)));
-    balances[address(this)].escrowIncoming = balances[address(this)].escrowIncoming.add(protocolAmount);
+    balances[owner].escrowIncoming = balances[owner].escrowIncoming.add(
+      basePoint.mul(ownerPercentage)
+    );
+    balances[publisher].escrowIncoming = balances[publisher].escrowIncoming.add(
+      basePoint.mul(publisherPercentage)
+    );
+    balances[marketplace].escrowIncoming = balances[marketplace]
+      .escrowIncoming
+      .add(basePoint.mul(marketplacePercentage));
+    uint256 protocolAmount = amount.sub(
+      (basePoint.mul(ownerPercentage))
+        .add(basePoint.mul(publisherPercentage))
+        .add(basePoint.mul(marketplacePercentage))
+    );
+    balances[address(this)].escrowIncoming = balances[address(this)]
+      .escrowIncoming
+      .add(protocolAmount);
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////
@@ -166,22 +214,34 @@ contract DXC is Ownable, OwnedUpgradeabilityProxy {
     return dealsList;
   }
 
-  function deal(uint256 index) external view returns (Deal memory){
+  function deal(uint256 index) external view returns (Deal memory) {
     return dealsList[index];
   }
 
-  function dealsForDID(string calldata did) external view returns (Deal[] memory){
+  function dealsForDID(string calldata did)
+    external
+    view
+    returns (Deal[] memory)
+  {
     return didToDeals[did];
   }
 
-  function dealsForAddress(address user) external view returns (Deal[] memory){
+  function dealsForAddress(address user) external view returns (Deal[] memory) {
     return userToDeals[user];
   }
 
-  function hasAccessToDiD(string calldata did, address user) external view returns (bool){
+  function hasAccessToDiD(string calldata did, address user)
+    external
+    view
+    returns (bool)
+  {
     bool accessToDid = false;
-    for (uint256 i = 0; i < userToDeals[user].length; i++){
-      if (keccak256(abi.encode(userToDeals[user][i].did)) == keccak256(abi.encode(did)) && userToDeals[user][i].validUntil > now){
+    for (uint256 i = 0; i < userToDeals[user].length; i++) {
+      if (
+        keccak256(abi.encode(userToDeals[user][i].did)) ==
+        keccak256(abi.encode(did)) &&
+        userToDeals[user][i].validUntil > now
+      ) {
         return true;
       }
     }
@@ -200,7 +260,7 @@ contract DXC is Ownable, OwnedUpgradeabilityProxy {
     uint256 amount,
     uint256 validFrom,
     uint256 validUntil
-  ) public onlyOwner {
+  ) public onlyProxyOwner {
     escrow(
       owner,
       ownerPercentage,
@@ -227,13 +287,15 @@ contract DXC is Ownable, OwnedUpgradeabilityProxy {
     uint256 dealIndex = dealsList.push(newDeal) - 1;
     didToDeals[did].push(newDeal);
     userToDeals[user].push(newDeal);
-    if( owner != user) {
+    if (owner != user) {
       userToDeals[owner].push(newDeal);
     }
-    if(publisher != owner && publisher != user){
+    if (publisher != owner && publisher != user) {
       userToDeals[publisher].push(newDeal);
     }
-    if(marketplace != owner && marketplace != user && marketplace != publisher){
+    if (
+      marketplace != owner && marketplace != user && marketplace != publisher
+    ) {
       userToDeals[marketplace].push(newDeal);
     }
     emit NewDeal(
@@ -251,18 +313,44 @@ contract DXC is Ownable, OwnedUpgradeabilityProxy {
 
   function payout(uint256 dealIndex) public {
     Deal memory _deal = dealsList[dealIndex];
-    require(now >= _deal.validFrom + 14 days, "Payouts can only happen 14 days after the start of the deal (validFrom)");
+    require(
+      now >= _deal.validFrom + 14 days,
+      "Payouts can only happen 14 days after the start of the deal (validFrom)"
+    );
     // release escrow
-    balances[_deal.user].escrowOutgoing = balances[_deal.user].escrowOutgoing.sub(_deal.amount);
-    balances[_deal.owner].escrowIncoming = balances[_deal.owner].escrowIncoming.sub(_deal.amount.mul(_deal.ownerPercentage).div(100));
-    balances[_deal.publisher].escrowIncoming = balances[_deal.publisher].escrowIncoming.sub(_deal.amount.mul(_deal.publisherPercentage).div(100));
-    balances[_deal.marketplace].escrowIncoming = balances[_deal.marketplace].escrowIncoming.add(_deal.amount.mul(_deal.marketplacePercentage).div(100));
+    balances[_deal.user].escrowOutgoing = balances[_deal.user]
+      .escrowOutgoing
+      .sub(_deal.amount);
+    balances[_deal.owner].escrowIncoming = balances[_deal.owner]
+      .escrowIncoming
+      .sub(_deal.amount.mul(_deal.ownerPercentage).div(100));
+    balances[_deal.publisher].escrowIncoming = balances[_deal.publisher]
+      .escrowIncoming
+      .sub(_deal.amount.mul(_deal.publisherPercentage).div(100));
+    balances[_deal.marketplace].escrowIncoming = balances[_deal.marketplace]
+      .escrowIncoming
+      .add(_deal.amount.mul(_deal.marketplacePercentage).div(100));
     // transfer DTX
-    transfer(_deal.user, _deal.owner, _deal.amount.mul(_deal.ownerPercentage).div(100));
-    transfer(_deal.user, _deal.publisher, _deal.amount.mul(_deal.publisherPercentage).div(100));
-    transfer(_deal.user, _deal.marketplace, _deal.amount.mul(_deal.marketplacePercentage).div(100));
-    uint256 protocolAmount = _deal.amount.sub((_deal.amount.mul(_deal.ownerPercentage).div(100)).add(_deal.amount.mul(_deal.publisherPercentage).div(100)).add(_deal.amount.mul(_deal.marketplacePercentage).div(100)));
+    transfer(
+      _deal.user,
+      _deal.owner,
+      _deal.amount.mul(_deal.ownerPercentage).div(100)
+    );
+    transfer(
+      _deal.user,
+      _deal.publisher,
+      _deal.amount.mul(_deal.publisherPercentage).div(100)
+    );
+    transfer(
+      _deal.user,
+      _deal.marketplace,
+      _deal.amount.mul(_deal.marketplacePercentage).div(100)
+    );
+    uint256 protocolAmount = _deal.amount.sub(
+      (_deal.amount.mul(_deal.ownerPercentage).div(100))
+        .add(_deal.amount.mul(_deal.publisherPercentage).div(100))
+        .add(_deal.amount.mul(_deal.marketplacePercentage).div(100))
+    );
     transfer(_deal.user, address(this), protocolAmount);
   }
-
 }

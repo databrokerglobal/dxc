@@ -501,15 +501,6 @@ export interface DXCInstance extends Truffle.ContractInstance {
     txDetails?: Truffle.TransactionDetails
   ): Promise<[string, string, BN, string, BN, string, string, BN, BN, BN, BN]>;
 
-  renounceOwnership: {
-    (txDetails?: Truffle.TransactionDetails): Promise<
-      Truffle.TransactionResponse
-    >;
-    call(txDetails?: Truffle.TransactionDetails): Promise<void>;
-    sendTransaction(txDetails?: Truffle.TransactionDetails): Promise<string>;
-    estimateGas(txDetails?: Truffle.TransactionDetails): Promise<number>;
-  };
-
   didToDeals(
     arg0: string,
     arg1: number | BN | string,
@@ -521,33 +512,11 @@ export interface DXCInstance extends Truffle.ContractInstance {
     txDetails?: Truffle.TransactionDetails
   ): Promise<[string, string, BN, string, BN, string, string, BN, BN, BN, BN]>;
 
-  owner(txDetails?: Truffle.TransactionDetails): Promise<string>;
-
-  isOwner(txDetails?: Truffle.TransactionDetails): Promise<boolean>;
-
   protocolPercentage(txDetails?: Truffle.TransactionDetails): Promise<BN>;
 
   totalBalance(txDetails?: Truffle.TransactionDetails): Promise<BN>;
 
   transferProxyOwnership: {
-    (newOwner: string | BN, txDetails?: Truffle.TransactionDetails): Promise<
-      Truffle.TransactionResponse
-    >;
-    call(
-      newOwner: string | BN,
-      txDetails?: Truffle.TransactionDetails
-    ): Promise<void>;
-    sendTransaction(
-      newOwner: string | BN,
-      txDetails?: Truffle.TransactionDetails
-    ): Promise<string>;
-    estimateGas(
-      newOwner: string | BN,
-      txDetails?: Truffle.TransactionDetails
-    ): Promise<number>;
-  };
-
-  transferOwnership: {
     (newOwner: string | BN, txDetails?: Truffle.TransactionDetails): Promise<
       Truffle.TransactionResponse
     >;
