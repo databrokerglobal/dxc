@@ -442,12 +442,58 @@ export interface DTXTokenInstance extends Truffle.ContractInstance {
 }
 
 export interface DXCInstance extends Truffle.ContractInstance {
+  proxyOwner(txDetails?: Truffle.TransactionDetails): Promise<string>;
+
   balances(
     arg0: string | BN,
     txDetails?: Truffle.TransactionDetails
   ): Promise<[BN, BN, BN]>;
 
+  upgradeTo: {
+    (
+      implementation: string | BN,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<Truffle.TransactionResponse>;
+    call(
+      implementation: string | BN,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<void>;
+    sendTransaction(
+      implementation: string | BN,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<string>;
+    estimateGas(
+      implementation: string | BN,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<number>;
+  };
+
   dtxToken(txDetails?: Truffle.TransactionDetails): Promise<string>;
+
+  upgradeToAndCall: {
+    (
+      implementation: string | BN,
+      data: string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<Truffle.TransactionResponse>;
+    call(
+      implementation: string | BN,
+      data: string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<void>;
+    sendTransaction(
+      implementation: string | BN,
+      data: string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<string>;
+    estimateGas(
+      implementation: string | BN,
+      data: string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<number>;
+  };
+
+  implementation(txDetails?: Truffle.TransactionDetails): Promise<string>;
 
   userToDeals(
     arg0: string | BN,
@@ -482,6 +528,24 @@ export interface DXCInstance extends Truffle.ContractInstance {
   protocolPercentage(txDetails?: Truffle.TransactionDetails): Promise<BN>;
 
   totalBalance(txDetails?: Truffle.TransactionDetails): Promise<BN>;
+
+  transferProxyOwnership: {
+    (newOwner: string | BN, txDetails?: Truffle.TransactionDetails): Promise<
+      Truffle.TransactionResponse
+    >;
+    call(
+      newOwner: string | BN,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<void>;
+    sendTransaction(
+      newOwner: string | BN,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<string>;
+    estimateGas(
+      newOwner: string | BN,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<number>;
+  };
 
   transferOwnership: {
     (newOwner: string | BN, txDetails?: Truffle.TransactionDetails): Promise<

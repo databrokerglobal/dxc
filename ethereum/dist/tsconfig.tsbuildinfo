@@ -490,8 +490,8 @@
         "signature": "7185c75f0b599a5636b0559967d0c70053828c24307bfbea24dbeb9cbb5d7e1f"
       },
       "../types/truffle-contracts/index.d.ts": {
-        "version": "72590c0eba3a9941602daacf91bab30bcf6899068533f2f691842ab0e4e8579d",
-        "signature": "72590c0eba3a9941602daacf91bab30bcf6899068533f2f691842ab0e4e8579d"
+        "version": "278d74ef4864c46cd02fc294a8fe32a4fbf4f28a4b168e7f2aaf4f3ca6205f86",
+        "signature": "278d74ef4864c46cd02fc294a8fe32a4fbf4f28a4b168e7f2aaf4f3ca6205f86"
       },
       "../test/migrations.ts": {
         "version": "95fdfdf3c0450b2fec8da586a3740cae8e1983bb60e709dc4fe87bc61b849e6f",
