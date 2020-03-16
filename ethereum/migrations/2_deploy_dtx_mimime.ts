@@ -17,7 +17,7 @@ const performMigration = async (
   await deployer.deploy(TokenFactory);
   const tokenFactoryInstance: MiniMeTokenFactoryInstance = await TokenFactory.deployed();
   await tokenFactoryInstance.createCloneToken(
-    '0x0',
+    '0x0000000000000000000000000000000000000000',
     0,
     'DaTa eXchange Token',
     18,

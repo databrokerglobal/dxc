@@ -502,7 +502,7 @@
         "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
       },
       "../migrations/2_deploy_dtx_mimime.ts": {
-        "version": "f61a37ac0bcfec7eec2c8cf6ce98b2fa0a5c4b8109fd54044ffc895a2a569c24",
+        "version": "567120c70db70823fe0195d86b4524bd482d7670053c794f3c2e51e6094b81b2",
         "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
       },
       "../migrations/3_deploy_dxc.ts": {
