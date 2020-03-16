@@ -15,3 +15,12 @@ const performMigration = async (
   const dTXTokenInstance: DTXTokenInstance = await DTXMiniMe.deployed();
   await deployer.deploy(DXC, dTXTokenInstance.address);
 };
+
+module.exports = (deployer: any, network: string, accounts: string[]) => {
+  deployer
+    .then(() => performMigration(deployer, network, accounts))
+    .catch((err: Error) => {
+      console.log(err);
+      process.exit(1);
+    });
+};

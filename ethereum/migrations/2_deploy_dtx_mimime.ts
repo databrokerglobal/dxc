@@ -1,6 +1,5 @@
 import {
   DTXTokenContract,
-  ERC20TokenContract,
   MiniMeTokenFactoryContract,
   MiniMeTokenFactoryInstance,
 } from '../types/truffle-contracts';
@@ -26,4 +25,13 @@ const performMigration = async (
     true
   );
   await deployer.deploy(DTXMiniMe, tokenFactoryInstance.address);
+};
+
+module.exports = (deployer: any, network: string, accounts: string[]) => {
+  deployer
+    .then(() => performMigration(deployer, network, accounts))
+    .catch((err: Error) => {
+      console.log(err);
+      process.exit(1);
+    });
 };
