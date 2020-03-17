@@ -1,34 +1,41 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.7;
 pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "../ownership/Ownable.sol";
 
 
-contract DXC {
+contract DXC is Ownable {
   using SafeMath for uint256;
   using SafeMath for uint8;
   using SafeERC20 for ERC20;
 
   ERC20 public dtxToken;
-  uint8 public protocolPercentage = 5;
+  uint8 public protocolPercentage;
   bool private initialized;
 
   function initialize(address token) public {
     require(!initialized);
+    protocolPercentage = 5;
     dtxToken = ERC20(token);
+    initializeOwner();
+    initialized = true;
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////
   //// Mofifiers for default settings                                                ////
   ///////////////////////////////////////////////////////////////////////////////////////
 
-  function changeProtocolPercentage(uint8 _protocolPercentage) public {
+  function changeProtocolPercentage(uint8 _protocolPercentage)
+    public
+    onlyOwner
+  {
     protocolPercentage = _protocolPercentage;
   }
 
-  function changeDTXToken(address token) public {
+  function changeDTXToken(address token) public onlyOwner {
     dtxToken = ERC20(token);
   }
 
@@ -79,7 +86,7 @@ contract DXC {
     globalBalance = dtxToken.balanceOf(owner);
   }
 
-  function convertFiatToToken(address to, uint256 amount) public {
+  function convertFiatToToken(address to, uint256 amount) public onlyOwner {
     transfer(address(this), to, amount);
     emit DepositDTX(to, amount);
   }
@@ -98,7 +105,7 @@ contract DXC {
     emit DepositDTX(msg.sender, amount);
   }
 
-  function platformDeposit(uint256 amount) public {
+  function platformDeposit(uint256 amount) public onlyOwner {
     balances[address(this)].balance = balances[address(this)].balance.add(
       amount
     );
@@ -115,8 +122,8 @@ contract DXC {
     emit WithdrawDTX(msg.sender, available);
   }
 
-  function platformTokenWithdraw(uint256 amount) public {
-    dtxToken.transfer(msg.sender, amount);
+  function platformTokenWithdraw(uint256 amount) public onlyOwner {
+    dtxToken.transfer(owner(), amount);
   }
 
   function transfer(address from, address to, uint256 amount) internal {
@@ -255,7 +262,7 @@ contract DXC {
     uint256 amount,
     uint256 validFrom,
     uint256 validUntil
-  ) public {
+  ) public onlyOwner {
     escrow(
       owner,
       ownerPercentage,
