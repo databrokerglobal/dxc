@@ -6,16 +6,21 @@ const DTX = artifacts.require('DTXToken');
 const DXC = artifacts.require('DXC');
 const OUP = artifacts.require('OwnedUpgradeabilityProxy');
 contract('Upgradeability of DXC', async (accounts) => {
-    it('test case 1', async () => {
+    it('Test proxied initializer', async () => {
         const tfInstance = await TF.new();
         const dtxInstance = await DTX.new(tfInstance.address);
         const dxcInstance = await DXC.new();
         const oUPinstance = await OUP.new();
         const data = encodeCall_1.encodeCall('initialize', ['address'], [dtxInstance.address]);
-        console.log(data);
         assert.isOk(await oUPinstance.upgradeToAndCall(dxcInstance.address, data, {
             from: accounts[0],
         }));
+        const proxiedDxc = await DXC.at(oUPinstance.address);
+        const val2 = await proxiedDxc.protocolPercentage();
+        assert.equal(val2.toNumber(), 5);
+        await proxiedDxc.changeProtocolPercentage(10);
+        const val3 = await proxiedDxc.protocolPercentage();
+        assert.equal(val3.toNumber(), 10);
     });
 });
 //# sourceMappingURL=upgradeability.js.map

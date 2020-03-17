@@ -19,7 +19,7 @@ const OUP: OwnedUpgradeabilityProxyContract = artifacts.require(
 );
 
 contract('Upgradeability of DXC', async accounts => {
-  it('test case 1', async () => {
+  it('Test proxied initializer', async () => {
     const tfInstance: MiniMeTokenFactoryInstance = await TF.new();
     const dtxInstance: DTXTokenInstance = await DTX.new(tfInstance.address);
     const dxcInstance: DXCInstance = await DXC.new();
@@ -32,5 +32,13 @@ contract('Upgradeability of DXC', async accounts => {
         from: accounts[0],
       })
     );
+
+    const proxiedDxc = await DXC.at(oUPinstance.address);
+    const val2 = await proxiedDxc.protocolPercentage();
+    assert.equal(val2.toNumber(), 5);
+
+    await proxiedDxc.changeProtocolPercentage(10);
+    const val3 = await proxiedDxc.protocolPercentage();
+    assert.equal(val3.toNumber(), 10);
   });
 });
