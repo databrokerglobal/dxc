@@ -73,5 +73,8 @@ contract('Upgradeability of DXC', async accounts => {
     const proxiedUpgradedDxc = await DXCV2.at(oUPinstance.address);
     const val4 = await proxiedUpgradedDxc.protocolPercentage();
     assert.equal(val4.toNumber(), 10);
+
+    const message = await proxiedUpgradedDxc.newFeature();
+    assert.equal(message, 'Whoooaaaaa it works');
   });
 });
