@@ -31,6 +31,10 @@ export interface DXCContract extends Truffle.Contract<DXCInstance> {
   "new"(meta?: Truffle.TransactionDetails): Promise<DXCInstance>;
 }
 
+export interface DXCV2Contract extends Truffle.Contract<DXCV2Instance> {
+  "new"(meta?: Truffle.TransactionDetails): Promise<DXCV2Instance>;
+}
+
 export interface ERC20Contract extends Truffle.Contract<ERC20Instance> {
   "new"(meta?: Truffle.TransactionDetails): Promise<ERC20Instance>;
 }
@@ -85,6 +89,10 @@ export interface MultiSigWalletWithDailyLimitContract
     _dailyLimit: number | BN | string,
     meta?: Truffle.TransactionDetails
   ): Promise<MultiSigWalletWithDailyLimitInstance>;
+}
+
+export interface OwnableContract extends Truffle.Contract<OwnableInstance> {
+  "new"(meta?: Truffle.TransactionDetails): Promise<OwnableInstance>;
 }
 
 export interface OwnedUpgradeabilityProxyContract
@@ -460,13 +468,7 @@ export interface DXCInstance extends Truffle.ContractInstance {
 
   dtxToken(txDetails?: Truffle.TransactionDetails): Promise<string>;
 
-  userToDeals(
-    arg0: string | BN,
-    arg1: number | BN | string,
-    txDetails?: Truffle.TransactionDetails
-  ): Promise<[string, string, BN, string, BN, string, string, BN, BN, BN, BN]>;
-
-  renounceOwnership: {
+  initializeOwner: {
     (txDetails?: Truffle.TransactionDetails): Promise<
       Truffle.TransactionResponse
     >;
@@ -474,6 +476,12 @@ export interface DXCInstance extends Truffle.ContractInstance {
     sendTransaction(txDetails?: Truffle.TransactionDetails): Promise<string>;
     estimateGas(txDetails?: Truffle.TransactionDetails): Promise<number>;
   };
+
+  userToDeals(
+    arg0: string | BN,
+    arg1: number | BN | string,
+    txDetails?: Truffle.TransactionDetails
+  ): Promise<[string, string, BN, string, BN, string, string, BN, BN, BN, BN]>;
 
   didToDeals(
     arg0: string,
@@ -487,8 +495,6 @@ export interface DXCInstance extends Truffle.ContractInstance {
   ): Promise<[string, string, BN, string, BN, string, string, BN, BN, BN, BN]>;
 
   owner(txDetails?: Truffle.TransactionDetails): Promise<string>;
-
-  isOwner(txDetails?: Truffle.TransactionDetails): Promise<boolean>;
 
   protocolPercentage(txDetails?: Truffle.TransactionDetails): Promise<BN>;
 
@@ -570,6 +576,377 @@ export interface DXCInstance extends Truffle.ContractInstance {
   };
 
   platformBalance(txDetails?: Truffle.TransactionDetails): Promise<BN>;
+
+  balanceOf(
+    owner: string | BN,
+    txDetails?: Truffle.TransactionDetails
+  ): Promise<[BN, BN, BN, BN, BN]>;
+
+  convertFiatToToken: {
+    (
+      to: string | BN,
+      amount: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<Truffle.TransactionResponse>;
+    call(
+      to: string | BN,
+      amount: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<void>;
+    sendTransaction(
+      to: string | BN,
+      amount: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<string>;
+    estimateGas(
+      to: string | BN,
+      amount: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<number>;
+  };
+
+  deposit: {
+    (
+      amount: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<Truffle.TransactionResponse>;
+    call(
+      amount: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<void>;
+    sendTransaction(
+      amount: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<string>;
+    estimateGas(
+      amount: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<number>;
+  };
+
+  platformDeposit: {
+    (
+      amount: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<Truffle.TransactionResponse>;
+    call(
+      amount: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<void>;
+    sendTransaction(
+      amount: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<string>;
+    estimateGas(
+      amount: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<number>;
+  };
+
+  withdraw: {
+    (txDetails?: Truffle.TransactionDetails): Promise<
+      Truffle.TransactionResponse
+    >;
+    call(txDetails?: Truffle.TransactionDetails): Promise<void>;
+    sendTransaction(txDetails?: Truffle.TransactionDetails): Promise<string>;
+    estimateGas(txDetails?: Truffle.TransactionDetails): Promise<number>;
+  };
+
+  platformTokenWithdraw: {
+    (
+      amount: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<Truffle.TransactionResponse>;
+    call(
+      amount: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<void>;
+    sendTransaction(
+      amount: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<string>;
+    estimateGas(
+      amount: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<number>;
+  };
+
+  allDeals(
+    txDetails?: Truffle.TransactionDetails
+  ): Promise<
+    {
+      did: string;
+      owner: string;
+      ownerPercentage: BN;
+      publisher: string;
+      publisherPercentage: BN;
+      user: string;
+      marketplace: string;
+      marketplacePercentage: BN;
+      amount: BN;
+      validFrom: BN;
+      validUntil: BN;
+    }[]
+  >;
+
+  deal(
+    index: number | BN | string,
+    txDetails?: Truffle.TransactionDetails
+  ): Promise<{
+    did: string;
+    owner: string;
+    ownerPercentage: BN;
+    publisher: string;
+    publisherPercentage: BN;
+    user: string;
+    marketplace: string;
+    marketplacePercentage: BN;
+    amount: BN;
+    validFrom: BN;
+    validUntil: BN;
+  }>;
+
+  dealsForDID(
+    did: string,
+    txDetails?: Truffle.TransactionDetails
+  ): Promise<
+    {
+      did: string;
+      owner: string;
+      ownerPercentage: BN;
+      publisher: string;
+      publisherPercentage: BN;
+      user: string;
+      marketplace: string;
+      marketplacePercentage: BN;
+      amount: BN;
+      validFrom: BN;
+      validUntil: BN;
+    }[]
+  >;
+
+  dealsForAddress(
+    user: string | BN,
+    txDetails?: Truffle.TransactionDetails
+  ): Promise<
+    {
+      did: string;
+      owner: string;
+      ownerPercentage: BN;
+      publisher: string;
+      publisherPercentage: BN;
+      user: string;
+      marketplace: string;
+      marketplacePercentage: BN;
+      amount: BN;
+      validFrom: BN;
+      validUntil: BN;
+    }[]
+  >;
+
+  hasAccessToDiD(
+    did: string,
+    user: string | BN,
+    txDetails?: Truffle.TransactionDetails
+  ): Promise<boolean>;
+
+  createDeal: {
+    (
+      did: string,
+      owner: string | BN,
+      ownerPercentage: number | BN | string,
+      publisher: string | BN,
+      publisherPercentage: number | BN | string,
+      user: string | BN,
+      marketplace: string | BN,
+      marketplacePercentage: number | BN | string,
+      amount: number | BN | string,
+      validFrom: number | BN | string,
+      validUntil: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<Truffle.TransactionResponse>;
+    call(
+      did: string,
+      owner: string | BN,
+      ownerPercentage: number | BN | string,
+      publisher: string | BN,
+      publisherPercentage: number | BN | string,
+      user: string | BN,
+      marketplace: string | BN,
+      marketplacePercentage: number | BN | string,
+      amount: number | BN | string,
+      validFrom: number | BN | string,
+      validUntil: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<void>;
+    sendTransaction(
+      did: string,
+      owner: string | BN,
+      ownerPercentage: number | BN | string,
+      publisher: string | BN,
+      publisherPercentage: number | BN | string,
+      user: string | BN,
+      marketplace: string | BN,
+      marketplacePercentage: number | BN | string,
+      amount: number | BN | string,
+      validFrom: number | BN | string,
+      validUntil: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<string>;
+    estimateGas(
+      did: string,
+      owner: string | BN,
+      ownerPercentage: number | BN | string,
+      publisher: string | BN,
+      publisherPercentage: number | BN | string,
+      user: string | BN,
+      marketplace: string | BN,
+      marketplacePercentage: number | BN | string,
+      amount: number | BN | string,
+      validFrom: number | BN | string,
+      validUntil: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<number>;
+  };
+
+  payout: {
+    (
+      dealIndex: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<Truffle.TransactionResponse>;
+    call(
+      dealIndex: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<void>;
+    sendTransaction(
+      dealIndex: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<string>;
+    estimateGas(
+      dealIndex: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<number>;
+  };
+}
+
+export interface DXCV2Instance extends Truffle.ContractInstance {
+  balances(
+    arg0: string | BN,
+    txDetails?: Truffle.TransactionDetails
+  ): Promise<[BN, BN, BN]>;
+
+  dtxToken(txDetails?: Truffle.TransactionDetails): Promise<string>;
+
+  initializeOwner: {
+    (txDetails?: Truffle.TransactionDetails): Promise<
+      Truffle.TransactionResponse
+    >;
+    call(txDetails?: Truffle.TransactionDetails): Promise<void>;
+    sendTransaction(txDetails?: Truffle.TransactionDetails): Promise<string>;
+    estimateGas(txDetails?: Truffle.TransactionDetails): Promise<number>;
+  };
+
+  userToDeals(
+    arg0: string | BN,
+    arg1: number | BN | string,
+    txDetails?: Truffle.TransactionDetails
+  ): Promise<[string, string, BN, string, BN, string, string, BN, BN, BN, BN]>;
+
+  didToDeals(
+    arg0: string,
+    arg1: number | BN | string,
+    txDetails?: Truffle.TransactionDetails
+  ): Promise<[string, string, BN, string, BN, string, string, BN, BN, BN, BN]>;
+
+  dealsList(
+    arg0: number | BN | string,
+    txDetails?: Truffle.TransactionDetails
+  ): Promise<[string, string, BN, string, BN, string, string, BN, BN, BN, BN]>;
+
+  owner(txDetails?: Truffle.TransactionDetails): Promise<string>;
+
+  protocolPercentage(txDetails?: Truffle.TransactionDetails): Promise<BN>;
+
+  totalBalance(txDetails?: Truffle.TransactionDetails): Promise<BN>;
+
+  transferOwnership: {
+    (newOwner: string | BN, txDetails?: Truffle.TransactionDetails): Promise<
+      Truffle.TransactionResponse
+    >;
+    call(
+      newOwner: string | BN,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<void>;
+    sendTransaction(
+      newOwner: string | BN,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<string>;
+    estimateGas(
+      newOwner: string | BN,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<number>;
+  };
+
+  totalEscrowed(txDetails?: Truffle.TransactionDetails): Promise<BN>;
+
+  initialize: {
+    (token: string | BN, txDetails?: Truffle.TransactionDetails): Promise<
+      Truffle.TransactionResponse
+    >;
+    call(
+      token: string | BN,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<void>;
+    sendTransaction(
+      token: string | BN,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<string>;
+    estimateGas(
+      token: string | BN,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<number>;
+  };
+
+  changeProtocolPercentage: {
+    (
+      _protocolPercentage: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<Truffle.TransactionResponse>;
+    call(
+      _protocolPercentage: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<void>;
+    sendTransaction(
+      _protocolPercentage: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<string>;
+    estimateGas(
+      _protocolPercentage: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<number>;
+  };
+
+  changeDTXToken: {
+    (token: string | BN, txDetails?: Truffle.TransactionDetails): Promise<
+      Truffle.TransactionResponse
+    >;
+    call(
+      token: string | BN,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<void>;
+    sendTransaction(
+      token: string | BN,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<string>;
+    estimateGas(
+      token: string | BN,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<number>;
+  };
+
+  platformBalance(txDetails?: Truffle.TransactionDetails): Promise<BN>;
+
+  newFeature(txDetails?: Truffle.TransactionDetails): Promise<string>;
 
   balanceOf(
     owner: string | BN,
@@ -1970,6 +2347,37 @@ export interface MultiSigWalletWithDailyLimitInstance
   };
 
   calcMaxWithdraw(txDetails?: Truffle.TransactionDetails): Promise<BN>;
+}
+
+export interface OwnableInstance extends Truffle.ContractInstance {
+  initializeOwner: {
+    (txDetails?: Truffle.TransactionDetails): Promise<
+      Truffle.TransactionResponse
+    >;
+    call(txDetails?: Truffle.TransactionDetails): Promise<void>;
+    sendTransaction(txDetails?: Truffle.TransactionDetails): Promise<string>;
+    estimateGas(txDetails?: Truffle.TransactionDetails): Promise<number>;
+  };
+
+  owner(txDetails?: Truffle.TransactionDetails): Promise<string>;
+
+  transferOwnership: {
+    (newOwner: string | BN, txDetails?: Truffle.TransactionDetails): Promise<
+      Truffle.TransactionResponse
+    >;
+    call(
+      newOwner: string | BN,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<void>;
+    sendTransaction(
+      newOwner: string | BN,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<string>;
+    estimateGas(
+      newOwner: string | BN,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<number>;
+  };
 }
 
 export interface OwnedUpgradeabilityProxyInstance

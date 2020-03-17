@@ -15,6 +15,7 @@ declare global {
       require(name: "Controlled"): TruffleContracts.ControlledContract;
       require(name: "DTXToken"): TruffleContracts.DTXTokenContract;
       require(name: "DXC"): TruffleContracts.DXCContract;
+      require(name: "DXCV2"): TruffleContracts.DXCV2Contract;
       require(name: "ERC20"): TruffleContracts.ERC20Contract;
       require(name: "ERC20Token"): TruffleContracts.ERC20TokenContract;
       require(name: "IERC20"): TruffleContracts.IERC20Contract;
@@ -27,6 +28,7 @@ declare global {
       require(
         name: "MultiSigWalletWithDailyLimit"
       ): TruffleContracts.MultiSigWalletWithDailyLimitContract;
+      require(name: "Ownable"): TruffleContracts.OwnableContract;
       require(
         name: "OwnedUpgradeabilityProxy"
       ): TruffleContracts.OwnedUpgradeabilityProxyContract;
