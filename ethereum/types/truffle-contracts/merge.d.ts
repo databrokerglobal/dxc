@@ -11,10 +11,13 @@ declare global {
       require(
         name: "ApproveAndCallFallBack"
       ): TruffleContracts.ApproveAndCallFallBackContract;
+      require(name: "Context"): TruffleContracts.ContextContract;
       require(name: "Controlled"): TruffleContracts.ControlledContract;
       require(name: "DTXToken"): TruffleContracts.DTXTokenContract;
       require(name: "DXC"): TruffleContracts.DXCContract;
+      require(name: "ERC20"): TruffleContracts.ERC20Contract;
       require(name: "ERC20Token"): TruffleContracts.ERC20TokenContract;
+      require(name: "IERC20"): TruffleContracts.IERC20Contract;
       require(name: "Migrations"): TruffleContracts.MigrationsContract;
       require(name: "MiniMeToken"): TruffleContracts.MiniMeTokenContract;
       require(

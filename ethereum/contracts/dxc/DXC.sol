@@ -4,18 +4,19 @@ pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-import "../upgradeability/OwnedUpgradeabilityProxy.sol";
 
 
-contract DXC is OwnedUpgradeabilityProxy {
+contract DXC {
   using SafeMath for uint256;
   using SafeMath for uint8;
   using SafeERC20 for ERC20;
 
   ERC20 public dtxToken;
   uint8 public protocolPercentage = 5;
+  bool private initialized;
 
-  constructor(address token) public {
+  function initialize(address token) public {
+    require(!initialized);
     dtxToken = ERC20(token);
   }
 
@@ -23,14 +24,11 @@ contract DXC is OwnedUpgradeabilityProxy {
   //// Mofifiers for default settings                                                ////
   ///////////////////////////////////////////////////////////////////////////////////////
 
-  function changeProtocolPercentage(uint8 _protocolPercentage)
-    public
-    onlyProxyOwner
-  {
+  function changeProtocolPercentage(uint8 _protocolPercentage) public {
     protocolPercentage = _protocolPercentage;
   }
 
-  function changeDTXToken(address token) public onlyProxyOwner {
+  function changeDTXToken(address token) public {
     dtxToken = ERC20(token);
   }
 
@@ -81,10 +79,7 @@ contract DXC is OwnedUpgradeabilityProxy {
     globalBalance = dtxToken.balanceOf(owner);
   }
 
-  function convertFiatToToken(address to, uint256 amount)
-    public
-    onlyProxyOwner
-  {
+  function convertFiatToToken(address to, uint256 amount) public {
     transfer(address(this), to, amount);
     emit DepositDTX(to, amount);
   }
@@ -103,7 +98,7 @@ contract DXC is OwnedUpgradeabilityProxy {
     emit DepositDTX(msg.sender, amount);
   }
 
-  function platformDeposit(uint256 amount) public onlyProxyOwner {
+  function platformDeposit(uint256 amount) public {
     balances[address(this)].balance = balances[address(this)].balance.add(
       amount
     );
@@ -120,8 +115,8 @@ contract DXC is OwnedUpgradeabilityProxy {
     emit WithdrawDTX(msg.sender, available);
   }
 
-  function platformTokenWithdraw(uint256 amount) public onlyProxyOwner {
-    dtxToken.transfer(proxyOwner(), amount);
+  function platformTokenWithdraw(uint256 amount) public {
+    dtxToken.transfer(msg.sender, amount);
   }
 
   function transfer(address from, address to, uint256 amount) internal {
@@ -260,7 +255,7 @@ contract DXC is OwnedUpgradeabilityProxy {
     uint256 amount,
     uint256 validFrom,
     uint256 validUntil
-  ) public onlyProxyOwner {
+  ) public {
     escrow(
       owner,
       ownerPercentage,

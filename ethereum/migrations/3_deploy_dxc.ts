@@ -1,10 +1,6 @@
-import {
-  DTXTokenContract,
-  DTXTokenInstance,
-  DXCContract,
-} from '../types/truffle-contracts';
+import {DXCContract} from '../types/truffle-contracts';
 
-const DTXMiniMe: DTXTokenContract = artifacts.require('DTXToken');
+//const DTXMiniMe: DTXTokenContract = artifacts.require('DTXToken');
 const DXC: DXCContract = artifacts.require('DXC');
 
 const performMigration = async (
@@ -12,8 +8,8 @@ const performMigration = async (
   network: string,
   accounts: string[]
 ) => {
-  const dTXTokenInstance: DTXTokenInstance = await DTXMiniMe.deployed();
-  await deployer.deploy(DXC, dTXTokenInstance.address);
+  //const dTXTokenInstance: DTXTokenInstance = await DTXMiniMe.deployed();
+  await deployer.deploy(DXC);
 };
 
 module.exports = (deployer: any, network: string, accounts: string[]) => {
