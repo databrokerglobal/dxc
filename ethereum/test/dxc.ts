@@ -18,110 +18,117 @@ const OUP: OwnedUpgradeabilityProxyContract = artifacts.require(
   'OwnedUpgradeabilityProxy'
 );
 
-contract('DXC functionailities', async accounts => {
-  it('Should depoy succesfully using proxy pattern', async () => {
-    const tfInstance: MiniMeTokenFactoryInstance = await TF.new();
-    const dtxInstance: DTXTokenInstance = await DTX.new(tfInstance.address);
-    const dxcInstance: DXCInstance = await DXC.new();
-    const oUPinstance: OwnedUpgradeabilityProxyInstance = await OUP.new();
+contract('DXC', async accounts => {
+  describe('DXC functionalities', async () => {
+    let tfInstance: MiniMeTokenFactoryInstance;
+    let dtxInstance: DTXTokenInstance;
+    let dxcInstance: DXCInstance;
+    let oUPinstance: OwnedUpgradeabilityProxyInstance;
+    let proxiedDxc: DXCInstance;
 
-    // Encode the calling of the function initialize with the argument dtxInstance.address to bytes
-    const data = encodeCall('initialize', ['address'], [dtxInstance.address]);
+    beforeEach(async () => {
+      tfInstance = await TF.new();
+      dtxInstance = await DTX.new(tfInstance.address);
 
-    // point proxy contract to dxc contract and call the initialize function which is analogous to a constructor
-    assert.isOk(
-      await oUPinstance.upgradeToAndCall(dxcInstance.address, data, {
-        from: accounts[0],
-      })
-    );
+      dxcInstance = await DXC.new();
+      oUPinstance = await OUP.new();
 
-    // Intitialize the proxied dxc instance
-    const proxiedDxc = await DXC.at(oUPinstance.address);
-    // check if the intial state is correct
-    const val2 = await proxiedDxc.protocolPercentage();
-    assert.equal(val2.toNumber(), 5);
-  });
+      // Encode the calling of the function initialize with the argument dtxInstance.address to bytes
+      const data = encodeCall('initialize', ['address'], [dtxInstance.address]);
 
-  it('Should create a deal successfully', async () => {
-    const tfInstance: MiniMeTokenFactoryInstance = await TF.new();
-    const dtxInstance: DTXTokenInstance = await DTX.new(tfInstance.address);
+      // point proxy contract to dxc contract and call the initialize function which is analogous to a constructor
+      assert.isOk(
+        await oUPinstance.upgradeToAndCall(dxcInstance.address, data, {
+          from: accounts[0],
+        })
+      );
 
-    const dxcInstance: DXCInstance = await DXC.new();
-    const oUPinstance: OwnedUpgradeabilityProxyInstance = await OUP.new();
+      // Intitialize the proxied dxc instance
+      proxiedDxc = await DXC.at(oUPinstance.address);
+    });
 
-    // Encode the calling of the function initialize with the argument dtxInstance.address to bytes
-    const data = encodeCall('initialize', ['address'], [dtxInstance.address]);
+    it('Should have a platform balance', async () => {
+      await dtxInstance.generateTokens(
+        proxiedDxc.address,
+        web3.utils.toWei('1000000')
+      );
 
-    // point proxy contract to dxc contract and call the initialize function which is analogous to a constructor
-    assert.isOk(
-      await oUPinstance.upgradeToAndCall(dxcInstance.address, data, {
-        from: accounts[0],
-      })
-    );
+      await dtxInstance.generateTokens(
+        accounts[0],
+        web3.utils.toWei('1000000')
+      );
+      await dtxInstance.generateTokens(
+        accounts[1],
+        web3.utils.toWei('1000000')
+      );
 
-    // Intitialize the proxied dxc instance
-    const proxiedDxc = await DXC.at(oUPinstance.address);
+      expect(await (await proxiedDxc.platformBalance()).toString()).to.be.equal(
+        web3.utils.toWei('1000000')
+      );
+    });
 
-    // All percentages here need to add up to a 100: 15 + 70 + 10 = 95 + protocol percentage 5 = 100
-    await proxiedDxc.createDeal(
-      'did:databroker:deal2:weatherdata',
-      accounts[1],
-      15,
-      accounts[2],
-      70,
-      accounts[3],
-      accounts[4],
-      10,
-      5,
-      0,
-      0
-    );
-  });
+    it('Can read the balance of someone internally', async () => {
+      const balanceResult = await proxiedDxc.balanceOf(accounts[1]);
+      expect(balanceResult[0].toString()).to.be.equal('0');
+    });
 
-  it('Blacklisting should work', async () => {
-    const tfInstance: MiniMeTokenFactoryInstance = await TF.new();
-    const dtxInstance: DTXTokenInstance = await DTX.new(tfInstance.address);
-    const dxcInstance: DXCInstance = await DXC.new();
-    const oUPinstance: OwnedUpgradeabilityProxyInstance = await OUP.new();
+    // it('Can convert from fiat money', async () => {
+    //   let balanceResult = await proxiedDxc.balanceOf(accounts[1]);
+    //   expect(balanceResult[0].toString()).to.be.equal('0');
+    //   await proxiedDxc.convertFiatToToken(
+    //     accounts[1],
+    //     web3.utils.toWei(amountOfDTXFor(100))
+    //   );
+    //   balanceResult = await dDXC.balanceOf(accounts[1]);
+    //   expect(balanceResult[0]).to.be.bignumber.equal(
+    //     web3.utils.toWei(amountOfDTXFor(100))
+    //   );
+    // });
 
-    // Encode the calling of the function initialize with the argument dtxInstance.address to bytes
-    const data = encodeCall('initialize', ['address'], [dtxInstance.address]);
+    it('Should create a deal successfully', async () => {
+      // All percentages here need to add up to a 100: 15 + 70 + 10 = 95 + protocol percentage 5 = 100
+      await proxiedDxc.createDeal(
+        'did:databroker:deal2:weatherdata',
+        accounts[1],
+        15,
+        accounts[2],
+        70,
+        accounts[3],
+        accounts[4],
+        10,
+        5,
+        0,
+        0
+      );
+    });
 
-    // point proxy contract to dxc contract and call the initialize function which is analogous to a constructor
-    assert.isOk(
-      await oUPinstance.upgradeToAndCall(dxcInstance.address, data, {
-        from: accounts[0],
-      })
-    );
+    it('Blacklisting should work', async () => {
+      // Owner cannot be blacklisted
+      const blackListErr: string = await proxiedDxc
+        .addToBlackList(accounts[0])
+        .catch(err => err);
 
-    // Intitialize the proxied dxc instance
-    const proxiedDxc = await DXC.at(oUPinstance.address);
+      assert.isTrue(
+        String(blackListErr).includes(
+          'VM Exception while processing transaction: revert Owner cannot be blacklisted'
+        )
+      );
 
-    // Owner cannot be blacklisted
-    const blackListErr: string = await proxiedDxc
-      .addToBlackList(accounts[0])
-      .catch(err => err);
+      // Add other user to blacklist
+      assert.isOk(await proxiedDxc.addToBlackList(accounts[1]));
 
-    assert.isTrue(
-      String(blackListErr).includes(
-        'VM Exception while processing transaction: revert Owner cannot be blacklisted'
-      )
-    );
+      const cannotWithdrawErr = await proxiedDxc
+        .withdraw({from: accounts[1]})
+        .catch(err => err);
+      assert.isTrue(
+        String(cannotWithdrawErr).includes(
+          'VM Exception while processing transaction: revert User is blacklisted'
+        )
+      );
 
-    // Add other user to blacklist
-    assert.isOk(await proxiedDxc.addToBlackList(accounts[1]));
-
-    const cannotWithdrawErr = await proxiedDxc
-      .withdraw({from: accounts[1]})
-      .catch(err => err);
-    assert.isTrue(
-      String(cannotWithdrawErr).includes(
-        'VM Exception while processing transaction: revert User is blacklisted'
-      )
-    );
-
-    // Remove from blacklist
-    assert.isOk(await proxiedDxc.removeFromBlackList(accounts[1]));
-    assert.isOk(await proxiedDxc.withdraw({from: accounts[1]}));
+      // Remove from blacklist
+      assert.isOk(await proxiedDxc.removeFromBlackList(accounts[1]));
+      assert.isOk(await proxiedDxc.withdraw({from: accounts[1]}));
+    });
   });
 });
