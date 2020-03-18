@@ -25,6 +25,30 @@ contract DXC is Ownable {
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////
+  //// Blacklist                                                                     ////
+  ///////////////////////////////////////////////////////////////////////////////////////
+
+  mapping(address => bool) internal _blackList;
+
+  modifier isNotBlackListed(address user) {
+    bool bl = _blackList[user];
+    require(!bl);
+
+    _;
+  }
+
+  function addToBlackList(address user) public onlyOwner {
+    require(!_blackList[user], "User is already blacklisted");
+    require(user != owner(), "Owner cannot be blacklisted");
+    _blackList[user] = true;
+  }
+
+  function removeFromBlackList(address user) public onlyOwner {
+    require(_blackList[user], "User is not blacklisted");
+    _blackList[user] = false;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////////////
   //// Mofifiers for default settings                                                ////
   ///////////////////////////////////////////////////////////////////////////////////////
 
@@ -91,7 +115,7 @@ contract DXC is Ownable {
     emit DepositDTX(to, amount);
   }
 
-  function deposit(uint256 amount) public {
+  function deposit(uint256 amount) public isNotBlackListed(msg.sender) {
     require(
       dtxToken.balanceOf(msg.sender) >= amount,
       "Sender has too little DTX to make this transaction work"
@@ -111,7 +135,7 @@ contract DXC is Ownable {
     );
   }
 
-  function withdraw() public {
+  function withdraw() public isNotBlackListed(msg.sender) {
     (, , , uint256 available, ) = balanceOf(msg.sender);
     balances[msg.sender].balance = balances[msg.sender].balance.sub(available);
     totalBalance = totalBalance.sub(available);
