@@ -32,7 +32,7 @@ contract DXC is Ownable {
 
   modifier isNotBlackListed(address user) {
     bool bl = _blackList[user];
-    require(!bl);
+    require(!bl, "User is blacklisted");
 
     _;
   }

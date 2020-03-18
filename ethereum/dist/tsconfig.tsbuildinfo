@@ -610,7 +610,7 @@
         "signature": "feb571d6888d725d451c7327e4f2334e3228c1bd88ef7438bf4692833dcce109"
       },
       "../test/dxc.ts": {
-        "version": "ee3c8c5f4083af794ba096a7272b76a7f8decf82261a0d70ab89adef1a77c6ce",
+        "version": "c727a96bd3cf4f09f161d54de12abd6ead047f7805cc9e419e0d7e630ce23601",
         "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
       },
       "../test/migrations.ts": {
@@ -3184,6 +3184,7 @@
       "../node_modules/web3/node_modules/web3-shh/types/index.d.ts",
       "../node_modules/web3/types/index.d.ts",
       "../node_modules/truffle-typings/index.d.ts",
+      "../types/truffle-contracts/index.d.ts",
       "../node_modules/@types/ethereumjs-abi/index.d.ts",
       "../node_modules/ethers/utils/bytes.d.ts",
       "../node_modules/ethers/utils/bignumber.d.ts",
@@ -3213,18 +3214,17 @@
       "../node_modules/ethers/utils/secret-storage.d.ts",
       "../node_modules/ethers/utils/index.d.ts",
       "../test/utils/encodecall.ts",
+      "../test/migrations.ts",
+      "../test/upgradeability.ts",
+      "../migrations/1_initial_migration.ts",
+      "../migrations/2_deploy_dtx_mimime.ts",
+      "../migrations/3_deploy_dxc.ts",
       "../node_modules/@types/faker/index.d.ts",
       "../node_modules/@types/lru-cache/index.d.ts",
       "../node_modules/@types/mkdirp/index.d.ts",
       "../node_modules/@types/prettier/index.d.ts",
       "../node_modules/@types/resolve/index.d.ts",
-      "../types/truffle-contracts/index.d.ts",
-      "../test/dxc.ts",
-      "../test/upgradeability.ts",
-      "../migrations/3_deploy_dxc.ts",
-      "../test/migrations.ts",
-      "../migrations/1_initial_migration.ts",
-      "../migrations/2_deploy_dtx_mimime.ts"
+      "../test/dxc.ts"
     ]
   },
   "version": "3.8.3"
