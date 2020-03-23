@@ -4,6 +4,7 @@ pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "@nomiclabs/buidler/console.sol";
 import "../ownership/Ownable.sol";
 
 
@@ -22,30 +23,6 @@ contract DXC is Ownable {
     dtxToken = ERC20(token);
     initializeOwner();
     initialized = true;
-  }
-
-  ///////////////////////////////////////////////////////////////////////////////////////
-  //// Blacklist                                                                     ////
-  ///////////////////////////////////////////////////////////////////////////////////////
-
-  mapping(address => bool) internal _blackList;
-
-  modifier isNotBlackListed(address user) {
-    bool bl = _blackList[user];
-    require(!bl, "User is blacklisted");
-
-    _;
-  }
-
-  function addToBlackList(address user) public onlyOwner {
-    require(!_blackList[user], "User is already blacklisted");
-    require(user != owner(), "Owner cannot be blacklisted");
-    _blackList[user] = true;
-  }
-
-  function removeFromBlackList(address user) public onlyOwner {
-    require(_blackList[user], "User is not blacklisted");
-    _blackList[user] = false;
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////
@@ -88,8 +65,18 @@ contract DXC is Ownable {
   event WithdrawDTX(address indexed to, uint256 amount);
   event TransferDTX(address indexed from, address indexed to, uint256 value);
 
-  function platformBalance() public view returns (uint256) {
-    return dtxToken.balanceOf(address(this));
+  function platformBalance()
+    public
+    view
+    returns (
+      uint256 balance,
+      uint256 escrowOutgoing,
+      uint256 escrowIncoming,
+      uint256 available,
+      uint256 globalBalance
+    )
+  {
+    return balanceOf(address(this));
   }
 
   function balanceOf(address owner)
@@ -115,7 +102,7 @@ contract DXC is Ownable {
     emit DepositDTX(to, amount);
   }
 
-  function deposit(uint256 amount) public isNotBlackListed(msg.sender) {
+  function deposit(uint256 amount) public {
     require(
       dtxToken.balanceOf(msg.sender) >= amount,
       "Sender has too little DTX to make this transaction work"
@@ -129,13 +116,7 @@ contract DXC is Ownable {
     emit DepositDTX(msg.sender, amount);
   }
 
-  function platformDeposit(uint256 amount) public onlyOwner {
-    balances[address(this)].balance = balances[address(this)].balance.add(
-      amount
-    );
-  }
-
-  function withdraw() public isNotBlackListed(msg.sender) {
+  function withdraw() public {
     (, , , uint256 available, ) = balanceOf(msg.sender);
     balances[msg.sender].balance = balances[msg.sender].balance.sub(available);
     totalBalance = totalBalance.sub(available);
@@ -144,10 +125,6 @@ contract DXC is Ownable {
       "Not enough DTX tokens available to withdraw, contact DataBrokerDAO!"
     );
     emit WithdrawDTX(msg.sender, available);
-  }
-
-  function platformTokenWithdraw(uint256 amount) public onlyOwner {
-    dtxToken.transfer(owner(), amount);
   }
 
   function transfer(address from, address to, uint256 amount) internal {
@@ -207,6 +184,7 @@ contract DXC is Ownable {
 
   struct Deal {
     string did; // the did of the data share in question
+    uint256 index;
     address owner;
     uint8 ownerPercentage;
     address publisher;
@@ -221,11 +199,21 @@ contract DXC is Ownable {
 
   Deal[] public dealsList;
 
+  struct DealAccess {
+    address[] whitelist;
+    address[] blacklist;
+  }
+
+  // WARNING: 1-based (starts at one)
+  uint256 dealCount;
+
+  mapping(uint256 => Deal) internal dealList;
   mapping(string => Deal[]) public didToDeals;
   mapping(address => Deal[]) public userToDeals;
+  mapping(uint256 => DealAccess) internal DealIndexToAccessList;
 
   event NewDeal(
-    uint256 dealIndex,
+    uint256 index,
     string did,
     address owner,
     address publisher,
@@ -235,44 +223,6 @@ contract DXC is Ownable {
     uint256 validFrom,
     uint256 validUntil
   );
-
-  function allDeals() external view returns (Deal[] memory) {
-    return dealsList;
-  }
-
-  function deal(uint256 index) external view returns (Deal memory) {
-    return dealsList[index];
-  }
-
-  function dealsForDID(string calldata did)
-    external
-    view
-    returns (Deal[] memory)
-  {
-    return didToDeals[did];
-  }
-
-  function dealsForAddress(address user) external view returns (Deal[] memory) {
-    return userToDeals[user];
-  }
-
-  function hasAccessToDiD(string calldata did, address user)
-    external
-    view
-    returns (bool)
-  {
-    bool accessToDid = false;
-    for (uint256 i = 0; i < userToDeals[user].length; i++) {
-      if (
-        keccak256(abi.encode(userToDeals[user][i].did)) ==
-        keccak256(abi.encode(did)) &&
-        userToDeals[user][i].validUntil > now
-      ) {
-        return true;
-      }
-    }
-    return accessToDid;
-  }
 
   function createDeal(
     string memory did,
@@ -297,8 +247,12 @@ contract DXC is Ownable {
       marketplacePercentage,
       amount
     );
+
+    dealCount++;
+
     Deal memory newDeal = Deal(
       did,
+      dealCount,
       owner,
       ownerPercentage,
       publisher,
@@ -310,7 +264,7 @@ contract DXC is Ownable {
       validFrom,
       validUntil
     );
-    uint256 dealIndex = dealsList.push(newDeal) - 1;
+    dealsList.push(newDeal);
     didToDeals[did].push(newDeal);
     userToDeals[user].push(newDeal);
     if (owner != user) {
@@ -325,7 +279,7 @@ contract DXC is Ownable {
       userToDeals[marketplace].push(newDeal);
     }
     emit NewDeal(
-      dealIndex,
+      dealCount,
       did,
       owner,
       publisher,
@@ -335,6 +289,95 @@ contract DXC is Ownable {
       validFrom,
       validUntil
     );
+  }
+
+  function allDeals() external view returns (Deal[] memory) {
+    return dealsList;
+  }
+
+  function getDealByIndex(uint256 index) public view returns (Deal memory) {
+    return dealsList[index - 1];
+  }
+
+  function dealsForDID(string calldata did)
+    external
+    view
+    returns (Deal[] memory)
+  {
+    return didToDeals[did];
+  }
+
+  function dealsForAddress(address user) external view returns (Deal[] memory) {
+    return userToDeals[user];
+  }
+
+  function hasAccessToDID(string calldata did, address user)
+    external
+    view
+    returns (bool)
+  {
+    bool accessToDid = false;
+    uint256 dealIndex;
+    for (uint256 i = 0; i < userToDeals[user].length; i++) {
+      if (
+        keccak256(abi.encode(userToDeals[user][i].did)) ==
+        keccak256(abi.encode(did)) &&
+        userToDeals[user][i].validUntil > now
+      ) {
+        accessToDid = true;
+        dealIndex = userToDeals[user][i].index;
+      }
+    }
+
+    if (!accessToDid) {
+      return accessToDid;
+    }
+
+    require(dealIndex > 0, "No deal was found for the submitted user address");
+    DealAccess memory da = DealIndexToAccessList[dealIndex];
+
+    bool blackListed;
+    bool whiteListed;
+
+    if (da.whitelist.length == 0 && da.blacklist.length == 0) {
+      return accessToDid;
+    }
+
+    for (uint256 i = 0; i < da.whitelist.length; i++) {
+      if (!whiteListed) {
+        whiteListed = da.whitelist[i] == user;
+      }
+    }
+
+    for (uint256 j = 0; j < da.blacklist.length; j++) {
+      if (!blackListed) {
+        blackListed = da.blacklist[j] == user;
+      }
+    }
+
+    if (!whiteListed && da.whitelist.length > 0) {
+      accessToDid = false;
+    }
+
+    if (blackListed) {
+      accessToDid = false;
+    }
+
+    return accessToDid;
+  }
+
+  function addPermissionToDeal(
+    address[] memory blackList,
+    address[] memory whiteList,
+    uint256 dealIndex
+  ) public view onlyOwner {
+    Deal memory d = getDealByIndex(dealIndex);
+
+    require(address(0) != d.user, "Deal does not exist");
+
+    DealAccess memory da = DealIndexToAccessList[dealIndex];
+    da.whitelist = whiteList;
+    da.blacklist = blackList;
   }
 
   function payout(uint256 dealIndex) public {
