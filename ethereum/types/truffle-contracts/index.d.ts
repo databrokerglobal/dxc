@@ -493,13 +493,6 @@ export interface DXCInstance extends Truffle.ContractInstance {
     [string, BN, string, BN, string, BN, string, string, BN, BN, BN, BN]
   >;
 
-  dealsList(
-    arg0: number | BN | string,
-    txDetails?: Truffle.TransactionDetails
-  ): Promise<
-    [string, BN, string, BN, string, BN, string, string, BN, BN, BN, BN]
-  >;
-
   owner(txDetails?: Truffle.TransactionDetails): Promise<string>;
 
   protocolPercentage(txDetails?: Truffle.TransactionDetails): Promise<BN>;

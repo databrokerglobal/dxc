@@ -197,20 +197,19 @@ contract DXC is Ownable {
     uint256 validUntil; // 0 means forever, all others are a timestamp
   }
 
-  Deal[] public dealsList;
+  Deal[] internal _dealRegistry;
+  uint256 internal _dealCount;
+
+  mapping(uint256 => bool) internal _dealExists;
+  mapping(string => Deal[]) public didToDeals;
+  mapping(address => Deal[]) public userToDeals;
 
   struct DealAccess {
     address[] whitelist;
     address[] blacklist;
   }
 
-  // WARNING: 1-based (starts at one)
-  uint256 dealCount;
-
-  mapping(uint256 => Deal) internal dealList;
-  mapping(string => Deal[]) public didToDeals;
-  mapping(address => Deal[]) public userToDeals;
-  mapping(uint256 => DealAccess) internal DealIndexToAccessList;
+  mapping(uint256 => DealAccess) internal _dealIndexToAccessList;
 
   event NewDeal(
     uint256 index,
@@ -248,11 +247,9 @@ contract DXC is Ownable {
       amount
     );
 
-    dealCount++;
-
     Deal memory newDeal = Deal(
       did,
-      dealCount,
+      _dealCount,
       owner,
       ownerPercentage,
       publisher,
@@ -264,7 +261,11 @@ contract DXC is Ownable {
       validFrom,
       validUntil
     );
-    dealsList.push(newDeal);
+
+    _dealRegistry.push(newDeal);
+    _dealExists[_dealCount] = true;
+    _dealCount++;
+
     didToDeals[did].push(newDeal);
     userToDeals[user].push(newDeal);
     if (owner != user) {
@@ -279,7 +280,7 @@ contract DXC is Ownable {
       userToDeals[marketplace].push(newDeal);
     }
     emit NewDeal(
-      dealCount,
+      _dealCount,
       did,
       owner,
       publisher,
@@ -291,12 +292,13 @@ contract DXC is Ownable {
     );
   }
 
-  function allDeals() external view returns (Deal[] memory) {
-    return dealsList;
+  function allDeals() external view onlyOwner returns (Deal[] memory) {
+    return _dealRegistry;
   }
 
   function getDealByIndex(uint256 index) public view returns (Deal memory) {
-    return dealsList[index - 1];
+    require(_dealExists[index], "Deal does not exist");
+    return _dealRegistry[index];
   }
 
   function dealsForDID(string calldata did)
@@ -333,8 +335,11 @@ contract DXC is Ownable {
       return accessToDid;
     }
 
-    require(dealIndex > 0, "No deal was found for the submitted user address");
-    DealAccess memory da = DealIndexToAccessList[dealIndex];
+    require(
+      _dealExists[dealIndex],
+      "No deal was found for the submitted user address"
+    );
+    DealAccess memory da = _dealIndexToAccessList[dealIndex];
 
     bool blackListed;
     bool whiteListed;
@@ -367,21 +372,19 @@ contract DXC is Ownable {
   }
 
   function addPermissionToDeal(
-    address[] memory blackList,
-    address[] memory whiteList,
+    address[] calldata blackList,
+    address[] calldata whiteList,
     uint256 dealIndex
-  ) public view onlyOwner {
-    Deal memory d = getDealByIndex(dealIndex);
+  ) external view onlyOwner {
+    require(_dealExists[dealIndex], "No matchiing deal for index");
 
-    require(address(0) != d.user, "Deal does not exist");
-
-    DealAccess memory da = DealIndexToAccessList[dealIndex];
+    DealAccess memory da = _dealIndexToAccessList[dealIndex];
     da.whitelist = whiteList;
     da.blacklist = blackList;
   }
 
   function payout(uint256 dealIndex) public {
-    Deal memory _deal = dealsList[dealIndex];
+    Deal memory _deal = _dealRegistry[dealIndex];
     require(
       now >= _deal.validFrom + 14 days,
       "Payouts can only happen 14 days after the start of the deal (validFrom)"

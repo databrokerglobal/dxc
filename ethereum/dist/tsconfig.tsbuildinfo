@@ -490,8 +490,8 @@
         "signature": "7185c75f0b599a5636b0559967d0c70053828c24307bfbea24dbeb9cbb5d7e1f"
       },
       "../types/truffle-contracts/index.d.ts": {
-        "version": "a10f5ec4a8a5c0320b2bc294c0eabb37af3eb7a548eff639850c2af8f6fd9261",
-        "signature": "a10f5ec4a8a5c0320b2bc294c0eabb37af3eb7a548eff639850c2af8f6fd9261"
+        "version": "89c4a804fa2373ad19aa4e705bbaa3b7a87310fe76b0dec6b4500a188ed6e222",
+        "signature": "89c4a804fa2373ad19aa4e705bbaa3b7a87310fe76b0dec6b4500a188ed6e222"
       },
       "../node_modules/@types/ethereumjs-abi/index.d.ts": {
         "version": "4130f45b114de4cf06a465c0540c4fe31270876afff1cd59111314b6c4077c69",
