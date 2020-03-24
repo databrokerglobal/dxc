@@ -115,6 +115,35 @@ contract('DXC', async accounts => {
       expect(balanceResult[0].toString()).to.be.equal(new BN(0).toString());
     });
 
+    it('can deposit DTX tokens', async () => {
+      await dtxInstance.generateTokens(
+        accounts[3],
+        web3.utils.toWei('1000000')
+      );
+
+      let balanceResult = await proxiedDxc.balanceOf(accounts[3]);
+      expect(balanceResult[0].toString()).to.be.equal(new BN(0).toString());
+      await dtxInstance.approve(
+        proxiedDxc.address,
+        web3.utils.toWei(amountOfDTXFor(100)),
+        {from: accounts[3]}
+      );
+      const allowanceResult = await dtxInstance.allowance(
+        accounts[3],
+        proxiedDxc.address
+      );
+      expect(allowanceResult.toString()).to.be.equal(
+        web3.utils.toWei(amountOfDTXFor(100).toString())
+      );
+      await proxiedDxc.deposit(web3.utils.toWei(amountOfDTXFor(100)), {
+        from: accounts[3],
+      });
+      balanceResult = await proxiedDxc.balanceOf(accounts[3]);
+      expect(balanceResult[0].toString()).to.be.equal(
+        web3.utils.toWei(amountOfDTXFor(100).toString())
+      );
+    });
+
     it('Should create a deal successfully', async () => {
       // All percentages here need to add up to a 100: 15 + 70 + 10 = 95 + protocol percentage 5 = 100
       await proxiedDxc.createDeal(
