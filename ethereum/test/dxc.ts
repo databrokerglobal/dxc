@@ -144,6 +144,58 @@ contract('DXC', async accounts => {
       );
     });
 
+    it('cannot deposit DTX tokens if the allowance is too little', async () => {
+      await dtxInstance.generateTokens(
+        accounts[4],
+        web3.utils.toWei(amountOfDTXFor(100))
+      );
+      let balanceResult = await proxiedDxc.balanceOf(accounts[4]);
+      expect(balanceResult[0].toString()).to.be.equal(new BN(0).toString());
+      await dtxInstance.approve(proxiedDxc.address, new BN('5'), {
+        from: accounts[4],
+      });
+      const allowanceResult = await dtxInstance.allowance(
+        accounts[4],
+        proxiedDxc.address
+      );
+      expect(allowanceResult.toString()).to.be.equal(new BN('5').toString());
+      try {
+        await proxiedDxc.deposit(web3.utils.toWei(amountOfDTXFor(100)), {
+          from: accounts[4],
+        });
+      } catch (error) {
+        assert.isTrue(error.toString().includes('too little allowance'));
+      }
+      balanceResult = await proxiedDxc.balanceOf(accounts[4]);
+      expect(balanceResult[0].toString()).to.be.equal(new BN(0).toString());
+    });
+
+    it('cannot deposit DTX tokens if their is not enough DTX available', async () => {
+      let balanceResult = await proxiedDxc.balanceOf(accounts[5]);
+      expect(balanceResult[0].toString()).to.be.equal(new BN(0).toString());
+      await dtxInstance.approve(
+        proxiedDxc.address,
+        web3.utils.toWei(amountOfDTXFor(100)),
+        {from: accounts[5]}
+      );
+      const allowanceResult = await dtxInstance.allowance(
+        accounts[5],
+        proxiedDxc.address
+      );
+      expect(allowanceResult.toString()).to.be.equal(
+        web3.utils.toWei(amountOfDTXFor(100).toString())
+      );
+      try {
+        await proxiedDxc.deposit(web3.utils.toWei(amountOfDTXFor(100)), {
+          from: accounts[5],
+        });
+      } catch (error) {
+        assert.isTrue(error.toString().includes('too little DTX'));
+      }
+      balanceResult = await proxiedDxc.balanceOf(accounts[5]);
+      expect(balanceResult[0].toString()).to.be.equal(new BN(0).toString());
+    });
+
     it('Should create a deal successfully', async () => {
       // All percentages here need to add up to a 100: 15 + 70 + 10 = 95 + protocol percentage 5 = 100
       await proxiedDxc.createDeal(
