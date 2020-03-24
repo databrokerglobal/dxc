@@ -98,6 +98,23 @@ contract('DXC', async accounts => {
       );
     });
 
+    it('Cannot convert from fiat money if the user is not the owner', async () => {
+      let balanceResult = await proxiedDxc.balanceOf(accounts[2]);
+      expect(balanceResult[0].toString()).to.be.equal(new BN(0).toString());
+      try {
+        await proxiedDxc.convertFiatToToken(
+          accounts[2],
+          web3.utils.toWei(amountOfDTXFor(100)),
+          {from: accounts[9]}
+        );
+        assert(false, 'Test succeeded when it should have failed');
+      } catch (error) {
+        assert.isTrue(error.toString().includes('caller is not the owner'));
+      }
+      balanceResult = await proxiedDxc.balanceOf(accounts[2]);
+      expect(balanceResult[0].toString()).to.be.equal(new BN(0).toString());
+    });
+
     it('Should create a deal successfully', async () => {
       // All percentages here need to add up to a 100: 15 + 70 + 10 = 95 + protocol percentage 5 = 100
       await proxiedDxc.createDeal(
