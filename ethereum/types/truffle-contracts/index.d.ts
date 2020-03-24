@@ -574,14 +574,12 @@ export interface DXCInstance extends Truffle.ContractInstance {
     ): Promise<number>;
   };
 
-  platformBalance(
-    txDetails?: Truffle.TransactionDetails
-  ): Promise<[BN, BN, BN, BN, BN]>;
-
   balanceOf(
     owner: string | BN,
     txDetails?: Truffle.TransactionDetails
   ): Promise<[BN, BN, BN, BN, BN]>;
+
+  platformBalance(txDetails?: Truffle.TransactionDetails): Promise<BN>;
 
   convertFiatToToken: {
     (
@@ -601,6 +599,25 @@ export interface DXCInstance extends Truffle.ContractInstance {
     ): Promise<string>;
     estimateGas(
       to: string | BN,
+      amount: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<number>;
+  };
+
+  platformDeposit: {
+    (
+      amount: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<Truffle.TransactionResponse>;
+    call(
+      amount: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<void>;
+    sendTransaction(
+      amount: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<string>;
+    estimateGas(
       amount: number | BN | string,
       txDetails?: Truffle.TransactionDetails
     ): Promise<number>;

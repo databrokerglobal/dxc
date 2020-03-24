@@ -65,20 +65,6 @@ contract DXC is Ownable {
   event WithdrawDTX(address indexed to, uint256 amount);
   event TransferDTX(address indexed from, address indexed to, uint256 value);
 
-  function platformBalance()
-    public
-    view
-    returns (
-      uint256 balance,
-      uint256 escrowOutgoing,
-      uint256 escrowIncoming,
-      uint256 available,
-      uint256 globalBalance
-    )
-  {
-    return balanceOf(address(this));
-  }
-
   function balanceOf(address owner)
     public
     view
@@ -97,9 +83,19 @@ contract DXC is Ownable {
     globalBalance = dtxToken.balanceOf(owner);
   }
 
+  function platformBalance() public view returns (uint256) {
+    return dtxToken.balanceOf(address(this));
+  }
+
   function convertFiatToToken(address to, uint256 amount) public onlyOwner {
     transfer(address(this), to, amount);
     emit DepositDTX(to, amount);
+  }
+
+  function platformDeposit(uint256 amount) public onlyOwner {
+    balances[address(this)].balance = balances[address(this)].balance.add(
+      amount
+    );
   }
 
   function deposit(uint256 amount) public {
