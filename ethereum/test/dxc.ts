@@ -144,7 +144,7 @@ contract('DXC', async accounts => {
       );
     });
 
-    it('cannot deposit DTX tokens if the allowance is too little', async () => {
+    it('Cannot deposit DTX tokens if the allowance is too little', async () => {
       await dtxInstance.generateTokens(
         accounts[4],
         web3.utils.toWei(amountOfDTXFor(100))
@@ -170,7 +170,7 @@ contract('DXC', async accounts => {
       expect(balanceResult[0].toString()).to.be.equal(new BN(0).toString());
     });
 
-    it('cannot deposit DTX tokens if their is not enough DTX available', async () => {
+    it('Cannot deposit DTX tokens if their is not enough DTX available', async () => {
       let balanceResult = await proxiedDxc.balanceOf(accounts[5]);
       expect(balanceResult[0].toString()).to.be.equal(new BN(0).toString());
       await dtxInstance.approve(
@@ -193,6 +193,16 @@ contract('DXC', async accounts => {
         assert.isTrue(error.toString().includes('too little DTX'));
       }
       balanceResult = await proxiedDxc.balanceOf(accounts[5]);
+      expect(balanceResult[0].toString()).to.be.equal(new BN(0).toString());
+    });
+
+    it('Can withdraw DTX tokens', async () => {
+      const balanceResult1 = await proxiedDxc.balanceOf(accounts[1]);
+      assert.isTrue(balanceResult1[0].toString() !== '0');
+      await proxiedDxc.withdraw({
+        from: accounts[1],
+      });
+      const balanceResult = await proxiedDxc.balanceOf(accounts[1]);
       expect(balanceResult[0].toString()).to.be.equal(new BN(0).toString());
     });
 
