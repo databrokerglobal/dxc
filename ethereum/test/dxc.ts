@@ -86,16 +86,16 @@ contract('DXC', async accounts => {
     });
 
     it('Can convert from fiat money', async () => {
-      const balanceResult = await proxiedDxc.balanceOf(accounts[1]);
+      let balanceResult = await proxiedDxc.balanceOf(accounts[1]);
       expect(balanceResult[0].toString()).to.be.equal(web3.utils.toWei('0'));
       await proxiedDxc.convertFiatToToken(
         accounts[1],
         web3.utils.toWei(amountOfDTXFor(1))
       );
-      // balanceResult = await proxiedDxc.balanceOf(accounts[1]);
-      // expect(balanceResult[0].toString()).to.be.equal(
-      //   web3.utils.toWei(amountOfDTXFor(1))
-      // );
+      balanceResult = await proxiedDxc.balanceOf(accounts[1]);
+      expect(balanceResult[0].toString()).to.be.equal(
+        web3.utils.toWei(amountOfDTXFor(1).toString())
+      );
     });
 
     it('Should create a deal successfully', async () => {
