@@ -246,5 +246,41 @@ contract('DXC', async accounts => {
         );
       }
     });
+
+    it('can list all deals', async () => {
+      await proxiedDxc.createDeal(
+        'did:dxc:12345',
+        accounts[3],
+        new BN('70'),
+        accounts[2],
+        new BN('10'),
+        accounts[1],
+        accounts[0],
+        new BN('15'),
+        web3.utils.toWei(amountOfDTXFor(50)),
+        Math.floor(Date.now() / 1000),
+        Math.floor(Date.now() / 1000) + 3600 * 24 * 30
+      );
+      const deals = await proxiedDxc.allDeals();
+      expect(deals.length).to.be.equal(2);
+    });
+
+    it('can get the info for a deal', async () => {
+      await proxiedDxc.createDeal(
+        'did:dxc:12345',
+        accounts[3],
+        new BN('70'),
+        accounts[2],
+        new BN('10'),
+        accounts[1],
+        accounts[0],
+        new BN('15'),
+        web3.utils.toWei(amountOfDTXFor(50)),
+        Math.floor(Date.now() / 1000),
+        Math.floor(Date.now() / 1000) + 3600 * 24 * 30
+      );
+      const deal = await proxiedDxc.getDealByIndex(2);
+      expect(deal.did).to.be.equal('did:dxc:12345');
+    });
   });
 });
