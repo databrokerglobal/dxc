@@ -102,6 +102,10 @@ export interface OwnedUpgradeabilityProxyContract
   ): Promise<OwnedUpgradeabilityProxyInstance>;
 }
 
+export interface PausableContract extends Truffle.Contract<PausableInstance> {
+  "new"(meta?: Truffle.TransactionDetails): Promise<PausableInstance>;
+}
+
 export interface ProxyContract extends Truffle.Contract<ProxyInstance> {
   "new"(meta?: Truffle.TransactionDetails): Promise<ProxyInstance>;
 }
@@ -461,12 +465,32 @@ export interface DTXTokenInstance extends Truffle.ContractInstance {
 }
 
 export interface DXCInstance extends Truffle.ContractInstance {
+  initPause: {
+    (txDetails?: Truffle.TransactionDetails): Promise<
+      Truffle.TransactionResponse
+    >;
+    call(txDetails?: Truffle.TransactionDetails): Promise<void>;
+    sendTransaction(txDetails?: Truffle.TransactionDetails): Promise<string>;
+    estimateGas(txDetails?: Truffle.TransactionDetails): Promise<number>;
+  };
+
   balances(
     arg0: string | BN,
     txDetails?: Truffle.TransactionDetails
   ): Promise<[BN, BN, BN]>;
 
+  unpause: {
+    (txDetails?: Truffle.TransactionDetails): Promise<
+      Truffle.TransactionResponse
+    >;
+    call(txDetails?: Truffle.TransactionDetails): Promise<void>;
+    sendTransaction(txDetails?: Truffle.TransactionDetails): Promise<string>;
+    estimateGas(txDetails?: Truffle.TransactionDetails): Promise<number>;
+  };
+
   dtxToken(txDetails?: Truffle.TransactionDetails): Promise<string>;
+
+  paused(txDetails?: Truffle.TransactionDetails): Promise<boolean>;
 
   initializeOwner: {
     (txDetails?: Truffle.TransactionDetails): Promise<
@@ -492,6 +516,15 @@ export interface DXCInstance extends Truffle.ContractInstance {
   ): Promise<
     [string, BN, string, BN, string, BN, string, string, BN, BN, BN, BN]
   >;
+
+  pause: {
+    (txDetails?: Truffle.TransactionDetails): Promise<
+      Truffle.TransactionResponse
+    >;
+    call(txDetails?: Truffle.TransactionDetails): Promise<void>;
+    sendTransaction(txDetails?: Truffle.TransactionDetails): Promise<string>;
+    estimateGas(txDetails?: Truffle.TransactionDetails): Promise<number>;
+  };
 
   owner(txDetails?: Truffle.TransactionDetails): Promise<string>;
 
@@ -793,12 +826,32 @@ export interface DXCInstance extends Truffle.ContractInstance {
     txDetails?: Truffle.TransactionDetails
   ): Promise<boolean>;
 
-  addPermissionsToDeal(
-    blackList: (string | BN)[],
-    whiteList: (string | BN)[],
-    dealIndex: number | BN | string,
-    txDetails?: Truffle.TransactionDetails
-  ): Promise<void>;
+  addPermissionsToDeal: {
+    (
+      blackList: (string | BN)[],
+      whiteList: (string | BN)[],
+      dealIndex: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<Truffle.TransactionResponse>;
+    call(
+      blackList: (string | BN)[],
+      whiteList: (string | BN)[],
+      dealIndex: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<void>;
+    sendTransaction(
+      blackList: (string | BN)[],
+      whiteList: (string | BN)[],
+      dealIndex: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<string>;
+    estimateGas(
+      blackList: (string | BN)[],
+      whiteList: (string | BN)[],
+      dealIndex: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<number>;
+  };
 
   payout: {
     (
@@ -2435,6 +2488,66 @@ export interface OwnedUpgradeabilityProxyInstance
       data: string,
       txDetails?: Truffle.TransactionDetails
     ): Promise<number>;
+  };
+}
+
+export interface PausableInstance extends Truffle.ContractInstance {
+  initializeOwner: {
+    (txDetails?: Truffle.TransactionDetails): Promise<
+      Truffle.TransactionResponse
+    >;
+    call(txDetails?: Truffle.TransactionDetails): Promise<void>;
+    sendTransaction(txDetails?: Truffle.TransactionDetails): Promise<string>;
+    estimateGas(txDetails?: Truffle.TransactionDetails): Promise<number>;
+  };
+
+  owner(txDetails?: Truffle.TransactionDetails): Promise<string>;
+
+  transferOwnership: {
+    (newOwner: string | BN, txDetails?: Truffle.TransactionDetails): Promise<
+      Truffle.TransactionResponse
+    >;
+    call(
+      newOwner: string | BN,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<void>;
+    sendTransaction(
+      newOwner: string | BN,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<string>;
+    estimateGas(
+      newOwner: string | BN,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<number>;
+  };
+
+  initPause: {
+    (txDetails?: Truffle.TransactionDetails): Promise<
+      Truffle.TransactionResponse
+    >;
+    call(txDetails?: Truffle.TransactionDetails): Promise<void>;
+    sendTransaction(txDetails?: Truffle.TransactionDetails): Promise<string>;
+    estimateGas(txDetails?: Truffle.TransactionDetails): Promise<number>;
+  };
+
+  paused(txDetails?: Truffle.TransactionDetails): Promise<boolean>;
+
+  pause: {
+    (txDetails?: Truffle.TransactionDetails): Promise<
+      Truffle.TransactionResponse
+    >;
+    call(txDetails?: Truffle.TransactionDetails): Promise<void>;
+    sendTransaction(txDetails?: Truffle.TransactionDetails): Promise<string>;
+    estimateGas(txDetails?: Truffle.TransactionDetails): Promise<number>;
+  };
+
+  unpause: {
+    (txDetails?: Truffle.TransactionDetails): Promise<
+      Truffle.TransactionResponse
+    >;
+    call(txDetails?: Truffle.TransactionDetails): Promise<void>;
+    sendTransaction(txDetails?: Truffle.TransactionDetails): Promise<string>;
+    estimateGas(txDetails?: Truffle.TransactionDetails): Promise<number>;
   };
 }
 

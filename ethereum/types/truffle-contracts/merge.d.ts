@@ -32,6 +32,7 @@ declare global {
       require(
         name: "OwnedUpgradeabilityProxy"
       ): TruffleContracts.OwnedUpgradeabilityProxyContract;
+      require(name: "Pausable"): TruffleContracts.PausableContract;
       require(name: "Proxy"): TruffleContracts.ProxyContract;
       require(
         name: "TokenController"

@@ -4,11 +4,11 @@ pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-import "@nomiclabs/buidler/console.sol";
+import "../ownership/Pausable.sol";
 import "../ownership/Ownable.sol";
 
 
-contract DXC is Ownable {
+contract DXC is Ownable, Pausable {
   using SafeMath for uint256;
   using SafeMath for uint8;
   using SafeERC20 for ERC20;
@@ -17,11 +17,12 @@ contract DXC is Ownable {
   uint8 public protocolPercentage;
   bool private initialized;
 
-  function initialize(address token) public {
+  function initialize(address token) public whenNotPaused {
     require(!initialized);
     protocolPercentage = 5;
     dtxToken = ERC20(token);
     initializeOwner();
+    initPause();
     initialized = true;
   }
 
@@ -32,11 +33,12 @@ contract DXC is Ownable {
   function changeProtocolPercentage(uint8 _protocolPercentage)
     public
     onlyOwner
+    whenNotPaused
   {
     protocolPercentage = _protocolPercentage;
   }
 
-  function changeDTXToken(address token) public onlyOwner {
+  function changeDTXToken(address token) public onlyOwner whenNotPaused {
     dtxToken = ERC20(token);
   }
 
@@ -68,6 +70,7 @@ contract DXC is Ownable {
   function balanceOf(address owner)
     public
     view
+    whenNotPaused
     returns (
       uint256 balance,
       uint256 escrowOutgoing,
@@ -83,22 +86,26 @@ contract DXC is Ownable {
     globalBalance = dtxToken.balanceOf(owner);
   }
 
-  function platformBalance() public view returns (uint256) {
+  function platformBalance() public view whenNotPaused returns (uint256) {
     return dtxToken.balanceOf(address(this));
   }
 
-  function convertFiatToToken(address to, uint256 amount) public onlyOwner {
+  function convertFiatToToken(address to, uint256 amount)
+    public
+    onlyOwner
+    whenNotPaused
+  {
     transfer(address(this), to, amount);
     emit DepositDTX(to, amount);
   }
 
-  function platformDeposit(uint256 amount) public onlyOwner {
+  function platformDeposit(uint256 amount) public onlyOwner whenNotPaused {
     balances[address(this)].balance = balances[address(this)].balance.add(
       amount
     );
   }
 
-  function deposit(uint256 amount) public {
+  function deposit(uint256 amount) public whenNotPaused {
     require(
       dtxToken.balanceOf(msg.sender) >= amount,
       "Sender has too little DTX to make this transaction work"
@@ -112,7 +119,7 @@ contract DXC is Ownable {
     emit DepositDTX(msg.sender, amount);
   }
 
-  function withdraw() public {
+  function withdraw() public whenNotPaused {
     (, , , uint256 available, ) = balanceOf(msg.sender);
     balances[msg.sender].balance = balances[msg.sender].balance.sub(available);
     totalBalance = totalBalance.sub(available);
@@ -123,7 +130,10 @@ contract DXC is Ownable {
     emit WithdrawDTX(msg.sender, available);
   }
 
-  function transfer(address from, address to, uint256 amount) internal {
+  function transfer(address from, address to, uint256 amount)
+    internal
+    whenNotPaused
+  {
     (, , , uint256 available, ) = balanceOf(from);
     require(
       amount <= available,
@@ -143,7 +153,7 @@ contract DXC is Ownable {
     address marketplace,
     uint8 marketplacePercentage,
     uint256 amount
-  ) internal {
+  ) internal whenNotPaused {
     require(
       ownerPercentage +
         publisherPercentage +
@@ -231,7 +241,7 @@ contract DXC is Ownable {
     uint256 amount,
     uint256 validFrom,
     uint256 validUntil
-  ) public onlyOwner {
+  ) public onlyOwner whenNotPaused {
     escrow(
       owner,
       ownerPercentage,
@@ -288,11 +298,22 @@ contract DXC is Ownable {
     );
   }
 
-  function allDeals() external view onlyOwner returns (Deal[] memory) {
+  function allDeals()
+    external
+    view
+    onlyOwner
+    whenNotPaused
+    returns (Deal[] memory)
+  {
     return _dealRegistry;
   }
 
-  function getDealByIndex(uint256 index) public view returns (Deal memory) {
+  function getDealByIndex(uint256 index)
+    public
+    view
+    whenNotPaused
+    returns (Deal memory)
+  {
     require(_dealExists[index], "Deal does not exist");
     return _dealRegistry[index];
   }
@@ -300,18 +321,25 @@ contract DXC is Ownable {
   function dealsForDID(string calldata did)
     external
     view
+    whenNotPaused
     returns (Deal[] memory)
   {
     return didToDeals[did];
   }
 
-  function dealsForAddress(address user) external view returns (Deal[] memory) {
+  function dealsForAddress(address user)
+    external
+    view
+    whenNotPaused
+    returns (Deal[] memory)
+  {
     return userToDeals[user];
   }
 
   function hasAccessToDeal(uint256 index, address user)
     external
     view
+    whenNotPaused
     returns (bool)
   {
     bool accessToDid = false;
@@ -365,7 +393,7 @@ contract DXC is Ownable {
     address[] calldata blackList,
     address[] calldata whiteList,
     uint256 dealIndex
-  ) external onlyOwner {
+  ) external onlyOwner whenNotPaused {
     require(_dealExists[dealIndex], "No matching deal for index");
 
     DealAccess storage da = _dealIndexToAccessList[dealIndex];
@@ -373,7 +401,7 @@ contract DXC is Ownable {
     da.blacklist = blackList;
   }
 
-  function payout(uint256 dealIndex) public {
+  function payout(uint256 dealIndex) public whenNotPaused {
     Deal memory _deal = _dealRegistry[dealIndex];
     require(
       now >= _deal.validFrom + 14 days,
