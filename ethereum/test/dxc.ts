@@ -282,5 +282,10 @@ contract('DXC', async accounts => {
       const deal = await proxiedDxc.getDealByIndex(2);
       expect(deal.did).to.be.equal('did:dxc:12345');
     });
+
+    it('can get all the deals for a did', async () => {
+      const deals = await proxiedDxc.dealsForDID('did:dxc:12345');
+      expect(deals).to.be.length(2);
+    });
   });
 });
