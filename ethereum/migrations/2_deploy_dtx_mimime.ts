@@ -4,7 +4,7 @@ import {
   MiniMeTokenFactoryInstance,
 } from '../types/truffle-contracts';
 
-const DTXMiniMe: DTXTokenContract = artifacts.require('DTXToken');
+const DTXToken: DTXTokenContract = artifacts.require('DTXToken');
 const TokenFactory: MiniMeTokenFactoryContract = artifacts.require(
   'MiniMeTokenFactory'
 );
@@ -16,15 +16,7 @@ const performMigration = async (
 ) => {
   await deployer.deploy(TokenFactory);
   const tokenFactoryInstance: MiniMeTokenFactoryInstance = await TokenFactory.deployed();
-  await tokenFactoryInstance.createCloneToken(
-    '0x0000000000000000000000000000000000000000',
-    0,
-    'DaTa eXchange Token',
-    18,
-    'DTX',
-    true
-  );
-  await deployer.deploy(DTXMiniMe, tokenFactoryInstance.address);
+  await deployer.deploy(DTXToken, tokenFactoryInstance.address);
 };
 
 module.exports = (deployer: any, network: string, accounts: string[]) => {

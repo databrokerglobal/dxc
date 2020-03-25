@@ -622,11 +622,11 @@
         "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
       },
       "../test/migrations.ts": {
-        "version": "95fdfdf3c0450b2fec8da586a3740cae8e1983bb60e709dc4fe87bc61b849e6f",
+        "version": "466e10e1d63bba2cb7e7a7497a9118099aa676de634f7b6f68dfd3a30d1b1388",
         "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
       },
       "../test/pausable.ts": {
-        "version": "a4d78d993f95d52c3c852deeefc71e6812ee89fb78299733420889d3bcd317c0",
+        "version": "c4ee7f7fa50d097d89c2e668e9f965ca68c61c3c7a35b78b924042c0144d8f49",
         "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
       },
       "../test/upgradeability.ts": {
