@@ -309,33 +309,27 @@ contract DXC is Ownable {
     return userToDeals[user];
   }
 
-  function hasAccessToDID(string calldata did, address user)
+  function hasAccessToDeal(uint256 index, address user)
     external
     view
     returns (bool)
   {
     bool accessToDid = false;
-    uint256 dealIndex;
-    for (uint256 i = 0; i < userToDeals[user].length; i++) {
-      if (
-        keccak256(abi.encode(userToDeals[user][i].did)) ==
-        keccak256(abi.encode(did)) &&
-        userToDeals[user][i].validUntil > now
-      ) {
-        accessToDid = true;
-        dealIndex = userToDeals[user][i].index;
-      }
-    }
+
+    require(
+      _dealExists[index],
+      "No deal was found for the submitted user address"
+    );
+
+    Deal memory d = getDealByIndex(index);
+
+    accessToDid = d.user == user;
 
     if (!accessToDid) {
       return accessToDid;
     }
 
-    require(
-      _dealExists[dealIndex],
-      "No deal was found for the submitted user address"
-    );
-    DealAccess memory da = _dealIndexToAccessList[dealIndex];
+    DealAccess memory da = _dealIndexToAccessList[index];
 
     bool blackListed;
     bool whiteListed;
@@ -367,14 +361,14 @@ contract DXC is Ownable {
     return accessToDid;
   }
 
-  function addPermissionToDeal(
+  function addPermissionsToDeal(
     address[] calldata blackList,
     address[] calldata whiteList,
     uint256 dealIndex
-  ) external view onlyOwner {
-    require(_dealExists[dealIndex], "No matchiing deal for index");
+  ) external onlyOwner {
+    require(_dealExists[dealIndex], "No matching deal for index");
 
-    DealAccess memory da = _dealIndexToAccessList[dealIndex];
+    DealAccess storage da = _dealIndexToAccessList[dealIndex];
     da.whitelist = whiteList;
     da.blacklist = blackList;
   }

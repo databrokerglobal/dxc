@@ -787,13 +787,13 @@ export interface DXCInstance extends Truffle.ContractInstance {
     }[]
   >;
 
-  hasAccessToDID(
-    did: string,
+  hasAccessToDeal(
+    index: number | BN | string,
     user: string | BN,
     txDetails?: Truffle.TransactionDetails
   ): Promise<boolean>;
 
-  addPermissionToDeal(
+  addPermissionsToDeal(
     blackList: (string | BN)[],
     whiteList: (string | BN)[],
     dealIndex: number | BN | string,

@@ -115,7 +115,7 @@ contract('DXC', async accounts => {
       expect(balanceResult[0].toString()).to.be.equal(new BN(0).toString());
     });
 
-    it('can deposit DTX tokens', async () => {
+    it('Can deposit DTX tokens', async () => {
       await dtxInstance.generateTokens(
         accounts[3],
         web3.utils.toWei('1000000')
@@ -223,7 +223,7 @@ contract('DXC', async accounts => {
       );
     });
 
-    it('can create a new deal only when the percentages add up to 100', async () => {
+    it('Can create a new deal only when the percentages add up to 100', async () => {
       try {
         await proxiedDxc.createDeal(
           'did:dxc:12345',
@@ -247,7 +247,7 @@ contract('DXC', async accounts => {
       }
     });
 
-    it('can list all deals', async () => {
+    it('Can list all deals', async () => {
       await proxiedDxc.createDeal(
         'did:dxc:12345',
         accounts[3],
@@ -265,7 +265,7 @@ contract('DXC', async accounts => {
       expect(deals.length).to.be.equal(2);
     });
 
-    it('can get the info for a deal', async () => {
+    it('Can get the info for a deal', async () => {
       await proxiedDxc.createDeal(
         'did:dxc:12345',
         accounts[3],
@@ -283,9 +283,91 @@ contract('DXC', async accounts => {
       expect(deal.did).to.be.equal('did:dxc:12345');
     });
 
-    it('can get all the deals for a did', async () => {
+    it('Can get all the deals for a did', async () => {
       const deals = await proxiedDxc.dealsForDID('did:dxc:12345');
       expect(deals).to.be.length(2);
+    });
+
+    it('Can signal access to a did whithout blacklist/whitelist', async () => {
+      let access = await proxiedDxc.hasAccessToDeal(2, accounts[1]);
+      expect(access).to.be.equal(true);
+      access = await proxiedDxc.hasAccessToDeal(2, accounts[6]);
+      expect(access).to.be.equal(false);
+    });
+
+    it('Can signal access to a deal with blacklist/whitelist 1', async () => {
+      let access = await proxiedDxc.hasAccessToDeal(2, accounts[1]);
+      expect(access).to.be.equal(true);
+
+      // Add user to blacklist
+      await proxiedDxc.addPermissionsToDeal([accounts[1]], [], 2);
+
+      access = await proxiedDxc.hasAccessToDeal(2, accounts[1]);
+      expect(access).to.be.equal(false);
+
+      await proxiedDxc.addPermissionsToDeal([], [], 2);
+      access = await proxiedDxc.hasAccessToDeal(2, accounts[1]);
+      expect(access).to.be.equal(true);
+    });
+
+    it('Can signal access to a deal with blacklist/whitelist 2', async () => {
+      let access = await proxiedDxc.hasAccessToDeal(2, accounts[1]);
+      expect(access).to.be.equal(true);
+
+      // add a whitelist without the user in it
+      await proxiedDxc.addPermissionsToDeal([], [accounts[7]], 2);
+
+      access = await proxiedDxc.hasAccessToDeal(2, accounts[1]);
+      expect(access).to.be.equal(false);
+
+      await proxiedDxc.addPermissionsToDeal([], [], 2);
+      access = await proxiedDxc.hasAccessToDeal(2, accounts[1]);
+      expect(access).to.be.equal(true);
+    });
+
+    it('Can signal access to a deal whith blacklist/whitelist 3', async () => {
+      let access = await proxiedDxc.hasAccessToDeal(2, accounts[1]);
+      expect(access).to.be.equal(true);
+
+      // add a whitelist with the user in it
+      await proxiedDxc.addPermissionsToDeal([], [accounts[1]], 2);
+
+      access = await proxiedDxc.hasAccessToDeal(2, accounts[1]);
+      expect(access).to.be.equal(true);
+
+      await proxiedDxc.addPermissionsToDeal([], [], 2);
+      access = await proxiedDxc.hasAccessToDeal(2, accounts[1]);
+      expect(access).to.be.equal(true);
+    });
+
+    it('Can signal access to a deal whith blacklist/whitelist 4', async () => {
+      let access = await proxiedDxc.hasAccessToDeal(2, accounts[1]);
+      expect(access).to.be.equal(true);
+
+      // add a whitelist with the user in it and is in blacklist
+      await proxiedDxc.addPermissionsToDeal([accounts[2]], [accounts[2]], 2);
+
+      access = await proxiedDxc.hasAccessToDeal(2, accounts[1]);
+      expect(access).to.be.equal(false);
+
+      await proxiedDxc.addPermissionsToDeal([], [], 2);
+      access = await proxiedDxc.hasAccessToDeal(2, accounts[1]);
+      expect(access).to.be.equal(true);
+    });
+
+    it('Can signal access to a deal whith blacklist/whitelist 5', async () => {
+      let access = await proxiedDxc.hasAccessToDeal(2, accounts[1]);
+      expect(access).to.be.equal(true);
+
+      // add a whitelist without the user in it and is in blacklist
+      await proxiedDxc.addPermissionsToDeal([accounts[2]], [accounts[7]], 2);
+
+      access = await proxiedDxc.hasAccessToDeal(2, accounts[1]);
+      expect(access).to.be.equal(false);
+
+      await proxiedDxc.addPermissionsToDeal([], [], 2);
+      access = await proxiedDxc.hasAccessToDeal(2, accounts[1]);
+      expect(access).to.be.equal(true);
     });
   });
 });
