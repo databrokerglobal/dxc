@@ -1,6 +1,9 @@
 // import Web3 from 'web3';
 
-import {MigrationsContract, MigrationsInstance} from '../types/truffle-contracts';
+import {
+  MigrationsContract,
+  MigrationsInstance,
+} from '../types/truffle-contracts';
 
 // const w3: Web3 = web3;
 const Migrations: MigrationsContract = artifacts.require('Migrations');
