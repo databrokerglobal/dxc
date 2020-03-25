@@ -222,5 +222,29 @@ contract('DXC', async accounts => {
         0
       );
     });
+
+    it('can create a new deal only when the percentages add up to 100', async () => {
+      try {
+        await proxiedDxc.createDeal(
+          'did:dxc:12345',
+          accounts[1],
+          new BN('70'),
+          accounts[2],
+          new BN('10'),
+          accounts[3],
+          accounts[0],
+          new BN('10'),
+          web3.utils.toWei(amountOfDTXFor(50)),
+          Math.floor(Date.now() / 1000),
+          Math.floor(Date.now() / 1000) + 3600 * 24 * 30
+        );
+      } catch (error) {
+        assert.isTrue(
+          error
+            .toString()
+            .includes('All percentages need to add up to exactly 100')
+        );
+      }
+    });
   });
 });
