@@ -24,7 +24,7 @@ jobs: # basic units of work in a run
       - save_cache: # Store cache in the /go/pkg directory
           key: v1-pkg-cache
           paths:
-            - '/go/pkg'
+            - "/go/pkg"
 
       - store_artifacts: # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
           path: /tmp/test-results
@@ -33,7 +33,7 @@ jobs: # basic units of work in a run
       - store_test_results: # Upload test results for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
           path: /tmp/test-results
   build_and_test_truffle: # runs not using Workflows must have a `build` job as entry point
-    working_directory: ~/dxc/ethereum
+    working_directory: ~/dxc/truffle
     docker: # run the steps with Docker
       - image: circleci/node:10.16.3 # ...with this image as the primary container; this is where all `steps` will ru
     steps: # a collection of executable commands
@@ -41,7 +41,7 @@ jobs: # basic units of work in a run
           path: ~/dxc
       - run:
           name: update-npm
-          command: 'sudo npm install -g npm@latest'
+          command: "sudo npm install -g npm@latest"
       - restore_cache: # special step to restore the dependency cache
           # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
           key: dependency-cache-{{ checksum "package-lock.json" }}
