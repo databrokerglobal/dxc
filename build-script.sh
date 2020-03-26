@@ -10,4 +10,5 @@ cd ui &&
 npm i &&
 npm run build &&
 cd .. &&
-cp -r build/ "dxc_build_$(date +%Y%m%d)"/build
+cp -r build/ "dxc_build_$(date +%Y%m%d)"/build &&
+mv build ui/build
