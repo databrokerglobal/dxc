@@ -46,7 +46,7 @@ contract DXC is Ownable, Pausable {
   //// DTX Bank                                                                      ////
   ///////////////////////////////////////////////////////////////////////////////////////
 
-  struct TokenAvailabiltity {
+  struct TokenAvailability {
     uint256 balance;
     uint256 escrowOutgoing;
     uint256 escrowIncoming;
@@ -59,7 +59,7 @@ contract DXC is Ownable, Pausable {
     address from;
   }
 
-  mapping(address => TokenAvailabiltity) public balances;
+  mapping(address => TokenAvailability) public balances;
   uint256 public totalBalance;
   uint256 public totalEscrowed;
 
