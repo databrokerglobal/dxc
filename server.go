@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/joho/godotenv"
 
+	"github.com/databrokerglobal/dxc/ethereum"
 	"github.com/databrokerglobal/dxc/filemanager"
 	"github.com/databrokerglobal/dxc/products"
 	"github.com/labstack/echo"
@@ -57,6 +58,12 @@ func main() {
 	if err != nil {
 		e.Logger.Error("No env file loaded...")
 	}
+
+	/////////////////////////
+	// Ethereum go routine //
+	/////////////////////////
+
+	go ethereum.ServeContract()
 
 	// Log stuff if port is busy f.e.
 	e.Logger.Fatal(e.Start(":1323"))
