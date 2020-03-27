@@ -1,12 +1,12 @@
 package ethereum
 
 import (
-	"fmt"
 	"log"
 	"os"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/fatih/color"
 	"github.com/joho/godotenv"
 )
 
@@ -30,9 +30,25 @@ func ServeContract() {
 	if err != nil {
 		log.Fatalf("Failed to instantiate a DXC contract: %v", err)
 	}
+
+	color.Cyan(`
+  /////////////////////////////////////////////////////////////
+  // Connected to the DXC Contract on the Görli Test Network //
+  /////////////////////////////////////////////////////////////
+  `)
+
 	pp, err := dxc.ProtocolPercentage(nil)
 	if err != nil {
 		log.Fatalf("Failed to get protocol percentage: %v", err)
 	}
-	fmt.Println("Protocol percetage: ", pp)
+
+	balance, err := dxc.PlatformBalance(nil)
+	if err != nil {
+		log.Fatalf("Failed to get platform balance: %v", err)
+	}
+
+	color.Yellow("Contract address: 0x8774f98C752062B6e96E5f5dcDcE011214a8dc1D")
+	color.Magenta("Current protocol percentage: %d", pp)
+	color.Green("Platform balance: %d", balance)
+
 }
