@@ -1,6 +1,9 @@
 package main
 
 import (
+	"sync"
+
+	"github.com/fatih/color"
 	"github.com/joho/godotenv"
 
 	"github.com/databrokerglobal/dxc/ethereum"
@@ -11,6 +14,26 @@ import (
 )
 
 func main() {
+
+	color.Blue(`
+      DDDDDDDDDDDDD       XXXXXXX       XXXXXXX       CCCCCCCCCCCCC
+      D::::::::::::DDD    X:::::X       X:::::X    CCC::::::::::::C
+      D:::::::::::::::DD  X:::::X       X:::::X  CC:::::::::::::::C
+      DDD:::::DDDDD:::::D X::::::X     X::::::X C:::::CCCCCCCC::::C
+        D:::::D    D:::::DXXX:::::X   X:::::XXXC:::::C       CCCCCC
+        D:::::D     D:::::D  X:::::X X:::::X  C:::::C
+        D:::::D     D:::::D   X:::::X:::::X   C:::::C
+        D:::::D     D:::::D    X:::::::::X    C:::::C
+        D:::::D     D:::::D    X:::::::::X    C:::::C
+        D:::::D     D:::::D   X:::::X:::::X   C:::::C
+        D:::::D     D:::::D  X:::::X X:::::X  C:::::C
+        D:::::D    D:::::DXXX:::::X   X:::::XXXC:::::C       CCCCCC
+      DDD:::::DDDDD:::::D X::::::X     X::::::X C:::::CCCCCCCC::::C
+      D:::::::::::::::DD  X:::::X       X:::::X  CC:::::::::::::::C
+      D::::::::::::DDD    X:::::X       X:::::X    CCC::::::::::::C
+      DDDDDDDDDDDDD       XXXXXXX       XXXXXXX       CCCCCCCCCCCCC
+  `)
+
 	e := echo.New()
 
 	//////////////////////////
@@ -59,12 +82,35 @@ func main() {
 		e.Logger.Error("No env file loaded...")
 	}
 
+	/////////////////
+	// GO ROUTINES //
+	/////////////////
+
+	var wg sync.WaitGroup
+
+	wg.Add(2)
+
+	//////////////////////////
+	// File Checker Routine //
+	//////////////////////////
+
+	go func() {
+		filemanager.CheckingFiles()
+		wg.Done()
+	}()
+
 	/////////////////////////
 	// Ethereum go routine //
 	/////////////////////////
 
-	go ethereum.ServeContract()
+	go func() {
+		ethereum.ServeContract()
+		wg.Done()
+	}()
+
+	wg.Wait()
 
 	// Log stuff if port is busy f.e.
 	e.Logger.Fatal(e.Start(":1323"))
+
 }
