@@ -1,0 +1,103 @@
+Starting migrations...
+======================
+> Network name:    'goerli'
+> Network id:      5
+> Block gas limit: 0x7a1200
+
+
+1_initial_migration.js
+======================
+
+   Deploying 'Migrations'
+   ----------------------
+   > transaction hash:    0x55f7409e7d8707f9556b28f3cc5154b8df9ae23458c2a2ab21b36041532746e5
+   > Blocks: 0            Seconds: 12
+   > contract address:    0xb9fa15D678359F154E0d046EBdbDa917B41C4c41
+   > account:             0x7CB82e4e66c3f04554BF6f0B499bE9a259E331D4
+   > balance:             0.14794094
+   > gas used:            205906
+   > gas price:           10 gwei
+   > value sent:          0 ETH
+   > total cost:          0.00205906 ETH
+
+
+   > Saving migration to chain.
+   > Saving artifacts
+   -------------------------------------
+   > Total cost:          0.00205906 ETH
+
+
+2_deploy_dtx_mimime.js
+======================
+
+   Deploying 'MiniMeTokenFactory'
+   ------------------------------
+   > transaction hash:    0x684c08ebbbbbd5a597a9d539d72a017d2e2ccb26fe37a77bb50781f66040779f
+   > Blocks: 1            Seconds: 24
+   > contract address:    0x992f729f8d764e9A2541a95bd805Ce7e7D7A0D9D
+   > account:             0x7CB82e4e66c3f04554BF6f0B499bE9a259E331D4
+   > balance:             0.12923648
+   > gas used:            1828169
+   > gas price:           10 gwei
+   > value sent:          0 ETH
+   > total cost:          0.01828169 ETH
+
+
+   Deploying 'DTXToken'
+   --------------------
+   > transaction hash:    0x5ce188123ead8db24d9c8fb9c6698df0797c58457d7f86b0318f65c9fb7c98c4
+   > Blocks: 0            Seconds: 8
+   > contract address:    0xC8C5003633986245980bE92960Da209eeB750527
+   > account:             0x7CB82e4e66c3f04554BF6f0B499bE9a259E331D4
+   > balance:             0.11274179
+   > gas used:            1649469
+   > gas price:           10 gwei
+   > value sent:          0 ETH
+   > total cost:          0.01649469 ETH
+
+
+   > Saving migration to chain.
+   > Saving artifacts
+   -------------------------------------
+   > Total cost:          0.03477638 ETH
+
+
+3_deploy_dxc.js
+===============
+
+   Deploying 'DXC'
+   ---------------
+   > transaction hash:    0x4a4dba30733059961a99bc945279f56706e6bfe0ba823e0fb53ee3b48ae50976
+   > Blocks: 0            Seconds: 8
+   > contract address:    0xFbcbD546dACD48E1Feba2d6e0B6e714C085a78B6
+   > account:             0x7CB82e4e66c3f04554BF6f0B499bE9a259E331D4
+   > balance:             0.07733663
+   > gas used:            3513239
+   > gas price:           10 gwei
+   > value sent:          0 ETH
+   > total cost:          0.03513239 ETH
+
+
+   Deploying 'OwnedUpgradeabilityProxy'
+   ------------------------------------
+   > transaction hash:    0x15aff23ce1b81ef02da958521cb5cf8599b00be6257579767562738607fd319f
+   > Blocks: 0            Seconds: 8
+   > contract address:    0x8774f98C752062B6e96E5f5dcDcE011214a8dc1D
+   > account:             0x7CB82e4e66c3f04554BF6f0B499bE9a259E331D4
+   > balance:             0.0738821
+   > gas used:            345453
+   > gas price:           10 gwei
+   > value sent:          0 ETH
+   > total cost:          0.00345453 ETH
+
+
+   > Saving migration to chain.
+   > Saving artifacts
+   -------------------------------------
+   > Total cost:          0.03858692 ETH
+
+
+Summary
+=======
+> Total deployments:   5
+> Final cost:          0.07542236 ETH

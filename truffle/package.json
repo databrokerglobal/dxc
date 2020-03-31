@@ -25,9 +25,11 @@
     "axios": "^0.19.2",
     "bn.js": "^5.1.1",
     "dayjs": "^1.8.21",
+    "dotenv": "^8.2.0",
     "ethereumjs-abi": "^0.6.8",
     "ethers": "^4.0.45",
-    "faker": "^4.1.0"
+    "faker": "^4.1.0",
+    "truffle-hdwallet-provider": "^1.0.17"
   },
   "devDependencies": {
     "@nomiclabs/buidler": "1.2.0",

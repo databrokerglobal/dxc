@@ -39,7 +39,7 @@ func init() {
 		log.Fatal("Error connecting to database")
 	}
 	DBInstance = Manager{db}
-	DBInstance.DB.LogMode(true)
+	DBInstance.DB.LogMode(false)
 	DBInstance.DB.AutoMigrate(&File{})
 	DBInstance.DB.AutoMigrate(&Product{})
 }

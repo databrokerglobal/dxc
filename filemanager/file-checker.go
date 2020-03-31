@@ -1,28 +1,16 @@
 package filemanager
 
 import (
-	"fmt"
 	"log"
-	"os"
 
 	"github.com/databrokerglobal/dxc/database"
+	"github.com/fatih/color"
 )
-
-// Check if file is still on disk, if not delete from
-func init() {
-	if len(os.Args) > 1 && os.Args[1][:5] == "-test" {
-		log.Println("Testing: omitting database init")
-		return
-	}
-
-	// Start up a go routine for file checking
-	go CheckingFiles()
-}
 
 // CheckingFiles Delete files that are not in directory anymore, restore files that were deleted but now back in their directory
 func CheckingFiles() {
 
-	fmt.Println("Checking file integrity...")
+	color.Magenta("Checking file integrity...")
 	files, err := database.DBInstance.GetFiles()
 	if err != nil {
 		log.Fatal(err)
@@ -48,5 +36,7 @@ func CheckingFiles() {
 		}
 	}
 
-	defer fmt.Println("Finished checking file integrity")
+	yellow := color.New(color.FgYellow).SprintFunc()
+
+	defer color.Green("Finished checking file integrity %s", yellow("\nCurrent file count: ", len(*files)))
 }

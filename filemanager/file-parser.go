@@ -20,12 +20,6 @@ func parseFile(file *multipart.FileHeader) error {
 	}
 	defer src.Close()
 
-	// Load env files
-	err = godotenv.Load()
-	if err != nil {
-		return err
-	}
-
 	uploadedFileSnippet, err := readBytes(src)
 	if err != nil {
 		return err

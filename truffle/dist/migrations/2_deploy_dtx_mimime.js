@@ -1,12 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const DTXMiniMe = artifacts.require('DTXToken');
+const DTXToken = artifacts.require('DTXToken');
 const TokenFactory = artifacts.require('MiniMeTokenFactory');
 const performMigration = async (deployer, network, accounts) => {
     await deployer.deploy(TokenFactory);
     const tokenFactoryInstance = await TokenFactory.deployed();
-    await tokenFactoryInstance.createCloneToken('0x0000000000000000000000000000000000000000', 0, 'DaTa eXchange Token', 18, 'DTX', true);
-    await deployer.deploy(DTXMiniMe, tokenFactoryInstance.address);
+    await deployer.deploy(DTXToken, tokenFactoryInstance.address);
 };
 module.exports = (deployer, network, accounts) => {
     deployer
