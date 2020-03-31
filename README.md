@@ -6,7 +6,7 @@ The data exchange controller has three parts:
 
 - a Go API (mostly using the echo framework)
 - a React UI (ui folder)
-- a Truffle project for the DTX related smart contracts (ethereum folder)
+- a Truffle project for the DTX related smart contracts (truffle folder)
 
 ## How to run
 
