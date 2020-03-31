@@ -99,9 +99,9 @@ After running the test script an outfile is converted into a coverage.html file 
 - [x] More clever file checker, files can be restored
 
 - [x] Fully functional U
-- [ ] Dynamic build script for different architectures
+- [ ] New build script
 - [ ] Authentication
-- [ ] Smart contracts
+- [x] Smart contracts
 - [ ] Support for streaming protocols
 - [ ] Docker update
 - [ ] Download file button in UI
