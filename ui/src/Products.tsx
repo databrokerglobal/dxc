@@ -1,10 +1,17 @@
 import React from "react";
-import { Form, Field, FormikProps, withFormik } from "formik";
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 import { LOCAL_HOST, fetcher } from "./fetchers";
 import useSWR from "swr";
 import { IFile } from "./Files";
-import Select from "react-select";
+import { ShoppingBasket } from "@material-ui/icons";
+import {
+  TextField,
+  MenuItem,
+  Button,
+  List,
+  ListItem,
+  ListItemIcon
+} from "@material-ui/core";
 
 interface IProduct {
   ID: string;
@@ -24,257 +31,131 @@ interface IProductFormValues {
   message?: string;
 }
 
-export const ProductsList = (data: IProduct[]) => (
-  <div style={{ margin: "3%" }}>
-    <h3 style={{ borderWidth: "2px", borderStyle: "solid", padding: "10px" }}>
-      Products List
-    </h3>
-    {data.map(p => (
-      <div
-        key={p.ID}
-        style={{
-          borderWidth: "1px",
-          borderStyle: "solid",
-          display: "flex",
-          padding: "10px",
-          alignContent: "center",
-          marginBottom: "5px",
-          flexDirection: "column"
-        }}
-      >
-        <li>Name: {p.name}</li>
-        <li>Type: {p.producttype}</li>
-        <li>Host: {p.host}</li>
-        {p.Files?.length > 0 ? (
-          <li>
-            Files:
-            {p.Files.map((file: IFile) => (
-              <ul key={p.ID}>
-                <li key={file.ID}>{file.name}</li>
-              </ul>
-            ))}
-          </li>
-        ) : null}
-        {p.Files?.length === 0 && p.producttype === "FILE" && (
-          <li style={{ color: "red" }}>File: linked file not found...</li>
-        )}
-      </div>
-    ))}
-  </div>
-);
+export const ProductForm = () => {
+  const [type, setType] = React.useState("API");
+  const [name, setName] = React.useState("Sensor 12a");
+  const [host, setHost] = React.useState("http://localhost:8080");
+  const [file, setFile] = React.useState("weather_data.xlsx");
 
-let resp: AxiosResponse;
-
-const InnerProductForm = (props: FormikProps<IProductFormValues>) => {
-  const { errors, isSubmitting } = props;
   const { data } = useSWR("/files", fetcher);
-  const options = data
+  const fileList = data
     ? data.data.map((file: IFile) => ({ value: file, label: file.name }))
     : null;
+
+  const handleType = (event: any) => {
+    setType(event.target.value);
+  };
+
+  const handleName = (event: any) => {
+    setName(event.target.value);
+  };
+
+  const handleHost = (event: any) => {
+    setHost(event.target.value);
+  };
+
+  const handleFile = (event: any) => {
+    setFile(event.target.value);
+  };
+
+  const handleSubmit = async (event: any) => {
+    const body = {
+      host: host ? host : "N/A",
+      name: name,
+      producttype: type,
+      files: data?.data.filter((f: IFile) => f.name === file)
+    };
+
+    await axios.post(`${LOCAL_HOST}/product`, body);
+  };
+
   return (
-    <Form style={{ borderWidth: "1px", borderStyle: "solid", padding: "10px" }}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignContent: "stretch"
-        }}
+    <div
+      style={{
+        marginTop: "2%",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "baseline"
+      }}
+    >
+      <TextField
+        required
+        id="name"
+        label="Name"
+        helperText="Please enter the product name"
+        value={name}
+        onChange={handleName}
+      />
+      <TextField
+        required
+        id="productType"
+        select
+        label="Type"
+        helperText="Please select the product type"
+        value={type}
+        onChange={handleType}
       >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-start",
-            padding: "1% 0% 1% 0%"
-          }}
-        >
-          <label style={{ marginBottom: "1%", padding: "0% 1% 0% 1%" }}>
-            Name:
-          </label>
-          <Field
-            placeholder="Product name"
-            type="text"
-            name="name"
-            style={{
-              minWidth: "auto",
-              width: "20%",
-              marginBottom: "1%"
-            }}
-          />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "baseline",
-            justifyContent: "flex-start",
-            padding: "1% 0% 1% 0%"
-          }}
-        >
-          <label style={{ marginBottom: "1%", padding: "0% 1% 0% 1%" }}>
-            Type:
-          </label>
-          <Select
-            as="select"
-            name="producttype"
-            styles={{ container: base => ({ ...base, flex: 1 }) }}
-            options={[
-              { value: "FILE", label: "File" },
-              { value: "STREAM", label: "Stream" },
-              { value: "API", label: "API" }
-            ]}
-            onChange={v =>
-              props.setValues({
-                name: props.values.name,
-                producttype: (v as any).value,
-                host: props.values.host,
-                file: props.values.file
-              })
-            }
-          />
-        </div>
-        {props.values.producttype !== "FILE" && (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-start",
-              padding: "1% 0% 1% 0%"
-            }}
-          >
-            <label style={{ marginBottom: "1%", padding: "0% 1% 0% 1%" }}>
-              Host:
-            </label>
-            <Field
-              type="text"
-              name="host"
-              placeholder="http://address:port"
-              style={{ minWidth: "auto", width: "20%", marginBottom: "1%" }}
-            />
-          </div>
-        )}
-        {props.values.producttype === "FILE" && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "baseline",
-              justifyContent: "flex-start",
-              padding: "1% 0% 1% 0%"
-            }}
-          >
-            <label
-              style={{
-                marginRight: "1%",
-                marginBottom: "1%",
-                minWidth: "0",
-                padding: "0% 1% 0% 1%"
-              }}
-            >
-              File:
-            </label>
-            {Object.values(options).length > 0 && (
-              <Select
-                style={{ minWidth: "auto" }}
-                styles={{ container: base => ({ ...base, flex: 1 }) }}
-                name="file"
-                as="select"
-                options={options}
-                onChange={v =>
-                  props.setValues({
-                    name: props.values.name,
-                    producttype: props.values.producttype,
-                    host: props.values.host,
-                    file: (v as any).value
-                  })
-                }
-              />
-            )}
-            {Object.values(options).length === 0 && (
-              <p style={{ fontSize: "12px", color: "red" }}>
-                No files available. Please add a file first...
-              </p>
-            )}
-          </div>
-        )}
-      </div>
-      {!resp && (
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          style={{ marginTop: "1%" }}
-        >
-          Submit
-        </button>
+        {[
+          { value: "API", label: "API" },
+          { value: "FILE", label: "File" },
+          { value: "STREAM", label: "Stream" }
+        ].map((o: any) => (
+          <MenuItem value={o.value}>{o.label}</MenuItem>
+        ))}
+      </TextField>
+      {type !== "FILE" && (
+        <TextField
+          required={type !== "FILE"}
+          id="host"
+          label="Host"
+          helperText="Please enter the host address"
+          value={host}
+          onChange={handleHost}
+        />
       )}
-      {resp && (
-        <p
-          style={{ color: "green", fontSize: "11px" }}
-        >{`Success: ${resp.status} ${resp.statusText}`}</p>
+      {type === "FILE" && (
+        <TextField
+          required={type === "FILE"}
+          id="file"
+          select
+          label="File"
+          helperText="Please select the file to link"
+          value={file}
+          onChange={handleFile}
+        >
+          {fileList.length === 0 && (
+            <MenuItem value={""}>No files available</MenuItem>
+          )}
+          {fileList.length > 0 &&
+            fileList.map((o: any) => (
+              <MenuItem value={o.value}>{o.label}</MenuItem>
+            ))}
+        </TextField>
       )}
-      <p style={{ color: "red", fontSize: "11px" }}>{errors.error}</p>
-    </Form>
+      <Button variant="contained" onClick={handleSubmit}>
+        Add
+      </Button>
+    </div>
   );
 };
 
-const ProductForm = withFormik<{}, IProductFormValues>({
-  mapPropsToValues: props => {
-    return {
-      name: "",
-      producttype: "API",
-      host: ""
-    };
-  },
-
-  handleSubmit: async (values, formikBag) => {
-    try {
-      if (!values.name) {
-        formikBag.setErrors({ error: `Error: a name is required` });
-      } else if (values.producttype === "") {
-        formikBag.setErrors({ error: `Error: a type must be selected` });
-      } else if (values.producttype === "FILE" && values.file === undefined) {
-        formikBag.setErrors({ error: `Error: a file must be selected` });
-      } else if (values.producttype !== "FILE" && values.host === "") {
-        formikBag.setErrors({ error: `Error: a host is required` });
-      } else {
-        const data = {
-          host: values.host ? values.host : "N/A",
-          name: values.name,
-          producttype: values.producttype,
-          files: [
-            {
-              ID: values.file?.ID,
-              name: values.file?.name
-            }
-          ]
-        };
-        if (data.producttype !== "FILE") {
-          delete data.files;
-        }
-        resp = await axios.post(`${LOCAL_HOST}/product`, data);
-        console.log(resp);
-        formikBag.setSubmitting(false);
-      }
-    } catch (err) {
-      formikBag.setErrors({
-        error: `Error submitting form: ${err.toString().replace("Error: ", "")}`
-      });
-    }
-  }
-})(InnerProductForm);
-
-export const ProductAdd = () => (
-  <div style={{ margin: "3%" }}>
-    <h3 style={{ borderWidth: "2px", borderStyle: "solid", padding: "10px" }}>
-      Add a product
-    </h3>
-    <ProductForm />
-  </div>
-);
-
-export const ProductComponent = () => {
-  const { data, error } = useSWR("/products", fetcher);
+export const ProductList = () => {
+  const { data } = useSWR("/products", fetcher);
+  console.log(data);
   return (
-    <div style={{ margin: "3%" }}>
-      {data?.data ? ProductsList(data.data) : <p>Loading...</p>}
-      {error ? <p>{error}</p> : null}
-      <ProductAdd />
+    <div>
+      {data
+        ? (data.data as any).map((p: any) => (
+            <List key={p.ID}>
+              <ListItem>
+                <ListItemIcon>
+                  <ShoppingBasket />
+                </ListItemIcon>
+                {p.name}
+              </ListItem>
+            </List>
+          ))
+        : null}
     </div>
   );
 };
