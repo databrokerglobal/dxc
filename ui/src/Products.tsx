@@ -3,7 +3,7 @@ import axios from "axios";
 import { LOCAL_HOST, fetcher } from "./fetchers";
 import useSWR from "swr";
 import { IFile } from "./Files";
-import { ShoppingBasket } from "@material-ui/icons";
+import { ShoppingBasket, Error, CloudOff } from "@material-ui/icons";
 import {
   TextField,
   MenuItem,
@@ -12,6 +12,7 @@ import {
   ListItem,
   ListItemIcon
 } from "@material-ui/core";
+import { isEmptyArray } from "formik";
 
 interface IProduct {
   ID: string;
@@ -140,22 +141,40 @@ export const ProductForm = () => {
 };
 
 export const ProductList = () => {
-  const { data } = useSWR("/products", fetcher);
-  console.log(data);
+  const { data, error } = useSWR("/products", fetcher);
   return (
     <div>
-      {data
-        ? (data.data as any).map((p: any) => (
-            <List key={p.ID}>
-              <ListItem>
-                <ListItemIcon>
-                  <ShoppingBasket />
-                </ListItemIcon>
-                {p.name}
-              </ListItem>
-            </List>
-          ))
-        : null}
+      {data &&
+        (data.data as any).map((p: any) => (
+          <List key={p.ID}>
+            <ListItem>
+              <ListItemIcon>
+                <ShoppingBasket />
+              </ListItemIcon>
+              {p.name}
+            </ListItem>
+          </List>
+        ))}
+      {data && isEmptyArray(data.data) && (
+        <List>
+          <ListItem>
+            <ListItemIcon>
+              <CloudOff />
+            </ListItemIcon>
+            No products created yet
+          </ListItem>
+        </List>
+      )}
+      {error && error.toString().length > 0 && (
+        <div
+          style={{ display: "flex", alignContent: "row", alignItems: "center" }}
+        >
+          <Error />
+          <p style={{ marginLeft: "1%", color: "red" }}>
+            {error.toString().replace("Error: ", "")}
+          </p>
+        </div>
+      )}
     </div>
   );
 };

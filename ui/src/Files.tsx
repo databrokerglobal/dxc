@@ -1,10 +1,10 @@
 import React from "react";
 import { fetcher, LOCAL_HOST } from "./fetchers";
 import useSWR from "swr";
-import { FormikProps, Form, withFormik } from "formik";
+import { FormikProps, Form, withFormik, isEmptyArray } from "formik";
 import axios, { AxiosResponse } from "axios";
 import { Input, Button, List, ListItem, ListItemIcon } from "@material-ui/core";
-import InsertDriveFile from "@material-ui/icons/InsertDriveFile";
+import { InsertDriveFile, Error, CloudOff } from "@material-ui/icons";
 
 export interface IFile {
   ID?: string;
@@ -12,21 +12,40 @@ export interface IFile {
 }
 
 export const FilesList = () => {
-  const { data } = useSWR("/files", fetcher);
+  const { data, error } = useSWR("/files", fetcher);
   return (
     <div>
-      {data
-        ? (data.data as any).map((f: any) => (
-            <List key={f.ID}>
-              <ListItem>
-                <ListItemIcon>
-                  <InsertDriveFile />
-                </ListItemIcon>
-                {f.name}
-              </ListItem>
-            </List>
-          ))
-        : null}
+      {data &&
+        (data.data as any).map((f: any) => (
+          <List key={f.ID}>
+            <ListItem>
+              <ListItemIcon>
+                <InsertDriveFile />
+              </ListItemIcon>
+              {f.name}
+            </ListItem>
+          </List>
+        ))}
+      {data && isEmptyArray(data.data) && (
+        <List>
+          <ListItem>
+            <ListItemIcon>
+              <CloudOff />
+            </ListItemIcon>
+            No files linked yet to the DXC
+          </ListItem>
+        </List>
+      )}
+      {error && error.toString().length > 0 && (
+        <div
+          style={{ display: "flex", alignContent: "row", alignItems: "center" }}
+        >
+          <Error />
+          <p style={{ marginLeft: "1%", color: "red" }}>
+            {error.toString().replace("Error: ", "")}
+          </p>
+        </div>
+      )}
     </div>
   );
 };
