@@ -15,31 +15,39 @@ import {
 } from "@material-ui/core";
 import { isEmptyArray } from "formik";
 import { useWindowSize } from "./WindowSizeHook";
+import * as Yup from "yup";
+import * as R from "ramda";
 
 interface IProduct {
-  ID: string;
+  ID?: string;
   name: string;
   producttype: string;
   uuid?: string;
   host: string;
-  Files: IFile[];
-}
-
-interface IProductFormValues {
-  name: string;
-  producttype: string;
-  host: string;
-  file?: IFile;
-  error?: string;
-  message?: string;
+  files: IFile[];
 }
 
 export const ProductForm = () => {
-  const [type, setType] = React.useState("API");
-  const [name, setName] = React.useState("Sensor 12a");
-  const [host, setHost] = React.useState("http://localhost:8080");
-  const [file, setFile] = React.useState<IFile>();
+  const [body, setBody] = React.useState<IProduct>({
+    name: "Example 1",
+    host: "http://example.com",
+    producttype: "API",
+    files: [],
+  });
   const [width] = useWindowSize();
+
+  const schema =
+    body.producttype !== "FILE"
+      ? Yup.object().shape({
+          name: Yup.string().required(),
+          producttype: Yup.string().required(),
+          host: Yup.string().required(),
+        })
+      : Yup.object().shape({
+          name: Yup.string().required(),
+          producttype: Yup.string().required(),
+          files: Yup.array().min(1),
+        });
 
   const { data } = useSWR("/files", fetcher);
 
@@ -48,30 +56,26 @@ export const ProductForm = () => {
     : null;
 
   const handleType = (event: any) => {
-    setType(event.target.value);
+    setBody(R.assoc("producttype", event.target.value, body));
   };
 
   const handleName = (event: any) => {
-    setName(event.target.value);
+    setBody(R.assoc("name", event.target.value, body));
   };
 
   const handleHost = (event: any) => {
-    setHost(event.target.value);
+    setBody(R.assoc("host", event.target.value, body));
   };
 
   const handleFile = (event: any) => {
-    console.log(event.target.value);
-    setFile(event.target.value);
+    setBody(R.assoc("files", body.files.concat(event.target.value), body));
   };
 
-  const handleSubmit = async (event: any) => {
-    const body = {
-      host: host,
-      name: name,
-      producttype: type,
-      files: file ? data?.data.filter((f: IFile) => f.name === file.name) : [],
-    };
-
+  const handleSubmit = async () => {
+    console.log(body);
+    const ok = await schema.isValid(body);
+    console.log("schema", schema, "OK", ok);
+    if (!ok) return;
     await axios.post(`${LOCAL_HOST}/product`, body);
   };
 
@@ -84,12 +88,12 @@ export const ProductForm = () => {
     >
       <Grid item>
         <TextField
-          error={name.length === 0}
+          error={body?.name.length === 0}
           required
           id="name"
           label="Name"
           helperText="Please enter the product name"
-          value={name}
+          value={body?.name}
           onChange={handleName}
         />
       </Grid>
@@ -100,7 +104,7 @@ export const ProductForm = () => {
           select
           label="Type"
           helperText="Please select the product type"
-          value={type}
+          value={body?.producttype}
           onChange={handleType}
         >
           {[
@@ -115,33 +119,35 @@ export const ProductForm = () => {
         </TextField>
       </Grid>
       <Grid item>
-        {type !== "FILE" && (
+        {body?.producttype !== "FILE" && (
           <TextField
-            required={type !== "FILE"}
-            error={type !== "FILE" && host.length === 0}
+            required={body?.producttype !== "FILE"}
+            error={body?.producttype !== "FILE" && body?.host.length === 0}
             id="host"
             label="Host"
             helperText="Please enter the host address"
-            value={host}
+            value={body?.host}
             onChange={handleHost}
           />
         )}
-        {type === "FILE" && (
+        {body?.producttype === "FILE" && (
           <TextField
-            required={type === "FILE"}
+            required={body.producttype === "FILE"}
             id="file"
             select
             label="File"
             helperText="Please select the file to link"
-            value={file}
+            value={body.files.find((f) => f)} // temporary workaround
             onChange={handleFile}
           >
             {fileList.length === 0 && (
               <MenuItem value={""}>No files available</MenuItem>
             )}
             {fileList.length > 0 &&
-              fileList.map((o: any) => (
-                <MenuItem value={o.value}>{o.label}</MenuItem>
+              fileList.map((o: any, index: number) => (
+                <MenuItem key={index} value={o.value}>
+                  {o.label}
+                </MenuItem>
               ))}
           </TextField>
         )}
