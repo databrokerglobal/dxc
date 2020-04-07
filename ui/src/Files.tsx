@@ -15,7 +15,8 @@ export const FilesList = () => {
   const { data, error } = useSWR("/files", fetcher);
   return (
     <div>
-      {data &&
+      {!error &&
+        data &&
         (data.data as any).map((f: any) => (
           <List key={f.ID}>
             <ListItem>
@@ -26,7 +27,7 @@ export const FilesList = () => {
             </ListItem>
           </List>
         ))}
-      {data && isEmptyArray(data.data) && (
+      {!error && data && isEmptyArray(data.data) && (
         <List>
           <ListItem>
             <ListItemIcon>
@@ -90,7 +91,7 @@ const InnerProductForm = (props: FormikProps<IFileFormValues>) => {
               display: "flex",
               alignContent: "row",
               justifyContent: "space-between",
-              alignItems: "center"
+              alignItems: "center",
             }}
           >
             <Check />
@@ -117,7 +118,7 @@ const InnerProductForm = (props: FormikProps<IFileFormValues>) => {
           style={{
             display: "flex",
             alignContent: "row",
-            alignItems: "center"
+            alignItems: "center",
           }}
         >
           <Error />
@@ -131,11 +132,11 @@ const InnerProductForm = (props: FormikProps<IFileFormValues>) => {
 };
 
 export const FileForm = withFormik<{}, IFileFormValues>({
-  handleSubmit: async values => {
+  handleSubmit: async (values) => {
     try {
       resp = await axios.post(`${LOCAL_HOST}/files/upload`, values.file);
     } catch (err) {
       errorMsg = err;
     }
-  }
+  },
 })(InnerProductForm);

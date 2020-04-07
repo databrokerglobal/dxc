@@ -157,7 +157,8 @@ export const ProductList = () => {
   const { data, error } = useSWR("/products", fetcher);
   return (
     <div>
-      {data &&
+      {!error &&
+        data &&
         (data.data as any).map((p: any) => (
           <List key={p.ID}>
             <ListItem>
@@ -168,7 +169,7 @@ export const ProductList = () => {
             </ListItem>
           </List>
         ))}
-      {data && isEmptyArray(data.data) && (
+      {!error && data && isEmptyArray(data.data) && (
         <List>
           <ListItem>
             <ListItemIcon>
