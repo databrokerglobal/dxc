@@ -30,10 +30,9 @@ function App() {
         container
         style={{ marginTop: "2%" }}
         spacing={2}
-        direction={window.innerWidth < 900 ? "column" : "row"}
+        direction={width < 1286 ? "column" : "row"}
       >
-        <Grid item spacing={2} xs={12}>
-          <p>{width}</p>
+        <Grid item spacing={2} xs={width < 1286 ? 12 : 6}>
           <Typography variant="subtitle1">Available files</Typography>
           <Divider />
           <Grid xs={12}>
@@ -45,7 +44,7 @@ function App() {
             <FileForm />
           </Grid>
         </Grid>
-        <Grid item spacing={2} xs={12}>
+        <Grid item spacing={2} xs={width < 1286 ? 12 : 6}>
           <Typography variant="subtitle1">Available products</Typography>
           <Divider />
           <Grid xs={12}>

@@ -10,9 +10,11 @@ import {
   Button,
   List,
   ListItem,
-  ListItemIcon
+  ListItemIcon,
+  Grid,
 } from "@material-ui/core";
 import { isEmptyArray } from "formik";
+import { useWindowSize } from "./WindowSizeHook";
 
 interface IProduct {
   ID: string;
@@ -37,6 +39,7 @@ export const ProductForm = () => {
   const [name, setName] = React.useState("Sensor 12a");
   const [host, setHost] = React.useState("http://localhost:8080");
   const [file, setFile] = React.useState<IFile>();
+  const [width] = useWindowSize();
 
   const { data } = useSWR("/files", fetcher);
 
@@ -66,81 +69,87 @@ export const ProductForm = () => {
       host: host,
       name: name,
       producttype: type,
-      files: file ? data?.data.filter((f: IFile) => f.name === file.name) : []
+      files: file ? data?.data.filter((f: IFile) => f.name === file.name) : [],
     };
 
     await axios.post(`${LOCAL_HOST}/product`, body);
   };
 
   return (
-    <div
-      style={{
-        marginTop: "2%",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "baseline"
-      }}
+    <Grid
+      container
+      spacing={2}
+      style={{ marginTop: "1%" }}
+      direction={width < 590 ? "column" : "row"}
     >
-      <TextField
-        error={name.length === 0}
-        required
-        id="name"
-        label="Name"
-        helperText="Please enter the product name"
-        value={name}
-        onChange={handleName}
-      />
-      <TextField
-        required
-        id="productType"
-        select
-        label="Type"
-        helperText="Please select the product type"
-        value={type}
-        onChange={handleType}
-      >
-        {[
-          { value: "API", label: "API" },
-          { value: "FILE", label: "File" },
-          { value: "STREAM", label: "Stream" }
-        ].map((o: any) => (
-          <MenuItem value={o.value}>{o.label}</MenuItem>
-        ))}
-      </TextField>
-      {type !== "FILE" && (
+      <Grid item spacing={2}>
         <TextField
-          required={type !== "FILE"}
-          error={type !== "FILE" && host.length === 0}
-          id="host"
-          label="Host"
-          helperText="Please enter the host address"
-          value={host}
-          onChange={handleHost}
+          error={name.length === 0}
+          required
+          id="name"
+          label="Name"
+          helperText="Please enter the product name"
+          value={name}
+          onChange={handleName}
         />
-      )}
-      {type === "FILE" && (
+      </Grid>
+      <Grid item spacing={2}>
         <TextField
-          required={type === "FILE"}
-          id="file"
+          required
+          id="productType"
           select
-          label="File"
-          helperText="Please select the file to link"
-          value={file}
-          onChange={handleFile}
+          label="Type"
+          helperText="Please select the product type"
+          value={type}
+          onChange={handleType}
         >
-          {fileList.length === 0 && (
-            <MenuItem value={""}>No files available</MenuItem>
-          )}
-          {fileList.length > 0 &&
-            fileList.map((o: any) => (
-              <MenuItem value={o.value}>{o.label}</MenuItem>
-            ))}
+          {[
+            { value: "API", label: "API" },
+            { value: "FILE", label: "File" },
+            { value: "STREAM", label: "Stream" },
+          ].map((o: any) => (
+            <MenuItem value={o.value}>{o.label}</MenuItem>
+          ))}
         </TextField>
-      )}
-      <Button variant="contained" onClick={handleSubmit}>
-        Add
-      </Button>
-    </div>
+      </Grid>
+      <Grid item spacing={2}>
+        {type !== "FILE" && (
+          <TextField
+            required={type !== "FILE"}
+            error={type !== "FILE" && host.length === 0}
+            id="host"
+            label="Host"
+            helperText="Please enter the host address"
+            value={host}
+            onChange={handleHost}
+          />
+        )}
+        {type === "FILE" && (
+          <TextField
+            required={type === "FILE"}
+            id="file"
+            select
+            label="File"
+            helperText="Please select the file to link"
+            value={file}
+            onChange={handleFile}
+          >
+            {fileList.length === 0 && (
+              <MenuItem value={""}>No files available</MenuItem>
+            )}
+            {fileList.length > 0 &&
+              fileList.map((o: any) => (
+                <MenuItem value={o.value}>{o.label}</MenuItem>
+              ))}
+          </TextField>
+        )}
+      </Grid>
+      <Grid item spacing={2}>
+        <Button variant="contained" onClick={handleSubmit}>
+          Add
+        </Button>
+      </Grid>
+    </Grid>
   );
 };
 
