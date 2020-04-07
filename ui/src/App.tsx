@@ -8,11 +8,14 @@ import {
   Toolbar,
   Typography,
   Divider,
-  Grid
+  Grid,
 } from "@material-ui/core";
 import CssBaseline from "@material-ui/core/CssBaseline";
+import { useWindowSize } from "./WindowSizeHook";
 
 function App() {
+  const [width] = useWindowSize();
+
   return (
     <Container>
       <CssBaseline />
@@ -23,22 +26,34 @@ function App() {
           </Typography>
         </Toolbar>
       </AppBar>
-      <Grid container style={{ marginTop: "2%" }} spacing={2}>
+      <Grid
+        container
+        style={{ marginTop: "2%" }}
+        spacing={2}
+        direction={window.innerWidth < 900 ? "column" : "row"}
+      >
         <Grid item spacing={2} xs={12}>
+          <p>{width}</p>
           <Typography variant="subtitle1">Available files</Typography>
           <Divider />
-          <FilesList />
+          <Grid xs={12}>
+            <FilesList />
+          </Grid>
           <Typography variant="subtitle1">Add a file</Typography>
           <Divider />
-          <FileForm />
+          <Grid xs={12}>
+            <FileForm />
+          </Grid>
         </Grid>
         <Grid item spacing={2} xs={12}>
           <Typography variant="subtitle1">Available products</Typography>
           <Divider />
-          <ProductList />
+          <Grid xs={12}>
+            <ProductList />
+          </Grid>
           <Typography variant="subtitle1">Add a product</Typography>
           <Divider />
-          <Grid xs={6}>
+          <Grid xs={12}>
             <ProductForm />
           </Grid>
         </Grid>

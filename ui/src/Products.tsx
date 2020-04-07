@@ -36,9 +36,10 @@ export const ProductForm = () => {
   const [type, setType] = React.useState("API");
   const [name, setName] = React.useState("Sensor 12a");
   const [host, setHost] = React.useState("http://localhost:8080");
-  const [file, setFile] = React.useState("weather_data.xlsx");
+  const [file, setFile] = React.useState<IFile>();
 
   const { data } = useSWR("/files", fetcher);
+
   const fileList = data
     ? data.data.map((file: IFile) => ({ value: file, label: file.name }))
     : null;
@@ -56,15 +57,16 @@ export const ProductForm = () => {
   };
 
   const handleFile = (event: any) => {
+    console.log(event.target.value);
     setFile(event.target.value);
   };
 
   const handleSubmit = async (event: any) => {
     const body = {
-      host: host ? host : "N/A",
+      host: host,
       name: name,
       producttype: type,
-      files: data?.data.filter((f: IFile) => f.name === file)
+      files: file ? data?.data.filter((f: IFile) => f.name === file.name) : []
     };
 
     await axios.post(`${LOCAL_HOST}/product`, body);
@@ -80,6 +82,7 @@ export const ProductForm = () => {
       }}
     >
       <TextField
+        error={name.length === 0}
         required
         id="name"
         label="Name"
@@ -107,6 +110,7 @@ export const ProductForm = () => {
       {type !== "FILE" && (
         <TextField
           required={type !== "FILE"}
+          error={type !== "FILE" && host.length === 0}
           id="host"
           label="Host"
           helperText="Please enter the host address"

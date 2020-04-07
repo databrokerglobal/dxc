@@ -4,7 +4,7 @@ import useSWR from "swr";
 import { FormikProps, Form, withFormik, isEmptyArray } from "formik";
 import axios, { AxiosResponse } from "axios";
 import { Input, Button, List, ListItem, ListItemIcon } from "@material-ui/core";
-import { InsertDriveFile, Error, CloudOff } from "@material-ui/icons";
+import { InsertDriveFile, Error, CloudOff, Check } from "@material-ui/icons";
 
 export interface IFile {
   ID?: string;
@@ -61,6 +61,7 @@ let errorMsg: string;
 
 const InnerProductForm = (props: FormikProps<IFileFormValues>) => {
   const { isSubmitting } = props;
+  const [fileSelected, setFileSelected] = React.useState<boolean>(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) {
@@ -70,6 +71,7 @@ const InnerProductForm = (props: FormikProps<IFileFormValues>) => {
     let tempData = new FormData();
     tempData.append("file", file);
     props.values.file = tempData;
+    setFileSelected(!fileSelected);
   };
 
   return (
@@ -83,21 +85,47 @@ const InnerProductForm = (props: FormikProps<IFileFormValues>) => {
           />
         )}
         {resp ? (
-          <div>
-            <p>{resp.data.replace("<p>", "").replace("</p>", "")}</p>
+          <div
+            style={{
+              display: "flex",
+              alignContent: "row",
+              justifyContent: "space-between",
+              alignItems: "center"
+            }}
+          >
+            <Check />
+            <p style={{ marginLeft: "5%", flexGrow: 3 }}>
+              {resp.data
+                .replace("<p>", "")
+                .replace("</p>", "")
+                .replace(". File checksum result: OK", "")}
+            </p>
           </div>
         ) : (
           <Button
             type="submit"
             variant="contained"
-            disabled={isSubmitting}
+            disabled={isSubmitting || !fileSelected}
             style={{ marginLeft: "1%" }}
           >
             Submit
           </Button>
         )}
-        {errorMsg ? <p>{`${errorMsg}`}</p> : null}
       </div>
+      {errorMsg && (
+        <div
+          style={{
+            display: "flex",
+            alignContent: "row",
+            alignItems: "center"
+          }}
+        >
+          <Error />
+          <p style={{ marginLeft: "1%", color: "red" }}>
+            {errorMsg.toString().replace("Error: ", "")}
+          </p>
+        </div>
+      )}
     </Form>
   );
 };
