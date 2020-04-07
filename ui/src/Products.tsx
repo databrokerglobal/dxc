@@ -82,7 +82,7 @@ export const ProductForm = () => {
       style={{ marginTop: "1%" }}
       direction={width < 590 ? "column" : "row"}
     >
-      <Grid item spacing={2}>
+      <Grid item>
         <TextField
           error={name.length === 0}
           required
@@ -93,7 +93,7 @@ export const ProductForm = () => {
           onChange={handleName}
         />
       </Grid>
-      <Grid item spacing={2}>
+      <Grid item>
         <TextField
           required
           id="productType"
@@ -107,12 +107,14 @@ export const ProductForm = () => {
             { value: "API", label: "API" },
             { value: "FILE", label: "File" },
             { value: "STREAM", label: "Stream" },
-          ].map((o: any) => (
-            <MenuItem value={o.value}>{o.label}</MenuItem>
+          ].map((o: any, i: number) => (
+            <MenuItem key={i.toString()} value={o.value}>
+              {o.label}
+            </MenuItem>
           ))}
         </TextField>
       </Grid>
-      <Grid item spacing={2}>
+      <Grid item>
         {type !== "FILE" && (
           <TextField
             required={type !== "FILE"}
@@ -144,7 +146,7 @@ export const ProductForm = () => {
           </TextField>
         )}
       </Grid>
-      <Grid item spacing={2}>
+      <Grid item>
         <Button variant="contained" onClick={handleSubmit}>
           Add
         </Button>

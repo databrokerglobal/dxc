@@ -32,27 +32,27 @@ function App() {
         spacing={2}
         direction={width < 1286 ? "column" : "row"}
       >
-        <Grid item spacing={2} xs={width < 1286 ? 12 : 6}>
+        <Grid item xs={width < 1286 ? 12 : 6}>
           <Typography variant="subtitle1">Available files</Typography>
           <Divider />
-          <Grid xs={12}>
+          <Grid item xs={12}>
             <FilesList />
           </Grid>
           <Typography variant="subtitle1">Add a file</Typography>
           <Divider />
-          <Grid xs={12}>
+          <Grid item xs={12}>
             <FileForm />
           </Grid>
         </Grid>
-        <Grid item spacing={2} xs={width < 1286 ? 12 : 6}>
+        <Grid item xs={width < 1286 ? 12 : 6}>
           <Typography variant="subtitle1">Available products</Typography>
           <Divider />
-          <Grid xs={12}>
+          <Grid item xs={12}>
             <ProductList />
           </Grid>
           <Typography variant="subtitle1">Add a product</Typography>
           <Divider />
-          <Grid xs={12}>
+          <Grid item xs={12}>
             <ProductForm />
           </Grid>
         </Grid>

@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { fetcher, LOCAL_HOST } from "./fetchers";
 import useSWR from "swr";
-import { FormikProps, Form, withFormik, isEmptyArray } from "formik";
-import axios, { AxiosResponse } from "axios";
+import { FormikProps, Form, withFormik, isEmptyArray, FormikBag } from "formik";
+import axios from "axios";
 import { Input, Button, List, ListItem, ListItemIcon } from "@material-ui/core";
 import { InsertDriveFile, Error, CloudOff, Check } from "@material-ui/icons";
+import * as R from "ramda";
+import * as Yup from "yup";
 
 export interface IFile {
   ID?: string;
@@ -57,12 +59,8 @@ interface IFileFormValues {
   message?: string;
 }
 
-let resp: AxiosResponse;
-let errorMsg: string;
-
 const InnerProductForm = (props: FormikProps<IFileFormValues>) => {
   const { isSubmitting } = props;
-  const [fileSelected, setFileSelected] = React.useState<boolean>(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) {
@@ -72,20 +70,33 @@ const InnerProductForm = (props: FormikProps<IFileFormValues>) => {
     let tempData = new FormData();
     tempData.append("file", file);
     props.values.file = tempData;
-    setFileSelected(!fileSelected);
   };
+
+  // When submitting form reset input field
+  useEffect(() => {
+    if (isSubmitting) {
+      (document.getElementById("file-input") as any).value = null;
+    }
+  });
+
+  useEffect(() => {
+    if (!R.isEmpty(props.errors)) {
+      setTimeout(() => props.setErrors({}), 2000);
+    }
+  });
 
   return (
     <Form>
       <div style={{ marginTop: "2%", display: "flex", alignContent: "row" }}>
-        {!resp && (
+        {!props.status && (
           <Input
+            id="file-input"
             type="file"
             className="visually-hidden"
             onChange={handleFileChange}
           />
         )}
-        {resp ? (
+        {props.status ? (
           <div
             style={{
               display: "flex",
@@ -96,7 +107,7 @@ const InnerProductForm = (props: FormikProps<IFileFormValues>) => {
           >
             <Check />
             <p style={{ marginLeft: "5%", flexGrow: 3 }}>
-              {resp.data
+              {props.status.data
                 .replace("<p>", "")
                 .replace("</p>", "")
                 .replace(". File checksum result: OK", "")}
@@ -106,14 +117,14 @@ const InnerProductForm = (props: FormikProps<IFileFormValues>) => {
           <Button
             type="submit"
             variant="contained"
-            disabled={isSubmitting || !fileSelected}
+            disabled={isSubmitting}
             style={{ marginLeft: "1%" }}
           >
             Submit
           </Button>
         )}
       </div>
-      {errorMsg && (
+      {!R.isEmpty(props.errors) && (
         <div
           style={{
             display: "flex",
@@ -123,7 +134,15 @@ const InnerProductForm = (props: FormikProps<IFileFormValues>) => {
         >
           <Error />
           <p style={{ marginLeft: "1%", color: "red" }}>
-            {errorMsg.toString().replace("Error: ", "")}
+            {props.errors.file ? "Please select a file" : ""}
+            <br />
+            {!props.errors.file &&
+            props.errors.message &&
+            props.errors.message.includes("404")
+              ? `${props.errors.message}. ` +
+                "\n" +
+                "Did you select a file from the correct directory?"
+              : ""}
           </p>
         </div>
       )}
@@ -132,11 +151,20 @@ const InnerProductForm = (props: FormikProps<IFileFormValues>) => {
 };
 
 export const FileForm = withFormik<{}, IFileFormValues>({
-  handleSubmit: async (values) => {
+  validationSchema: Yup.object().shape({ file: Yup.mixed().required() }),
+  handleSubmit: async (
+    values: IFileFormValues,
+    formikBag: FormikBag<{}, IFileFormValues>
+  ) => {
     try {
-      resp = await axios.post(`${LOCAL_HOST}/files/upload`, values.file);
+      formikBag.setSubmitting(true);
+      const resp = await axios.post(`${LOCAL_HOST}/files/upload`, values.file);
+      formikBag.setSubmitting(false);
+      formikBag.setStatus(resp);
+      setTimeout(() => formikBag.resetForm(), 2000);
     } catch (err) {
-      errorMsg = err;
+      formikBag.setErrors(err);
+      setTimeout(() => formikBag.resetForm(), 2000);
     }
   },
 })(InnerProductForm);
