@@ -41,7 +41,6 @@ function intersection(a: any, b: any) {
 }
 
 export function TransferList() {
-  const [, setFilesToLink] = React.useContext(TransferlistContext);
   const { data, error } = useSWR("/files", fetcher);
   const [checked, setChecked] = React.useState<any[]>([]);
   const [left, setLeft] = React.useState<any[]>([]);
@@ -55,6 +54,7 @@ export function TransferList() {
     if (data) {
       if (data.data) {
         if (data.data.length > 0 && left.length === 0 && right.length === 0) {
+          console.log(data.data);
           setLeft([...data.data]);
         }
       }
@@ -76,13 +76,11 @@ export function TransferList() {
 
   const handleAllRight = () => {
     setRight(right.concat(left));
-    setFilesToLink(right.concat(left));
     setLeft([]);
   };
 
   const handleCheckedRight = () => {
     setRight(right.concat(leftChecked));
-    setFilesToLink(right.concat(leftChecked));
     setLeft(not(left, leftChecked));
     setChecked(not(checked, leftChecked));
   };
@@ -90,14 +88,12 @@ export function TransferList() {
   const handleCheckedLeft = () => {
     setLeft(left.concat(rightChecked));
     setRight(not(right, rightChecked));
-    setFilesToLink(not(right, rightChecked));
     setChecked(not(checked, rightChecked));
   };
 
   const handleAllLeft = () => {
     setLeft(left.concat(right));
     setRight([]);
-    setFilesToLink([]);
   };
 
   const emptyProductList = () => (
