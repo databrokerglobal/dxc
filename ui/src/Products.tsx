@@ -12,6 +12,10 @@ import {
   ListItem,
   ListItemIcon,
   Grid,
+  Paper,
+  Checkbox,
+  ListItemText,
+  CircularProgress,
 } from "@material-ui/core";
 import { isEmptyArray } from "formik";
 import { useWindowSize } from "./WindowSizeHook";
@@ -25,6 +29,199 @@ interface IProduct {
   uuid?: string;
   host: string;
   files: IFile[];
+}
+
+function not(a: any, b: any) {
+  return a.filter((value: any) => b.indexOf(value) === -1);
+}
+
+function intersection(a: any, b: any) {
+  return a.filter((value: any) => b.indexOf(value) !== -1);
+}
+
+export function TransferList() {
+  const { data, error } = useSWR("/files", fetcher);
+  const [checked, setChecked] = React.useState<any[]>([]);
+  const [left, setLeft] = React.useState<any[]>([]);
+  const [right, setRight] = React.useState<any[]>([]);
+
+  const leftChecked = intersection(checked, left);
+  const rightChecked = intersection(checked, right);
+
+  // Only set the files list once in the left
+  React.useEffect(() => {
+    if (data) {
+      if (data.data) {
+        if (data.data.length > 0 && left.length === 0 && right.length === 0) {
+          console.log(data.data);
+          setLeft([...data.data]);
+        }
+      }
+    }
+  }, [data, right.length, left.length]);
+
+  const handleToggle = (value: any) => () => {
+    const currentIndex = checked.indexOf(value);
+    const newChecked = [...checked];
+
+    if (currentIndex === -1) {
+      newChecked.push(value);
+    } else {
+      newChecked.splice(currentIndex, 1);
+    }
+
+    setChecked(newChecked);
+  };
+
+  const handleAllRight = () => {
+    setRight(right.concat(left));
+    setLeft([]);
+  };
+
+  const handleCheckedRight = () => {
+    setRight(right.concat(leftChecked));
+    setLeft(not(left, leftChecked));
+    setChecked(not(checked, leftChecked));
+  };
+
+  const handleCheckedLeft = () => {
+    setLeft(left.concat(rightChecked));
+    setRight(not(right, rightChecked));
+    setChecked(not(checked, rightChecked));
+  };
+
+  const handleAllLeft = () => {
+    setLeft(left.concat(right));
+    setRight([]);
+  };
+
+  const emptyProductList = () => (
+    <List dense component="div" role="list">
+      <ListItem key={0} role="listitem" button>
+        <ListItemIcon style={{ marginLeft: "1%" }}>
+          <Error />
+        </ListItemIcon>
+        <ListItemText>{"Add file(s) to link to a product"}</ListItemText>
+      </ListItem>
+    </List>
+  );
+
+  const emptyFileList = () => (
+    <List dense component="div" role="list">
+      <ListItem key={0} role="listitem" button>
+        <ListItemIcon style={{ marginLeft: "1%" }}>
+          <Error />
+        </ListItemIcon>
+        <ListItemText>
+          {"All files have been selected for a product"}
+        </ListItemText>
+      </ListItem>
+    </List>
+  );
+
+  const customList = (items: any) => (
+    <List dense component="div" role="list">
+      {items.map((value: IFile, index: number) => {
+        const labelId = `transfer-list-item-${value}-label`;
+        return (
+          <ListItem
+            key={index}
+            role="listitem"
+            button
+            onClick={handleToggle(value)}
+          >
+            <ListItemIcon>
+              <Checkbox
+                checked={checked.indexOf(value) !== -1}
+                tabIndex={-1}
+                disableRipple
+                inputProps={{ "aria-labelledby": labelId }}
+              />
+            </ListItemIcon>
+            <ListItemText id={labelId} primary={value.name} />
+          </ListItem>
+        );
+      })}
+      <ListItem />
+    </List>
+  );
+
+  if (!error && data) {
+    return (
+      <Grid container spacing={2} justify="center" alignItems="center">
+        <Paper>
+          <Grid item>
+            {left.length === 0 ? emptyFileList() : customList(left)}
+          </Grid>
+        </Paper>
+        <Grid item>
+          <Grid container direction="column" alignItems="center">
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={handleAllRight}
+              disabled={left.length === 0}
+              aria-label="move all right"
+            >
+              ≫
+            </Button>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={handleCheckedRight}
+              disabled={leftChecked.length === 0}
+              aria-label="move selected right"
+            >
+              &gt;
+            </Button>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={handleCheckedLeft}
+              disabled={rightChecked.length === 0}
+              aria-label="move selected left"
+            >
+              &lt;
+            </Button>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={handleAllLeft}
+              disabled={right.length === 0}
+              aria-label="move all left"
+            >
+              ≪
+            </Button>
+          </Grid>
+        </Grid>
+        <Paper>
+          <Grid item>
+            {right.length === 0 ? emptyProductList() : customList(right)}
+          </Grid>
+        </Paper>
+      </Grid>
+    );
+  } else if (error) {
+    return (
+      <div
+        style={{ display: "flex", alignContent: "row", alignItems: "center" }}
+      >
+        <Error />
+        <p style={{ marginLeft: "10%", color: "red" }}>
+          Error fetching the files
+        </p>
+      </div>
+    );
+  } else if (!data && !error) {
+    return (
+      <div>
+        <CircularProgress />
+        <p>Fetching files...</p>
+      </div>
+    );
+  } else {
+    return null;
+  }
 }
 
 export const ProductForm = () => {
@@ -160,27 +357,7 @@ export const ProductForm = () => {
             onChange={handleHost}
           />
         )}
-        {body?.producttype === "FILE" && (
-          <TextField
-            required={body.producttype === "FILE"}
-            id="file"
-            select
-            label="File"
-            helperText="Please select the file to link"
-            value={body.files.find((f) => f)} // temporary workaround
-            onChange={handleFile}
-          >
-            {fileList.length === 0 && (
-              <MenuItem value={""}>No files available</MenuItem>
-            )}
-            {fileList.length > 0 &&
-              fileList.map((o: any, index: number) => (
-                <MenuItem key={index} value={o.value}>
-                  {o.label}
-                </MenuItem>
-              ))}
-          </TextField>
-        )}
+        {body?.producttype === "FILE" && <TransferList />}
       </Grid>
       <Grid item>
         {R.isEmpty(err) && R.isEmpty(resp) && (
