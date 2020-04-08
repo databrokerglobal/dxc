@@ -3,7 +3,7 @@ import axios from "axios";
 import { LOCAL_HOST, fetcher } from "./fetchers";
 import useSWR from "swr";
 import { IFile } from "./Files";
-import { ShoppingBasket, Error, CloudOff } from "@material-ui/icons";
+import { ShoppingBasket, Error, CloudOff, Check } from "@material-ui/icons";
 import {
   TextField,
   MenuItem,
@@ -34,7 +34,36 @@ export const ProductForm = () => {
     producttype: "API",
     files: [],
   });
+  const [resp, setResp] = React.useState<string>("");
+  const [err, setErr] = React.useState<string>("");
+
   const [width] = useWindowSize();
+
+  // reset error or response + form
+  React.useEffect(() => {
+    if (!R.isEmpty(err)) {
+      setTimeout(() => {
+        setErr("");
+        setBody({
+          name: "Example 1",
+          host: "http://example.com",
+          producttype: "API",
+          files: [],
+        });
+      }, 2000);
+    }
+    if (!R.isEmpty(resp)) {
+      setTimeout(() => {
+        setResp("");
+        setBody({
+          name: "Example 1",
+          host: "http://example.com",
+          producttype: "API",
+          files: [],
+        });
+      }, 2000);
+    }
+  });
 
   const schema =
     body.producttype !== "FILE"
@@ -72,11 +101,12 @@ export const ProductForm = () => {
   };
 
   const handleSubmit = async () => {
-    console.log(body);
-    const ok = await schema.isValid(body);
-    console.log("schema", schema, "OK", ok);
-    if (!ok) return;
-    await axios.post(`${LOCAL_HOST}/product`, body);
+    try {
+      await axios.post(`${LOCAL_HOST}/product`, undefined);
+      setResp(`Success. Product created.`);
+    } catch (error) {
+      setErr(error.toString());
+    }
   };
 
   return (
@@ -153,9 +183,39 @@ export const ProductForm = () => {
         )}
       </Grid>
       <Grid item>
-        <Button variant="contained" onClick={handleSubmit}>
-          Add
-        </Button>
+        {R.isEmpty(err) && R.isEmpty(resp) && (
+          <Button
+            variant="contained"
+            onClick={handleSubmit}
+            disabled={!schema.isValidSync(body)}
+          >
+            Add
+          </Button>
+        )}
+        {!R.isEmpty(err) && R.isEmpty(resp) && (
+          <div
+            style={{
+              display: "flex",
+              alignContent: "row",
+              alignItems: "center",
+            }}
+          >
+            <Error />
+            <p style={{ marginLeft: "1%", color: "red" }}>{err}</p>
+          </div>
+        )}
+        {R.isEmpty(err) && !R.isEmpty(resp) && (
+          <div
+            style={{
+              display: "flex",
+              alignContent: "row",
+              alignItems: "center",
+            }}
+          >
+            <Check />
+            <p style={{ marginLeft: "1%" }}>{resp}</p>
+          </div>
+        )}
       </Grid>
     </Grid>
   );
