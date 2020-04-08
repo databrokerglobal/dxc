@@ -102,7 +102,7 @@ export const ProductForm = () => {
 
   const handleSubmit = async () => {
     try {
-      await axios.post(`${LOCAL_HOST}/product`, undefined);
+      await axios.post(`${LOCAL_HOST}/product`, body);
       setResp(`Success. Product created.`);
     } catch (error) {
       setErr(error.toString());
