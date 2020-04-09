@@ -312,7 +312,12 @@ export const ProductForm = () => {
     <Grid
       container
       spacing={2}
-      style={{ marginTop: "1%" }}
+      style={{
+        marginTop: "1%",
+        flexGrow: 1,
+        alignItems:
+          body.producttype === "FILE" && width > 600 ? "center" : "normal",
+      }}
       direction={width < 590 ? "column" : "row"}
     >
       <Grid item>
