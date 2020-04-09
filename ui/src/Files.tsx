@@ -1,45 +1,54 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { fetcher, LOCAL_HOST } from "./fetchers";
 import useSWR from "swr";
-import { FormikProps, Form, withFormik } from "formik";
-import axios, { AxiosResponse } from "axios";
+import { FormikProps, Form, withFormik, isEmptyArray, FormikBag } from "formik";
+import axios from "axios";
+import { Input, Button, List, ListItem, ListItemIcon } from "@material-ui/core";
+import { InsertDriveFile, Error, CloudOff, Check } from "@material-ui/icons";
+import * as R from "ramda";
+import * as Yup from "yup";
 
 export interface IFile {
   ID?: string;
   name: string;
 }
 
-export const FilesList = (data: IFile[]) => (
-  <div style={{ margin: "3%" }}>
-    <h3 style={{ borderWidth: "2px", borderStyle: "solid", padding: "10px" }}>
-      Files List
-    </h3>
-    {data.map(f => (
-      <div
-        key={f.ID}
-        style={{
-          borderWidth: "1px",
-          borderStyle: "solid",
-          display: "flex",
-          padding: "10px",
-          alignContent: "center",
-          marginBottom: "5px",
-          flexDirection: "column"
-        }}
-      >
-        <li>Name: {f.name}</li>
-      </div>
-    ))}
-  </div>
-);
-
-export const FilesComponent = () => {
+export const FilesList = () => {
   const { data, error } = useSWR("/files", fetcher);
   return (
-    <div style={{ margin: "3%" }}>
-      {data?.data ? FilesList(data.data) : <p>Loading...</p>}
-      {error ? <p>{error}</p> : null}
-      <FileAdd />
+    <div>
+      {!error &&
+        data &&
+        (data.data as any).map((f: any) => (
+          <List key={f.ID}>
+            <ListItem>
+              <ListItemIcon>
+                <InsertDriveFile />
+              </ListItemIcon>
+              {f.name}
+            </ListItem>
+          </List>
+        ))}
+      {!error && data && isEmptyArray(data.data) && (
+        <List>
+          <ListItem>
+            <ListItemIcon>
+              <CloudOff />
+            </ListItemIcon>
+            No files linked yet to the DXC
+          </ListItem>
+        </List>
+      )}
+      {error && error.toString().length > 0 && (
+        <div
+          style={{ display: "flex", alignContent: "row", alignItems: "center" }}
+        >
+          <Error />
+          <p style={{ marginLeft: "1%", color: "red" }}>
+            {error.toString().replace("Error: ", "")}
+          </p>
+        </div>
+      )}
     </div>
   );
 };
@@ -49,9 +58,6 @@ interface IFileFormValues {
   error?: string;
   message?: string;
 }
-
-let resp: AxiosResponse;
-let errorMsg: string;
 
 const InnerProductForm = (props: FormikProps<IFileFormValues>) => {
   const { isSubmitting } = props;
@@ -66,59 +72,99 @@ const InnerProductForm = (props: FormikProps<IFileFormValues>) => {
     props.values.file = tempData;
   };
 
+  // When submitting form reset input field
+  useEffect(() => {
+    if (isSubmitting) {
+      (document.getElementById("file-input") as any).value = null;
+    }
+  });
+
+  useEffect(() => {
+    if (!R.isEmpty(props.errors)) {
+      setTimeout(() => props.setErrors({}), 2000);
+    }
+  });
+
   return (
-    <Form style={{ borderWidth: "1px", borderStyle: "solid", padding: "10px" }}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column"
-        }}
-      >
-        {!resp && (
-          <input
+    <Form>
+      <div style={{ marginTop: "2%", display: "flex", alignContent: "row" }}>
+        {!props.status && (
+          <Input
+            id="file-input"
             type="file"
             className="visually-hidden"
             onChange={handleFileChange}
           />
         )}
+        {props.status ? (
+          <div
+            style={{
+              display: "flex",
+              alignContent: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Check />
+            <p style={{ marginLeft: "5%", flexGrow: 3 }}>
+              {props.status.data
+                .replace("<p>", "")
+                .replace("</p>", "")
+                .replace(". File checksum result: OK", "")}
+            </p>
+          </div>
+        ) : (
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={isSubmitting}
+            style={{ marginLeft: "1%" }}
+          >
+            Submit
+          </Button>
+        )}
       </div>
-      {resp ? (
-        <div>
-          <p style={{ color: "green", fontSize: "11px" }}>
-            {resp.data.replace("<p>", "").replace("</p>", "")}
+      {!R.isEmpty(props.errors) && (
+        <div
+          style={{
+            display: "flex",
+            alignContent: "row",
+            alignItems: "center",
+          }}
+        >
+          <Error />
+          <p style={{ marginLeft: "1%", color: "red" }}>
+            {props.errors.file ? "Please select a file" : ""}
+            <br />
+            {!props.errors.file &&
+            props.errors.message &&
+            props.errors.message.includes("404")
+              ? `${props.errors.message}. ` +
+                "\n" +
+                "Did you select a file from the correct directory?"
+              : ""}
           </p>
         </div>
-      ) : (
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          style={{ marginTop: "1%" }}
-        >
-          Submit
-        </button>
       )}
-      {errorMsg ? (
-        <p style={{ color: "red", fontSize: "11px" }}>{`${errorMsg}`}</p>
-      ) : null}
     </Form>
   );
 };
 
-const FileForm = withFormik<{}, IFileFormValues>({
-  handleSubmit: async values => {
+export const FileForm = withFormik<{}, IFileFormValues>({
+  validationSchema: Yup.object().shape({ file: Yup.mixed().required() }),
+  handleSubmit: async (
+    values: IFileFormValues,
+    formikBag: FormikBag<{}, IFileFormValues>
+  ) => {
     try {
-      resp = await axios.post(`${LOCAL_HOST}/files/upload`, values.file);
+      formikBag.setSubmitting(true);
+      const resp = await axios.post(`${LOCAL_HOST}/files/upload`, values.file);
+      formikBag.setSubmitting(false);
+      formikBag.setStatus(resp);
+      setTimeout(() => formikBag.resetForm(), 2000);
     } catch (err) {
-      errorMsg = err;
+      formikBag.setErrors(err);
+      setTimeout(() => formikBag.resetForm(), 2000);
     }
-  }
+  },
 })(InnerProductForm);
-
-export const FileAdd = () => (
-  <div style={{ margin: "3%" }}>
-    <h3 style={{ borderWidth: "2px", borderStyle: "solid", padding: "10px" }}>
-      Add a file
-    </h3>
-    <FileForm />
-  </div>
-);

@@ -30,12 +30,22 @@ func AddOne(c echo.Context) error {
 		return err
 	}
 
-	if status := checkProduct(p); status == http.StatusBadRequest {
+	status := checkProduct(p)
+	if status == http.StatusBadRequest {
 		return c.String(http.StatusBadRequest, "")
 	}
 
 	if p.Type == "FILE" {
 		p.Host = "N/A"
+	}
+
+	if p.Type == "FILE" {
+		if p.Files == nil {
+			return c.String(http.StatusBadRequest, "")
+		}
+		if len(p.Files) == 0 {
+			return c.String(http.StatusBadRequest, "")
+		}
 	}
 
 	if p.Type != "FILE" {
