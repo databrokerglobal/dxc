@@ -11,6 +11,9 @@ import * as Yup from "yup";
 export interface IFile {
   ID?: string;
   name: string;
+  CreatedAt?: string;
+  UpdatedAt?: string;
+  ProductID?: number;
 }
 
 export const FilesList = () => {

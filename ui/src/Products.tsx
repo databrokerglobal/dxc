@@ -12,11 +12,16 @@ import {
   ListItem,
   ListItemIcon,
   Grid,
+  Paper,
+  Checkbox,
+  ListItemText,
+  CircularProgress,
 } from "@material-ui/core";
 import { isEmptyArray } from "formik";
 import { useWindowSize } from "./WindowSizeHook";
 import * as Yup from "yup";
 import * as R from "ramda";
+import { TransferlistContext } from "./Context";
 
 interface IProduct {
   ID?: string;
@@ -27,7 +32,205 @@ interface IProduct {
   files: IFile[];
 }
 
+function not(a: any, b: any) {
+  return a.filter((value: any) => b.indexOf(value) === -1);
+}
+
+function intersection(a: any, b: any) {
+  return a.filter((value: any) => b.indexOf(value) !== -1);
+}
+
+export function TransferList() {
+  const [, setFilesToLink] = React.useContext(TransferlistContext);
+  const { data, error } = useSWR("/files", fetcher);
+  const [checked, setChecked] = React.useState<any[]>([]);
+  const [left, setLeft] = React.useState<any[]>([]);
+  const [right, setRight] = React.useState<any[]>([]);
+
+  const leftChecked = intersection(checked, left);
+  const rightChecked = intersection(checked, right);
+
+  // Only set the files list once in the left
+  React.useEffect(() => {
+    if (data) {
+      if (data.data) {
+        if (data.data.length > 0 && left.length === 0 && right.length === 0) {
+          setLeft([...data.data]);
+        }
+      }
+    }
+  }, [data, right.length, left.length]);
+
+  const handleToggle = (value: any) => () => {
+    const currentIndex = checked.indexOf(value);
+    const newChecked = [...checked];
+
+    if (currentIndex === -1) {
+      newChecked.push(value);
+    } else {
+      newChecked.splice(currentIndex, 1);
+    }
+
+    setChecked(newChecked);
+  };
+
+  const handleAllRight = () => {
+    setRight(right.concat(left));
+    setFilesToLink(right.concat(left));
+    setLeft([]);
+  };
+
+  const handleCheckedRight = () => {
+    setRight(right.concat(leftChecked));
+    setFilesToLink(right.concat(leftChecked));
+    setLeft(not(left, leftChecked));
+    setChecked(not(checked, leftChecked));
+  };
+
+  const handleCheckedLeft = () => {
+    setLeft(left.concat(rightChecked));
+    setRight(not(right, rightChecked));
+    setFilesToLink(not(right, rightChecked));
+    setChecked(not(checked, rightChecked));
+  };
+
+  const handleAllLeft = () => {
+    setLeft(left.concat(right));
+    setRight([]);
+    setFilesToLink([]);
+  };
+
+  const emptyProductList = () => (
+    <List dense component="div" role="list">
+      <ListItem key={0} role="listitem" button>
+        <ListItemIcon style={{ marginLeft: "1%" }}>
+          <Error />
+        </ListItemIcon>
+        <ListItemText>{"Add file(s) to link to a product"}</ListItemText>
+      </ListItem>
+    </List>
+  );
+
+  const emptyFileList = () => (
+    <List dense component="div" role="list">
+      <ListItem key={0} role="listitem" button>
+        <ListItemIcon style={{ marginLeft: "1%" }}>
+          <Error />
+        </ListItemIcon>
+        <ListItemText>
+          {"All files have been selected for a product"}
+        </ListItemText>
+      </ListItem>
+    </List>
+  );
+
+  const customList = (items: any) => (
+    <List dense component="div" role="list">
+      {items.map((value: IFile, index: number) => {
+        const labelId = `transfer-list-item-${value}-label`;
+        return (
+          <ListItem
+            key={index}
+            role="listitem"
+            button
+            onClick={handleToggle(value)}
+          >
+            <ListItemIcon>
+              <Checkbox
+                checked={checked.indexOf(value) !== -1}
+                tabIndex={-1}
+                disableRipple
+                inputProps={{ "aria-labelledby": labelId }}
+              />
+            </ListItemIcon>
+            <ListItemText id={labelId} primary={value.name} />
+          </ListItem>
+        );
+      })}
+      <ListItem />
+    </List>
+  );
+
+  if (!error && data) {
+    return (
+      <Grid container spacing={2} justify="center" alignItems="center">
+        <Paper>
+          <Grid item>
+            {left.length === 0 ? emptyFileList() : customList(left)}
+          </Grid>
+        </Paper>
+        <Grid item>
+          <Grid container direction="column" alignItems="center">
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={handleAllRight}
+              disabled={left.length === 0}
+              aria-label="move all right"
+            >
+              ≫
+            </Button>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={handleCheckedRight}
+              disabled={leftChecked.length === 0}
+              aria-label="move selected right"
+            >
+              &gt;
+            </Button>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={handleCheckedLeft}
+              disabled={rightChecked.length === 0}
+              aria-label="move selected left"
+            >
+              &lt;
+            </Button>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={handleAllLeft}
+              disabled={right.length === 0}
+              aria-label="move all left"
+            >
+              ≪
+            </Button>
+          </Grid>
+        </Grid>
+        <Paper>
+          <Grid item>
+            {right.length === 0 ? emptyProductList() : customList(right)}
+          </Grid>
+        </Paper>
+      </Grid>
+    );
+  } else if (error) {
+    return (
+      <div
+        style={{ display: "flex", alignContent: "row", alignItems: "center" }}
+      >
+        <Error />
+        <p style={{ marginLeft: "10%", color: "red" }}>
+          Error fetching the files
+        </p>
+      </div>
+    );
+  } else if (!data && !error) {
+    return (
+      <div>
+        <CircularProgress />
+        <p>Fetching files...</p>
+      </div>
+    );
+  } else {
+    return null;
+  }
+}
+
 export const ProductForm = () => {
+  const [filesToLink] = React.useContext(TransferlistContext);
   const [body, setBody] = React.useState<IProduct>({
     name: "Example 1",
     host: "http://example.com",
@@ -36,8 +239,14 @@ export const ProductForm = () => {
   });
   const [resp, setResp] = React.useState<string>("");
   const [err, setErr] = React.useState<string>("");
-
   const [width] = useWindowSize();
+
+  // When filesToLink from the TransferListChanges -> update body
+  React.useEffect(() => {
+    if (body && JSON.stringify(body.files) !== JSON.stringify(filesToLink)) {
+      setBody({ ...body, files: filesToLink });
+    }
+  }, [body, filesToLink]);
 
   // reset error or response + form
   React.useEffect(() => {
@@ -78,12 +287,6 @@ export const ProductForm = () => {
           files: Yup.array().min(1),
         });
 
-  const { data } = useSWR("/files", fetcher);
-
-  const fileList = data
-    ? data.data.map((file: IFile) => ({ value: file, label: file.name }))
-    : null;
-
   const handleType = (event: any) => {
     setBody(R.assoc("producttype", event.target.value, body));
   };
@@ -94,10 +297,6 @@ export const ProductForm = () => {
 
   const handleHost = (event: any) => {
     setBody(R.assoc("host", event.target.value, body));
-  };
-
-  const handleFile = (event: any) => {
-    setBody(R.assoc("files", body.files.concat(event.target.value), body));
   };
 
   const handleSubmit = async () => {
@@ -113,12 +312,17 @@ export const ProductForm = () => {
     <Grid
       container
       spacing={2}
-      style={{ marginTop: "1%" }}
+      style={{
+        marginTop: "1%",
+        flexGrow: 1,
+        alignItems:
+          body.producttype === "FILE" && width > 600 ? "center" : "normal",
+      }}
       direction={width < 590 ? "column" : "row"}
     >
       <Grid item>
         <TextField
-          error={body?.name.length === 0}
+          error={body?.name?.length === 0}
           required
           id="name"
           label="Name"
@@ -152,7 +356,7 @@ export const ProductForm = () => {
         {body?.producttype !== "FILE" && (
           <TextField
             required={body?.producttype !== "FILE"}
-            error={body?.producttype !== "FILE" && body?.host.length === 0}
+            error={body?.producttype !== "FILE" && body?.host?.length === 0}
             id="host"
             label="Host"
             helperText="Please enter the host address"
@@ -160,29 +364,9 @@ export const ProductForm = () => {
             onChange={handleHost}
           />
         )}
-        {body?.producttype === "FILE" && (
-          <TextField
-            required={body.producttype === "FILE"}
-            id="file"
-            select
-            label="File"
-            helperText="Please select the file to link"
-            value={body.files.find((f) => f)} // temporary workaround
-            onChange={handleFile}
-          >
-            {fileList.length === 0 && (
-              <MenuItem value={""}>No files available</MenuItem>
-            )}
-            {fileList.length > 0 &&
-              fileList.map((o: any, index: number) => (
-                <MenuItem key={index} value={o.value}>
-                  {o.label}
-                </MenuItem>
-              ))}
-          </TextField>
-        )}
+        {body?.producttype === "FILE" && <TransferList />}
       </Grid>
-      <Grid item>
+      <Grid item xs={12}>
         {R.isEmpty(err) && R.isEmpty(resp) && (
           <Button
             variant="contained"
@@ -210,10 +394,11 @@ export const ProductForm = () => {
               display: "flex",
               alignContent: "row",
               alignItems: "center",
+              flexGrow: 2,
             }}
           >
             <Check />
-            <p style={{ marginLeft: "1%" }}>{resp}</p>
+            <p style={{ marginLeft: "2%" }}>{resp}</p>
           </div>
         )}
       </Grid>

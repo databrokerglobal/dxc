@@ -1,7 +1,7 @@
 import React from "react";
 import "./App.css";
 import { ProductForm, ProductList } from "./Products";
-import { FilesList, FileForm } from "./Files";
+import { FilesList, FileForm, IFile } from "./Files";
 import {
   Container,
   AppBar,
@@ -12,9 +12,11 @@ import {
 } from "@material-ui/core";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { useWindowSize } from "./WindowSizeHook";
+import { TransferlistContext } from "./Context";
 
 function App() {
   const [width] = useWindowSize();
+  const [filesToLink, setFilesToLink] = React.useState<IFile[]>([]);
 
   return (
     <Container>
@@ -53,7 +55,9 @@ function App() {
           <Typography variant="subtitle1">Add a product</Typography>
           <Divider />
           <Grid item xs={12}>
-            <ProductForm />
+            <TransferlistContext.Provider value={[filesToLink, setFilesToLink]}>
+              <ProductForm />
+            </TransferlistContext.Provider>
           </Grid>
         </Grid>
       </Grid>
