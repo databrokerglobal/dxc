@@ -21,6 +21,7 @@ import { isEmptyArray } from "formik";
 import { useWindowSize } from "./WindowSizeHook";
 import * as Yup from "yup";
 import * as R from "ramda";
+import { TransferlistContext } from "./Context";
 
 interface IProduct {
   ID?: string;
@@ -40,6 +41,7 @@ function intersection(a: any, b: any) {
 }
 
 export function TransferList() {
+  const [, setFilesToLink] = React.useContext(TransferlistContext);
   const { data, error } = useSWR("/files", fetcher);
   const [checked, setChecked] = React.useState<any[]>([]);
   const [left, setLeft] = React.useState<any[]>([]);
@@ -53,7 +55,6 @@ export function TransferList() {
     if (data) {
       if (data.data) {
         if (data.data.length > 0 && left.length === 0 && right.length === 0) {
-          console.log(data.data);
           setLeft([...data.data]);
         }
       }
@@ -75,11 +76,13 @@ export function TransferList() {
 
   const handleAllRight = () => {
     setRight(right.concat(left));
+    setFilesToLink(right.concat(left));
     setLeft([]);
   };
 
   const handleCheckedRight = () => {
     setRight(right.concat(leftChecked));
+    setFilesToLink(right.concat(leftChecked));
     setLeft(not(left, leftChecked));
     setChecked(not(checked, leftChecked));
   };
@@ -87,12 +90,14 @@ export function TransferList() {
   const handleCheckedLeft = () => {
     setLeft(left.concat(rightChecked));
     setRight(not(right, rightChecked));
+    setFilesToLink(not(right, rightChecked));
     setChecked(not(checked, rightChecked));
   };
 
   const handleAllLeft = () => {
     setLeft(left.concat(right));
     setRight([]);
+    setFilesToLink([]);
   };
 
   const emptyProductList = () => (
@@ -225,6 +230,7 @@ export function TransferList() {
 }
 
 export const ProductForm = () => {
+  const [filesToLink] = React.useContext(TransferlistContext);
   const [body, setBody] = React.useState<IProduct>({
     name: "Example 1",
     host: "http://example.com",
@@ -233,8 +239,14 @@ export const ProductForm = () => {
   });
   const [resp, setResp] = React.useState<string>("");
   const [err, setErr] = React.useState<string>("");
-
   const [width] = useWindowSize();
+
+  // When filesToLink from the TransferListChanges -> update body
+  React.useEffect(() => {
+    if (body) {
+      setBody({ ...body, files: filesToLink });
+    }
+  }, [body, filesToLink]);
 
   // reset error or response + form
   React.useEffect(() => {
@@ -275,12 +287,6 @@ export const ProductForm = () => {
           files: Yup.array().min(1),
         });
 
-  const { data } = useSWR("/files", fetcher);
-
-  const fileList = data
-    ? data.data.map((file: IFile) => ({ value: file, label: file.name }))
-    : null;
-
   const handleType = (event: any) => {
     setBody(R.assoc("producttype", event.target.value, body));
   };
@@ -291,10 +297,6 @@ export const ProductForm = () => {
 
   const handleHost = (event: any) => {
     setBody(R.assoc("host", event.target.value, body));
-  };
-
-  const handleFile = (event: any) => {
-    setBody(R.assoc("files", body.files.concat(event.target.value), body));
   };
 
   const handleSubmit = async () => {
@@ -315,7 +317,7 @@ export const ProductForm = () => {
     >
       <Grid item>
         <TextField
-          error={body?.name.length === 0}
+          error={body?.name?.length === 0}
           required
           id="name"
           label="Name"
@@ -349,7 +351,7 @@ export const ProductForm = () => {
         {body?.producttype !== "FILE" && (
           <TextField
             required={body?.producttype !== "FILE"}
-            error={body?.producttype !== "FILE" && body?.host.length === 0}
+            error={body?.producttype !== "FILE" && body?.host?.length === 0}
             id="host"
             label="Host"
             helperText="Please enter the host address"
