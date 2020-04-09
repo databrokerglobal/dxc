@@ -243,7 +243,7 @@ export const ProductForm = () => {
 
   // When filesToLink from the TransferListChanges -> update body
   React.useEffect(() => {
-    if (body) {
+    if (body && JSON.stringify(body.files) !== JSON.stringify(filesToLink)) {
       setBody({ ...body, files: filesToLink });
     }
   }, [body, filesToLink]);
