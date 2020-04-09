@@ -366,7 +366,7 @@ export const ProductForm = () => {
         )}
         {body?.producttype === "FILE" && <TransferList />}
       </Grid>
-      <Grid item>
+      <Grid item xs={12}>
         {R.isEmpty(err) && R.isEmpty(resp) && (
           <Button
             variant="contained"
@@ -394,10 +394,11 @@ export const ProductForm = () => {
               display: "flex",
               alignContent: "row",
               alignItems: "center",
+              flexGrow: 2,
             }}
           >
             <Check />
-            <p style={{ marginLeft: "1%" }}>{resp}</p>
+            <p style={{ marginLeft: "2%" }}>{resp}</p>
           </div>
         )}
       </Grid>
