@@ -25,6 +25,7 @@ import {
   ListItemText,
   CircularProgress,
   Collapse,
+  Link,
 } from "@material-ui/core";
 import { isEmptyArray } from "formik";
 import { useWindowSize } from "./WindowSizeHook";
@@ -427,55 +428,60 @@ export const ProductList = () => {
   };
 
   return (
-    <Grid container xs={12}>
+    <Grid container spacing={2}>
       {!error &&
         data &&
         (data.data as any).map((p: any) => (
-          <List key={p.ID}>
-            <ListItem id={p.ID} button onClick={handleClick}>
-              <ListItemIcon>
-                <ShoppingBasket />
-              </ListItemIcon>
-              {p.name}
-              {open.includes(p.ID.toString()) ? (
-                <ExpandLess id={p.ID} />
-              ) : (
-                <ExpandMore id={p.ID} />
-              )}
-            </ListItem>
-            <Collapse
-              in={open.includes(p.ID.toString())}
-              timeout="auto"
-              unmountOnExit
-            >
-              <List>
-                <ListItem>
-                  <ListItemText secondary={`Type: ${p.producttype}`} />
-                </ListItem>
-                {p.producttype !== "FILE" ? (
-                  <ListItem>
-                    <ListItemText secondary={`Host address: ${p.host}`} />
-                  </ListItem>
+          <Grid item xs={12}>
+            <List key={p.ID}>
+              <ListItem id={p.ID} button onClick={handleClick}>
+                <ListItemIcon>
+                  <ShoppingBasket />
+                </ListItemIcon>
+                {p.name}
+                {open.includes(p.ID.toString()) ? (
+                  <ExpandLess id={p.ID} />
                 ) : (
-                  <List>
-                    <ListItem>
-                      <ListItemText secondary={`File(s): `} />
-                    </ListItem>
-                    {p.Files.map((f: any) => (
-                      <List key={f.ID}>
-                        <ListItem>
-                          <ListItemIcon>
-                            <InsertDriveFile />
-                          </ListItemIcon>
-                          {f.name}
-                        </ListItem>
-                      </List>
-                    ))}
-                  </List>
+                  <ExpandMore id={p.ID} />
                 )}
-              </List>
-            </Collapse>
-          </List>
+              </ListItem>
+              <Collapse
+                in={open.includes(p.ID.toString())}
+                timeout="auto"
+                unmountOnExit
+              >
+                <List>
+                  <ListItem>
+                    <ListItemText secondary={`Type: ${p.producttype}`} />
+                  </ListItem>
+                  {p.producttype !== "FILE" ? (
+                    <ListItem>
+                      <Grid>
+                        <ListItemText secondary={`Host address: `} />
+                        <Link href={p.host}>{p.host}</Link>
+                      </Grid>
+                    </ListItem>
+                  ) : (
+                    <List>
+                      <ListItem>
+                        <ListItemText secondary={`File(s): `} />
+                      </ListItem>
+                      {p.Files.map((f: any) => (
+                        <List key={f.ID}>
+                          <ListItem>
+                            <ListItemIcon>
+                              <InsertDriveFile />
+                            </ListItemIcon>
+                            {f.name}
+                          </ListItem>
+                        </List>
+                      ))}
+                    </List>
+                  )}
+                </List>
+              </Collapse>
+            </List>
+          </Grid>
         ))}
       {!error && data && isEmptyArray(data.data) && (
         <List>
