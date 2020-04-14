@@ -3,8 +3,24 @@ import { fetcher, LOCAL_HOST } from "./fetchers";
 import useSWR from "swr";
 import { FormikProps, Form, withFormik, isEmptyArray, FormikBag } from "formik";
 import axios from "axios";
-import { Input, Button, List, ListItem, ListItemIcon } from "@material-ui/core";
-import { InsertDriveFile, Error, CloudOff, Check } from "@material-ui/icons";
+import dayjs from "dayjs";
+import {
+  Input,
+  Button,
+  List,
+  ListItem,
+  ListItemIcon,
+  Collapse,
+  ListItemText,
+} from "@material-ui/core";
+import {
+  InsertDriveFile,
+  Error,
+  CloudOff,
+  Check,
+  ExpandLess,
+  ExpandMore,
+} from "@material-ui/icons";
 import * as R from "ramda";
 import * as Yup from "yup";
 
@@ -18,18 +34,47 @@ export interface IFile {
 
 export const FilesList = () => {
   const { data, error } = useSWR("/files", fetcher);
+  const [open, setOpen] = React.useState<string[]>([]);
+
+  const handleClick = (e: any) => {
+    R.contains(e.target.id, open) && e.target.id !== ""
+      ? setOpen(R.filter((s) => s !== e.target.id, open))
+      : setOpen(R.append(e.target.id, open));
+    console.log(open);
+  };
+
   return (
     <div>
       {!error &&
         data &&
         (data.data as any).map((f: any) => (
           <List key={f.ID}>
-            <ListItem>
+            <ListItem id={f.ID} button onClick={handleClick}>
               <ListItemIcon>
                 <InsertDriveFile />
               </ListItemIcon>
               {f.name}
+              {open.includes(f.ID.toString()) ? (
+                <ExpandLess id={f.ID} />
+              ) : (
+                <ExpandMore id={f.ID} />
+              )}
             </ListItem>
+            <Collapse
+              in={open.includes(f.ID.toString())}
+              timeout="auto"
+              unmountOnExit
+            >
+              <List>
+                <ListItem>
+                  <ListItemText
+                    secondary={`Time of creation: ${dayjs(
+                      f.CreatedAt
+                    ).toDate()}`}
+                  />
+                </ListItem>
+              </List>
+            </Collapse>
           </List>
         ))}
       {!error && data && isEmptyArray(data.data) && (

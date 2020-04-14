@@ -3,7 +3,15 @@ import axios from "axios";
 import { LOCAL_HOST, fetcher } from "./fetchers";
 import useSWR from "swr";
 import { IFile } from "./Files";
-import { ShoppingBasket, Error, CloudOff, Check } from "@material-ui/icons";
+import {
+  ShoppingBasket,
+  Error,
+  CloudOff,
+  Check,
+  ExpandLess,
+  ExpandMore,
+  InsertDriveFile,
+} from "@material-ui/icons";
 import {
   TextField,
   MenuItem,
@@ -16,6 +24,8 @@ import {
   Checkbox,
   ListItemText,
   CircularProgress,
+  Collapse,
+  Link,
 } from "@material-ui/core";
 import { isEmptyArray } from "formik";
 import { useWindowSize } from "./WindowSizeHook";
@@ -408,19 +418,70 @@ export const ProductForm = () => {
 
 export const ProductList = () => {
   const { data, error } = useSWR("/products", fetcher);
+  const [open, setOpen] = React.useState<string[]>([]);
+
+  const handleClick = (e: any) => {
+    R.contains(e.target.id, open) && e.target.id !== ""
+      ? setOpen(R.filter((s) => s !== e.target.id, open))
+      : setOpen(R.append(e.target.id, open));
+    console.log(open);
+  };
+
   return (
-    <div>
+    <Grid container spacing={2}>
       {!error &&
         data &&
         (data.data as any).map((p: any) => (
-          <List key={p.ID}>
-            <ListItem>
-              <ListItemIcon>
-                <ShoppingBasket />
-              </ListItemIcon>
-              {p.name}
-            </ListItem>
-          </List>
+          <Grid item xs={12}>
+            <List key={p.ID}>
+              <ListItem id={p.ID} button onClick={handleClick}>
+                <ListItemIcon>
+                  <ShoppingBasket />
+                </ListItemIcon>
+                {p.name}
+                {open.includes(p.ID.toString()) ? (
+                  <ExpandLess id={p.ID} />
+                ) : (
+                  <ExpandMore id={p.ID} />
+                )}
+              </ListItem>
+              <Collapse
+                in={open.includes(p.ID.toString())}
+                timeout="auto"
+                unmountOnExit
+              >
+                <List>
+                  <ListItem>
+                    <ListItemText secondary={`Type: ${p.producttype}`} />
+                  </ListItem>
+                  {p.producttype !== "FILE" ? (
+                    <ListItem>
+                      <Grid>
+                        <ListItemText secondary={`Host address: `} />
+                        <Link href={p.host}>{p.host}</Link>
+                      </Grid>
+                    </ListItem>
+                  ) : (
+                    <List>
+                      <ListItem>
+                        <ListItemText secondary={`File(s): `} />
+                      </ListItem>
+                      {p.Files.map((f: any) => (
+                        <List key={f.ID}>
+                          <ListItem>
+                            <ListItemIcon>
+                              <InsertDriveFile />
+                            </ListItemIcon>
+                            {f.name}
+                          </ListItem>
+                        </List>
+                      ))}
+                    </List>
+                  )}
+                </List>
+              </Collapse>
+            </List>
+          </Grid>
         ))}
       {!error && data && isEmptyArray(data.data) && (
         <List>
@@ -442,6 +503,6 @@ export const ProductList = () => {
           </p>
         </div>
       )}
-    </div>
+    </Grid>
   );
 };
