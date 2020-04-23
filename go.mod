@@ -14,7 +14,7 @@ require (
 	github.com/robertkrimen/otto v0.0.0-20170205013659-6a77b7cbc37d // indirect
 	github.com/selvatico/go-mocket v1.0.7
 	github.com/spf13/afero v1.2.2
-	github.com/stretchr/testify v1.4.0
+	github.com/stretchr/testify v1.5.1
 	golang.org/x/tools v0.0.0-20200107184032-11e9d9cc0042 // indirect
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
 )
