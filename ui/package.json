@@ -7,7 +7,7 @@
     "@material-ui/icons": "^4.9.1",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.4.1",
-    "@testing-library/user-event": "^7.2.1",
+    "@testing-library/user-event": "^10.0.2",
     "@types/ramda": "^0.27.3",
     "@types/react-select": "^3.0.10",
     "@types/yup": "^0.26.34",
