@@ -41,7 +41,7 @@
     "@types/mocha": "7.0.2",
     "@types/node": "13.9.0",
     "prettier": "1.19.1",
-    "prettier-plugin-solidity": "1.0.0-alpha.44",
+    "prettier-plugin-solidity": "1.0.0-alpha.48",
     "solc": "0.5.7",
     "solhint": "3.0.0-rc.5",
     "solhint-plugin-prettier": "0.0.4",
