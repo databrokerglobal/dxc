@@ -21,7 +21,7 @@
     "react-select": "^3.0.8",
     "swr": "^0.1.18",
     "typescript": "^3.8.2",
-    "yup": "^0.28.3"
+    "yup": "^0.28.4"
   },
   "scripts": {
     "start": "react-scripts start",
