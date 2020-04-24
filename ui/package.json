@@ -9,7 +9,7 @@
     "@testing-library/react": "^9.4.1",
     "@testing-library/user-event": "^10.0.2",
     "@types/ramda": "^0.27.3",
-    "@types/react-select": "^3.0.10",
+    "@types/react-select": "^3.0.11",
     "@types/yup": "^0.26.34",
     "axios": "^0.19.2",
     "dayjs": "^1.8.25",
