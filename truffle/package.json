@@ -37,7 +37,7 @@
     "@nomiclabs/buidler-truffle5": "1.2.0",
     "@nomiclabs/buidler-web3": "1.2.0",
     "@typechain/truffle-v5": "0.9.0",
-    "@types/faker": "4.1.10",
+    "@types/faker": "4.1.11",
     "@types/mocha": "7.0.2",
     "@types/node": "13.9.0",
     "prettier": "1.19.1",
