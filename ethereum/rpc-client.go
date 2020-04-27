@@ -7,17 +7,10 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fatih/color"
-	"github.com/joho/godotenv"
 )
 
 // ServeContract Connect to the contract instance
 func ServeContract() {
-	// Load env files
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Failed to load .env file")
-	}
-
 	id := os.Getenv("INFURA_ID")
 
 	// Create an IPC based RPC connection to a remote node
