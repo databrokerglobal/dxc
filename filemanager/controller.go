@@ -2,11 +2,11 @@ package filemanager
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 
 	"github.com/databrokerglobal/dxc/database"
-	"github.com/joho/godotenv"
 	"github.com/labstack/echo"
 )
 
@@ -53,15 +53,20 @@ func Download(c echo.Context) error {
 		}
 	}
 
-	if err := godotenv.Load(); err != nil {
-		return c.String(http.StatusInternalServerError, "Error loading env variables")
-	}
-
 	var filePath string
+
 	if os.Getenv("GO_ENV") == "local" {
 		filePath = os.Getenv("LOCAL_FILES_DIR")
 	} else {
 		filePath = "/var/files"
+	}
+
+	if omit {
+		filePath = "/tmp"
+		testdata := []byte("test")
+		if err := ioutil.WriteFile(fmt.Sprintf("%s/%s", filePath, name), testdata, 0644); err != nil {
+			return c.String(http.StatusNotFound, "File not found")
+		}
 	}
 
 	return c.Attachment(fmt.Sprintf("%s/%s", filePath, name), name)

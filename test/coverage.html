@@ -64,7 +64,7 @@
 				
 				<option value="file4">github.com/databrokerglobal/dxc/database/provide-mock-db.go (80.0%)</option>
 				
-				<option value="file5">github.com/databrokerglobal/dxc/filemanager/controller.go (33.3%)</option>
+				<option value="file5">github.com/databrokerglobal/dxc/filemanager/controller.go (48.5%)</option>
 				
 				<option value="file6">github.com/databrokerglobal/dxc/filemanager/file-checker.go (0.0%)</option>
 				
@@ -263,11 +263,11 @@ func provideMockDB() (sqlmock.Sqlmock, *gorm.DB, Repository) <span class="cov8" 
 
 import (
         "fmt"
+        "io/ioutil"
         "net/http"
         "os"
 
         "github.com/databrokerglobal/dxc/database"
-        "github.com/joho/godotenv"
         "github.com/labstack/echo"
 )
 
@@ -314,18 +314,23 @@ func Download(c echo.Context) error <span class="cov8" title="1">{
                 }</span>
         }
 
-        <span class="cov8" title="1">if err := godotenv.Load(); err != nil </span><span class="cov8" title="1">{
-                return c.String(http.StatusInternalServerError, "Error loading env variables")
-        }</span>
+        <span class="cov8" title="1">var filePath string
 
-        <span class="cov0" title="0">var filePath string
         if os.Getenv("GO_ENV") == "local" </span><span class="cov0" title="0">{
                 filePath = os.Getenv("LOCAL_FILES_DIR")
-        }</span> else<span class="cov0" title="0"> {
+        }</span> else<span class="cov8" title="1"> {
                 filePath = "/var/files"
         }</span>
 
-        <span class="cov0" title="0">return c.Attachment(fmt.Sprintf("%s/%s", filePath, name), name)</span>
+        <span class="cov8" title="1">if omit </span><span class="cov8" title="1">{
+                filePath = "/tmp"
+                testdata := []byte("test")
+                if err := ioutil.WriteFile(fmt.Sprintf("%s/%s", filePath, name), testdata, 0644); err != nil </span><span class="cov0" title="0">{
+                        return c.String(http.StatusNotFound, "File not found")
+                }</span>
+        }
+
+        <span class="cov8" title="1">return c.Attachment(fmt.Sprintf("%s/%s", filePath, name), name)</span>
 }
 
 // GetAll get all files
