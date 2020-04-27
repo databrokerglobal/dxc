@@ -67,7 +67,7 @@ $ navigate to localhost:3000
 $ ./build-script.sh
 $ cd dxc_build_dir
 $ ./dxc
-$ navigate to localhost:1323
+$ navigate to localhost:8080
 ```
 
 ## How to run unit tests
