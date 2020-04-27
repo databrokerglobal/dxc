@@ -8,7 +8,6 @@ import (
 	"os"
 
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/joho/godotenv"
 )
 
 // ReadFile read a multipart uploaded file from controller
@@ -67,12 +66,6 @@ func CompareHashes(file1 []byte, file2 []byte) bool {
 
 // open file
 func open(filename string) (*os.File, error) {
-	// Load env files
-	err := godotenv.Load()
-	if err != nil {
-		return nil, err
-	}
-
 	// Load file path
 	var filePath string
 	if os.Getenv("GO_ENV") == "local" {
