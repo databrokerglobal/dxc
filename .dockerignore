@@ -17,4 +17,4 @@ dxc_build_*/
 run-tests.sh
 truffle/
 test/
-
+dxc.db
