@@ -27,6 +27,8 @@ INFURA_ID=111111111111111111
 LOCAL_FILES_DIR=/path/to/files
 ```
 
+Put the .env file in the root of the directory
+
 Run the container
 
 ```
