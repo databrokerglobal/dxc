@@ -36,7 +36,7 @@ func init() {
 
 	db, err := gorm.Open("sqlite3", "./dxc.db")
 	if err != nil {
-		log.Fatal("Error connecting to database")
+		log.Fatal("Error connecting to database: ", err)
 	}
 	DBInstance = Manager{db}
 	DBInstance.DB.LogMode(false)
