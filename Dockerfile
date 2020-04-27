@@ -1,16 +1,17 @@
-FROM mhart/alpine-node:12
+FROM mhart/alpine-node:12 AS ui
 WORKDIR /
-COPY /ui/package.json ./
-COPY /ui/package-lock.json ./
+COPY /ui .
 RUN npm install --silent
-CMD ["npm", "run", "build"]
-COPY /ui/build/ ./
+RUN npm run build
 
 FROM golang:latest
 WORKDIR /
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
+RUN rm -rf ui
+RUN mkdir build
+COPY --from=ui build ./build
 RUN go build -o main .
 CMD ["./main"]
 

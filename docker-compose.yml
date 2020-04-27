@@ -1,11 +1,13 @@
-version: '3'
+version: "3"
 
 services:
-  api:
+  client:
     build:
       context: .
       dockerfile: Dockerfile
     volumes:
       - ${LOCAL_FILES_DIR}:/var/files
     ports:
-      - '8080:1323'
+      - "8080:8080"
+    env_file:
+      - .env
