@@ -68,7 +68,7 @@
 				
 				<option value="file6">github.com/databrokerglobal/dxc/filemanager/file-checker.go (0.0%)</option>
 				
-				<option value="file7">github.com/databrokerglobal/dxc/filemanager/file-parser.go (8.3%)</option>
+				<option value="file7">github.com/databrokerglobal/dxc/filemanager/file-parser.go (9.1%)</option>
 				
 				<option value="file8">github.com/databrokerglobal/dxc/products/controller.go (62.3%)</option>
 				
@@ -396,7 +396,6 @@ import (
         "os"
 
         "github.com/ethereum/go-ethereum/crypto"
-        "github.com/joho/godotenv"
 )
 
 // ReadFile read a multipart uploaded file from controller
@@ -455,14 +454,8 @@ func CompareHashes(file1 []byte, file2 []byte) bool <span class="cov8" title="1"
 
 // open file
 func open(filename string) (*os.File, error) <span class="cov0" title="0">{
-        // Load env files
-        err := godotenv.Load()
-        if err != nil </span><span class="cov0" title="0">{
-                return nil, err
-        }</span>
-
         // Load file path
-        <span class="cov0" title="0">var filePath string
+        var filePath string
         if os.Getenv("GO_ENV") == "local" </span><span class="cov0" title="0">{
                 filePath = os.Getenv("LOCAL_FILES_DIR")
         }</span> else<span class="cov0" title="0"> {
