@@ -1,3 +1,11 @@
+definitions:
+  database.File:
+    properties:
+      name:
+        type: string
+      productID:
+        type: integer
+    type: object
 info:
   contact:
     name: Databroker Github Repo
@@ -9,6 +17,27 @@ info:
   title: DXC
   version: "1.0"
 paths:
+  /files:
+    get:
+      consumes:
+      - application/json
+      description: Get all files linked
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/database.File'
+            type: array
+        "500":
+          description: Error retrieving item from database
+          schema:
+            type: string
+      summary: Get files
+      tags:
+      - files
   /files/download:
     get:
       consumes:

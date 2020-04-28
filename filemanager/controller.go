@@ -95,6 +95,15 @@ func Download(c echo.Context) error {
 }
 
 // GetAll get all files
+// GetFiles godoc
+// @Summary Get files
+// @Description Get all files linked
+// @Tags files
+// @Accept json
+// @Produce json
+// @Success 200 {array} database.File true
+// @Failure 500 {string} string "Error retrieving item from database"
+// @Router /files [get]
 func GetAll(c echo.Context) error {
 	var fs *[]database.File
 
