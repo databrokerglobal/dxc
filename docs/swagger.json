@@ -1,0 +1,39 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is the DXC API server",
+        "title": "DXC API",
+        "contact": {
+            "name": "Databroker",
+            "url": "https://github.com/databrokerglobal/dxc/issues"
+        },
+        "license": {
+            "name": "Settlemint NV",
+            "url": "https://github.com/databrokerglobal/dxc/blob/master/dbdao-license.txt"
+        },
+        "version": "1.0"
+    },
+    "paths": {
+        "/files/upload": {
+            "post": {
+                "description": "Link a file from the LOCAL_FILES_DIR to the DXC",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "files"
+                ],
+                "summary": "Upload a file",
+                "responses": {
+                    "200": {},
+                    "400": {},
+                    "404": {},
+                    "500": {}
+                }
+            }
+        }
+    }
+}

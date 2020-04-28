@@ -1,0 +1,27 @@
+info:
+  contact:
+    name: Databroker
+    url: https://github.com/databrokerglobal/dxc/issues
+  description: This is the DXC API server
+  license:
+    name: Settlemint NV
+    url: https://github.com/databrokerglobal/dxc/blob/master/dbdao-license.txt
+  title: DXC API
+  version: "1.0"
+paths:
+  /files/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Link a file from the LOCAL_FILES_DIR to the DXC
+      produces:
+      - text/html
+      responses:
+        "200": {}
+        "400": {}
+        "404": {}
+        "500": {}
+      summary: Upload a file
+      tags:
+      - files
+swagger: "2.0"

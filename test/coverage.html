@@ -182,7 +182,7 @@ func init() <span class="cov8" title="1">{
 
         <span class="cov0" title="0">db, err := gorm.Open("sqlite3", "./dxc.db")
         if err != nil </span><span class="cov0" title="0">{
-                log.Fatal("Error connecting to database")
+                log.Fatal("Error connecting to database: ", err)
         }</span>
         <span class="cov0" title="0">DBInstance = Manager{db}
         DBInstance.DB.LogMode(false)
@@ -268,7 +268,7 @@ import (
         "os"
 
         "github.com/databrokerglobal/dxc/database"
-        "github.com/labstack/echo"
+        "github.com/labstack/echo/v4"
 )
 
 // Upload file controller
@@ -489,7 +489,7 @@ import (
 
         "github.com/databrokerglobal/dxc/database"
         "github.com/google/uuid"
-        "github.com/labstack/echo"
+        "github.com/labstack/echo/v4"
 )
 
 func trimLastSlash(host string) (h string) <span class="cov8" title="1">{

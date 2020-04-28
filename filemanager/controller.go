@@ -7,10 +7,21 @@ import (
 	"os"
 
 	"github.com/databrokerglobal/dxc/database"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 // Upload file controller
+// Upload godoc
+// @Summary Upload a file
+// @Description Link a file from the LOCAL_FILES_DIR to the DXC
+// @Tags files
+// @Accept  multipart/form-data
+// @Produce html
+// @Success 200
+// @Failure 400
+// @Failure 404
+// @Failure 500
+// @Router /files/upload [post]
 func Upload(c echo.Context) error {
 
 	// Source - File stream from upload

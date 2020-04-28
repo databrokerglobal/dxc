@@ -6,13 +6,24 @@ import (
 	"github.com/fatih/color"
 	"github.com/joho/godotenv"
 
+	_ "github.com/databrokerglobal/dxc/docs"
 	"github.com/databrokerglobal/dxc/ethereum"
 	"github.com/databrokerglobal/dxc/filemanager"
 	"github.com/databrokerglobal/dxc/products"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
+// @title DXC API
+// @version 1.0
+// @description This is the DXC API server
+
+// @contact.name Databroker
+// @contact.url https://github.com/databrokerglobal/dxc/issues
+
+// @license.name Settlemint NV
+// @license.url https://github.com/databrokerglobal/dxc/blob/master/dbdao-license.txt
 func main() {
 
 	color.Blue(`
@@ -60,6 +71,8 @@ func main() {
 	// Templating
 	// Static index.html route, serve html
 	e.Static("/", "build")
+
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	// FILES
 	// Upload file route
