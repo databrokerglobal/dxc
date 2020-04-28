@@ -74,7 +74,7 @@ func main() {
 	e.GET("/products", products.GetAll)
 
 	// PRODUCTS Request Redirect
-	e.Any("api/*", products.RedirectToHost)
+	e.Any("/api/*", products.RedirectToHost)
 
 	// Loading env file
 	err := godotenv.Load()
