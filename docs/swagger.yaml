@@ -14,13 +14,32 @@ paths:
       consumes:
       - multipart/form-data
       description: Link a file from the LOCAL_FILES_DIR to the DXC
+      parameters:
+      - description: File to Upload
+        in: formData
+        name: file
+        required: true
+        type: file
       produces:
       - text/html
       responses:
-        "200": {}
-        "400": {}
-        "404": {}
-        "500": {}
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: File invalid or empty
+          schema:
+            type: string
+        "404":
+          description: File not found, is the uploaded file in the rigth directory
+            or correctly bound to your docker volume?
+          schema:
+            type: string
+        "500":
+          description: Error inserting file metadata in database
+          schema:
+            type: string
       summary: Upload a file
       tags:
       - files

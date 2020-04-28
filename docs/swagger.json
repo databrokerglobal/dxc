@@ -27,11 +27,40 @@
                     "files"
                 ],
                 "summary": "Upload a file",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "File to Upload",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
                 "responses": {
-                    "200": {},
-                    "400": {},
-                    "404": {},
-                    "500": {}
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "File invalid or empty",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "File not found, is the uploaded file in the rigth directory or correctly bound to your docker volume?",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Error inserting file metadata in database",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
                 }
             }
         }

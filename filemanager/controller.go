@@ -15,12 +15,13 @@ import (
 // @Summary Upload a file
 // @Description Link a file from the LOCAL_FILES_DIR to the DXC
 // @Tags files
-// @Accept  multipart/form-data
+// @Accept mpfd
+// @Param file formData file true "File to Upload"
 // @Produce html
-// @Success 200
-// @Failure 400
-// @Failure 404
-// @Failure 500
+// @Success 200 {string} string true
+// @Failure 400 {string} string "File invalid or empty"
+// @Failure 404 {string} string "File not found, is the uploaded file in the rigth directory or correctly bound to your docker volume?""
+// @Failure 500 {string} string "Error inserting file metadata in database"
 // @Router /files/upload [post]
 func Upload(c echo.Context) error {
 
@@ -43,7 +44,7 @@ func Upload(c echo.Context) error {
 	}
 
 	// Return succes message
-	return c.HTML(http.StatusOK, fmt.Sprintf("<p>File %s uploaded successfully. File checksum result: OK</p>", file.Filename))
+	return c.String(http.StatusOK, fmt.Sprintf("File %s uploaded successfully. File checksum result: OK", file.Filename))
 }
 
 // Download a file
