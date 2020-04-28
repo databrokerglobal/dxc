@@ -15,14 +15,14 @@ import (
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
-// @title DXC API
+// @title DXC
 // @version 1.0
-// @description This is the DXC API server
+// @description Data eXchange Controller API
 
-// @contact.name Databroker
-// @contact.url https://github.com/databrokerglobal/dxc/issues
+// @contact.name Databroker Github Repo
+// @contact.url https://github.com/databrokerglobal/dxc
 
-// @license.name Settlemint NV
+// @license.name License details
 // @license.url https://github.com/databrokerglobal/dxc/blob/master/dbdao-license.txt
 func main() {
 

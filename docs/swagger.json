@@ -1,19 +1,57 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "This is the DXC API server",
-        "title": "DXC API",
+        "description": "Data eXchange Controller API",
+        "title": "DXC",
         "contact": {
-            "name": "Databroker",
-            "url": "https://github.com/databrokerglobal/dxc/issues"
+            "name": "Databroker Github Repo",
+            "url": "https://github.com/databrokerglobal/dxc"
         },
         "license": {
-            "name": "Settlemint NV",
+            "name": "License details",
             "url": "https://github.com/databrokerglobal/dxc/blob/master/dbdao-license.txt"
         },
         "version": "1.0"
     },
     "paths": {
+        "/files/download": {
+            "get": {
+                "description": "Download a file from the DXC",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "files"
+                ],
+                "summary": "Download a file",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "File name",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "404": {
+                        "description": "File not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/files/upload": {
             "post": {
                 "description": "Link a file from the LOCAL_FILES_DIR to the DXC",
@@ -21,7 +59,7 @@
                     "multipart/form-data"
                 ],
                 "produces": [
-                    "text/html"
+                    "application/json"
                 ],
                 "tags": [
                     "files"

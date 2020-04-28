@@ -1,14 +1,39 @@
 info:
   contact:
-    name: Databroker
-    url: https://github.com/databrokerglobal/dxc/issues
-  description: This is the DXC API server
+    name: Databroker Github Repo
+    url: https://github.com/databrokerglobal/dxc
+  description: Data eXchange Controller API
   license:
-    name: Settlemint NV
+    name: License details
     url: https://github.com/databrokerglobal/dxc/blob/master/dbdao-license.txt
-  title: DXC API
+  title: DXC
   version: "1.0"
 paths:
+  /files/download:
+    get:
+      consumes:
+      - application/json
+      description: Download a file from the DXC
+      parameters:
+      - description: File name
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "404":
+          description: File not found
+          schema:
+            type: string
+      summary: Download a file
+      tags:
+      - files
   /files/upload:
     post:
       consumes:
@@ -21,7 +46,7 @@ paths:
         required: true
         type: file
       produces:
-      - text/html
+      - application/json
       responses:
         "200":
           description: OK

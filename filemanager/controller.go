@@ -17,7 +17,7 @@ import (
 // @Tags files
 // @Accept mpfd
 // @Param file formData file true "File to Upload"
-// @Produce html
+// @Produce json
 // @Success 200 {string} string true
 // @Failure 400 {string} string "File invalid or empty"
 // @Failure 404 {string} string "File not found, is the uploaded file in the rigth directory or correctly bound to your docker volume?""
@@ -48,6 +48,16 @@ func Upload(c echo.Context) error {
 }
 
 // Download a file
+// Download godoc
+// @Summary Download a file
+// @Description Download a file from the DXC
+// @Tags files
+// @Accept json
+// @Param name query string true "File name"
+// @Produce octet-stream
+// @Success 200 {file} string true
+// @Failure 404 {string} string "File not found"
+// @Router /files/download [get]
 func Download(c echo.Context) error {
 	// Read form field
 	name := c.QueryParam("name")
