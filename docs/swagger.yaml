@@ -6,6 +6,21 @@ definitions:
       productID:
         type: integer
     type: object
+  database.Product:
+    properties:
+      files:
+        items:
+          $ref: '#/definitions/database.File'
+        type: array
+      host:
+        type: string
+      name:
+        type: string
+      producttype:
+        type: string
+      uuid:
+        type: string
+    type: object
   products.ProductController:
     properties:
       files:
@@ -128,12 +143,33 @@ paths:
         "201":
           description: Success
           schema:
-            type: string
+            $ref: '#/definitions/products.ProductController'
         "400":
           description: Error creating product
           schema:
             type: string
       summary: Create Product
+      tags:
+      - products
+  /products:
+    get:
+      consumes:
+      - application/json
+      description: Get all products
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/database.Product'
+            type: array
+        "500":
+          description: Error retrieving item from database
+          schema:
+            type: string
+      summary: Get products
       tags:
       - products
 swagger: "2.0"

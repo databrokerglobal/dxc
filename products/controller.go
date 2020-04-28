@@ -38,7 +38,7 @@ type ProductController struct {
 // @Accept json
 // @Produce json
 // @Param p body ProductController true "Product"
-// @Success 201 {string} string "Success"
+// @Success 201 {object} ProductController "Success"
 // @Failure 400 {string} string "Error creating product"
 // @Router /product [post]
 func AddOne(c echo.Context) error {
@@ -95,6 +95,15 @@ func AddOne(c echo.Context) error {
 }
 
 // GetAll return all products
+// GetProducts godoc
+// @Summary Get products
+// @Description Get all products
+// @Tags products
+// @Accept json
+// @Produce json
+// @Success 200 {array} database.Product true
+// @Failure 500 {string} string "Error retrieving item from database"
+// @Router /products [get]
 func GetAll(c echo.Context) error {
 	var ps *[]database.Product
 
