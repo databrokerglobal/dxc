@@ -6,6 +6,19 @@ definitions:
       productID:
         type: integer
     type: object
+  products.ProductController:
+    properties:
+      files:
+        items:
+          $ref: '#/definitions/database.File'
+        type: array
+      host:
+        type: string
+      name:
+        type: string
+      producttype:
+        type: string
+    type: object
 info:
   contact:
     name: Databroker Github Repo
@@ -97,4 +110,30 @@ paths:
       summary: Upload a file
       tags:
       - files
+  /product:
+    post:
+      consumes:
+      - application/json
+      description: Create a product
+      parameters:
+      - description: Product
+        in: body
+        name: p
+        required: true
+        schema:
+          $ref: '#/definitions/products.ProductController'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Error creating product
+          schema:
+            type: string
+      summary: Create Product
+      tags:
+      - products
 swagger: "2.0"

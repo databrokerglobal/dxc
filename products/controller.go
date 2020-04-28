@@ -22,7 +22,25 @@ func trimLastSlash(host string) (h string) {
 	return h
 }
 
+// ProductController safe type for the controller
+type ProductController struct {
+	Name  string `json:"name"`
+	Type  string `json:"producttype"`
+	Host  string `json:"host"`
+	Files []database.File
+}
+
 // AddOne product
+// Create godoc
+// @Summary Create Product
+// @Description Create a product
+// @Tags products
+// @Accept json
+// @Produce json
+// @Param p body ProductController true "Product"
+// @Success 201 {string} string "Success"
+// @Failure 400 {string} string "Error creating product"
+// @Router /product [post]
 func AddOne(c echo.Context) error {
 	p := new(database.Product)
 
@@ -32,7 +50,7 @@ func AddOne(c echo.Context) error {
 
 	status := checkProduct(p)
 	if status == http.StatusBadRequest {
-		return c.String(http.StatusBadRequest, "")
+		return c.String(http.StatusBadRequest, "Name, Type or Host (if product type is not FILE) are empty but are required")
 	}
 
 	if p.Type == "FILE" {
@@ -41,10 +59,10 @@ func AddOne(c echo.Context) error {
 
 	if p.Type == "FILE" {
 		if p.Files == nil {
-			return c.String(http.StatusBadRequest, "")
+			return c.String(http.StatusBadRequest, "Product is of type File but no files linked")
 		}
 		if len(p.Files) == 0 {
-			return c.String(http.StatusBadRequest, "")
+			return c.String(http.StatusBadRequest, "Product is of type File but no files linked")
 		}
 	}
 
@@ -127,7 +145,7 @@ func checkProduct(p *database.Product) int {
 		status = http.StatusBadRequest
 	case p.Type == "":
 		status = http.StatusBadRequest
-	case p.Host == "":
+	case p.Host == "" && p.Type != "FILE":
 		status = http.StatusBadRequest
 	default:
 		status = http.StatusContinue
