@@ -12,6 +12,7 @@ WORKDIR /
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
+# CGO_ENABLED=1 is required for sqlite to work
 RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o main .
 
 FROM alpine:edge
