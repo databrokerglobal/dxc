@@ -5,13 +5,13 @@ rm -rf build
 
 set -e
 
-mkdir "dxc_build_$(date +%Y%m%d)"
-go build -o "dxc_build_$(date +%Y%m%d)"/dxc
-touch "dxc_build_$(date +%Y%m%d)"/dxc.db
-cp .env "dxc_build_$(date +%Y%m%d)"/.env
-cd ui
+BUILD_DIR=dxc_build_$(date +%Y%m%d)
+
+mkdir ${BUILD_DIR}
+go build -o ${BUILD_DIR}/dxc
+touch ${BUILD_DIR}/dxc.db
+cp .env ${BUILD_DIR}/.env
+pushd ui
 npm i
 npm run build
-cd ..
-cp -r build/ "dxc_build_$(date +%Y%m%d)"/build
-mv build ui/build
+popd
