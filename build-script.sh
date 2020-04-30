@@ -1,7 +1,6 @@
 #! /bin/bash
 
 rm -rf dxc_build_*
-rm -rf build
 
 set -e
 
