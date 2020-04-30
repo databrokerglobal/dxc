@@ -60,17 +60,17 @@
 				
 				<option value="file2">github.com/databrokerglobal/dxc/database/manager.go (36.4%)</option>
 				
-				<option value="file3">github.com/databrokerglobal/dxc/database/products.go (77.8%)</option>
+				<option value="file3">github.com/databrokerglobal/dxc/database/products.go (81.2%)</option>
 				
 				<option value="file4">github.com/databrokerglobal/dxc/database/provide-mock-db.go (80.0%)</option>
 				
-				<option value="file5">github.com/databrokerglobal/dxc/filemanager/controller.go (42.3%)</option>
+				<option value="file5">github.com/databrokerglobal/dxc/filemanager/controller.go (48.5%)</option>
 				
-				<option value="file6">github.com/databrokerglobal/dxc/filemanager/file-checker.go (15.8%)</option>
+				<option value="file6">github.com/databrokerglobal/dxc/filemanager/file-checker.go (0.0%)</option>
 				
-				<option value="file7">github.com/databrokerglobal/dxc/filemanager/file-parser.go (7.7%)</option>
+				<option value="file7">github.com/databrokerglobal/dxc/filemanager/file-parser.go (9.1%)</option>
 				
-				<option value="file8">github.com/databrokerglobal/dxc/products/controller.go (65.8%)</option>
+				<option value="file8">github.com/databrokerglobal/dxc/products/controller.go (62.3%)</option>
 				
 				</select>
 			</div>
@@ -180,12 +180,12 @@ func init() <span class="cov8" title="1">{
                 return
         }</span>
 
-        <span class="cov0" title="0">db, err := gorm.Open("sqlite3", "./database/dxc.db")
+        <span class="cov0" title="0">db, err := gorm.Open("sqlite3", "./dxc.db")
         if err != nil </span><span class="cov0" title="0">{
-                log.Fatal("Error connecting to database")
+                log.Fatal("Error connecting to database: ", err)
         }</span>
         <span class="cov0" title="0">DBInstance = Manager{db}
-        DBInstance.DB.LogMode(true)
+        DBInstance.DB.LogMode(false)
         DBInstance.DB.AutoMigrate(&amp;File{})
         DBInstance.DB.AutoMigrate(&amp;Product{})</span>
 }
@@ -215,12 +215,9 @@ func (m *Manager) GetProduct(u string) (p *Product, err error) <span class="cov8
 // GetProducts Get all Products query
 func (m *Manager) GetProducts() (ps *[]Product, err error) <span class="cov8" title="1">{
         products := []Product{}
-        m.DB.Table("Products").Find(&amp;products)
-        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
-                err = errs[0]
-        }</span>
-        <span class="cov8" title="1">return &amp;products, nil</span>
-}
+        m.DB.Table("Products").Preload("Files").Find(&amp;products)
+        return &amp;products, nil
+}</span>
 
 // DeleteProduct delete a Product
 func (m *Manager) DeleteProduct(ProductName string) (err error) <span class="cov8" title="1">{
@@ -266,17 +263,16 @@ func provideMockDB() (sqlmock.Sqlmock, *gorm.DB, Repository) <span class="cov8" 
 
 import (
         "fmt"
+        "io/ioutil"
         "net/http"
         "os"
 
         "github.com/databrokerglobal/dxc/database"
-        "github.com/joho/godotenv"
-        "github.com/labstack/echo"
+        "github.com/labstack/echo/v4"
 )
 
 // Upload file controller
 func Upload(c echo.Context) error <span class="cov8" title="1">{
-        defer fmt.Println("hello")
 
         // Source - File stream from upload
         file, err := c.FormFile("file")
@@ -318,46 +314,52 @@ func Download(c echo.Context) error <span class="cov8" title="1">{
                 }</span>
         }
 
-        <span class="cov8" title="1">if err := godotenv.Load(); err != nil </span><span class="cov8" title="1">{
-                return c.String(http.StatusInternalServerError, "Error loading env variables")
-        }</span>
+        <span class="cov8" title="1">var filePath string
 
-        <span class="cov0" title="0">var filePath string
         if os.Getenv("GO_ENV") == "local" </span><span class="cov0" title="0">{
                 filePath = os.Getenv("LOCAL_FILES_DIR")
-        }</span> else<span class="cov0" title="0"> {
+        }</span> else<span class="cov8" title="1"> {
                 filePath = "/var/files"
         }</span>
 
-        <span class="cov0" title="0">return c.Attachment(fmt.Sprintf("%s/%s", filePath, name), name)</span>
+        <span class="cov8" title="1">if omit </span><span class="cov8" title="1">{
+                filePath = "/tmp"
+                testdata := []byte("test")
+                if err := ioutil.WriteFile(fmt.Sprintf("%s/%s", filePath, name), testdata, 0644); err != nil </span><span class="cov0" title="0">{
+                        return c.String(http.StatusNotFound, "File not found")
+                }</span>
+        }
+
+        <span class="cov8" title="1">return c.Attachment(fmt.Sprintf("%s/%s", filePath, name), name)</span>
+}
+
+// GetAll get all files
+func GetAll(c echo.Context) error <span class="cov0" title="0">{
+        var fs *[]database.File
+
+        fs, err := database.DBInstance.GetFiles()
+
+        if err != nil </span><span class="cov0" title="0">{
+                return c.String(http.StatusInternalServerError, "Error retrieving item from database")
+        }</span>
+
+        <span class="cov0" title="0">return c.JSON(http.StatusOK, fs)</span>
 }
 </pre>
 		
 		<pre class="file" id="file6" style="display: none">package filemanager
 
 import (
-        "fmt"
         "log"
-        "os"
 
         "github.com/databrokerglobal/dxc/database"
+        "github.com/fatih/color"
 )
-
-// Check if file is still on disk, if not delete from
-func init() <span class="cov8" title="1">{
-        if len(os.Args) &gt; 1 &amp;&amp; os.Args[1][:5] == "-test" </span><span class="cov8" title="1">{
-                log.Println("Testing: omitting database init")
-                return
-        }</span>
-
-        // Start up a go routine for file checking
-        <span class="cov0" title="0">go CheckingFiles()</span>
-}
 
 // CheckingFiles Delete files that are not in directory anymore, restore files that were deleted but now back in their directory
 func CheckingFiles() <span class="cov0" title="0">{
 
-        fmt.Println("Checking file integrity...")
+        color.Magenta("Checking file integrity...")
         files, err := database.DBInstance.GetFiles()
         if err != nil </span><span class="cov0" title="0">{
                 log.Fatal(err)
@@ -383,7 +385,9 @@ func CheckingFiles() <span class="cov0" title="0">{
                 }</span>
         }
 
-        <span class="cov0" title="0">defer fmt.Println("Finished checking file integrity")</span>
+        <span class="cov0" title="0">yellow := color.New(color.FgYellow).SprintFunc()
+
+        defer color.Green("Finished checking file integrity %s", yellow("\nCurrent file count: ", len(*files)))</span>
 }
 </pre>
 		
@@ -397,7 +401,6 @@ import (
         "os"
 
         "github.com/ethereum/go-ethereum/crypto"
-        "github.com/joho/godotenv"
 )
 
 // ReadFile read a multipart uploaded file from controller
@@ -409,13 +412,7 @@ func parseFile(file *multipart.FileHeader) error <span class="cov0" title="0">{
         }</span>
         <span class="cov0" title="0">defer src.Close()
 
-        // Load env files
-        err = godotenv.Load()
-        if err != nil </span><span class="cov0" title="0">{
-                return err
-        }</span>
-
-        <span class="cov0" title="0">uploadedFileSnippet, err := readBytes(src)
+        uploadedFileSnippet, err := readBytes(src)
         if err != nil </span><span class="cov0" title="0">{
                 return err
         }</span>
@@ -462,14 +459,8 @@ func CompareHashes(file1 []byte, file2 []byte) bool <span class="cov8" title="1"
 
 // open file
 func open(filename string) (*os.File, error) <span class="cov0" title="0">{
-        // Load env files
-        err := godotenv.Load()
-        if err != nil </span><span class="cov0" title="0">{
-                return nil, err
-        }</span>
-
         // Load file path
-        <span class="cov0" title="0">var filePath string
+        var filePath string
         if os.Getenv("GO_ENV") == "local" </span><span class="cov0" title="0">{
                 filePath = os.Getenv("LOCAL_FILES_DIR")
         }</span> else<span class="cov0" title="0"> {
@@ -498,7 +489,7 @@ import (
 
         "github.com/databrokerglobal/dxc/database"
         "github.com/google/uuid"
-        "github.com/labstack/echo"
+        "github.com/labstack/echo/v4"
 )
 
 func trimLastSlash(host string) (h string) <span class="cov8" title="1">{
@@ -517,25 +508,38 @@ func AddOne(c echo.Context) error <span class="cov8" title="1">{
                 return err
         }</span>
 
-        <span class="cov8" title="1">if status := checkProduct(p); status == http.StatusBadRequest </span><span class="cov0" title="0">{
+        <span class="cov8" title="1">status := checkProduct(p)
+        if status == http.StatusBadRequest </span><span class="cov0" title="0">{
                 return c.String(http.StatusBadRequest, "")
         }</span>
 
-        <span class="cov8" title="1">newHost := trimLastSlash(p.Host)
-        p.Host = newHost
-
-        if p.Type == "FILE" </span><span class="cov0" title="0">{
+        <span class="cov8" title="1">if p.Type == "FILE" </span><span class="cov0" title="0">{
                 p.Host = "N/A"
         }</span>
 
-        <span class="cov8" title="1">tempuuid, err := uuid.NewRandom()
-        if err != nil </span><span class="cov0" title="0">{
-                return err
+        <span class="cov8" title="1">if p.Type == "FILE" </span><span class="cov0" title="0">{
+                if p.Files == nil </span><span class="cov0" title="0">{
+                        return c.String(http.StatusBadRequest, "")
+                }</span>
+                <span class="cov0" title="0">if len(p.Files) == 0 </span><span class="cov0" title="0">{
+                        return c.String(http.StatusBadRequest, "")
+                }</span>
+        }
+
+        <span class="cov8" title="1">if p.Type != "FILE" </span><span class="cov8" title="1">{
+                newHost := trimLastSlash(p.Host)
+                p.Host = newHost
         }</span>
 
-        <span class="cov8" title="1">p.UUID = tempuuid.String()
+        <span class="cov8" title="1">if p.UUID == "" </span><span class="cov0" title="0">{
+                tempuuid, err := uuid.NewRandom()
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov0" title="0">p.UUID = tempuuid.String()</span>
+        }
 
-        var omit bool
+        <span class="cov8" title="1">var omit bool
 
         if len(os.Args) &gt; 1 &amp;&amp; os.Args[1][:5] == "-test" </span><span class="cov8" title="1">{
                 omit = true

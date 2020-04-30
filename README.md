@@ -20,9 +20,14 @@ The data exchange controller has three parts:
 ## docker = docker
 GO_ENV=docker
 
+# Infura project id
+INFURA_ID=111111111111111111
+
 # File directory
 LOCAL_FILES_DIR=/path/to/files
 ```
+
+Put the .env file in the root of the directory
 
 Run the container
 
@@ -41,6 +46,9 @@ Navigate to localhost:8080
 ## docker = docker
 
 GO_ENV=local
+
+# Infura project id
+INFURA_ID=111111111111111111
 
 # File directory
 LOCAL_FILES_DIR=/path/to/files
@@ -66,8 +74,9 @@ $ navigate to localhost:3000
 ```
 $ ./build-script.sh
 $ cd dxc_build_dir
+$ touch .env && echo "list of env vars" > .env (aka set the right env vars, see above)
 $ ./dxc
-$ navigate to localhost:1323
+$ navigate to localhost:8080
 ```
 
 ## How to run unit tests
@@ -94,8 +103,9 @@ After running the test script an outfile is converted into a coverage.html file 
 - [ ] Authentication
 - [x] Smart contracts
 - [ ] Support for streaming protocols
-- [ ] Docker image working
+- [x] Docker image working
 - [ ] Delete file / product button in UI
-- [ ] Detailed files list and status
-- [ ] Detailed products list and status
+- [ ] Update file / products feature
+- [x] Detailed files and products list
+- [ ] Products and file status status
 - [ ] Add multiple files at once

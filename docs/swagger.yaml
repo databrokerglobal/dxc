@@ -1,0 +1,175 @@
+definitions:
+  database.File:
+    properties:
+      name:
+        type: string
+      productID:
+        type: integer
+    type: object
+  database.Product:
+    properties:
+      files:
+        items:
+          $ref: '#/definitions/database.File'
+        type: array
+      host:
+        type: string
+      name:
+        type: string
+      producttype:
+        type: string
+      uuid:
+        type: string
+    type: object
+  products.ProductController:
+    properties:
+      files:
+        items:
+          $ref: '#/definitions/database.File'
+        type: array
+      host:
+        type: string
+      name:
+        type: string
+      producttype:
+        type: string
+    type: object
+info:
+  contact:
+    name: Databroker Github Repo
+    url: https://github.com/databrokerglobal/dxc
+  description: Data eXchange Controller API
+  license:
+    name: License details
+    url: https://github.com/databrokerglobal/dxc/blob/master/dbdao-license.txt
+  title: DXC
+  version: "1.0"
+paths:
+  /files:
+    get:
+      consumes:
+      - application/json
+      description: Get all files linked
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/database.File'
+            type: array
+        "500":
+          description: Error retrieving item from database
+          schema:
+            type: string
+      summary: Get files
+      tags:
+      - files
+  /files/download:
+    get:
+      consumes:
+      - application/json
+      description: Download a file from the DXC
+      parameters:
+      - description: File name
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "404":
+          description: File not found
+          schema:
+            type: string
+      summary: Download a file
+      tags:
+      - files
+  /files/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Link a file from the LOCAL_FILES_DIR to the DXC
+      parameters:
+      - description: File to Upload
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: File invalid or empty
+          schema:
+            type: string
+        "404":
+          description: File not found, is the uploaded file in the rigth directory
+            or correctly bound to your docker volume?
+          schema:
+            type: string
+        "500":
+          description: Error inserting file metadata in database
+          schema:
+            type: string
+      summary: Upload a file
+      tags:
+      - files
+  /product:
+    post:
+      consumes:
+      - application/json
+      description: Create a product
+      parameters:
+      - description: Product
+        in: body
+        name: p
+        required: true
+        schema:
+          $ref: '#/definitions/products.ProductController'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Success
+          schema:
+            $ref: '#/definitions/products.ProductController'
+        "400":
+          description: Error creating product
+          schema:
+            type: string
+      summary: Create Product
+      tags:
+      - products
+  /products:
+    get:
+      consumes:
+      - application/json
+      description: Get all products
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/database.Product'
+            type: array
+        "500":
+          description: Error retrieving item from database
+          schema:
+            type: string
+      summary: Get products
+      tags:
+      - products
+swagger: "2.0"

@@ -2,15 +2,27 @@ package filemanager
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 
 	"github.com/databrokerglobal/dxc/database"
-	"github.com/joho/godotenv"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 // Upload file controller
+// Upload godoc
+// @Summary Upload a file
+// @Description Link a file from the LOCAL_FILES_DIR to the DXC
+// @Tags files
+// @Accept mpfd
+// @Param file formData file true "File to Upload"
+// @Produce json
+// @Success 200 {string} string true
+// @Failure 400 {string} string "File invalid or empty"
+// @Failure 404 {string} string "File not found, is the uploaded file in the rigth directory or correctly bound to your docker volume?""
+// @Failure 500 {string} string "Error inserting file metadata in database"
+// @Router /files/upload [post]
 func Upload(c echo.Context) error {
 
 	// Source - File stream from upload
@@ -32,10 +44,20 @@ func Upload(c echo.Context) error {
 	}
 
 	// Return succes message
-	return c.HTML(http.StatusOK, fmt.Sprintf("<p>File %s uploaded successfully. File checksum result: OK</p>", file.Filename))
+	return c.String(http.StatusOK, fmt.Sprintf("File %s uploaded successfully. File checksum result: OK", file.Filename))
 }
 
 // Download a file
+// Download godoc
+// @Summary Download a file
+// @Description Download a file from the DXC
+// @Tags files
+// @Accept json
+// @Param name query string true "File name"
+// @Produce octet-stream
+// @Success 200 {file} string true
+// @Failure 404 {string} string "File not found"
+// @Router /files/download [get]
 func Download(c echo.Context) error {
 	// Read form field
 	name := c.QueryParam("name")
@@ -53,21 +75,35 @@ func Download(c echo.Context) error {
 		}
 	}
 
-	if err := godotenv.Load(); err != nil {
-		return c.String(http.StatusInternalServerError, "Error loading env variables")
-	}
-
 	var filePath string
+
 	if os.Getenv("GO_ENV") == "local" {
 		filePath = os.Getenv("LOCAL_FILES_DIR")
 	} else {
 		filePath = "/var/files"
 	}
 
+	if omit {
+		filePath = "/tmp"
+		testdata := []byte("test")
+		if err := ioutil.WriteFile(fmt.Sprintf("%s/%s", filePath, name), testdata, 0644); err != nil {
+			return c.String(http.StatusNotFound, "File not found")
+		}
+	}
+
 	return c.Attachment(fmt.Sprintf("%s/%s", filePath, name), name)
 }
 
 // GetAll get all files
+// GetFiles godoc
+// @Summary Get files
+// @Description Get all files linked
+// @Tags files
+// @Accept json
+// @Produce json
+// @Success 200 {array} database.File true
+// @Failure 500 {string} string "Error retrieving item from database"
+// @Router /files [get]
 func GetAll(c echo.Context) error {
 	var fs *[]database.File
 

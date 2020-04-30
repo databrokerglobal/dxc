@@ -20,3 +20,5 @@ type Product struct {
 	Host  string `json:"host"`
 	Files []File
 }
+
+

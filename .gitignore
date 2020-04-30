@@ -32,3 +32,5 @@ node_modules/
 build/
 
 dxc_build_*/
+
+outfile
