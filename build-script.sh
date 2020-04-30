@@ -15,3 +15,4 @@ pushd ui
 npm i
 npm run build
 popd
+mv ui/build ${BUILD_DIR}/build
