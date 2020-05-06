@@ -37,7 +37,7 @@ interface IProduct {
   ID?: string;
   name: string;
   producttype: string;
-  uuid?: string;
+  did?: string;
   host: string;
   files: IFile[];
 }

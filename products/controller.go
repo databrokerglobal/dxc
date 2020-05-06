@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"regexp"
 	"strings"
 
 	"github.com/databrokerglobal/dxc/database"
@@ -71,12 +70,8 @@ func AddOne(c echo.Context) error {
 		p.Host = newHost
 	}
 
-	if p.UUID == "" {
-		tempuuid, err := uuid.NewRandom()
-		if err != nil {
-			return err
-		}
-		p.UUID = tempuuid.String()
+	if p.DID == "" {
+		p.DID = fmt.Sprintf("did:databroker:%s:%s", p.Name, p.Type)
 	}
 
 	var omit bool
@@ -118,7 +113,7 @@ func GetAll(c echo.Context) error {
 
 // GetOne product
 func GetOne(c echo.Context) error {
-	uuid := c.Param("uuid")
+	did := c.Param("did")
 
 	var omit bool
 
@@ -131,7 +126,7 @@ func GetOne(c echo.Context) error {
 	var p *database.Product
 
 	if !omit {
-		p, err = database.DBInstance.GetProduct(uuid)
+		p, err = database.DBInstance.GetProduct(did)
 	}
 
 	if err != nil {
@@ -183,21 +178,13 @@ func checkProductForRedirect(p *database.Product) int {
 
 func parseRequestURL(requestURI string, p *database.Product) string {
 	// replace first encounter of product uuid
-	newRequestURI := strings.TrimPrefix(strings.Replace(requestURI, p.UUID, "", 1), "/")
+	newRequestURI := strings.TrimPrefix(strings.Replace(requestURI, p.DID, "", 1), "/")
 
 	requestURLSlice := []string{p.Host, newRequestURI}
 
 	requestURL := strings.Join(requestURLSlice, "")
 
 	return requestURL
-}
-
-func matchingUUID(str string) (bool, error) {
-	match, err := regexp.MatchString(`[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}`, str)
-	if err != nil {
-		return false, err
-	}
-	return match, err
 }
 
 // RedirectToHost based on product uuid path check if api or stream and subsequently redirect
@@ -215,33 +202,25 @@ func RedirectToHost(c echo.Context) error {
 	// Check if string in path matches uuid regex, is valid uuid and matches product that is type API or STREAM
 	for _, str := range slice {
 
-		match, err := matchingUUID(str)
-
+		_, err := uuid.Parse(str)
 		if err != nil {
 			return c.String(http.StatusNoContent, "")
 		}
 
-		if match {
-			_, err := uuid.Parse(str)
+		if !omit {
+			p, err = database.DBInstance.GetProduct(str)
 			if err != nil {
 				return c.String(http.StatusNoContent, "")
 			}
-
-			if !omit {
-				p, err = database.DBInstance.GetProduct(str)
-				if err != nil {
-					return c.String(http.StatusNoContent, "")
-				}
-			}
-
-			if status := checkProductForRedirect(p); status == http.StatusNoContent {
-				return c.String(http.StatusNoContent, "")
-			}
-
-			r := buildProxyRequest(c, c.Request(), "http", p.Host)
-
-			err = executeRequest(c, r)
 		}
+
+		if status := checkProductForRedirect(p); status == http.StatusNoContent {
+			return c.String(http.StatusNoContent, "")
+		}
+
+		r := buildProxyRequest(c, c.Request(), "http", p.Host)
+
+		err = executeRequest(c, r)
 	}
 
 	return c.String(http.StatusNoContent, "")

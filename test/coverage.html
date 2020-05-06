@@ -70,7 +70,7 @@
 				
 				<option value="file7">github.com/databrokerglobal/dxc/filemanager/file-parser.go (9.1%)</option>
 				
-				<option value="file8">github.com/databrokerglobal/dxc/products/controller.go (62.3%)</option>
+				<option value="file8">github.com/databrokerglobal/dxc/products/controller.go (61.3%)</option>
 				
 				</select>
 			</div>
@@ -203,9 +203,9 @@ func (m *Manager) CreateProduct(p *Product) (err error) <span class="cov8" title
 }
 
 // GetProduct Query
-func (m *Manager) GetProduct(u string) (p *Product, err error) <span class="cov8" title="1">{
+func (m *Manager) GetProduct(d string) (p *Product, err error) <span class="cov8" title="1">{
         product := Product{}
-        m.DB.Where(&amp;Product{UUID: u}).First(&amp;product)
+        m.DB.Where(&amp;Product{DID: d}).First(&amp;product)
         if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
                 err = errs[0]
         }</span>
@@ -272,6 +272,18 @@ import (
 )
 
 // Upload file controller
+// Upload godoc
+// @Summary Upload a file
+// @Description Link a file from the LOCAL_FILES_DIR to the DXC
+// @Tags files
+// @Accept mpfd
+// @Param file formData file true "File to Upload"
+// @Produce json
+// @Success 200 {string} string true
+// @Failure 400 {string} string "File invalid or empty"
+// @Failure 404 {string} string "File not found, is the uploaded file in the rigth directory or correctly bound to your docker volume?""
+// @Failure 500 {string} string "Error inserting file metadata in database"
+// @Router /files/upload [post]
 func Upload(c echo.Context) error <span class="cov8" title="1">{
 
         // Source - File stream from upload
@@ -293,10 +305,20 @@ func Upload(c echo.Context) error <span class="cov8" title="1">{
         }</span>
 
         // Return succes message
-        <span class="cov0" title="0">return c.HTML(http.StatusOK, fmt.Sprintf("&lt;p&gt;File %s uploaded successfully. File checksum result: OK&lt;/p&gt;", file.Filename))</span>
+        <span class="cov0" title="0">return c.String(http.StatusOK, fmt.Sprintf("File %s uploaded successfully. File checksum result: OK", file.Filename))</span>
 }
 
 // Download a file
+// Download godoc
+// @Summary Download a file
+// @Description Download a file from the DXC
+// @Tags files
+// @Accept json
+// @Param name query string true "File name"
+// @Produce octet-stream
+// @Success 200 {file} string true
+// @Failure 404 {string} string "File not found"
+// @Router /files/download [get]
 func Download(c echo.Context) error <span class="cov8" title="1">{
         // Read form field
         name := c.QueryParam("name")
@@ -334,6 +356,15 @@ func Download(c echo.Context) error <span class="cov8" title="1">{
 }
 
 // GetAll get all files
+// GetFiles godoc
+// @Summary Get files
+// @Description Get all files linked
+// @Tags files
+// @Accept json
+// @Produce json
+// @Success 200 {array} database.File true
+// @Failure 500 {string} string "Error retrieving item from database"
+// @Router /files [get]
 func GetAll(c echo.Context) error <span class="cov0" title="0">{
         var fs *[]database.File
 
@@ -484,7 +515,6 @@ import (
         "io/ioutil"
         "net/http"
         "os"
-        "regexp"
         "strings"
 
         "github.com/databrokerglobal/dxc/database"
@@ -500,7 +530,25 @@ func trimLastSlash(host string) (h string) <span class="cov8" title="1">{
         <span class="cov8" title="1">return h</span>
 }
 
+// ProductController safe type for the controller
+type ProductController struct {
+        Name  string `json:"name"`
+        Type  string `json:"producttype"`
+        Host  string `json:"host"`
+        Files []database.File
+}
+
 // AddOne product
+// Create godoc
+// @Summary Create Product
+// @Description Create a product
+// @Tags products
+// @Accept json
+// @Produce json
+// @Param p body ProductController true "Product"
+// @Success 201 {object} ProductController "Success"
+// @Failure 400 {string} string "Error creating product"
+// @Router /product [post]
 func AddOne(c echo.Context) error <span class="cov8" title="1">{
         p := new(database.Product)
 
@@ -510,7 +558,7 @@ func AddOne(c echo.Context) error <span class="cov8" title="1">{
 
         <span class="cov8" title="1">status := checkProduct(p)
         if status == http.StatusBadRequest </span><span class="cov0" title="0">{
-                return c.String(http.StatusBadRequest, "")
+                return c.String(http.StatusBadRequest, "Name, Type or Host (if product type is not FILE) are empty but are required")
         }</span>
 
         <span class="cov8" title="1">if p.Type == "FILE" </span><span class="cov0" title="0">{
@@ -519,10 +567,10 @@ func AddOne(c echo.Context) error <span class="cov8" title="1">{
 
         <span class="cov8" title="1">if p.Type == "FILE" </span><span class="cov0" title="0">{
                 if p.Files == nil </span><span class="cov0" title="0">{
-                        return c.String(http.StatusBadRequest, "")
+                        return c.String(http.StatusBadRequest, "Product is of type File but no files linked")
                 }</span>
                 <span class="cov0" title="0">if len(p.Files) == 0 </span><span class="cov0" title="0">{
-                        return c.String(http.StatusBadRequest, "")
+                        return c.String(http.StatusBadRequest, "Product is of type File but no files linked")
                 }</span>
         }
 
@@ -531,13 +579,9 @@ func AddOne(c echo.Context) error <span class="cov8" title="1">{
                 p.Host = newHost
         }</span>
 
-        <span class="cov8" title="1">if p.UUID == "" </span><span class="cov0" title="0">{
-                tempuuid, err := uuid.NewRandom()
-                if err != nil </span><span class="cov0" title="0">{
-                        return err
-                }</span>
-                <span class="cov0" title="0">p.UUID = tempuuid.String()</span>
-        }
+        <span class="cov8" title="1">if p.DID == "" </span><span class="cov0" title="0">{
+                p.DID = fmt.Sprintf("did:databroker:%s:%s", p.Name, p.Type)
+        }</span>
 
         <span class="cov8" title="1">var omit bool
 
@@ -555,6 +599,15 @@ func AddOne(c echo.Context) error <span class="cov8" title="1">{
 }
 
 // GetAll return all products
+// GetProducts godoc
+// @Summary Get products
+// @Description Get all products
+// @Tags products
+// @Accept json
+// @Produce json
+// @Success 200 {array} database.Product true
+// @Failure 500 {string} string "Error retrieving item from database"
+// @Router /products [get]
 func GetAll(c echo.Context) error <span class="cov0" title="0">{
         var ps *[]database.Product
 
@@ -569,7 +622,7 @@ func GetAll(c echo.Context) error <span class="cov0" title="0">{
 
 // GetOne product
 func GetOne(c echo.Context) error <span class="cov8" title="1">{
-        uuid := c.Param("uuid")
+        did := c.Param("did")
 
         var omit bool
 
@@ -582,7 +635,7 @@ func GetOne(c echo.Context) error <span class="cov8" title="1">{
         var p *database.Product
 
         if !omit </span><span class="cov0" title="0">{
-                p, err = database.DBInstance.GetProduct(uuid)
+                p, err = database.DBInstance.GetProduct(did)
         }</span>
 
         <span class="cov8" title="1">if err != nil </span><span class="cov0" title="0">{
@@ -605,7 +658,7 @@ func checkProduct(p *database.Product) int <span class="cov8" title="1">{
                 status = http.StatusBadRequest</span>
         case p.Type == "":<span class="cov8" title="1">
                 status = http.StatusBadRequest</span>
-        case p.Host == "":<span class="cov8" title="1">
+        case p.Host == "" &amp;&amp; p.Type != "FILE":<span class="cov8" title="1">
                 status = http.StatusBadRequest</span>
         default:<span class="cov8" title="1">
                 status = http.StatusContinue</span>
@@ -634,7 +687,7 @@ func checkProductForRedirect(p *database.Product) int <span class="cov8" title="
 
 func parseRequestURL(requestURI string, p *database.Product) string <span class="cov8" title="1">{
         // replace first encounter of product uuid
-        newRequestURI := strings.TrimPrefix(strings.Replace(requestURI, p.UUID, "", 1), "/")
+        newRequestURI := strings.TrimPrefix(strings.Replace(requestURI, p.DID, "", 1), "/")
 
         requestURLSlice := []string{p.Host, newRequestURI}
 
@@ -642,14 +695,6 @@ func parseRequestURL(requestURI string, p *database.Product) string <span class=
 
         return requestURL
 }</span>
-
-func matchingUUID(str string) (bool, error) <span class="cov8" title="1">{
-        match, err := regexp.MatchString(`[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}`, str)
-        if err != nil </span><span class="cov0" title="0">{
-                return false, err
-        }</span>
-        <span class="cov8" title="1">return match, err</span>
-}
 
 // RedirectToHost based on product uuid path check if api or stream and subsequently redirect
 func RedirectToHost(c echo.Context) error <span class="cov8" title="1">{
@@ -666,33 +711,25 @@ func RedirectToHost(c echo.Context) error <span class="cov8" title="1">{
         // Check if string in path matches uuid regex, is valid uuid and matches product that is type API or STREAM
         for _, str := range slice </span><span class="cov8" title="1">{
 
-                match, err := matchingUUID(str)
-
-                if err != nil </span><span class="cov0" title="0">{
+                _, err := uuid.Parse(str)
+                if err != nil </span><span class="cov8" title="1">{
                         return c.String(http.StatusNoContent, "")
                 }</span>
 
-                <span class="cov8" title="1">if match </span><span class="cov8" title="1">{
-                        _, err := uuid.Parse(str)
+                <span class="cov0" title="0">if !omit </span><span class="cov0" title="0">{
+                        p, err = database.DBInstance.GetProduct(str)
                         if err != nil </span><span class="cov0" title="0">{
                                 return c.String(http.StatusNoContent, "")
                         }</span>
-
-                        <span class="cov8" title="1">if !omit </span><span class="cov0" title="0">{
-                                p, err = database.DBInstance.GetProduct(str)
-                                if err != nil </span><span class="cov0" title="0">{
-                                        return c.String(http.StatusNoContent, "")
-                                }</span>
-                        }
-
-                        <span class="cov8" title="1">if status := checkProductForRedirect(p); status == http.StatusNoContent </span><span class="cov8" title="1">{
-                                return c.String(http.StatusNoContent, "")
-                        }</span>
-
-                        <span class="cov0" title="0">r := buildProxyRequest(c, c.Request(), "http", p.Host)
-
-                        err = executeRequest(c, r)</span>
                 }
+
+                <span class="cov0" title="0">if status := checkProductForRedirect(p); status == http.StatusNoContent </span><span class="cov0" title="0">{
+                        return c.String(http.StatusNoContent, "")
+                }</span>
+
+                <span class="cov0" title="0">r := buildProxyRequest(c, c.Request(), "http", p.Host)
+
+                err = executeRequest(c, r)</span>
         }
 
         <span class="cov0" title="0">return c.String(http.StatusNoContent, "")</span>

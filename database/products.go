@@ -10,9 +10,9 @@ func (m *Manager) CreateProduct(p *Product) (err error) {
 }
 
 // GetProduct Query
-func (m *Manager) GetProduct(u string) (p *Product, err error) {
+func (m *Manager) GetProduct(d string) (p *Product, err error) {
 	product := Product{}
-	m.DB.Where(&Product{UUID: u}).First(&product)
+	m.DB.Where(&Product{DID: d}).First(&product)
 	if errs := m.DB.GetErrors(); len(errs) > 0 {
 		err = errs[0]
 	}

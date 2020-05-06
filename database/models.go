@@ -16,9 +16,7 @@ type Product struct {
 	gorm.Model
 	Name  string `json:"name"`
 	Type  string `json:"producttype"`
-	UUID  string `json:"uuid"`
+	DID   string `json:"did"`
 	Host  string `json:"host"`
 	Files []File
 }
-
-

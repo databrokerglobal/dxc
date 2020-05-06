@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
 )
 
@@ -25,7 +24,7 @@ func TestManager_CreateProduct(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		{"Test case 1", fields{DB: mockGorm}, args{p: &Product{Name: "Test", Type: "API", UUID: uuid.New().String(), Host: "http://localhost:3453"}}, false},
+		{"Test case 1", fields{DB: mockGorm}, args{p: &Product{Name: "Test", Type: "API", DID: "did", Host: "http://localhost:3453"}}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -47,13 +46,13 @@ func TestManager_GetProduct(t *testing.T) {
 		u string
 	}
 
-	p := &Product{Name: "Test", Type: "API", UUID: "eb5cefe0-891c-40c2-a36d-c2d81e1aeb3d", Host: "http://localhost:3453"}
+	p := &Product{Name: "Test", Type: "API", DID: "eb5cefe0-891c-40c2-a36d-c2d81e1aeb3d", Host: "http://localhost:3453"}
 
 	// New mock db manager instance
 	mockSQL, _, mgr := provideMockDB()
 
 	mockSQL.ExpectBegin()
-	mockSQL.ExpectExec(`INSERT INTO "products"`).WithArgs(AnyTime{}, AnyTime{}, nil, p.Name, p.Type, p.UUID, p.Host).WillReturnResult(sqlmock.NewResult(1, 7))
+	mockSQL.ExpectExec(`INSERT INTO "products"`).WithArgs(AnyTime{}, AnyTime{}, nil, p.Name, p.Type, p.DID, p.Host).WillReturnResult(sqlmock.NewResult(1, 7))
 	mockSQL.ExpectCommit()
 	mockSQL.ExpectationsWereMet()
 
@@ -65,11 +64,11 @@ func TestManager_GetProduct(t *testing.T) {
 		wantP   *Product
 		wantErr bool
 	}{
-		{"Test case 1", args{u: p.UUID}, p, false},
+		{"Test case 1", args{u: p.DID}, p, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockSQL.ExpectQuery(`SELECT`).WithArgs(p.UUID).WillReturnRows(sqlmock.NewRows([]string{"name"}).AddRow("Test"))
+			mockSQL.ExpectQuery(`SELECT`).WithArgs(p.DID).WillReturnRows(sqlmock.NewRows([]string{"name"}).AddRow("Test"))
 			_, err := mgr.GetProduct(tt.args.u)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Manager.GetProduct() error = %v, wantErr %v", err, tt.wantErr)

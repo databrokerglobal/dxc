@@ -83,7 +83,7 @@ func main() {
 
 	// PRODUCTS
 	e.POST("/product", products.AddOne)
-	e.GET("/product/:uuid", products.GetOne)
+	e.GET("/product/:did", products.GetOne)
 	e.GET("/products", products.GetAll)
 
 	// PRODUCTS Request Redirect
