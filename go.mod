@@ -17,6 +17,7 @@ require (
 	github.com/mailru/easyjson v0.7.1 // indirect
 	github.com/robertkrimen/otto v0.0.0-20170205013659-6a77b7cbc37d // indirect
 	github.com/selvatico/go-mocket v1.0.7
+	github.com/sparrc/go-ping v0.0.0-20190613174326-4e5b6552494c
 	github.com/spf13/afero v1.2.2
 	github.com/stretchr/testify v1.5.1
 	github.com/swaggo/echo-swagger v1.0.0
