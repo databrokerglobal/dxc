@@ -34,3 +34,12 @@ func (m *Manager) DeleteProduct(ProductName string) (err error) {
 	}
 	return
 }
+
+// UpdateProduct update a product entry
+func (m *Manager) UpdateProduct(p *Product) (err error) {
+	m.DB.Save(p)
+	if errs := m.DB.GetErrors(); len(errs) > 0 {
+		err = errs[0]
+	}
+	return
+}

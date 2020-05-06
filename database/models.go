@@ -14,9 +14,10 @@ type File struct {
 // Product struct
 type Product struct {
 	gorm.Model
-	Name  string `json:"name"`
-	Type  string `json:"producttype"`
-	DID   string `json:"did"`
-	Host  string `json:"host"`
-	Files []File
+	Name   string `json:"name"`
+	Type   string `json:"producttype"`
+	DID    string `json:"did"`
+	Host   string `json:"host"`
+	Status string `json:"available"`
+	Files  []File
 }
