@@ -9,7 +9,7 @@ func MakeProduct(name string, pType string, did string, host string) *database.P
 	return &database.Product{
 		Name: name,
 		Type: pType,
-		DID:  did,
+		Did:  did,
 		Host: host,
 	}
 }

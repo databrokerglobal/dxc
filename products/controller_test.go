@@ -20,7 +20,7 @@ var mockDB = map[string]*testProduct{
 		Name: "test",
 		Type: "FILE",
 		Host: "N/A",
-		DID:  "eb5cefe0-891c-40c2-a36d-c2d81e1aeb3d",
+		Did:  "eb5cefe0-891c-40c2-a36d-c2d81e1aeb3d",
 	},
 }
 
@@ -40,7 +40,7 @@ func TestAddOneCleanRequest(t *testing.T) {
 type testProduct struct {
 	Name string `json:"name"`
 	Type string `json:"producttype"`
-	DID  string `json:"did"`
+	Did  string `json:"did"`
 	Host string `json:"host"`
 }
 
@@ -68,9 +68,9 @@ func MockAddOne(c echo.Context) error {
 		p.Host = strings.TrimSuffix(p.Host, "/")
 	}
 
-	p.DID = "eb5cefe0-891c-40c2-a36d-c2d81e1aeb3d"
+	p.Did = "eb5cefe0-891c-40c2-a36d-c2d81e1aeb3d"
 
-	mockDB[p.DID] = p
+	mockDB[p.Did] = p
 
 	return c.JSON(http.StatusCreated, p)
 }
@@ -240,25 +240,25 @@ func Test_checkProduct(t *testing.T) {
 		{"first pass", args{p: &database.Product{
 			Name: "plc number 1231323",
 			Type: "API",
-			DID:  "did",
+			Did:  "did",
 			Host: "http://localhost:4000",
 		}}, 100},
 		{"product has empty name", args{p: &database.Product{
 			Name: "",
 			Type: "FILE",
-			DID:  "did",
+			Did:  "did",
 			Host: "http://localhost:4000",
 		}}, 400},
 		{"product is of empty type", args{p: &database.Product{
 			Name: "plc number 1231323",
 			Type: "",
-			DID:  "did",
+			Did:  "did",
 			Host: "http://localhost:4000",
 		}}, 400},
 		{"product has no host", args{p: &database.Product{
 			Name: "Stuff",
 			Type: "API",
-			DID:  "did",
+			Did:  "did",
 			Host: "",
 		}}, 400},
 		{"product is nil", args{p: nil}, 400},
@@ -285,7 +285,7 @@ func Test_parseRequestURL(t *testing.T) {
 		want string
 	}{
 		{"First pass", args{
-			requestURI: fmt.Sprintf("/%s/add", p.DID),
+			requestURI: fmt.Sprintf("/%s/add", p.Did),
 			p:          p,
 		}, "http://localhost:4000/add"},
 	}
@@ -310,31 +310,31 @@ func Test_checkProductForRedirect(t *testing.T) {
 		{"first pass", args{p: &database.Product{
 			Name: "plc number 1231323",
 			Type: "API",
-			DID:  "did",
+			Did:  "did",
 			Host: "http://localhost:4000",
 		}}, 100},
 		{"Is a FILE", args{p: &database.Product{
 			Name: "plc number 1231323",
 			Type: "FILE",
-			DID:  "did",
+			Did:  "did",
 			Host: "http://localhost:4000",
 		}}, 204},
 		{"product has empty name", args{p: &database.Product{
 			Name: "",
 			Type: "FILE",
-			DID:  "did",
+			Did:  "did",
 			Host: "http://localhost:4000",
 		}}, 204},
 		{"product is of empty type", args{p: &database.Product{
 			Name: "plc number 1231323",
 			Type: "",
-			DID:  "did",
+			Did:  "did",
 			Host: "http://localhost:4000",
 		}}, 204},
 		{"product has no host", args{p: &database.Product{
 			Name: "Stuff",
 			Type: "API",
-			DID:  "did",
+			Did:  "did",
 			Host: "",
 		}}, 204},
 		{"product is nil", args{p: nil}, 204},

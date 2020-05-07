@@ -207,7 +207,7 @@ func (m *Manager) CreateProduct(p *Product) (err error) <span class="cov8" title
 // GetProductByDID Query
 func (m *Manager) GetProductByDID(d string) (p *Product, err error) <span class="cov8" title="1">{
         product := Product{}
-        m.DB.Where(&amp;Product{DID: d}).First(&amp;product)
+        m.DB.Where(&amp;Product{Did: d}).First(&amp;product)
         if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
                 err = errs[0]
         }</span>
@@ -605,8 +605,8 @@ func AddOne(c echo.Context) error <span class="cov8" title="1">{
                 p.Host = newHost
         }</span>
 
-        <span class="cov8" title="1">if p.DID == "" </span><span class="cov0" title="0">{
-                p.DID = fmt.Sprintf("did:databroker:%s:%s", p.Name, p.Type)
+        <span class="cov8" title="1">if p.Did == "" </span><span class="cov0" title="0">{
+                p.Did = fmt.Sprintf("did:databroker:%s:%s", p.Name, p.Type)
         }</span>
 
         <span class="cov8" title="1">var omit bool
@@ -713,7 +713,7 @@ func checkProductForRedirect(p *database.Product) int <span class="cov8" title="
 
 func parseRequestURL(requestURI string, p *database.Product) string <span class="cov8" title="1">{
         // replace first encounter of product uuid
-        newRequestURI := strings.TrimPrefix(strings.Replace(requestURI, p.DID, "", 1), "/")
+        newRequestURI := strings.TrimPrefix(strings.Replace(requestURI, p.Did, "", 1), "/")
 
         requestURLSlice := []string{p.Host, newRequestURI}
 

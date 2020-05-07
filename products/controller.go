@@ -70,8 +70,8 @@ func AddOne(c echo.Context) error {
 		p.Host = newHost
 	}
 
-	if p.DID == "" {
-		p.DID = fmt.Sprintf("did:databroker:%s:%s", p.Name, p.Type)
+	if p.Did == "" {
+		p.Did = fmt.Sprintf("did:databroker:%s:%s", p.Name, p.Type)
 	}
 
 	var omit bool
@@ -178,7 +178,7 @@ func checkProductForRedirect(p *database.Product) int {
 
 func parseRequestURL(requestURI string, p *database.Product) string {
 	// replace first encounter of product uuid
-	newRequestURI := strings.TrimPrefix(strings.Replace(requestURI, p.DID, "", 1), "/")
+	newRequestURI := strings.TrimPrefix(strings.Replace(requestURI, p.Did, "", 1), "/")
 
 	requestURLSlice := []string{p.Host, newRequestURI}
 
