@@ -60,7 +60,7 @@
 				
 				<option value="file2">github.com/databrokerglobal/dxc/database/manager.go (36.4%)</option>
 				
-				<option value="file3">github.com/databrokerglobal/dxc/database/products.go (81.2%)</option>
+				<option value="file3">github.com/databrokerglobal/dxc/database/products.go (52.0%)</option>
 				
 				<option value="file4">github.com/databrokerglobal/dxc/database/provide-mock-db.go (80.0%)</option>
 				
@@ -71,6 +71,8 @@
 				<option value="file7">github.com/databrokerglobal/dxc/filemanager/file-parser.go (9.1%)</option>
 				
 				<option value="file8">github.com/databrokerglobal/dxc/products/controller.go (61.3%)</option>
+				
+				<option value="file9">github.com/databrokerglobal/dxc/products/host-check.go (0.0%)</option>
 				
 				</select>
 			</div>
@@ -202,14 +204,24 @@ func (m *Manager) CreateProduct(p *Product) (err error) <span class="cov8" title
         <span class="cov8" title="1">return</span>
 }
 
-// GetProduct Query
-func (m *Manager) GetProduct(d string) (p *Product, err error) <span class="cov8" title="1">{
+// GetProductByDID Query
+func (m *Manager) GetProductByDID(d string) (p *Product, err error) <span class="cov8" title="1">{
         product := Product{}
         m.DB.Where(&amp;Product{DID: d}).First(&amp;product)
         if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
                 err = errs[0]
         }</span>
         <span class="cov8" title="1">return &amp;product, nil</span>
+}
+
+// GetProductByID Query
+func (m *Manager) GetProductByID(id uint) (p *Product, err error) <span class="cov0" title="0">{
+        product := Product{}
+        m.DB.Where("id = ?", id).First(&amp;product)
+        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
+                err = errs[0]
+        }</span>
+        <span class="cov0" title="0">return &amp;product, nil</span>
 }
 
 // GetProducts Get all Products query
@@ -226,6 +238,15 @@ func (m *Manager) DeleteProduct(ProductName string) (err error) <span class="cov
                 err = errs[0]
         }</span>
         <span class="cov8" title="1">return</span>
+}
+
+// UpdateProduct update a product entry
+func (m *Manager) UpdateProduct(p *Product) (err error) <span class="cov0" title="0">{
+        m.DB.Save(p)
+        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
+                err = errs[0]
+        }</span>
+        <span class="cov0" title="0">return</span>
 }
 </pre>
 		
@@ -390,35 +411,40 @@ import (
 // CheckingFiles Delete files that are not in directory anymore, restore files that were deleted but now back in their directory
 func CheckingFiles() <span class="cov0" title="0">{
 
+        // Fetch all files
         color.Magenta("Checking file integrity...")
         files, err := database.DBInstance.GetFiles()
         if err != nil </span><span class="cov0" title="0">{
                 log.Fatal(err)
         }</span>
+
+        // Update file status
         <span class="cov0" title="0">for _, file := range *files </span><span class="cov0" title="0">{
                 _, err := open(file.Name)
                 if err != nil </span><span class="cov0" title="0">{
-                        database.DBInstance.DeleteFile(file.Name)
-                }</span>
-        }
-
-        // Checking if previously deleted files are back up
-        <span class="cov0" title="0">var deletedFiles []database.File
-        // Unscoped includes soft deleted files in the query
-        // Raw allows you to do SQL queries directly
-        database.DBInstance.DB.Unscoped().Raw(`SELECT * FROM files WHERE deleted_at IS NOT NULL`).Find(&amp;deletedFiles)
-
-        for _, deletedFile := range deletedFiles </span><span class="cov0" title="0">{
-                _, err = open(deletedFile.Name)
-                if err == nil </span><span class="cov0" title="0">{
-                        // if file opened successfully remove the soft deletion
-                        database.DBInstance.DB.Unscoped().Model(&amp;deletedFile).Update("deleted_at", nil)
-                }</span>
+                        p, err := database.DBInstance.GetProductByID(file.ProductID)
+                        if err != nil </span><span class="cov0" title="0">{
+                                log.Fatal(err)
+                        }</span>
+                        <span class="cov0" title="0">p.Status = "UNAVAILABLE"
+                        if err := database.DBInstance.UpdateProduct(p); err != nil </span><span class="cov0" title="0">{
+                                log.Fatal(err)
+                        }</span>
+                } else<span class="cov0" title="0"> {
+                        p, err := database.DBInstance.GetProductByID(file.ProductID)
+                        if err != nil </span><span class="cov0" title="0">{
+                                log.Fatal(err)
+                        }</span>
+                        <span class="cov0" title="0">p.Status = "AVAILABLE"
+                        if err := database.DBInstance.UpdateProduct(p); err != nil </span><span class="cov0" title="0">{
+                                log.Fatal(err)
+                        }</span>
+                }
         }
 
         <span class="cov0" title="0">yellow := color.New(color.FgYellow).SprintFunc()
 
-        defer color.Green("Finished checking file integrity %s", yellow("\nCurrent file count: ", len(*files)))</span>
+        defer color.Green("Finished checking file integrity %s", yellow("\nCurrent file count: ", len(*files), "\n"))</span>
 }
 </pre>
 		
@@ -635,7 +661,7 @@ func GetOne(c echo.Context) error <span class="cov8" title="1">{
         var p *database.Product
 
         if !omit </span><span class="cov0" title="0">{
-                p, err = database.DBInstance.GetProduct(did)
+                p, err = database.DBInstance.GetProductByDID(did)
         }</span>
 
         <span class="cov8" title="1">if err != nil </span><span class="cov0" title="0">{
@@ -717,7 +743,7 @@ func RedirectToHost(c echo.Context) error <span class="cov8" title="1">{
                 }</span>
 
                 <span class="cov0" title="0">if !omit </span><span class="cov0" title="0">{
-                        p, err = database.DBInstance.GetProduct(str)
+                        p, err = database.DBInstance.GetProductByDID(str)
                         if err != nil </span><span class="cov0" title="0">{
                                 return c.String(http.StatusNoContent, "")
                         }</span>
@@ -787,6 +813,42 @@ func executeRequest(c echo.Context, r *http.Request) error <span class="cov0" ti
         <span class="cov0" title="0">defer resp.Body.Close()
 
         return c.Blob(resp.StatusCode, resp.Header.Get("Content-Type"), stream)</span>
+}
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package products
+
+import (
+        "log"
+        "net/http"
+
+        "github.com/databrokerglobal/dxc/database"
+        "github.com/fatih/color"
+)
+
+// CheckHost check for a host resp
+func CheckHost() <span class="cov0" title="0">{
+
+        color.Cyan("Verifying API/Stream status...")
+
+        ps, err := database.DBInstance.GetProducts()
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatal(err)
+        }</span>
+
+        <span class="cov0" title="0">for _, p := range *ps </span><span class="cov0" title="0">{
+                _, err = http.Get(p.Host)
+                if err != nil </span><span class="cov0" title="0">{
+                        p.Status = "UNAVAILABLE"
+                }</span> else<span class="cov0" title="0"> {
+                        p.Status = "AVAILABLE"
+                }</span>
+                <span class="cov0" title="0">database.DBInstance.UpdateProduct(&amp;p)</span>
+        }
+
+        <span class="cov0" title="0">yellow := color.New(color.FgHiGreen).SprintFunc()
+
+        defer color.White("Finished checking product liveness %s", yellow("\nCurrent product count: ", len(*ps)))</span>
 }
 </pre>
 		

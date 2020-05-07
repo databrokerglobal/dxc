@@ -101,7 +101,7 @@ func main() {
 
 	var wg sync.WaitGroup
 
-	wg.Add(2)
+	wg.Add(1)
 
 	//////////////////////////
 	// File Checker Routine //
@@ -112,9 +112,22 @@ func main() {
 		wg.Done()
 	}()
 
+	wg.Wait()
+
+	wg.Add(1)
+
+	go func() {
+		products.CheckHost()
+		wg.Done()
+	}()
+
 	/////////////////////////////////////
 	// Ethereum RPC connection routine //
 	/////////////////////////////////////
+
+	wg.Wait()
+
+	wg.Add(1)
 
 	go func() {
 		ethereum.ServeContract()

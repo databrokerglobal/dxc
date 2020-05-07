@@ -126,7 +126,7 @@ func GetOne(c echo.Context) error {
 	var p *database.Product
 
 	if !omit {
-		p, err = database.DBInstance.GetProduct(did)
+		p, err = database.DBInstance.GetProductByDID(did)
 	}
 
 	if err != nil {
@@ -208,7 +208,7 @@ func RedirectToHost(c echo.Context) error {
 		}
 
 		if !omit {
-			p, err = database.DBInstance.GetProduct(str)
+			p, err = database.DBInstance.GetProductByDID(str)
 			if err != nil {
 				return c.String(http.StatusNoContent, "")
 			}

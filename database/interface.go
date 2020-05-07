@@ -7,7 +7,8 @@ type Repository interface {
 	GetFiles() (fs *[]File, err error)
 	DeleteFile(fileName string) (err error)
 	CreateProduct(p *Product) (err error)
-	GetProduct(u string) (p *Product, err error)
+	GetProductByDID(u string) (p *Product, err error)
+	GetProductByID(u uint) (p *Product, err error)
 	GetProducts() (ps *[]Product, err error)
 	DeleteProduct(ProductName string) (err error)
 }

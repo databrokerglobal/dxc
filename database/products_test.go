@@ -69,7 +69,7 @@ func TestManager_GetProduct(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockSQL.ExpectQuery(`SELECT`).WithArgs(p.DID).WillReturnRows(sqlmock.NewRows([]string{"name"}).AddRow("Test"))
-			_, err := mgr.GetProduct(tt.args.u)
+			_, err := mgr.GetProductByDID(tt.args.u)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Manager.GetProduct() error = %v, wantErr %v", err, tt.wantErr)
 				return

@@ -9,10 +9,20 @@ func (m *Manager) CreateProduct(p *Product) (err error) {
 	return
 }
 
-// GetProduct Query
-func (m *Manager) GetProduct(d string) (p *Product, err error) {
+// GetProductByDID Query
+func (m *Manager) GetProductByDID(d string) (p *Product, err error) {
 	product := Product{}
 	m.DB.Where(&Product{DID: d}).First(&product)
+	if errs := m.DB.GetErrors(); len(errs) > 0 {
+		err = errs[0]
+	}
+	return &product, nil
+}
+
+// GetProductByID Query
+func (m *Manager) GetProductByID(id uint) (p *Product, err error) {
+	product := Product{}
+	m.DB.Where("id = ?", id).First(&product)
 	if errs := m.DB.GetErrors(); len(errs) > 0 {
 		err = errs[0]
 	}
