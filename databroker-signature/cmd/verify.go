@@ -1,21 +1,8 @@
-/*
-Copyright © 2020 NAME HERE <EMAIL ADDRESS>
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
 package cmd
 
 import (
+	"databroker-signature/utils"
+
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -24,28 +11,39 @@ import (
 // verifyCmd represents the verify command
 var verifyCmd = &cobra.Command{
 	Use:   "verify",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Verify a signature",
+	Long: `Verify a provided signature.
+	
+	You must provide the signature, the data that was signed, and the public key corresponding to the private key used to generate the signature`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("verify called")
+
+		data, _ := cmd.Flags().GetString("data")
+		signature, _ := cmd.Flags().GetString("signature")
+		publicKey, _ := cmd.Flags().GetString("publicKey")
+
+		verify(data, signature, publicKey)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(verifyCmd)
 
-	// Here you will define your flags and configuration settings.
+	verifyCmd.Flags().StringP("data", "d", "", "data that was signed (string)")
+	verifyCmd.MarkFlagRequired("data")
 
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// verifyCmd.PersistentFlags().String("foo", "", "A help for foo")
+	verifyCmd.Flags().StringP("signature", "s", "", "signature in hex format (string)")
+	verifyCmd.MarkFlagRequired("signature")
 
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// verifyCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	verifyCmd.Flags().StringP("publicKey", "k", "", "public key in hex format (string")
+	verifyCmd.MarkFlagRequired("publicKey")
+}
+
+func verify(data string, signature string, publicKeyHex string) {
+
+	valid := utils.VerifySignature(data, signature, publicKeyHex)
+	if valid {
+		fmt.Println("✔️✔️ the signature is valid ✔️✔️")
+	} else {
+		fmt.Println("⚠️⚠️ !! the signature is not valid !! ⚠️⚠️")
+	}
 }
