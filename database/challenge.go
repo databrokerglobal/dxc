@@ -26,7 +26,7 @@ func (m *Manager) GenerateNewChallenge() (err error) {
 	}
 
 	// Generate new one
-	m.DB.Create(c)
+	m.DB.Create(&c)
 	if errs := m.DB.GetErrors(); len(errs) > 0 {
 		err = errs[0]
 	}

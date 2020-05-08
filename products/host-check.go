@@ -18,14 +18,18 @@ func CheckHost() {
 		log.Fatal(err)
 	}
 
-	for _, p := range *ps {
-		_, err = http.Get(p.Host)
-		if err != nil {
-			p.Status = "UNAVAILABLE"
-		} else {
-			p.Status = "AVAILABLE"
+	if len(*ps) > 0 {
+		for _, p := range *ps {
+			if p.Host != "" && p.Host != "N/A" && p.Name != "" && p.Type != "FILE" {
+				_, err = http.Get(p.Host)
+				if err != nil {
+					p.Status = "UNAVAILABLE"
+				} else {
+					p.Status = "AVAILABLE"
+				}
+				database.DBInstance.UpdateProduct(&p)
+			}
 		}
-		database.DBInstance.UpdateProduct(&p)
 	}
 
 	yellow := color.New(color.FgHiGreen).SprintFunc()

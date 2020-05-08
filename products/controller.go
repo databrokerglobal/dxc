@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/databrokerglobal/dxc/database"
+	"github.com/databrokerglobal/dxc/utils"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
@@ -72,7 +73,8 @@ func AddOne(c echo.Context) error {
 	}
 
 	if p.Did == "" {
-		p.Did = fmt.Sprintf("did:databroker:%s:%s", p.Name, p.Type)
+		rand, _ := utils.GenerateRandomStringURLSafe(10)
+		p.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(p.Name, " ", "", -1), p.Type, rand)
 	}
 
 	var omit bool
