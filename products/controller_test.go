@@ -273,16 +273,16 @@ func Test_checkProduct(t *testing.T) {
 }
 
 func Test_parseRequestURL(t *testing.T) {
-  p := database.Product{
-    Name: "test",
-    Type: "API",
-    Did: "did",
-    Host: "http://localhost:4000"
-  }
+	product := database.Product{
+		Name: "test",
+		Type: "API",
+		Did:  "did",
+		Host: "http://localhost:4000",
+	}
 
 	type args struct {
 		requestURI string
-		p          *database.Product
+		p          database.Product
 	}
 	tests := []struct {
 		name string
@@ -290,13 +290,13 @@ func Test_parseRequestURL(t *testing.T) {
 		want string
 	}{
 		{"First pass", args{
-			requestURI: fmt.Sprintf("/%s/add", p.Did),
-			p:          p,
+			requestURI: fmt.Sprintf("/%s/add", product.Did),
+			p:          product,
 		}, "http://localhost:4000/add"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := parseRequestURL(tt.args.requestURI, tt.args.p); got != tt.want {
+			if got := parseRequestURL(tt.args.requestURI, &tt.args.p); got != tt.want {
 				t.Errorf("parseRequestURL() = %v, want %v", got, tt.want)
 			}
 		})
