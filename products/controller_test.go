@@ -273,7 +273,12 @@ func Test_checkProduct(t *testing.T) {
 }
 
 func Test_parseRequestURL(t *testing.T) {
-	p := utils.MakeProduct("test", "API", "did", "http://localhost:4000")
+  p := database.Product{
+    Name: "test",
+    Type: "API",
+    Did: "did",
+    Host: "http://localhost:4000"
+  }
 
 	type args struct {
 		requestURI string

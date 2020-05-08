@@ -21,3 +21,9 @@ type Product struct {
 	Status string `json:"available"`
 	Files  []File
 }
+
+// Challenge struct
+type Challenge struct {
+	gorm.Model
+	Challenge string `json:"challenge"`
+}

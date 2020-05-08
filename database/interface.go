@@ -11,4 +11,6 @@ type Repository interface {
 	GetProductByID(u uint) (p *Product, err error)
 	GetProducts() (ps *[]Product, err error)
 	DeleteProduct(ProductName string) (err error)
+	GenerateNewChallenge() (err error)
+	GetCurrentChallenge() (c *Challenge, err error)
 }
