@@ -18,7 +18,7 @@ import (
 
 // ExecuteStatusTicker execute 10 min interval ticker
 func ExecuteStatusTicker() {
-	ticker := time.NewTicker(10 * time.Second)
+	ticker := time.NewTicker(10 * time.Minute)
 
 	color.Blue("\nPreparing status request to the DXS...")
 
