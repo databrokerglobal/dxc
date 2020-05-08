@@ -13,7 +13,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func trimLastSlash(host string) (h string) {
+// TrimLastSlash Trim the last slash
+func TrimLastSlash(host string) (h string) {
 	h = host
 	for strings.Split(h, "")[len(h)-1] == "/" {
 		h = strings.TrimSuffix(h, "/")
@@ -66,7 +67,7 @@ func AddOne(c echo.Context) error {
 	}
 
 	if p.Type != "FILE" {
-		newHost := trimLastSlash(p.Host)
+		newHost := TrimLastSlash(p.Host)
 		p.Host = newHost
 	}
 

@@ -136,6 +136,8 @@ func main() {
 
 	wg.Wait()
 
+	go products.ExecuteStatusTicker()
+
 	// Log stuff if port is busy f.e.
 	e.Logger.Fatal(e.Start(":8080"))
 

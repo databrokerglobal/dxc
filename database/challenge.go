@@ -36,6 +36,11 @@ func (m *Manager) GenerateNewChallenge() (err error) {
 // GetCurrentChallenge Query
 func (m *Manager) GetCurrentChallenge() (c *Challenge, err error) {
 	challenge := Challenge{}
+	var n int
+	m.DB.Table("challenge").Count(&n)
+	if n == 0 {
+		m.GenerateNewChallenge()
+	}
 	m.DB.First(&challenge)
 	if errs := m.DB.GetErrors(); len(errs) > 0 {
 		err = errs[0]
