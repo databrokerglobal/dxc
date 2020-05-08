@@ -35,5 +35,4 @@ require (
 	golang.org/x/tools v0.0.0-20200428021058-7ae4988eb4d9 // indirect
 	gopkg.in/ini.v1 v1.55.0 // indirect
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
-	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
