@@ -12,7 +12,11 @@ import (
 var getAddressCmd = &cobra.Command{
 	Use:   "getAddress",
 	Short: "get public key and address from private key",
-	Long:  `get public key and address from private key`,
+	Long: `get public key and address from private key.
+	
+example use:
+
+go run main.go getAddress -p 0xae78c8b502571dba876742437f8bc78b689cf8518356c0921393d89caaf284ce`,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		privateKey, _ := cmd.Flags().GetString("privateKey")
@@ -31,7 +35,7 @@ func init() {
 func getAddress(privateKeyHex string) {
 
 	hexPublicKey := utils.HexPublicKeyFromHexPrivateKey(privateKeyHex)
-	fmt.Println("hexPublicKey: " + hexPublicKey)
+	fmt.Println("publicKey: " + hexPublicKey)
 
 	address := utils.AddressFromHexPrivateKey(privateKeyHex)
 	fmt.Println("address: " + address)

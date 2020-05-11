@@ -12,7 +12,11 @@ import (
 var signCmd = &cobra.Command{
 	Use:   "sign",
 	Short: "sign a piece of data with your private key",
-	Long:  `sign a piece of data with your private key`,
+	Long: `sign a piece of data with your private key
+	
+example use:
+
+go run main.go sign -p 0xae78c8b502571dba876742437f8bc78b689cf8518356c0921393d89caaf284ce -d bou`,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		data, _ := cmd.Flags().GetString("data")
