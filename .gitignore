@@ -20,6 +20,9 @@
 ## Test text file
 test.txt
 
+## used for example data when developing
+test.json
+
 ## env file
 .env
 
