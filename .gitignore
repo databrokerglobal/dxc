@@ -37,5 +37,3 @@ build/
 dxc_build_*/
 
 outfile
-
-databroker-signature
