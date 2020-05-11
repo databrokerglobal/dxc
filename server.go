@@ -1,6 +1,8 @@
 package main
 
 import (
+	"net/http"
+	"strings"
 	"sync"
 
 	"github.com/fatih/color"
@@ -64,6 +66,8 @@ func main() {
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 	}))
 
+	e.Use(CheckLocalhost)
+
 	////////////
 	// ROUTES //
 	////////////
@@ -126,4 +130,22 @@ func main() {
 	// Log stuff if port is busy f.e.
 	e.Logger.Fatal(e.Start(":8080"))
 
+}
+
+// CheckLocalhost is middlewaere to check if request if from localhost
+func CheckLocalhost(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+
+		arrayHost := strings.Split(c.Request().Host, ":") // splits the host and the port
+
+		if arrayHost[0] != "localhost" {
+			return c.String(http.StatusUnauthorized, "this route is only accessible locally")
+		}
+
+		if err := next(c); err != nil {
+			c.Error(err)
+		}
+
+		return nil
+	}
 }
