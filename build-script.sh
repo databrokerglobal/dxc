@@ -11,7 +11,7 @@ go build -o ${BUILD_DIR}/dxc
 cd databroker-signature
 go build -o databroker-signature
 cd ..
-cp ./databroker-signature/databroker-signature ${BUILD_DIR}
+mv ./databroker-signature/databroker-signature ${BUILD_DIR}
 touch ${BUILD_DIR}/dxc.db
 cp .env ${BUILD_DIR}/.env
 pushd ui

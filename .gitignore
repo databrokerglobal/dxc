@@ -37,3 +37,6 @@ build/
 dxc_build_*/
 
 outfile
+
+# dxc build file is created when running `go build`
+dxc

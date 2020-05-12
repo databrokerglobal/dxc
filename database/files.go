@@ -1,5 +1,9 @@
 package database
 
+import (
+	errors "github.com/pkg/errors"
+)
+
 // CreateFile Query
 func (m *Manager) CreateFile(f *File) (err error) {
 	m.DB.Create(f)
@@ -12,7 +16,9 @@ func (m *Manager) CreateFile(f *File) (err error) {
 // GetFile Query
 func (m *Manager) GetFile(n string) (f *File, err error) {
 	file := File{}
-	m.DB.Where(&File{Name: n}).First(&file)
+	if m.DB.Where(&File{Name: n}).First(&file).RecordNotFound() {
+		return nil, errors.New("record not found")
+	}
 	if errs := m.DB.GetErrors(); len(errs) > 0 {
 		err = errs[0]
 	}

@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"os"
 
+	errors "github.com/pkg/errors"
+
 	"github.com/databrokerglobal/dxc/database"
 	"github.com/labstack/echo/v4"
 )
@@ -57,41 +59,17 @@ func Upload(c echo.Context) error {
 // @Produce octet-stream
 // @Success 200 {file} string true
 // @Failure 404 {string} string "File not found"
-// @Router /files/download [get]
+// @Router /file/download [get]
 func Download(c echo.Context) error {
-	// Read form field
+
 	name := c.QueryParam("name")
 
-	var omit bool
-
-	if len(os.Args) > 1 && os.Args[1][:5] == "-test" {
-		omit = true
+	filepath, err := findFile(name)
+	if err != nil {
+		return c.String(http.StatusNotFound, err.Error())
 	}
 
-	if !omit {
-		_, err := database.DBInstance.GetFile(name)
-		if err != nil {
-			return c.String(http.StatusNotFound, "File not found")
-		}
-	}
-
-	var filePath string
-
-	if os.Getenv("GO_ENV") == "local" {
-		filePath = os.Getenv("LOCAL_FILES_DIR")
-	} else {
-		filePath = "/var/files"
-	}
-
-	if omit {
-		filePath = "/tmp"
-		testdata := []byte("test")
-		if err := ioutil.WriteFile(fmt.Sprintf("%s/%s", filePath, name), testdata, 0644); err != nil {
-			return c.String(http.StatusNotFound, "File not found")
-		}
-	}
-
-	return c.Attachment(fmt.Sprintf("%s/%s", filePath, name), name)
+	return c.Attachment(filepath, name)
 }
 
 // GetAll get all files
@@ -114,4 +92,67 @@ func GetAll(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, fs)
+}
+
+// GetDataFile for the user to get a file
+// GetDataFile godoc
+// @Summary Download a file (for users)
+// @Description Download a file from the DXC
+// @Tags files
+// @Accept json
+// @Param did path string true "Digital identifier of the product bought"
+// @Param name query string true "File name"
+// @Param verificationdata query string true "Signed verification data"
+// @Produce octet-stream
+// @Success 200 {file} string true
+// @Failure 401 {string} string "Request not authorized. Signature and verification data invalid"
+// @Failure 404 {string} string "File not found"
+// @Router /getdata/{did}/file [get]
+func GetDataFile(c echo.Context) error {
+
+	// did := c.Param("did")
+	name := c.QueryParam("name")
+
+	filepath, err := findFile(name)
+	if err != nil {
+		return c.String(http.StatusNotFound, err.Error())
+	}
+
+	return c.Attachment(filepath, name)
+}
+
+func findFile(fileName string) (filePath string, err error) {
+
+	var omit bool
+
+	if len(os.Args) > 1 && os.Args[1][:5] == "-test" {
+		omit = true
+	}
+
+	if !omit {
+		_, err := database.DBInstance.GetFile(fileName)
+		if err != nil {
+			return "", errors.Wrap(err, "error getting file from db")
+		}
+	}
+
+	var fileDir string
+
+	if os.Getenv("GO_ENV") == "local" {
+		fileDir = os.Getenv("LOCAL_FILES_DIR")
+	} else {
+		fileDir = "/var/files"
+	}
+
+	filePath = fmt.Sprintf("%s/%s", fileDir, fileName)
+
+	if omit {
+		fileDir = "/tmp"
+		testdata := []byte("test")
+		if err := ioutil.WriteFile(filePath, testdata, 0644); err != nil {
+			return "", errors.Wrap(err, "error writing test file")
+		}
+	}
+
+	return
 }

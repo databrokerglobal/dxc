@@ -9,6 +9,7 @@ import (
 	_ "github.com/databrokerglobal/dxc/docs"
 	"github.com/databrokerglobal/dxc/ethereum"
 	"github.com/databrokerglobal/dxc/filemanager"
+	"github.com/databrokerglobal/dxc/middlewares"
 	"github.com/databrokerglobal/dxc/products"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -74,17 +75,27 @@ func main() {
 
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
+	////
+	// routes for admin
+	////
+
 	// FILES
 	// Upload file route
-	e.POST("/files/upload", filemanager.Upload)
+	e.POST("/files/upload", filemanager.Upload, middlewares.CheckLocalhost)
 	// Download file route
-	e.GET("/files/download", filemanager.Download)
-	e.GET("/files", filemanager.GetAll)
+	e.GET("/file/download", filemanager.Download, middlewares.CheckLocalhost)
+	e.GET("/files", filemanager.GetAll, middlewares.CheckLocalhost)
 
 	// PRODUCTS
-	e.POST("/product", products.AddOne)
-	e.GET("/product/:uuid", products.GetOne)
-	e.GET("/products", products.GetAll)
+	e.POST("/product", products.AddOne, middlewares.CheckLocalhost)
+	e.GET("/product/:uuid", products.GetOne, middlewares.CheckLocalhost)
+	e.GET("/products", products.GetAll, middlewares.CheckLocalhost)
+
+	////
+	// routes accessible by users
+	////
+
+	e.GET("/getdata/:did/file", filemanager.GetDataFile, middlewares.DataAccessVerification)
 
 	// PRODUCTS Request Redirect
 	e.Any("/api/*", products.RedirectToHost)
