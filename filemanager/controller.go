@@ -130,7 +130,7 @@ func findFile(fileName string) (filePath string, err error) {
 	}
 
 	if !omit {
-		file, err := database.DBInstance.GetFile(fileName)
+		_, err := database.DBInstance.GetFile(fileName)
 		if err != nil {
 			return "", errors.Wrap(err, "error getting file from db")
 		}

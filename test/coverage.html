@@ -56,7 +56,7 @@
 				
 				<option value="file0">github.com/databrokerglobal/dxc/database/any-time.go (100.0%)</option>
 				
-				<option value="file1">github.com/databrokerglobal/dxc/database/files.go (77.8%)</option>
+				<option value="file1">github.com/databrokerglobal/dxc/database/files.go (73.7%)</option>
 				
 				<option value="file2">github.com/databrokerglobal/dxc/database/manager.go (36.4%)</option>
 				
@@ -64,7 +64,7 @@
 				
 				<option value="file4">github.com/databrokerglobal/dxc/database/provide-mock-db.go (80.0%)</option>
 				
-				<option value="file5">github.com/databrokerglobal/dxc/filemanager/controller.go (47.1%)</option>
+				<option value="file5">github.com/databrokerglobal/dxc/filemanager/controller.go (46.5%)</option>
 				
 				<option value="file6">github.com/databrokerglobal/dxc/filemanager/file-checker.go (0.0%)</option>
 				
@@ -105,6 +105,10 @@ func (a AnyTime) Match(v driver.Value) bool <span class="cov8" title="1">{
 		
 		<pre class="file" id="file1" style="display: none">package database
 
+import (
+        errors "github.com/pkg/errors"
+)
+
 // CreateFile Query
 func (m *Manager) CreateFile(f *File) (err error) <span class="cov8" title="1">{
         m.DB.Create(f)
@@ -117,8 +121,10 @@ func (m *Manager) CreateFile(f *File) (err error) <span class="cov8" title="1">{
 // GetFile Query
 func (m *Manager) GetFile(n string) (f *File, err error) <span class="cov8" title="1">{
         file := File{}
-        m.DB.Where(&amp;File{Name: n}).First(&amp;file)
-        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
+        if m.DB.Where(&amp;File{Name: n}).First(&amp;file).RecordNotFound() </span><span class="cov0" title="0">{
+                return nil, errors.New("record not found")
+        }</span>
+        <span class="cov8" title="1">if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
                 err = errs[0]
         }</span>
         <span class="cov8" title="1">return &amp;file, nil</span>
@@ -267,6 +273,8 @@ import (
         "net/http"
         "os"
 
+        errors "github.com/pkg/errors"
+
         "github.com/databrokerglobal/dxc/database"
         "github.com/labstack/echo/v4"
 )
@@ -315,46 +323,20 @@ func Upload(c echo.Context) error <span class="cov8" title="1">{
 // @Tags files
 // @Accept json
 // @Param name query string true "File name"
-// @Param verificationdata query string false "Signed verification data"
 // @Produce octet-stream
 // @Success 200 {file} string true
 // @Failure 404 {string} string "File not found"
 // @Router /file/download [get]
 func Download(c echo.Context) error <span class="cov8" title="1">{
 
-        // Read form field
         name := c.QueryParam("name")
 
-        var omit bool
-
-        if len(os.Args) &gt; 1 &amp;&amp; os.Args[1][:5] == "-test" </span><span class="cov8" title="1">{
-                omit = true
+        filepath, err := findFile(name)
+        if err != nil </span><span class="cov8" title="1">{
+                return c.String(http.StatusNotFound, err.Error())
         }</span>
 
-        <span class="cov8" title="1">if !omit </span><span class="cov0" title="0">{
-                _, err := database.DBInstance.GetFile(name)
-                if err != nil </span><span class="cov0" title="0">{
-                        return c.String(http.StatusNotFound, "File not found")
-                }</span>
-        }
-
-        <span class="cov8" title="1">var filePath string
-
-        if os.Getenv("GO_ENV") == "local" </span><span class="cov0" title="0">{
-                filePath = os.Getenv("LOCAL_FILES_DIR")
-        }</span> else<span class="cov8" title="1"> {
-                filePath = "/var/files"
-        }</span>
-
-        <span class="cov8" title="1">if omit </span><span class="cov8" title="1">{
-                filePath = "/tmp"
-                testdata := []byte("test")
-                if err := ioutil.WriteFile(fmt.Sprintf("%s/%s", filePath, name), testdata, 0644); err != nil </span><span class="cov0" title="0">{
-                        return c.String(http.StatusNotFound, "File not found")
-                }</span>
-        }
-
-        <span class="cov8" title="1">return c.Attachment(fmt.Sprintf("%s/%s", filePath, name), name)</span>
+        <span class="cov0" title="0">return c.Attachment(filepath, name)</span>
 }
 
 // GetAll get all files
@@ -394,43 +376,53 @@ func GetAll(c echo.Context) error <span class="cov0" title="0">{
 // @Failure 404 {string} string "File not found"
 // @Router /getdata/{did}/file [get]
 func GetDataFile(c echo.Context) error <span class="cov0" title="0">{
-        // Read form field
-        // name := c.QueryParam("name")
+
         // did := c.Param("did")
+        name := c.QueryParam("name")
 
-        return c.String(http.StatusOK, "success JONY")
+        filepath, err := findFile(name)
+        if err != nil </span><span class="cov0" title="0">{
+                return c.String(http.StatusNotFound, err.Error())
+        }</span>
 
-        // var omit bool
+        <span class="cov0" title="0">return c.Attachment(filepath, name)</span>
+}
 
-        // if len(os.Args) &gt; 1 &amp;&amp; os.Args[1][:5] == "-test" {
-        //         omit = true
-        // }
+func findFile(fileName string) (filePath string, err error) <span class="cov8" title="1">{
 
-        // if !omit {
-        //         _, err := database.DBInstance.GetFile(name)
-        //         if err != nil {
-        //                 return c.String(http.StatusNotFound, "File not found")
-        //         }
-        // }
+        var omit bool
 
-        // var filePath string
+        if len(os.Args) &gt; 1 &amp;&amp; os.Args[1][:5] == "-test" </span><span class="cov8" title="1">{
+                omit = true
+        }</span>
 
-        // if os.Getenv("GO_ENV") == "local" {
-        //         filePath = os.Getenv("LOCAL_FILES_DIR")
-        // } else {
-        //         filePath = "/var/files"
-        // }
+        <span class="cov8" title="1">if !omit </span><span class="cov0" title="0">{
+                _, err := database.DBInstance.GetFile(fileName)
+                if err != nil </span><span class="cov0" title="0">{
+                        return "", errors.Wrap(err, "error getting file from db")
+                }</span>
+        }
 
-        // if omit {
-        //         filePath = "/tmp"
-        //         testdata := []byte("test")
-        //         if err := ioutil.WriteFile(fmt.Sprintf("%s/%s", filePath, name), testdata, 0644); err != nil {
-        //                 return c.String(http.StatusNotFound, "File not found")
-        //         }
-        // }
+        <span class="cov8" title="1">var fileDir string
 
-        // return c.Attachment(fmt.Sprintf("%s/%s", filePath, name), name)
-}</span>
+        if os.Getenv("GO_ENV") == "local" </span><span class="cov0" title="0">{
+                fileDir = os.Getenv("LOCAL_FILES_DIR")
+        }</span> else<span class="cov8" title="1"> {
+                fileDir = "/var/files"
+        }</span>
+
+        <span class="cov8" title="1">filePath = fmt.Sprintf("%s/%s", fileDir, fileName)
+
+        if omit </span><span class="cov8" title="1">{
+                fileDir = "/tmp"
+                testdata := []byte("test")
+                if err := ioutil.WriteFile(filePath, testdata, 0644); err != nil </span><span class="cov8" title="1">{
+                        return "", errors.Wrap(err, "error writing test file")
+                }</span>
+        }
+
+        <span class="cov0" title="0">return</span>
+}
 </pre>
 		
 		<pre class="file" id="file6" style="display: none">package filemanager
