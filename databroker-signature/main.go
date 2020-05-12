@@ -1,6 +1,6 @@
 package main
 
-import "databroker-signature/cmd"
+import "github.com/databrokerglobal/dxc/databroker-signature/cmd"
 
 func main() {
 	cmd.Execute()

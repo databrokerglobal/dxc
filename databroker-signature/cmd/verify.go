@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"databroker-signature/utils"
+	"github.com/databrokerglobal/dxc/cryptoutils"
 
 	"fmt"
 
@@ -48,7 +48,11 @@ func init() {
 
 func verify(data string, signature string, publicKeyHex string) {
 
-	valid := utils.VerifySignature(data, signature, publicKeyHex)
+	valid, err := cryptoutils.VerifySignature(data, signature, publicKeyHex)
+	if err != nil {
+		fmt.Println("error verifying signature. err: " + err.Error())
+		return
+	}
 	if valid {
 		fmt.Println("✔️✔️ the signature is valid ✔️✔️")
 	} else {

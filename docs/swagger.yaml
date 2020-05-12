@@ -45,6 +45,35 @@ info:
   title: DXC
   version: "1.0"
 paths:
+  /file/download:
+    get:
+      consumes:
+      - application/json
+      description: Download a file from the DXC
+      parameters:
+      - description: File name
+        in: query
+        name: name
+        required: true
+        type: string
+      - description: Signed verification data
+        in: query
+        name: verificationdata
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "404":
+          description: File not found
+          schema:
+            type: string
+      summary: Download a file
+      tags:
+      - files
   /files:
     get:
       consumes:
@@ -64,31 +93,6 @@ paths:
           schema:
             type: string
       summary: Get files
-      tags:
-      - files
-  /files/download:
-    get:
-      consumes:
-      - application/json
-      description: Download a file from the DXC
-      parameters:
-      - description: File name
-        in: query
-        name: name
-        required: true
-        type: string
-      produces:
-      - application/octet-stream
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: file
-        "404":
-          description: File not found
-          schema:
-            type: string
-      summary: Download a file
       tags:
       - files
   /files/upload:
@@ -123,6 +127,45 @@ paths:
           schema:
             type: string
       summary: Upload a file
+      tags:
+      - files
+  /getdata/{did}/file:
+    get:
+      consumes:
+      - application/json
+      description: Download a file from the DXC
+      parameters:
+      - description: Digital identifier of the product bought
+        in: path
+        name: did
+        required: true
+        type: string
+      - description: File name
+        in: query
+        name: name
+        required: true
+        type: string
+      - description: Signed verification data
+        in: query
+        name: verificationdata
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "401":
+          description: Request not authorized. Signature and verification data invalid
+          schema:
+            type: string
+        "404":
+          description: File not found
+          schema:
+            type: string
+      summary: Download a file (for users)
       tags:
       - files
   /product:
