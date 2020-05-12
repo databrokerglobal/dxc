@@ -34,12 +34,6 @@
                         "name": "name",
                         "in": "query",
                         "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Signed verification data",
-                        "name": "verificationdata",
-                        "in": "query"
                     }
                 ],
                 "responses": {

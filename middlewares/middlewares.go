@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/databrokerglobal/dxc/cryptoutils"
+	"github.com/databrokerglobal/dxc/utils"
 
 	_ "github.com/databrokerglobal/dxc/docs"
 	"github.com/labstack/echo/v4"
@@ -59,7 +59,7 @@ func DataAccessVerification(next echo.HandlerFunc) echo.HandlerFunc {
 
 		// check signature is valid
 
-		sigIsValid, err := cryptoutils.VerifySignature(verificationDataObject.UnsignedData, verificationDataObject.Signature, verificationDataObject.PublicKey)
+		sigIsValid, err := utils.VerifySignature(verificationDataObject.UnsignedData, verificationDataObject.Signature, verificationDataObject.PublicKey)
 		if err != nil {
 			return c.String(http.StatusBadRequest, "Verification data is not valid. err: "+err.Error())
 		}
@@ -82,7 +82,7 @@ func DataAccessVerification(next echo.HandlerFunc) echo.HandlerFunc {
 
 		// TODO: check supplied challenge exists in db and is not older that the start of the deal
 
-		// TODO: check address (take from public key -- use cryptoutils) is allowed to use that did
+		// TODO: check address (take from public key -- use crypto utils) is allowed to use that did
 
 		if err := next(c); err != nil {
 			c.Error(err)

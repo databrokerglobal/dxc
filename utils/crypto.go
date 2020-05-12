@@ -1,6 +1,6 @@
 // go-ethereum crypto stuff explanation: https://goethereumbook.org/en/
 
-package cryptoutils
+package utils
 
 import (
 	"bytes"

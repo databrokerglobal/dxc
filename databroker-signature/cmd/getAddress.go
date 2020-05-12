@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/databrokerglobal/dxc/cryptoutils"
+	"github.com/databrokerglobal/dxc/utils"
 
 	"fmt"
 
@@ -34,14 +34,14 @@ func init() {
 
 func getAddress(privateKeyHex string) {
 
-	hexPublicKey, err := cryptoutils.HexPublicKeyFromHexPrivateKey(privateKeyHex)
+	hexPublicKey, err := utils.HexPublicKeyFromHexPrivateKey(privateKeyHex)
 	if err != nil {
 		fmt.Println("error calculating public key from private key: " + err.Error())
 		return
 	}
 	fmt.Println("publicKey: " + hexPublicKey)
 
-	address, err := cryptoutils.AddressFromHexPrivateKey(privateKeyHex)
+	address, err := utils.AddressFromHexPrivateKey(privateKeyHex)
 	if err != nil {
 		fmt.Println("error calculating address from private key: " + err.Error())
 		return

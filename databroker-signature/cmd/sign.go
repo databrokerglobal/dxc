@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/databrokerglobal/dxc/cryptoutils"
+	"github.com/databrokerglobal/dxc/utils"
 
 	"fmt"
 
@@ -38,7 +38,7 @@ func init() {
 
 func sign(data string, privateKeyHex string) {
 
-	signature, err := cryptoutils.SignDataWithPrivateKey(data, privateKeyHex)
+	signature, err := utils.SignDataWithPrivateKey(data, privateKeyHex)
 	if err != nil {
 		fmt.Println("error signing data with private key. err: " + err.Error())
 		return

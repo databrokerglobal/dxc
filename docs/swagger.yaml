@@ -56,10 +56,6 @@ paths:
         name: name
         required: true
         type: string
-      - description: Signed verification data
-        in: query
-        name: verificationdata
-        type: string
       produces:
       - application/octet-stream
       responses:

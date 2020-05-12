@@ -64,7 +64,7 @@
 				
 				<option value="file4">github.com/databrokerglobal/dxc/database/provide-mock-db.go (80.0%)</option>
 				
-				<option value="file5">github.com/databrokerglobal/dxc/filemanager/controller.go (48.5%)</option>
+				<option value="file5">github.com/databrokerglobal/dxc/filemanager/controller.go (47.1%)</option>
 				
 				<option value="file6">github.com/databrokerglobal/dxc/filemanager/file-checker.go (0.0%)</option>
 				
@@ -272,6 +272,18 @@ import (
 )
 
 // Upload file controller
+// Upload godoc
+// @Summary Upload a file
+// @Description Link a file from the LOCAL_FILES_DIR to the DXC
+// @Tags files
+// @Accept mpfd
+// @Param file formData file true "File to Upload"
+// @Produce json
+// @Success 200 {string} string true
+// @Failure 400 {string} string "File invalid or empty"
+// @Failure 404 {string} string "File not found, is the uploaded file in the rigth directory or correctly bound to your docker volume?""
+// @Failure 500 {string} string "Error inserting file metadata in database"
+// @Router /files/upload [post]
 func Upload(c echo.Context) error <span class="cov8" title="1">{
 
         // Source - File stream from upload
@@ -293,11 +305,23 @@ func Upload(c echo.Context) error <span class="cov8" title="1">{
         }</span>
 
         // Return succes message
-        <span class="cov0" title="0">return c.HTML(http.StatusOK, fmt.Sprintf("&lt;p&gt;File %s uploaded successfully. File checksum result: OK&lt;/p&gt;", file.Filename))</span>
+        <span class="cov0" title="0">return c.String(http.StatusOK, fmt.Sprintf("File %s uploaded successfully. File checksum result: OK", file.Filename))</span>
 }
 
 // Download a file
+// Download godoc
+// @Summary Download a file
+// @Description Download a file from the DXC
+// @Tags files
+// @Accept json
+// @Param name query string true "File name"
+// @Param verificationdata query string false "Signed verification data"
+// @Produce octet-stream
+// @Success 200 {file} string true
+// @Failure 404 {string} string "File not found"
+// @Router /file/download [get]
 func Download(c echo.Context) error <span class="cov8" title="1">{
+
         // Read form field
         name := c.QueryParam("name")
 
@@ -334,6 +358,15 @@ func Download(c echo.Context) error <span class="cov8" title="1">{
 }
 
 // GetAll get all files
+// GetFiles godoc
+// @Summary Get files
+// @Description Get all files linked
+// @Tags files
+// @Accept json
+// @Produce json
+// @Success 200 {array} database.File true
+// @Failure 500 {string} string "Error retrieving item from database"
+// @Router /files [get]
 func GetAll(c echo.Context) error <span class="cov0" title="0">{
         var fs *[]database.File
 
@@ -345,6 +378,59 @@ func GetAll(c echo.Context) error <span class="cov0" title="0">{
 
         <span class="cov0" title="0">return c.JSON(http.StatusOK, fs)</span>
 }
+
+// GetDataFile for the user to get a file
+// GetDataFile godoc
+// @Summary Download a file (for users)
+// @Description Download a file from the DXC
+// @Tags files
+// @Accept json
+// @Param did path string true "Digital identifier of the product bought"
+// @Param name query string true "File name"
+// @Param verificationdata query string true "Signed verification data"
+// @Produce octet-stream
+// @Success 200 {file} string true
+// @Failure 401 {string} string "Request not authorized. Signature and verification data invalid"
+// @Failure 404 {string} string "File not found"
+// @Router /getdata/{did}/file [get]
+func GetDataFile(c echo.Context) error <span class="cov0" title="0">{
+        // Read form field
+        // name := c.QueryParam("name")
+        // did := c.Param("did")
+
+        return c.String(http.StatusOK, "success JONY")
+
+        // var omit bool
+
+        // if len(os.Args) &gt; 1 &amp;&amp; os.Args[1][:5] == "-test" {
+        //         omit = true
+        // }
+
+        // if !omit {
+        //         _, err := database.DBInstance.GetFile(name)
+        //         if err != nil {
+        //                 return c.String(http.StatusNotFound, "File not found")
+        //         }
+        // }
+
+        // var filePath string
+
+        // if os.Getenv("GO_ENV") == "local" {
+        //         filePath = os.Getenv("LOCAL_FILES_DIR")
+        // } else {
+        //         filePath = "/var/files"
+        // }
+
+        // if omit {
+        //         filePath = "/tmp"
+        //         testdata := []byte("test")
+        //         if err := ioutil.WriteFile(fmt.Sprintf("%s/%s", filePath, name), testdata, 0644); err != nil {
+        //                 return c.String(http.StatusNotFound, "File not found")
+        //         }
+        // }
+
+        // return c.Attachment(fmt.Sprintf("%s/%s", filePath, name), name)
+}</span>
 </pre>
 		
 		<pre class="file" id="file6" style="display: none">package filemanager
@@ -500,7 +586,25 @@ func trimLastSlash(host string) (h string) <span class="cov8" title="1">{
         <span class="cov8" title="1">return h</span>
 }
 
+// ProductController safe type for the controller
+type ProductController struct {
+        Name  string `json:"name"`
+        Type  string `json:"producttype"`
+        Host  string `json:"host"`
+        Files []database.File
+}
+
 // AddOne product
+// Create godoc
+// @Summary Create Product
+// @Description Create a product
+// @Tags products
+// @Accept json
+// @Produce json
+// @Param p body ProductController true "Product"
+// @Success 201 {object} ProductController "Success"
+// @Failure 400 {string} string "Error creating product"
+// @Router /product [post]
 func AddOne(c echo.Context) error <span class="cov8" title="1">{
         p := new(database.Product)
 
@@ -510,7 +614,7 @@ func AddOne(c echo.Context) error <span class="cov8" title="1">{
 
         <span class="cov8" title="1">status := checkProduct(p)
         if status == http.StatusBadRequest </span><span class="cov0" title="0">{
-                return c.String(http.StatusBadRequest, "")
+                return c.String(http.StatusBadRequest, "Name, Type or Host (if product type is not FILE) are empty but are required")
         }</span>
 
         <span class="cov8" title="1">if p.Type == "FILE" </span><span class="cov0" title="0">{
@@ -519,10 +623,10 @@ func AddOne(c echo.Context) error <span class="cov8" title="1">{
 
         <span class="cov8" title="1">if p.Type == "FILE" </span><span class="cov0" title="0">{
                 if p.Files == nil </span><span class="cov0" title="0">{
-                        return c.String(http.StatusBadRequest, "")
+                        return c.String(http.StatusBadRequest, "Product is of type File but no files linked")
                 }</span>
                 <span class="cov0" title="0">if len(p.Files) == 0 </span><span class="cov0" title="0">{
-                        return c.String(http.StatusBadRequest, "")
+                        return c.String(http.StatusBadRequest, "Product is of type File but no files linked")
                 }</span>
         }
 
@@ -555,6 +659,15 @@ func AddOne(c echo.Context) error <span class="cov8" title="1">{
 }
 
 // GetAll return all products
+// GetProducts godoc
+// @Summary Get products
+// @Description Get all products
+// @Tags products
+// @Accept json
+// @Produce json
+// @Success 200 {array} database.Product true
+// @Failure 500 {string} string "Error retrieving item from database"
+// @Router /products [get]
 func GetAll(c echo.Context) error <span class="cov0" title="0">{
         var ps *[]database.Product
 
@@ -605,7 +718,7 @@ func checkProduct(p *database.Product) int <span class="cov8" title="1">{
                 status = http.StatusBadRequest</span>
         case p.Type == "":<span class="cov8" title="1">
                 status = http.StatusBadRequest</span>
-        case p.Host == "":<span class="cov8" title="1">
+        case p.Host == "" &amp;&amp; p.Type != "FILE":<span class="cov8" title="1">
                 status = http.StatusBadRequest</span>
         default:<span class="cov8" title="1">
                 status = http.StatusContinue</span>
