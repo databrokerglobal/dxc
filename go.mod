@@ -5,7 +5,7 @@ go 1.12
 require (
 	github.com/DATA-DOG/go-sqlmock v1.4.1
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
-	github.com/ethereum/go-ethereum v1.9.13
+	github.com/ethereum/go-ethereum v1.9.14
 	github.com/fatih/color v1.9.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-openapi/spec v0.19.7 // indirect
