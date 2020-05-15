@@ -81,15 +81,15 @@ func main() {
 
 	// FILES
 	// Upload file route
-	e.POST("/files/upload", filemanager.Upload, middlewares.CheckLocalhost)
+	e.POST("/files/upload", filemanager.Upload) //, middlewares.CheckLocalhost)
 	// Download file route
-	e.GET("/file/download", filemanager.Download, middlewares.CheckLocalhost)
-	e.GET("/files", filemanager.GetAll, middlewares.CheckLocalhost)
+	e.GET("/file/download", filemanager.Download) //, middlewares.CheckLocalhost)
+	e.GET("/files", filemanager.GetAll)           //, middlewares.CheckLocalhost)
 
 	// PRODUCTS
-	e.POST("/product", products.AddOne, middlewares.CheckLocalhost)
-	e.GET("/product/:uuid", products.GetOne, middlewares.CheckLocalhost)
-	e.GET("/products", products.GetAll, middlewares.CheckLocalhost)
+	e.POST("/product", products.AddOne)      //, middlewares.CheckLocalhost)
+	e.GET("/product/:uuid", products.GetOne) //, middlewares.CheckLocalhost)
+	e.GET("/products", products.GetAll)      //, middlewares.CheckLocalhost)
 
 	////
 	// routes accessible by users
