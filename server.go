@@ -149,8 +149,6 @@ func main() {
 
 	go products.ExecuteStatusTicker()
 
-	go products.TestSendStatus()
-
 	// Log stuff if port is busy f.e.
 	e.Logger.Fatal(e.Start(":8080"))
 
