@@ -103,6 +103,7 @@ func AddOne(c echo.Context) error {
 // @Failure 500 {string} string "Error retrieving item from database"
 // @Router /products [get]
 func GetAll(c echo.Context) error {
+
 	var ps *[]database.Product
 
 	ps, err := database.DBInstance.GetProducts()

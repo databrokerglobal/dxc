@@ -43,4 +43,5 @@ func init() {
 	DBInstance.DB.AutoMigrate(&File{})
 	DBInstance.DB.AutoMigrate(&Product{})
 	DBInstance.DB.AutoMigrate(&Challenge{})
+	DBInstance.DB.AutoMigrate(&UserAuth{})
 }

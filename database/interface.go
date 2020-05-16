@@ -13,4 +13,8 @@ type Repository interface {
 	DeleteProduct(ProductName string) (err error)
 	GenerateNewChallenge() (err error)
 	GetCurrentChallenge() (c *Challenge, err error)
+
+	// UserAuth
+	SaveNewUserAuth(address string, apiKey string) (err error)
+	GetLatestUserAuth() (u *UserAuth, err error)
 }

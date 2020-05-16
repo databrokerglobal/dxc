@@ -27,3 +27,10 @@ type Challenge struct {
 	gorm.Model
 	Challenge string `json:"challenge"`
 }
+
+// UserAuth struct to
+type UserAuth struct {
+	gorm.Model
+	Address string `json:"address"`
+	APIKey  string `json:"api_key"`
+}

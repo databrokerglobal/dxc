@@ -34,7 +34,7 @@ func ExecuteStatusTicker() {
 		wg.Wait()
 
 		go func() {
-			sendStatus()
+			SendStatus()
 		}()
 	}
 }
@@ -62,7 +62,8 @@ func doChecks() {
 	defer color.Magenta("Finished checking product files and hosts...")
 }
 
-func sendStatus() {
+// SendStatus sends the dxc status and products to the DXS
+func SendStatus() {
 	products, err := database.DBInstance.GetProducts()
 	if err != nil {
 		log.Fatal("Database error: ", err)
@@ -97,9 +98,17 @@ func sendStatus() {
 
 	dxsURL := os.Getenv("DXS_HOST")
 
+	userAuth, err := database.DBInstance.GetLatestUserAuth()
+	if err != nil {
+		color.Red("Error sending status request because of error getting user auth. err: ", err)
+	}
+	if userAuth == nil {
+		color.Red("Error sending status request because no user auth data in exist in db")
+	}
+
 	client := &http.Client{}
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/dxc", TrimLastSlash(dxsURL)), bytes.NewBuffer(jsonBody))
-	req.SetBasicAuth("0x2f112ad225E011f067b2E456532918E6D679F978", "cb6075edfcdc003565bc7a6c")
+	req.SetBasicAuth(userAuth.Address, userAuth.APIKey)
 	resp, err := client.Do(req)
 
 	if err != nil {

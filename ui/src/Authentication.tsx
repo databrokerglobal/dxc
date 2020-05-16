@@ -1,7 +1,6 @@
 import React from "react";
-// import { fetcher, LOCAL_HOST } from "./fetchers";
-// import useSWR from "swr";
-// import axios from "axios";
+import { LOCAL_HOST } from "./fetchers";
+import axios from "axios";
 import {
   Button,
   TextField,
@@ -28,27 +27,65 @@ interface IAuth {
   apiKey: string;
 }
 
+let firstShow = true;
+
 export const Authentication = () => {
+
   const [body, setBody] = React.useState<IAuth>({
-    address: "0x2f112ad225E011f067b2E456532918E6D679F978",
-    apiKey: "cb6075edfcdc003565bc7a6c",
+    address: "",
+    apiKey: "",
   });
-  const [resp] = React.useState<string>("");
-  const [err] = React.useState<string>("");
+
+  const [resp, setResp] = React.useState<string>("");
+  const [err, setErr] = React.useState<string>("");
+
+  // reset error or response + form
+  React.useEffect(() => {
+    if (!R.isEmpty(err)) {
+      setTimeout(() => {
+        setErr("");
+      }, 2000);
+    }
+    if (!R.isEmpty(resp)) {
+      setTimeout(() => {
+        setResp("");
+      }, 2000);
+    }
+  });
 
   const schema = Yup.object().shape({
     address: Yup.string().required(),
     apiKey: Yup.string().required(),
   });
 
+  const getData = async () => {
+    axios
+      .get(`${LOCAL_HOST}/user/authinfo`)
+      .then(data => {
+        console.log(data)
+        setBody({
+          address: data.data.address,
+          apiKey: data.data.api_key,
+        });
+      })
+      .catch(err => {
+        console.log(err);
+        return null;
+      });
+  };
+
+  if (firstShow) {
+    firstShow = false;
+    getData();
+  }
+
   const handleSave = async () => {
-    console.log(body);
-    // try {
-    //   await axios.post(`${LOCAL_HOST}/product`, body);
-    //   setResp(`Success. Product created.`);
-    // } catch (error) {
-    //   setErr(error.toString());
-    // }
+    try {
+      await axios.post(`${LOCAL_HOST}/user/authinfo?address=${body.address}&apiKey=${body.apiKey}`);
+      setResp(`Authentication data successfully saved.`);
+    } catch (error) {
+      setErr(error.toString());
+    }
   };
 
   const handleAddress = (event: any) => {
@@ -76,7 +113,7 @@ export const Authentication = () => {
           required
           id="address"
           label="Address"
-          helperText="This is the address of your seller account in the CMS"
+          helperText="This is the wallet address of your seller account in the CMS"
           value={body?.address}
           onChange={handleAddress}
         />
