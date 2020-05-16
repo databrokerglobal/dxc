@@ -87,9 +87,9 @@ func main() {
 	e.GET("/files", filemanager.GetAll)           //, middlewares.CheckLocalhost)
 
 	// PRODUCTS
-	e.POST("/product", products.AddOne)      //, middlewares.CheckLocalhost)
+	e.POST("/product", products.AddOne)     //, middlewares.CheckLocalhost)
 	e.GET("/product/:did", products.GetOne) //, middlewares.CheckLocalhost)
-	e.GET("/products", products.GetAll)      //, middlewares.CheckLocalhost)
+	e.GET("/products", products.GetAll)     //, middlewares.CheckLocalhost)
 
 	////
 	// routes accessible by users
@@ -148,6 +148,8 @@ func main() {
 	wg.Wait()
 
 	go products.ExecuteStatusTicker()
+
+	go products.TestSendStatus()
 
 	// Log stuff if port is busy f.e.
 	e.Logger.Fatal(e.Start(":8080"))

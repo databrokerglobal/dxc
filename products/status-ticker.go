@@ -92,7 +92,52 @@ func sendStatus() {
 
 	dxsURL := os.Getenv("DXS_HOST")
 
-	resp, err := http.Post(fmt.Sprintf("%s/dxc", TrimLastSlash(dxsURL)), "applicatin/json", bytes.NewBuffer(jsonBody))
+	resp, err := http.Post(fmt.Sprintf("%s/dxc", TrimLastSlash(dxsURL)), "application/json", bytes.NewBuffer(jsonBody))
+
+	if err != nil {
+		color.Red("Error sending status request to the DXS host (%s): %v", dxsURL, err)
+	} else {
+		color.Green("Successfully sent status to the DXS host (%s): %v", dxsURL, *resp)
+	}
+}
+
+// TestSendStatus() JONY to be removec
+func TestSendStatus() {
+	products, err := database.DBInstance.GetProducts()
+	if err != nil {
+		log.Fatal("Database error: ", err)
+	}
+
+	var productsArray []map[string]string
+
+	for _, product := range *products {
+		if product.Did != "" {
+			productObject := make(map[string]string)
+			productObject["did"] = product.Did
+			productObject["status"] = product.Status
+			productsArray = append(productsArray, productObject)
+		}
+	}
+
+	challenge, err := database.DBInstance.GetCurrentChallenge()
+	if err != nil {
+		log.Fatal("Database error: ", err)
+	}
+
+	body := make(map[string]interface{})
+
+	body["challenge"] = challenge.Challenge
+	body["products"] = productsArray
+
+	jsonBody, err := json.Marshal(body)
+	fmt.Println(string(jsonBody))
+	if err != nil {
+		log.Fatal("JSON encoding error: ", err)
+	}
+
+	dxsURL := os.Getenv("DXS_HOST")
+
+	resp, err := http.Post(fmt.Sprintf("%s/dxc", TrimLastSlash(dxsURL)), "application/json", bytes.NewBuffer(jsonBody))
 
 	if err != nil {
 		color.Red("Error sending status request to the DXS host (%s): %v", dxsURL, err)
