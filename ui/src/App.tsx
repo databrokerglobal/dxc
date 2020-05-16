@@ -2,6 +2,7 @@ import React from "react";
 import "./App.css";
 import { ProductForm, ProductList } from "./Products";
 import { FilesList, FileForm, IFile } from "./Files";
+import { Authentication } from "./Authentication";
 import {
   Container,
   AppBar,
@@ -59,6 +60,11 @@ function App() {
               <ProductForm />
             </TransferlistContext.Provider>
           </Grid>
+        </Grid>
+        <Typography style={{marginTop: "50px",}} variant="subtitle1">Authentication</Typography>
+        <Divider />
+        <Grid item xs={12}>
+          <Authentication />
         </Grid>
       </Grid>
     </Container>

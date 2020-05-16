@@ -8,6 +8,10 @@ definitions:
     type: object
   database.Product:
     properties:
+      available:
+        type: string
+      did:
+        type: string
       files:
         items:
           $ref: '#/definitions/database.File'
@@ -18,7 +22,12 @@ definitions:
         type: string
       producttype:
         type: string
-      uuid:
+    type: object
+  database.UserAuth:
+    properties:
+      address:
+        type: string
+      api_key:
         type: string
     type: object
   products.ProductController:
@@ -211,4 +220,50 @@ paths:
       summary: Get products
       tags:
       - products
+  /user/authinfo:
+    get:
+      description: Get address and api key for authentication with DXS
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/database.UserAuth'
+        "404":
+          description: Not data found
+          schema:
+            type: string
+        "500":
+          description: Error getting auth info
+          schema:
+            type: string
+      summary: Get auth info
+      tags:
+      - user
+    post:
+      description: Save address and api key for authentication with DXS
+      parameters:
+      - description: Address
+        in: query
+        name: address
+        required: true
+        type: string
+      - description: API Key
+        in: query
+        name: apiKey
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Error saving auth info
+          schema:
+            type: string
+      summary: Save auth info
+      tags:
+      - user
 swagger: "2.0"

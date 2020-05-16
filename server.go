@@ -11,6 +11,8 @@ import (
 	"github.com/databrokerglobal/dxc/filemanager"
 	"github.com/databrokerglobal/dxc/middlewares"
 	"github.com/databrokerglobal/dxc/products"
+	"github.com/databrokerglobal/dxc/usermanager"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
@@ -90,6 +92,10 @@ func main() {
 	e.POST("/product", products.AddOne)     //, middlewares.CheckLocalhost)
 	e.GET("/product/:did", products.GetOne) //, middlewares.CheckLocalhost)
 	e.GET("/products", products.GetAll)     //, middlewares.CheckLocalhost)
+
+	// USERS
+	e.POST("/user/authinfo", usermanager.SaveUserAuth) //, middlewares.CheckLocalhost)
+	e.GET("/user/authinfo", usermanager.GetUserAuth)   //, middlewares.CheckLocalhost)
 
 	////
 	// routes accessible by users
