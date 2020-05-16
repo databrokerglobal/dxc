@@ -45,28 +45,7 @@ info:
   title: DXC
   version: "1.0"
 paths:
-  /files:
-    get:
-      consumes:
-      - application/json
-      description: Get all files linked
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/database.File'
-            type: array
-        "500":
-          description: Error retrieving item from database
-          schema:
-            type: string
-      summary: Get files
-      tags:
-      - files
-  /files/download:
+  /file/download:
     get:
       consumes:
       - application/json
@@ -89,6 +68,27 @@ paths:
           schema:
             type: string
       summary: Download a file
+      tags:
+      - files
+  /files:
+    get:
+      consumes:
+      - application/json
+      description: Get all files linked
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/database.File'
+            type: array
+        "500":
+          description: Error retrieving item from database
+          schema:
+            type: string
+      summary: Get files
       tags:
       - files
   /files/upload:
@@ -123,6 +123,45 @@ paths:
           schema:
             type: string
       summary: Upload a file
+      tags:
+      - files
+  /getdata/{did}/file:
+    get:
+      consumes:
+      - application/json
+      description: Download a file from the DXC
+      parameters:
+      - description: Digital identifier of the product bought
+        in: path
+        name: did
+        required: true
+        type: string
+      - description: File name
+        in: query
+        name: name
+        required: true
+        type: string
+      - description: Signed verification data
+        in: query
+        name: verificationdata
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "401":
+          description: Request not authorized. Signature and verification data invalid
+          schema:
+            type: string
+        "404":
+          description: File not found
+          schema:
+            type: string
+      summary: Download a file (for users)
       tags:
       - files
   /product:

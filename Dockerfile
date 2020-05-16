@@ -1,6 +1,8 @@
 FROM mhart/alpine-node:12 AS ui
 WORKDIR /
 COPY /ui .
+ARG REACT_APP_DXC_HOST
+ENV REACT_APP_DXC_HOST $REACT_APP_DXC_HOST
 RUN npm install --silent
 RUN npm run build --silent
 

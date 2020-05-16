@@ -20,6 +20,9 @@
 ## Test text file
 test.txt
 
+## used for example data when developing
+test.json
+
 ## env file
 .env
 
@@ -34,3 +37,6 @@ build/
 dxc_build_*/
 
 outfile
+
+# dxc build file is created when running `go build`
+dxc

@@ -14,39 +14,7 @@
         "version": "1.0"
     },
     "paths": {
-        "/files": {
-            "get": {
-                "description": "Get all files linked",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "files"
-                ],
-                "summary": "Get files",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/database.File"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Error retrieving item from database",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/files/download": {
+        "/file/download": {
             "get": {
                 "description": "Download a file from the DXC",
                 "consumes": [
@@ -77,6 +45,38 @@
                     },
                     "404": {
                         "description": "File not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/files": {
+            "get": {
+                "description": "Get all files linked",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "files"
+                ],
+                "summary": "Get files",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/database.File"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error retrieving item from database",
                         "schema": {
                             "type": "string"
                         }
@@ -127,6 +127,64 @@
                     },
                     "500": {
                         "description": "Error inserting file metadata in database",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/getdata/{did}/file": {
+            "get": {
+                "description": "Download a file from the DXC",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "files"
+                ],
+                "summary": "Download a file (for users)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Digital identifier of the product bought",
+                        "name": "did",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "File name",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Signed verification data",
+                        "name": "verificationdata",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "401": {
+                        "description": "Request not authorized. Signature and verification data invalid",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "File not found",
                         "schema": {
                             "type": "string"
                         }

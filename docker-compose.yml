@@ -5,6 +5,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+      - REACT_APP_DXC_HOST=${REACT_APP_DXC_HOST}
     volumes:
       - ${LOCAL_FILES_DIR}:/var/files
     ports:
