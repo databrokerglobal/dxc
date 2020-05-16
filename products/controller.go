@@ -6,15 +6,16 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"regexp"
 	"strings"
 
 	"github.com/databrokerglobal/dxc/database"
+	"github.com/databrokerglobal/dxc/utils"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
 
-func trimLastSlash(host string) (h string) {
+// TrimLastSlash Trim the last slash
+func TrimLastSlash(host string) (h string) {
 	h = host
 	for strings.Split(h, "")[len(h)-1] == "/" {
 		h = strings.TrimSuffix(h, "/")
@@ -67,16 +68,13 @@ func AddOne(c echo.Context) error {
 	}
 
 	if p.Type != "FILE" {
-		newHost := trimLastSlash(p.Host)
+		newHost := TrimLastSlash(p.Host)
 		p.Host = newHost
 	}
 
-	if p.UUID == "" {
-		tempuuid, err := uuid.NewRandom()
-		if err != nil {
-			return err
-		}
-		p.UUID = tempuuid.String()
+	if p.Did == "" {
+		rand, _ := utils.GenerateRandomStringURLSafe(10)
+		p.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(p.Name, " ", "", -1), p.Type, rand)
 	}
 
 	var omit bool
@@ -118,7 +116,7 @@ func GetAll(c echo.Context) error {
 
 // GetOne product
 func GetOne(c echo.Context) error {
-	uuid := c.Param("uuid")
+	did := c.Param("did")
 
 	var omit bool
 
@@ -131,7 +129,7 @@ func GetOne(c echo.Context) error {
 	var p *database.Product
 
 	if !omit {
-		p, err = database.DBInstance.GetProduct(uuid)
+		p, err = database.DBInstance.GetProductByDID(did)
 	}
 
 	if err != nil {
@@ -183,21 +181,13 @@ func checkProductForRedirect(p *database.Product) int {
 
 func parseRequestURL(requestURI string, p *database.Product) string {
 	// replace first encounter of product uuid
-	newRequestURI := strings.TrimPrefix(strings.Replace(requestURI, p.UUID, "", 1), "/")
+	newRequestURI := strings.TrimPrefix(strings.Replace(requestURI, p.Did, "", 1), "/")
 
 	requestURLSlice := []string{p.Host, newRequestURI}
 
 	requestURL := strings.Join(requestURLSlice, "")
 
 	return requestURL
-}
-
-func matchingUUID(str string) (bool, error) {
-	match, err := regexp.MatchString(`[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}`, str)
-	if err != nil {
-		return false, err
-	}
-	return match, err
 }
 
 // RedirectToHost based on product uuid path check if api or stream and subsequently redirect
@@ -215,33 +205,25 @@ func RedirectToHost(c echo.Context) error {
 	// Check if string in path matches uuid regex, is valid uuid and matches product that is type API or STREAM
 	for _, str := range slice {
 
-		match, err := matchingUUID(str)
-
+		_, err := uuid.Parse(str)
 		if err != nil {
 			return c.String(http.StatusNoContent, "")
 		}
 
-		if match {
-			_, err := uuid.Parse(str)
+		if !omit {
+			p, err = database.DBInstance.GetProductByDID(str)
 			if err != nil {
 				return c.String(http.StatusNoContent, "")
 			}
-
-			if !omit {
-				p, err = database.DBInstance.GetProduct(str)
-				if err != nil {
-					return c.String(http.StatusNoContent, "")
-				}
-			}
-
-			if status := checkProductForRedirect(p); status == http.StatusNoContent {
-				return c.String(http.StatusNoContent, "")
-			}
-
-			r := buildProxyRequest(c, c.Request(), "http", p.Host)
-
-			err = executeRequest(c, r)
 		}
+
+		if status := checkProductForRedirect(p); status == http.StatusNoContent {
+			return c.String(http.StatusNoContent, "")
+		}
+
+		r := buildProxyRequest(c, c.Request(), "http", p.Host)
+
+		err = executeRequest(c, r)
 	}
 
 	return c.String(http.StatusNoContent, "")

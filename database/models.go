@@ -14,11 +14,16 @@ type File struct {
 // Product struct
 type Product struct {
 	gorm.Model
-	Name  string `json:"name"`
-	Type  string `json:"producttype"`
-	UUID  string `json:"uuid"`
-	Host  string `json:"host"`
-	Files []File
+	Name   string `json:"name"`
+	Type   string `json:"producttype"`
+	Did    string `json:"did"`
+	Host   string `json:"host"`
+	Status string `json:"available"`
+	Files  []File
 }
 
-
+// Challenge struct
+type Challenge struct {
+	gorm.Model
+	Challenge string `json:"challenge"`
+}

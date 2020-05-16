@@ -87,9 +87,9 @@ func main() {
 	e.GET("/files", filemanager.GetAll)           //, middlewares.CheckLocalhost)
 
 	// PRODUCTS
-	e.POST("/product", products.AddOne)      //, middlewares.CheckLocalhost)
-	e.GET("/product/:uuid", products.GetOne) //, middlewares.CheckLocalhost)
-	e.GET("/products", products.GetAll)      //, middlewares.CheckLocalhost)
+	e.POST("/product", products.AddOne)     //, middlewares.CheckLocalhost)
+	e.GET("/product/:did", products.GetOne) //, middlewares.CheckLocalhost)
+	e.GET("/products", products.GetAll)     //, middlewares.CheckLocalhost)
 
 	////
 	// routes accessible by users
@@ -112,7 +112,7 @@ func main() {
 
 	var wg sync.WaitGroup
 
-	wg.Add(2)
+	wg.Add(1)
 
 	//////////////////////////
 	// File Checker Routine //
@@ -123,9 +123,22 @@ func main() {
 		wg.Done()
 	}()
 
+	wg.Wait()
+
+	wg.Add(1)
+
+	go func() {
+		products.CheckHost()
+		wg.Done()
+	}()
+
 	/////////////////////////////////////
 	// Ethereum RPC connection routine //
 	/////////////////////////////////////
+
+	wg.Wait()
+
+	wg.Add(1)
 
 	go func() {
 		ethereum.ServeContract()
@@ -133,6 +146,8 @@ func main() {
 	}()
 
 	wg.Wait()
+
+	go products.ExecuteStatusTicker()
 
 	// Log stuff if port is busy f.e.
 	e.Logger.Fatal(e.Start(":8080"))

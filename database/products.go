@@ -9,10 +9,20 @@ func (m *Manager) CreateProduct(p *Product) (err error) {
 	return
 }
 
-// GetProduct Query
-func (m *Manager) GetProduct(u string) (p *Product, err error) {
+// GetProductByDID Query
+func (m *Manager) GetProductByDID(d string) (p *Product, err error) {
 	product := Product{}
-	m.DB.Where(&Product{UUID: u}).First(&product)
+	m.DB.Where(&Product{Did: d}).First(&product)
+	if errs := m.DB.GetErrors(); len(errs) > 0 {
+		err = errs[0]
+	}
+	return &product, nil
+}
+
+// GetProductByID Query
+func (m *Manager) GetProductByID(id uint) (p *Product, err error) {
+	product := Product{}
+	m.DB.Where("id = ?", id).First(&product)
 	if errs := m.DB.GetErrors(); len(errs) > 0 {
 		err = errs[0]
 	}
@@ -29,6 +39,15 @@ func (m *Manager) GetProducts() (ps *[]Product, err error) {
 // DeleteProduct delete a Product
 func (m *Manager) DeleteProduct(ProductName string) (err error) {
 	m.DB.Delete(&Product{Name: ProductName})
+	if errs := m.DB.GetErrors(); len(errs) > 0 {
+		err = errs[0]
+	}
+	return
+}
+
+// UpdateProduct update a product entry
+func (m *Manager) UpdateProduct(p *Product) (err error) {
+	m.DB.Save(p)
 	if errs := m.DB.GetErrors(); len(errs) > 0 {
 		err = errs[0]
 	}
