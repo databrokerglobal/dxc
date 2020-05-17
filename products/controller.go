@@ -77,6 +77,8 @@ func AddOne(c echo.Context) error {
 		p.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(p.Name, " ", "", -1), p.Type, rand)
 	}
 
+	p.Status = "AVAILABLE"
+
 	var omit bool
 
 	if len(os.Args) > 1 && os.Args[1][:5] == "-test" {
