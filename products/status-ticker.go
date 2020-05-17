@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"sync"
@@ -15,6 +14,28 @@ import (
 	"github.com/databrokerglobal/dxc/filemanager"
 	"github.com/fatih/color"
 )
+
+// DXCObject to make the json object for posting the /dxc
+type DXCObject struct {
+	Challenge string       `json:"challenge"`
+	Address   string       `json:"address"`
+	Products  []DXCProduct `json:"products"`
+}
+
+// DXCProduct struct to make a json of the products in DXCObject
+type DXCProduct struct {
+	Name   string    `json:"name"`
+	DID    string    `json:"did"`
+	Type   string    `json:"type"`
+	Status string    `json:"status"`
+	Files  []DXCFile `json:"files"`
+}
+
+// DXCFile struct to make a json of the files in DXCProduct
+type DXCFile struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
 
 // ExecuteStatusTicker execute 10 min interval ticker
 func ExecuteStatusTicker() {
@@ -66,48 +87,67 @@ func doChecks() {
 func SendStatus() {
 	products, err := database.DBInstance.GetProducts()
 	if err != nil {
-		log.Fatal("Database error: ", err)
-	}
-
-	var productsArray []map[string]string
-
-	for _, product := range *products {
-		if product.Did != "" {
-			productObject := make(map[string]string)
-			productObject["did"] = product.Did
-			productObject["status"] = product.Status
-			productsArray = append(productsArray, productObject)
-		}
+		color.Red("Error sending status request because of error getting products from db. err: ", err)
+		return
 	}
 
 	challenge, err := database.DBInstance.GetCurrentChallenge()
 	if err != nil {
-		log.Fatal("Database error: ", err)
+		color.Red("Error sending status request because of error getting current challenge. err: ", err)
+		return
 	}
-
-	body := make(map[string]interface{})
-
-	body["challenge"] = challenge.Challenge
-	body["products"] = productsArray
-
-	jsonBody, err := json.Marshal(body)
-	fmt.Println(string(jsonBody))
-	if err != nil {
-		log.Fatal("JSON encoding error: ", err)
-	}
-
-	dxsURL := os.Getenv("DXS_HOST")
 
 	userAuth, err := database.DBInstance.GetLatestUserAuth()
 	if err != nil {
 		color.Red("Error sending status request because of error getting user auth. err: ", err)
+		return
 	}
 	if userAuth == nil {
 		color.Red("Error sending status request because no user auth data in exist in db")
+		return
 	}
 
+	bodyRequest := &DXCObject{
+		Challenge: challenge.Challenge,
+		Address:   userAuth.Address,
+	}
+
+	bodyRequest.Products = make([]DXCProduct, 0)
+
+	for _, product := range *products {
+		if product.Did != "" && product.Type == "FILE" && len(product.Files) > 0 {
+
+			dxcProduct := DXCProduct{
+				DID:    product.Did,
+				Status: product.Status,
+				Name:   product.Name,
+				Type:   product.Type,
+			}
+
+			dxcProduct.Files = make([]DXCFile, 0)
+
+			for _, file := range product.Files {
+				dxcFile := DXCFile{
+					ID:   fmt.Sprint(file.ID),
+					Name: file.Name,
+				}
+				dxcProduct.Files = append(dxcProduct.Files, dxcFile)
+			}
+
+			bodyRequest.Products = append(bodyRequest.Products, dxcProduct)
+		}
+	}
+
+	bodyRequestJSON, err := json.Marshal(bodyRequest)
+	if err != nil {
+		color.Red("Error marshalling DXCObject json. err: ", err)
+		return
+	}
+
+	dxsURL := os.Getenv("DXS_HOST")
+
 	client := &http.Client{}
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/dxc", TrimLastSlash(dxsURL)), bytes.NewBuffer(jsonBody))
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/dxc", TrimLastSlash(dxsURL)), bytes.NewBuffer(bodyRequestJSON))
 	req.SetBasicAuth(userAuth.Address, userAuth.APIKey)
 	resp, err := client.Do(req)
 
