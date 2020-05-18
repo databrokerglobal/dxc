@@ -112,8 +112,9 @@ export const Authentication = () => {
           error={body?.address?.length === 0}
           required
           id="address"
-          label="Address"
-          helperText="This is the wallet address of your seller account in the CMS"
+          label="Account ID"
+          fullWidth={true}
+          helperText="This is the account ID of your seller account."
           value={body?.address}
           onChange={handleAddress}
         />
@@ -124,7 +125,8 @@ export const Authentication = () => {
           required
           id="apiKey"
           label="API Key"
-          helperText="This API key is available on your seller account in the CMS"
+          fullWidth={true}
+          helperText="This API key is displayed on your seller account."
           value={body?.apiKey}
           onChange={handleApiKey}
         />

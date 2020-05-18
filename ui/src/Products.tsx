@@ -242,7 +242,7 @@ export function TransferList() {
 export const ProductForm = () => {
   const [filesToLink] = React.useContext(TransferlistContext);
   const [body, setBody] = React.useState<IProduct>({
-    name: "Example 1",
+    name: "Product xxx",
     host: "http://example.com",
     producttype: "API",
     files: [],
@@ -264,7 +264,7 @@ export const ProductForm = () => {
       setTimeout(() => {
         setErr("");
         setBody({
-          name: "Example 1",
+          name: "Product xxx",
           host: "http://example.com",
           producttype: "API",
           files: [],
@@ -275,7 +275,7 @@ export const ProductForm = () => {
       setTimeout(() => {
         setResp("");
         setBody({
-          name: "Example 1",
+          name: "Product xxx",
           host: "http://example.com",
           producttype: "API",
           files: [],
