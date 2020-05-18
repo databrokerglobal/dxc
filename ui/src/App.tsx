@@ -25,7 +25,7 @@ function App() {
       <AppBar position="static" style={{ background: "#79E6D0" }}>
         <Toolbar>
           <Typography variant="h6" style={{ color: "black" }}>
-            Databroker Exchange Controller
+            Databroker eXchange Controller
           </Typography>
         </Toolbar>
       </AppBar>
@@ -36,24 +36,24 @@ function App() {
         direction={width < 1286 ? "column" : "row"}
       >
         <Grid item xs={width < 1286 ? 12 : 6}>
-          <Typography variant="subtitle1">Available files</Typography>
+          <Typography variant="subtitle1">Data sources</Typography>
           <Divider />
           <Grid item xs={12}>
             <FilesList />
           </Grid>
-          <Typography variant="subtitle1">Add a file</Typography>
+          <Typography style={{ marginTop: "20px", }} variant="subtitle1">Add a data source</Typography>
           <Divider />
           <Grid item xs={12}>
             <FileForm />
           </Grid>
         </Grid>
-        <Grid item xs={width < 1286 ? 12 : 6}>
-          <Typography variant="subtitle1">Available products</Typography>
+        <Grid style={{ marginTop: "50px", }} item xs={width < 1286 ? 12 : 6}>
+          <Typography variant="subtitle1">Products</Typography>
           <Divider />
           <Grid item xs={12}>
             <ProductList />
           </Grid>
-          <Typography variant="subtitle1">Add a product</Typography>
+          <Typography style={{ marginTop: "20px", }} variant="subtitle1">Add a product</Typography>
           <Divider />
           <Grid item xs={12}>
             <TransferlistContext.Provider value={[filesToLink, setFilesToLink]}>
@@ -61,10 +61,12 @@ function App() {
             </TransferlistContext.Provider>
           </Grid>
         </Grid>
-        <Typography style={{marginTop: "50px",}} variant="subtitle1">Authentication</Typography>
-        <Divider />
-        <Grid item xs={12}>
-          <Authentication />
+        <Grid style={{ marginTop: "50px", }} item xs={width < 1286 ? 12 : 6}>
+          <Typography variant="subtitle1">Authentication</Typography>
+          <Divider />
+          <Grid item xs={12}>
+            <Authentication />
+          </Grid>
         </Grid>
       </Grid>
     </Container>

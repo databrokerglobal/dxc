@@ -1,6 +1,6 @@
 {
   "short_name": "DXC",
-  "name": "Databroker Exchange Controller",
+  "name": "Databroker eXchange Controller",
   "start_url": ".",
   "display": "standalone",
   "theme_color": "#000000",
