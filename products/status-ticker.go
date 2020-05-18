@@ -19,6 +19,8 @@ import (
 type DXCObject struct {
 	Challenge string       `json:"challenge"`
 	Address   string       `json:"address"`
+	Host      string       `json:"host"`
+	Port      string       `json:"port"`
 	Products  []DXCProduct `json:"products"`
 }
 
@@ -110,6 +112,8 @@ func SendStatus() {
 	bodyRequest := &DXCObject{
 		Challenge: challenge.Challenge,
 		Address:   userAuth.Address,
+		Host:      os.Getenv("REACT_APP_DXC_HOST"),
+		Port:      "8080",
 	}
 
 	bodyRequest.Products = make([]DXCProduct, 0)
