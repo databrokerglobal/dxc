@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 
@@ -118,16 +119,26 @@ func GetAll(c echo.Context) error {
 }
 
 // GetOne product
+// GetOne godoc
+// @Summary Get one product
+// @Description Get one products given a did
+// @Tags products
+// @Produce json
+// @Param did path string true "Digital identifier of the product"
+// @Success 200 {object} database.Product true
+// @Failure 500 {string} string "Error retrieving item from database"
+// @Router /product/{did} [get]
 func GetOne(c echo.Context) error {
-	did := c.Param("did")
+	did, err := url.QueryUnescape(c.Param("did"))
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Could not read the did")
+	}
 
 	var omit bool
 
 	if len(os.Args) > 1 && os.Args[1][:5] == "-test" {
 		omit = true
 	}
-
-	var err error
 
 	var p *database.Product
 

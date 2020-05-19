@@ -145,11 +145,6 @@ paths:
         name: did
         required: true
         type: string
-      - description: File name
-        in: query
-        name: name
-        required: true
-        type: string
       - description: Signed verification data
         in: query
         name: verificationdata
@@ -167,7 +162,11 @@ paths:
           schema:
             type: string
         "404":
-          description: File not found
+          description: Product not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
           schema:
             type: string
       summary: Download a file (for users)
@@ -197,6 +196,29 @@ paths:
           schema:
             type: string
       summary: Create Product
+      tags:
+      - products
+  /product/{did}:
+    get:
+      description: Get one products given a did
+      parameters:
+      - description: Digital identifier of the product
+        in: path
+        name: did
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/database.Product'
+        "500":
+          description: Error retrieving item from database
+          schema:
+            type: string
+      summary: Get one product
       tags:
       - products
   /products:

@@ -157,13 +157,6 @@
                     },
                     {
                         "type": "string",
-                        "description": "File name",
-                        "name": "name",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
                         "description": "Signed verification data",
                         "name": "verificationdata",
                         "in": "query",
@@ -184,7 +177,13 @@
                         }
                     },
                     "404": {
-                        "description": "File not found",
+                        "description": "Product not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "type": "string"
                         }
@@ -225,6 +224,41 @@
                     },
                     "400": {
                         "description": "Error creating product",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/product/{did}": {
+            "get": {
+                "description": "Get one products given a did",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "Get one product",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Digital identifier of the product",
+                        "name": "did",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/database.Product"
+                        }
+                    },
+                    "500": {
+                        "description": "Error retrieving item from database",
                         "schema": {
                             "type": "string"
                         }

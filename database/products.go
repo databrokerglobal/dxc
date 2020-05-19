@@ -12,7 +12,7 @@ func (m *Manager) CreateProduct(p *Product) (err error) {
 // GetProductByDID Query
 func (m *Manager) GetProductByDID(d string) (p *Product, err error) {
 	product := Product{}
-	m.DB.Where(&Product{Did: d}).First(&product)
+	m.DB.Preload("Files").Where(&Product{Did: d}).First(&product)
 	if errs := m.DB.GetErrors(); len(errs) > 0 {
 		err = errs[0]
 	}
@@ -22,7 +22,7 @@ func (m *Manager) GetProductByDID(d string) (p *Product, err error) {
 // GetProductByID Query
 func (m *Manager) GetProductByID(id uint) (p *Product, err error) {
 	product := Product{}
-	m.DB.Where("id = ?", id).First(&product)
+	m.DB.Preload("Files").Where("id = ?", id).First(&product)
 	if errs := m.DB.GetErrors(); len(errs) > 0 {
 		err = errs[0]
 	}
