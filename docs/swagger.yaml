@@ -220,6 +220,17 @@ paths:
       summary: Get products
       tags:
       - products
+  /test:
+    get:
+      description: returns "test dxc ok"
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Test the server
+      tags:
+      - test
   /user/authinfo:
     get:
       description: Get address and api key for authentication with DXS

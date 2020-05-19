@@ -62,10 +62,11 @@ func main() {
 	e.Use(middleware.Recover())
 
 	// CORS
-	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:3000"},
-		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
-	}))
+	// e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+	// 	AllowOrigins: []string{"http://localhost:3000"},
+	// 	AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+	// }))
+	e.Use(middleware.CORS())
 
 	////////////
 	// ROUTES //
@@ -102,6 +103,8 @@ func main() {
 	////
 
 	e.GET("/getdata/:did/file", filemanager.GetDataFile, middlewares.DataAccessVerification)
+
+	e.GET("/test", filemanager.TestRequest)
 
 	// PRODUCTS Request Redirect
 	e.Any("/api/*", products.RedirectToHost)

@@ -264,6 +264,23 @@
                 }
             }
         },
+        "/test": {
+            "get": {
+                "description": "returns \"test dxc ok\"",
+                "tags": [
+                    "test"
+                ],
+                "summary": "Test the server",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/user/authinfo": {
             "get": {
                 "description": "Get address and api key for authentication with DXS",

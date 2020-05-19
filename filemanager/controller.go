@@ -156,3 +156,15 @@ func findFile(fileName string) (filePath string, err error) {
 
 	return
 }
+
+// TestRequest for testing the server
+// TestRequest godoc
+// @Summary Test the server
+// @Description returns "test dxc ok"
+// @Tags test
+// @Success 200 {string} string true
+// @Router /test [get]
+func TestRequest(c echo.Context) error {
+
+	return c.String(http.StatusOK, "test dxc ok")
+}
