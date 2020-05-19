@@ -105,7 +105,7 @@ func SendStatus() {
 		return
 	}
 	if userAuth == nil {
-		color.Red("Error sending status request because no user auth data in exist in db")
+		color.Red("Error sending status request because no user auth data exist in db")
 		return
 	}
 
