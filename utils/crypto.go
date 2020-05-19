@@ -50,6 +50,19 @@ func AddressFromHexPrivateKey(hexPrivateKey string) (address string, err error) 
 	return
 }
 
+// AddressFromHexPublicKey takes a public key in hex format and returns the corresponding address
+func AddressFromHexPublicKey(hexPublicKey string) (address string, err error) {
+
+	publicKeyECDSA, err := publicKeyFromHexPublicKey(hexPublicKey)
+	if err != nil {
+		return "", errors.Wrap(err, "could not calculate public key from hex public key")
+	}
+
+	address = crypto.PubkeyToAddress(*publicKeyECDSA).Hex()
+
+	return
+}
+
 // SignDataWithPrivateKey takes a piece of data (string), and signs the hash of that piece of data with the provided private key (hex string)
 func SignDataWithPrivateKey(data string, hexPrivateKey string) (signature string, err error) {
 
@@ -103,6 +116,21 @@ func privateKeyFromHexPrivateKey(hexPrivateKey string) (privateKey *ecdsa.Privat
 	privateKey, err = crypto.HexToECDSA(hexPrivateKey[2:])
 	if err != nil {
 		return nil, errors.Wrap(err, "error of HexToECDSA")
+	}
+
+	return
+}
+
+func publicKeyFromHexPublicKey(hexPublicKey string) (publicKey *ecdsa.PublicKey, err error) {
+
+	publicKeyBytes, err := hexutil.Decode(hexPublicKey)
+	if err != nil {
+		return nil, errors.Wrap(err, "error decoding hex public key")
+	}
+
+	publicKey, err = crypto.UnmarshalPubkey(publicKeyBytes)
+	if err != nil {
+		return nil, errors.Wrap(err, "error unmarshaling public key")
 	}
 
 	return

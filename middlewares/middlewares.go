@@ -41,6 +41,7 @@ type VerificationData struct {
 type ChallengeDataObject struct {
 	DID       string `json:"did"`
 	Challenge string `json:"challenge"`
+	Address   string `json:"address"`
 }
 
 // DataAccessVerification is middlewaere to check access to data
@@ -69,7 +70,7 @@ func DataAccessVerification(next echo.HandlerFunc) echo.HandlerFunc {
 
 		// check did in signed data is same in param
 
-		challengeData, err := base64.RawStdEncoding.DecodeString(verificationDataObject.UnsignedData)
+		challengeData, err := base64.StdEncoding.DecodeString(verificationDataObject.UnsignedData)
 		if err != nil {
 			return c.String(http.StatusBadRequest, "Base64 encoding of challenge data is not valid. err: "+err.Error())
 		}
@@ -78,6 +79,16 @@ func DataAccessVerification(next echo.HandlerFunc) echo.HandlerFunc {
 
 		if did != challengeDataObject.DID {
 			return c.String(http.StatusBadRequest, "The DID of the product in signed data is not the same as the one passed as a parameter.")
+		}
+
+		// check address in signed data is same as address derived from public key
+		addressFromPubKey, err := utils.AddressFromHexPublicKey(verificationDataObject.PublicKey)
+		if err != nil {
+			return c.String(http.StatusBadRequest, "Provided public key is not valid: "+err.Error())
+		}
+
+		if addressFromPubKey != challengeDataObject.Address {
+			return c.String(http.StatusBadRequest, "The address in signed data is not the same as the one created from the public key passed as a parameter.")
 		}
 
 		// TODO: check supplied challenge exists in db and is not older that the start of the deal
