@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 
 	errors "github.com/pkg/errors"
@@ -101,24 +102,42 @@ func GetAll(c echo.Context) error {
 // @Tags files
 // @Accept json
 // @Param did path string true "Digital identifier of the product bought"
-// @Param name query string true "File name"
 // @Param verificationdata query string true "Signed verification data"
 // @Produce octet-stream
 // @Success 200 {file} string true
 // @Failure 401 {string} string "Request not authorized. Signature and verification data invalid"
-// @Failure 404 {string} string "File not found"
+// @Failure 404 {string} string "Product not found"
+// @Failure 500 {string} string "Internal server error"
 // @Router /getdata/{did}/file [get]
 func GetDataFile(c echo.Context) error {
 
-	// did := c.Param("did")
-	name := c.QueryParam("name")
+	did, err := url.QueryUnescape(c.Param("did"))
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Could not read the did")
+	}
 
-	filepath, err := findFile(name)
+	product, err := database.DBInstance.GetProductByDID(did)
+	if err != nil {
+		return c.String(http.StatusNotFound, errors.Wrap(err, "product not found in db").Error())
+	}
+
+	if len(product.Files) < 1 {
+		return c.String(http.StatusNotFound, errors.New("product has no file").Error())
+	}
+
+	file := product.Files[0]
+	fileName := file.Name
+
+	if fileName == "" {
+		return c.String(http.StatusInternalServerError, "Filename is empty")
+	}
+
+	filepath, err := findFile(fileName)
 	if err != nil {
 		return c.String(http.StatusNotFound, err.Error())
 	}
 
-	return c.Attachment(filepath, name)
+	return c.Attachment(filepath, fileName)
 }
 
 func findFile(fileName string) (filePath string, err error) {
