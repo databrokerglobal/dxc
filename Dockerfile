@@ -9,7 +9,7 @@ RUN npm run build --silent
 FROM alpine:edge as api
 RUN apk update
 RUN apk upgrade
-RUN apk add --update go=1.13.10-r0 gcc=9.3.0-r1 g++=9.3.0-r1 linux-headers
+RUN apk add --update go=1.13.10-r0 gcc=9.3.0-r2 g++=9.3.0-r2 linux-headers
 WORKDIR /
 COPY go.mod go.sum ./
 RUN go mod download
