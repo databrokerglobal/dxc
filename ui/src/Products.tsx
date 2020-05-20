@@ -430,8 +430,9 @@ export const ProductList = () => {
   return (
     <Grid container spacing={2}>
       {!error &&
-        data &&
+        data && 
         (data.data as any).map((p: any) => (
+          p.did !== "" ? 
           <Grid item xs={12}>
             <List key={p.ID}>
               <ListItem id={p.ID} button onClick={handleClick}>
@@ -481,7 +482,7 @@ export const ProductList = () => {
                 </List>
               </Collapse>
             </List>
-          </Grid>
+          </Grid> : null
         ))}
       {!error && data && isEmptyArray(data.data) && (
         <List>
