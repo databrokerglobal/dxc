@@ -31,7 +31,7 @@ require (
 	github.com/spf13/viper v1.6.3
 	github.com/stretchr/testify v1.5.1
 	github.com/swaggo/echo-swagger v1.0.0
-	github.com/swaggo/swag v1.6.5
+	github.com/swaggo/swag v1.6.6
 	github.com/urfave/cli v1.22.4 // indirect
 	golang.org/x/crypto v0.0.0-20200427165652-729f1e841bcc // indirect
 	golang.org/x/net v0.0.0-20200506145744-7e3656a0809f // indirect
