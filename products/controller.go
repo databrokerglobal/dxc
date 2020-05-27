@@ -11,6 +11,7 @@ import (
 
 	"github.com/databrokerglobal/dxc/database"
 	"github.com/databrokerglobal/dxc/utils"
+
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
@@ -90,6 +91,7 @@ func AddOne(c echo.Context) error {
 		if err := database.DBInstance.CreateProduct(p); err != nil {
 			return err
 		}
+		SendStatus()
 	}
 
 	return c.JSON(http.StatusCreated, p)
