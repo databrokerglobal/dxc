@@ -2,6 +2,7 @@ package products
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -37,6 +38,12 @@ type DXCProduct struct {
 type DXCFile struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
+}
+
+// DXSAPIKey object allows to decode the api key and get the dxs host
+type DXSAPIKey struct {
+	Key  string `json:"k"`
+	Host string `json:"h"`
 }
 
 // ExecuteStatusTicker execute 10 min interval ticker
@@ -148,7 +155,17 @@ func SendStatus() {
 		return
 	}
 
-	dxsURL := os.Getenv("DXS_HOST")
+	// get dxs url from api key
+	dxsAPIKeyB64 := userAuth.APIKey
+	dxsAPIKeyData, err := base64.StdEncoding.DecodeString(dxsAPIKeyB64)
+	if err != nil {
+		color.Red("Error decoding api key. err: ", err.Error())
+		return
+	}
+	dxsAPIKey := DXSAPIKey{}
+	json.Unmarshal(dxsAPIKeyData, &dxsAPIKey)
+
+	dxsURL := dxsAPIKey.Host
 
 	client := &http.Client{}
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/dxc", TrimLastSlash(dxsURL)), bytes.NewBuffer(bodyRequestJSON))
