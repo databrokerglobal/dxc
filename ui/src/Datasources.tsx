@@ -2,7 +2,7 @@ import React from "react";
 import axios from "axios";
 import { DateTime } from "luxon";
 import { LOCAL_HOST, fetcher } from "./fetchers";
-import useSWR from "swr";
+import useSWR, {mutate} from "swr";
 import {
   Error,
   Check,
@@ -81,6 +81,7 @@ export const DatasourceForm = () => {
     try {
       await axios.post(`${LOCAL_HOST}/datasource`, body);
       setResp(`Success. Datasource created.`);
+      mutate('/datasources')
     } catch (error) {
       setErr(error.toString());
     }
