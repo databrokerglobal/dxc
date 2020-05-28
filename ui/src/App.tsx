@@ -48,9 +48,9 @@ function App() {
             <Grid style={{ marginBottom: "50px", }} item xs={12}>
               <DatasourceForm />
             </Grid>
-            <Typography variant="subtitle1">Current data sources</Typography>
+            <Typography variant="h5">Current data sources</Typography>
             <Divider />
-            <Grid item xs={12}>
+            <Grid style={{ marginTop: "15px", }} item xs={12}>
               <DatasourcesList />
             </Grid>
           </Grid> : null}

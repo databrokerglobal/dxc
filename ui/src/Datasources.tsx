@@ -1,26 +1,23 @@
 import React from "react";
 import axios from "axios";
+import { DateTime } from "luxon";
 import { LOCAL_HOST, fetcher } from "./fetchers";
 import useSWR from "swr";
 import {
-  ShoppingBasket,
   Error,
-  CloudOff,
   Check,
-  ExpandLess,
-  ExpandMore,
 } from "@material-ui/icons";
 import {
   TextField,
   MenuItem,
   Button,
-  List,
-  ListItem,
-  ListItemIcon,
   Grid,
-  ListItemText,
-  Collapse,
-  Link,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from "@material-ui/core";
 import { isEmptyArray } from "formik";
 import { useWindowSize } from "./WindowSizeHook";
@@ -185,63 +182,46 @@ export const DatasourceForm = () => {
 
 export const DatasourcesList = () => {
   const { data, error } = useSWR("/datasources", fetcher);
-  const [open, setOpen] = React.useState<string[]>([]);
 
-  const handleClick = (e: any) => {
-    R.contains(e.target.id, open) && e.target.id !== ""
-      ? setOpen(R.filter((s) => s !== e.target.id, open))
-      : setOpen(R.append(e.target.id, open));
-    console.log(open);
+  console.log(data);
+
+  const dateFromStringTime = (stringTime: string) => {
+    let time = DateTime.fromISO(stringTime);
+    return time.toISODate();
   };
 
   return (
     <Grid container spacing={2}>
       {!error &&
-        data && 
-        (data.data as any).map((datasource: any) => (
-          datasource.did !== "" ? 
-          <Grid item xs={12}>
-              <List key={datasource.ID}>
-                <ListItem id={datasource.ID} button onClick={handleClick}>
-                <ListItemIcon>
-                  <ShoppingBasket />
-                </ListItemIcon>
-                  {datasource.name}
-                  {open.includes(datasource.ID.toString()) ? (
-                    <ExpandLess id={datasource.ID} />
-                ) : (
-                      <ExpandMore id={datasource.ID} />
-                )}
-              </ListItem>
-              <Collapse
-                  in={open.includes(datasource.ID.toString())}
-                timeout="auto"
-                unmountOnExit
-              >
-                <List>
-                  <ListItem>
-                      <ListItemText secondary={`Type: ${datasource.type}`} />
-                  </ListItem>
-                    <ListItem>
-                      <Grid>
-                        <ListItemText secondary={`Host address: `} />
-                        <Link href={datasource.host}>{datasource.host}</Link>
-                      </Grid>
-                    </ListItem>
-                </List>
-              </Collapse>
-            </List>
-          </Grid> : null
-        ))}
+        data && (
+        <TableContainer>
+          <Table aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell>Type</TableCell>
+                <TableCell>Host</TableCell>
+                <TableCell>Added on</TableCell>
+                <TableCell>ID</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {(data.data as any).map((datasource: any) => (
+                datasource.did !== "" ?
+                  <TableRow key={datasource.did}>
+                    <TableCell>{datasource.name}</TableCell>
+                    <TableCell>{datasource.type}</TableCell>
+                    <TableCell>{datasource.host}</TableCell>
+                    <TableCell>{dateFromStringTime(datasource.CreatedAt)}</TableCell>
+                    <TableCell component="th" scope="row">{datasource.did}</TableCell>
+                  </TableRow> : null
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        )}
       {!error && data && isEmptyArray(data.data) && (
-        <List>
-          <ListItem>
-            <ListItemIcon>
-              <CloudOff />
-            </ListItemIcon>
-            No data source created yet
-          </ListItem>
-        </List>
+        <p>No data source created yet</p>
       )}
       {error && error.toString().length > 0 && (
         <div
