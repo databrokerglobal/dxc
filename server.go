@@ -9,9 +9,7 @@ import (
 	"github.com/databrokerglobal/dxc/datasources"
 	_ "github.com/databrokerglobal/dxc/docs"
 	"github.com/databrokerglobal/dxc/ethereum"
-	"github.com/databrokerglobal/dxc/filemanager"
 	"github.com/databrokerglobal/dxc/middlewares"
-	"github.com/databrokerglobal/dxc/products"
 	"github.com/databrokerglobal/dxc/usermanager"
 
 	"github.com/labstack/echo/v4"
@@ -83,18 +81,6 @@ func main() {
 	// routes for admin
 	////
 
-	// FILES
-	// Upload file route
-	e.POST("/files/upload", filemanager.Upload) //, middlewares.CheckLocalhost)
-	// Download file route
-	e.GET("/file/download", filemanager.Download) //, middlewares.CheckLocalhost)
-	e.GET("/files", filemanager.GetAll)           //, middlewares.CheckLocalhost)
-
-	// PRODUCTS
-	e.POST("/product", products.AddOne)     //, middlewares.CheckLocalhost)
-	e.GET("/product/:did", products.GetOne) //, middlewares.CheckLocalhost)
-	e.GET("/products", products.GetAll)     //, middlewares.CheckLocalhost)
-
 	// DATASOURCES
 	e.POST("/datasource", datasources.AddOneDatasource)     //, middlewares.CheckLocalhost)
 	e.GET("/datasource/:did", datasources.GetOneDatasource) //, middlewares.CheckLocalhost)
@@ -108,12 +94,10 @@ func main() {
 	// routes accessible by users
 	////
 
-	e.GET("/getdata/:did/file", filemanager.GetDataFile, middlewares.DataAccessVerification)
+	e.GET("/getdata/:did", datasources.GetData, middlewares.DataAccessVerification)
 
-	e.GET("/test", filemanager.TestRequest)
-
-	// PRODUCTS Request Redirect
-	e.Any("/api/*", products.RedirectToHost)
+	// Datasources Request Redirect
+	// e.Any("/api/*", datasources.RedirectToHost)
 
 	// Loading env file
 	err := godotenv.Load()
@@ -130,20 +114,11 @@ func main() {
 	wg.Add(1)
 
 	//////////////////////////
-	// File Checker Routine //
+	// Hosts Checker Routine //
 	//////////////////////////
 
 	go func() {
-		filemanager.CheckingFiles()
-		wg.Done()
-	}()
-
-	wg.Wait()
-
-	wg.Add(1)
-
-	go func() {
-		products.CheckHost()
+		datasources.CheckHost()
 		wg.Done()
 	}()
 
@@ -162,7 +137,7 @@ func main() {
 
 	wg.Wait()
 
-	go products.ExecuteStatusTicker()
+	go datasources.ExecuteStatusTicker()
 
 	// Log stuff if port is busy f.e.
 	e.Logger.Fatal(e.Start(":8080"))

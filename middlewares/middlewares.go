@@ -78,7 +78,7 @@ func DataAccessVerification(next echo.HandlerFunc) echo.HandlerFunc {
 		json.Unmarshal(challengeData, &challengeDataObject)
 
 		if did != challengeDataObject.DID {
-			return c.String(http.StatusBadRequest, "The DID of the product in signed data is not the same as the one passed as a parameter.")
+			return c.String(http.StatusBadRequest, "The DID of the data source in signed data is not the same as the one passed as a parameter.")
 		}
 
 		// check address in signed data is same as address derived from public key

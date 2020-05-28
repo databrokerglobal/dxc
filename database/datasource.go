@@ -28,7 +28,7 @@ func (m *Manager) GetDatasourceByDID(did string) (d *Datasource, err error) {
 // GetDatasourceByID Query
 func (m *Manager) GetDatasourceByID(id uint) (d *Datasource, err error) {
 	datasource := Datasource{}
-	if m.DB.Preload("Files").Where("id = ?", id).First(&datasource).RecordNotFound() {
+	if m.DB.Where("id = ?", id).First(&datasource).RecordNotFound() {
 		return nil, errors.New("record not found")
 	}
 	if errs := m.DB.GetErrors(); len(errs) > 0 {

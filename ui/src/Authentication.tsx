@@ -13,14 +13,6 @@ import {
 import * as R from "ramda";
 import * as Yup from "yup";
 
-export interface IFile {
-  ID?: string;
-  name: string;
-  CreatedAt?: string;
-  UpdatedAt?: string;
-  ProductID?: number;
-}
-
 interface IAuth {
   ID?: string;
   address: string;
@@ -138,7 +130,7 @@ export const Authentication = () => {
             onClick={handleSave}
             disabled={!schema.isValidSync(body)}
           >
-            Save
+            Save & Sync
           </Button>
         )}
         {!R.isEmpty(err) && R.isEmpty(resp) && (

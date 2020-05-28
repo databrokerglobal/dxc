@@ -1,8 +1,6 @@
 import React from "react";
 import "./App.css";
-import { ProductForm, ProductList } from "./Products";
 import { DatasourceForm, DatasourcesList } from "./Datasources";
-import { FilesList, FileForm, IFile } from "./Files";
 import { Authentication } from "./Authentication";
 import {
   Container,
@@ -14,11 +12,9 @@ import {
 } from "@material-ui/core";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { useWindowSize } from "./WindowSizeHook";
-import { TransferlistContext } from "./Context";
 
 function App() {
   const [width] = useWindowSize();
-  const [filesToLink, setFilesToLink] = React.useState<IFile[]>([]);
 
   return (
     <Container>
@@ -36,32 +32,6 @@ function App() {
         spacing={2}
         direction={width < 1286 ? "column" : "row"}
       >
-        <Grid item xs={width < 1286 ? 12 : 6}>
-          <Typography variant="subtitle1">Data sources</Typography>
-          <Divider />
-          <Grid item xs={12}>
-            <FilesList />
-          </Grid>
-          <Typography style={{ marginTop: "20px", }} variant="subtitle1">Add a data source</Typography>
-          <Divider />
-          <Grid item xs={12}>
-            <FileForm />
-          </Grid>
-        </Grid>
-        <Grid style={{ marginTop: "50px", }} item xs={width < 1286 ? 12 : 6}>
-          <Typography variant="subtitle1">Products</Typography>
-          <Divider />
-          <Grid item xs={12}>
-            <ProductList />
-          </Grid>
-          <Typography style={{ marginTop: "20px", }} variant="subtitle1">Add a data source</Typography>
-          <Divider />
-          <Grid item xs={12}>
-            <TransferlistContext.Provider value={[filesToLink, setFilesToLink]}>
-              <ProductForm />
-            </TransferlistContext.Provider>
-          </Grid>
-        </Grid>
         <Grid style={{ marginTop: "50px", }} item xs={width < 1286 ? 12 : 6}>
           <Typography variant="subtitle1">Data sources</Typography>
           <Divider />
@@ -71,9 +41,7 @@ function App() {
           <Typography style={{ marginTop: "20px", }} variant="subtitle1">Add a data source</Typography>
           <Divider />
           <Grid item xs={12}>
-            <TransferlistContext.Provider value={[filesToLink, setFilesToLink]}>
-              <DatasourceForm />
-            </TransferlistContext.Provider>
+            <DatasourceForm />
           </Grid>
         </Grid>
         <Grid style={{ marginTop: "50px", }} item xs={width < 1286 ? 12 : 6}>

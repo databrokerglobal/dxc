@@ -8,6 +8,7 @@ import (
 
 	"github.com/databrokerglobal/dxc/database"
 	"github.com/databrokerglobal/dxc/utils"
+	"github.com/pkg/errors"
 
 	"github.com/labstack/echo/v4"
 )
@@ -111,6 +112,39 @@ func GetOneDatasource(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, datasource)
+}
+
+// GetData for the user to get the data source data
+// GetData godoc
+// @Summary Get the data (for users)
+// @Description Get the data (for users)
+// @Tags data
+// @Accept json
+// @Param did path string true "Digital identifier of the data source bought"
+// @Param verificationdata query string true "Signed verification data"
+// @Produce octet-stream
+// @Success 200 {file} string true
+// @Failure 401 {string} string "Request not authorized. Signature and verification data invalid"
+// @Failure 404 {string} string "Datasource not found"
+// @Failure 500 {string} string "Internal server error"
+// @Router /getdata/{did} [get]
+func GetData(c echo.Context) error {
+
+	did, err := url.QueryUnescape(c.Param("did"))
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Could not read the did")
+	}
+
+	datasource, err := database.DBInstance.GetDatasourceByDID(did)
+	if err != nil {
+		return c.String(http.StatusNotFound, errors.Wrap(err, "data source not found in db").Error())
+	}
+
+	// if datasource.Type == "FILE" {
+	// 	return c.Attachment(filepath, fileName)
+	// }
+
+	return c.JSON(http.StatusAccepted, datasource.Host)
 }
 
 // // RedirectToHost based on product uuid path check if api or stream and subsequently redirect
