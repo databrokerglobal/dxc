@@ -183,8 +183,6 @@ export const DatasourceForm = () => {
 export const DatasourcesList = () => {
   const { data, error } = useSWR("/datasources", fetcher);
 
-  console.log(data);
-
   const dateFromStringTime = (stringTime: string) => {
     let time = DateTime.fromISO(stringTime);
     return time.toISODate();
