@@ -1,6 +1,7 @@
 import React from "react";
 import "./App.css";
 import { ProductForm, ProductList } from "./Products";
+import { DatasourceForm, DatasourcesList } from "./Datasources";
 import { FilesList, FileForm, IFile } from "./Files";
 import { Authentication } from "./Authentication";
 import {
@@ -65,13 +66,13 @@ function App() {
           <Typography variant="subtitle1">Data sources</Typography>
           <Divider />
           <Grid item xs={12}>
-            <ProductList />
+            <DatasourcesList />
           </Grid>
           <Typography style={{ marginTop: "20px", }} variant="subtitle1">Add a data source</Typography>
           <Divider />
           <Grid item xs={12}>
             <TransferlistContext.Provider value={[filesToLink, setFilesToLink]}>
-              <ProductForm />
+              <DatasourceForm />
             </TransferlistContext.Provider>
           </Grid>
         </Grid>
