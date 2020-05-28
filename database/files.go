@@ -9,6 +9,7 @@ func (m *Manager) CreateFile(f *File) (err error) {
 	m.DB.Create(f)
 	if errs := m.DB.GetErrors(); len(errs) > 0 {
 		err = errs[0]
+		return
 	}
 	return
 }
@@ -21,6 +22,7 @@ func (m *Manager) GetFile(n string) (f *File, err error) {
 	}
 	if errs := m.DB.GetErrors(); len(errs) > 0 {
 		err = errs[0]
+		return
 	}
 	return &file, nil
 }
@@ -31,6 +33,7 @@ func (m *Manager) GetFiles() (fs *[]File, err error) {
 	m.DB.Table("files").Find(&files)
 	if errs := m.DB.GetErrors(); len(errs) > 0 {
 		err = errs[0]
+		return
 	}
 	return &files, nil
 }
@@ -40,6 +43,7 @@ func (m *Manager) DeleteFile(fileName string) (err error) {
 	m.DB.Delete(&File{Name: fileName})
 	if errs := m.DB.GetErrors(); len(errs) > 0 {
 		err = errs[0]
+		return
 	}
 	return
 }

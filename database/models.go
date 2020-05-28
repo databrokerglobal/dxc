@@ -22,6 +22,16 @@ type Product struct {
 	Files  []File
 }
 
+// Datasource struct
+type Datasource struct {
+	gorm.Model
+	Name   string `json:"name"`
+	Type   string `json:"type"`
+	Did    string `json:"did"`
+	Host   string `json:"host"`
+	Status string `json:"available"`
+}
+
 // Challenge struct
 type Challenge struct {
 	gorm.Model

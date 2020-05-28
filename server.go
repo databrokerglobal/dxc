@@ -6,6 +6,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/joho/godotenv"
 
+	"github.com/databrokerglobal/dxc/datasources"
 	_ "github.com/databrokerglobal/dxc/docs"
 	"github.com/databrokerglobal/dxc/ethereum"
 	"github.com/databrokerglobal/dxc/filemanager"
@@ -93,6 +94,11 @@ func main() {
 	e.POST("/product", products.AddOne)     //, middlewares.CheckLocalhost)
 	e.GET("/product/:did", products.GetOne) //, middlewares.CheckLocalhost)
 	e.GET("/products", products.GetAll)     //, middlewares.CheckLocalhost)
+
+	// DATASOURCES
+	e.POST("/datasource", datasources.AddOneDatasource)     //, middlewares.CheckLocalhost)
+	e.GET("/datasource/:did", datasources.GetOneDatasource) //, middlewares.CheckLocalhost)
+	e.GET("/datasources", datasources.GetAllDatasources)    //, middlewares.CheckLocalhost)
 
 	// USERS
 	e.POST("/user/authinfo", usermanager.SaveUserAuth) //, middlewares.CheckLocalhost)
