@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/databrokerglobal/dxc/database"
-	"github.com/databrokerglobal/dxc/products"
+	"github.com/databrokerglobal/dxc/datasources"
 )
 
 // SaveUserAuth to save the address and api key
@@ -34,7 +34,7 @@ func SaveUserAuth(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, errors.Wrap(err, "error saving user auth").Error())
 	}
 
-	products.SendStatus()
+	datasources.SendStatus()
 
 	return c.JSON(http.StatusAccepted, "success saving the data")
 }

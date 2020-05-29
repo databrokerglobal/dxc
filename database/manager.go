@@ -40,8 +40,7 @@ func init() {
 	}
 	DBInstance = Manager{db}
 	DBInstance.DB.LogMode(false)
-	DBInstance.DB.AutoMigrate(&File{})
-	DBInstance.DB.AutoMigrate(&Product{})
+	DBInstance.DB.AutoMigrate(&Datasource{})
 	DBInstance.DB.AutoMigrate(&Challenge{})
 	DBInstance.DB.AutoMigrate(&UserAuth{})
 }

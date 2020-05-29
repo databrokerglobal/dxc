@@ -13,27 +13,19 @@ import {
 import * as R from "ramda";
 import * as Yup from "yup";
 
-export interface IFile {
-  ID?: string;
-  name: string;
-  CreatedAt?: string;
-  UpdatedAt?: string;
-  ProductID?: number;
-}
-
 interface IAuth {
   ID?: string;
   address: string;
   apiKey: string;
+  alreadyRequestedData: boolean;
 }
-
-let firstShow = true;
 
 export const Authentication = () => {
 
   const [body, setBody] = React.useState<IAuth>({
     address: "",
     apiKey: "",
+    alreadyRequestedData: false,
   });
 
   const [resp, setResp] = React.useState<string>("");
@@ -62,10 +54,10 @@ export const Authentication = () => {
     axios
       .get(`${LOCAL_HOST}/user/authinfo`)
       .then(data => {
-        console.log(data)
         setBody({
           address: data.data.address,
           apiKey: data.data.api_key,
+          alreadyRequestedData: true,
         });
       })
       .catch(err => {
@@ -74,8 +66,7 @@ export const Authentication = () => {
       });
   };
 
-  if (firstShow) {
-    firstShow = false;
+  if (!body.alreadyRequestedData) {
     getData();
   }
 
@@ -138,7 +129,7 @@ export const Authentication = () => {
             onClick={handleSave}
             disabled={!schema.isValidSync(body)}
           >
-            Save
+            Save & Sync
           </Button>
         )}
         {!R.isEmpty(err) && R.isEmpty(resp) && (

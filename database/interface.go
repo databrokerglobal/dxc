@@ -2,19 +2,20 @@ package database
 
 // Repository inteface
 type Repository interface {
-	CreateFile(f *File) (err error)
-	GetFile(n string) (f *File, err error)
-	GetFiles() (fs *[]File, err error)
-	DeleteFile(fileName string) (err error)
-	CreateProduct(p *Product) (err error)
-	GetProductByDID(u string) (p *Product, err error)
-	GetProductByID(u uint) (p *Product, err error)
-	GetProducts() (ps *[]Product, err error)
-	DeleteProduct(ProductName string) (err error)
+
+	// Challenges
 	GenerateNewChallenge() (err error)
 	GetCurrentChallenge() (c *Challenge, err error)
 
 	// UserAuth
 	SaveNewUserAuth(address string, apiKey string) (err error)
 	GetLatestUserAuth() (u *UserAuth, err error)
+
+	// Datasources
+	CreateDatasource(datasource *Datasource) (err error)
+	GetDatasourceByDID(did string) (d *Datasource, err error)
+	GetDatasourceByID(id uint) (d *Datasource, err error)
+	GetDatasources() (ds *[]Datasource, err error)
+	DeleteDatasource(did string) (err error)
+	UpdateDatasource(datasource *Datasource) (err error)
 }

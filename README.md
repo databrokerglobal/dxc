@@ -15,16 +15,9 @@ The data exchange controller has three parts:
 - Docker
 
 ```
-# Runtime env
-## local = not dockerized
-## docker = docker
-GO_ENV=docker
-
 # Infura project id
 INFURA_ID=111111111111111111
 
-# File directory
-LOCAL_FILES_DIR=/path/to/files
 ```
 
 Put the .env file in the root of the directory
@@ -41,17 +34,12 @@ Navigate to localhost:8080
 - Local
 
 ```
-# Runtime env
-## local = no docker
-## docker = docker
-
-GO_ENV=local
-
 # Infura project id
 INFURA_ID=111111111111111111
 
-# File directory
-LOCAL_FILES_DIR=/path/to/files
+# DXC IP
+REACT_APP_DXC_HOST=localhost
+#REACT_APP_DXC_HOST=xx:xx:xx:xx
 ```
 
 ### Dependencies

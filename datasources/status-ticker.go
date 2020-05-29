@@ -1,4 +1,4 @@
-package products
+package datasources
 
 import (
 	"bytes"
@@ -12,32 +12,24 @@ import (
 
 	"github.com/databrokerglobal/dxc/database"
 
-	"github.com/databrokerglobal/dxc/filemanager"
 	"github.com/fatih/color"
 )
 
 // DXCObject to make the json object for posting the /dxc
 type DXCObject struct {
-	Challenge string       `json:"challenge"`
-	Address   string       `json:"address"`
-	Host      string       `json:"host"`
-	Port      string       `json:"port"`
-	Products  []DXCProduct `json:"products"`
+	Challenge   string          `json:"challenge"`
+	Address     string          `json:"address"`
+	Host        string          `json:"host"`
+	Port        string          `json:"port"`
+	Datasources []DXCDatasource `json:"datasources"`
 }
 
-// DXCProduct struct to make a json of the products in DXCObject
-type DXCProduct struct {
-	Name   string    `json:"name"`
-	DID    string    `json:"did"`
-	Type   string    `json:"type"`
-	Status string    `json:"status"`
-	Files  []DXCFile `json:"files"`
-}
-
-// DXCFile struct to make a json of the files in DXCProduct
-type DXCFile struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+// DXCDatasource struct to make a json of the datasources in DXCObject
+type DXCDatasource struct {
+	Name      string `json:"name"`
+	DID       string `json:"did"`
+	Type      string `json:"type"`
+	Available bool   `json:"available"`
 }
 
 // DXSAPIKey object allows to decode the api key and get the dxs host
@@ -73,13 +65,6 @@ func doChecks() {
 	var wg sync.WaitGroup
 	wg.Add(1)
 
-	go func() {
-		filemanager.CheckingFiles()
-		wg.Done()
-	}()
-
-	wg.Wait()
-
 	wg.Add(1)
 
 	go func() {
@@ -89,14 +74,14 @@ func doChecks() {
 
 	wg.Wait()
 
-	defer color.Magenta("Finished checking product files and hosts...")
+	defer color.Magenta("Finished checking datasources.")
 }
 
-// SendStatus sends the dxc status and products to the DXS
+// SendStatus sends the dxc status and datasources to the DXS
 func SendStatus() {
-	products, err := database.DBInstance.GetProducts()
+	datasources, err := database.DBInstance.GetDatasources()
 	if err != nil {
-		color.Red("Error sending status request because of error getting products from db. err: ", err)
+		color.Red("Error sending status request because of error getting datasources from db. err: ", err)
 		return
 	}
 
@@ -123,29 +108,19 @@ func SendStatus() {
 		Port:      "8080",
 	}
 
-	bodyRequest.Products = make([]DXCProduct, 0)
+	bodyRequest.Datasources = make([]DXCDatasource, 0)
 
-	for _, product := range *products {
-		if product.Did != "" && product.Type == "FILE" && len(product.Files) > 0 {
+	for _, datasource := range *datasources {
+		if datasource.Did != "" {
 
-			dxcProduct := DXCProduct{
-				DID:    product.Did,
-				Status: product.Status,
-				Name:   product.Name,
-				Type:   product.Type,
+			dxcDatasource := DXCDatasource{
+				DID:       datasource.Did,
+				Available: datasource.Available,
+				Name:      datasource.Name,
+				Type:      datasource.Type,
 			}
 
-			dxcProduct.Files = make([]DXCFile, 0)
-
-			for _, file := range product.Files {
-				dxcFile := DXCFile{
-					ID:   fmt.Sprint(file.ID),
-					Name: file.Name,
-				}
-				dxcProduct.Files = append(dxcProduct.Files, dxcFile)
-			}
-
-			bodyRequest.Products = append(bodyRequest.Products, dxcProduct)
+			bodyRequest.Datasources = append(bodyRequest.Datasources, dxcDatasource)
 		}
 	}
 
@@ -168,7 +143,7 @@ func SendStatus() {
 	dxsURL := dxsAPIKey.Host
 
 	client := &http.Client{}
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/dxc", TrimLastSlash(dxsURL)), bytes.NewBuffer(bodyRequestJSON))
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/dxc", trimLastSlash(dxsURL)), bytes.NewBuffer(bodyRequestJSON))
 	req.SetBasicAuth(userAuth.Address, userAuth.APIKey)
 	resp, err := client.Do(req)
 
