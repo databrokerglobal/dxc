@@ -82,9 +82,10 @@ func main() {
 	////
 
 	// DATASOURCES
-	e.POST("/datasource", datasources.AddOneDatasource)     //, middlewares.CheckLocalhost)
-	e.GET("/datasource/:did", datasources.GetOneDatasource) //, middlewares.CheckLocalhost)
-	e.GET("/datasources", datasources.GetAllDatasources)    //, middlewares.CheckLocalhost)
+	e.POST("/datasource", datasources.AddOneDatasource)                   //, middlewares.CheckLocalhost)
+	e.POST("/add-example-datasources", datasources.AddExampleDatasources) //, middlewares.CheckLocalhost)
+	e.GET("/datasource/:did", datasources.GetOneDatasource)               //, middlewares.CheckLocalhost)
+	e.GET("/datasources", datasources.GetAllDatasources)                  //, middlewares.CheckLocalhost)
 
 	// USERS
 	e.POST("/user/authinfo", usermanager.SaveUserAuth) //, middlewares.CheckLocalhost)

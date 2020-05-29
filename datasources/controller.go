@@ -2,8 +2,11 @@ package datasources
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
+	"os"
+	"path"
 	"strings"
 
 	"github.com/databrokerglobal/dxc/database"
@@ -50,7 +53,7 @@ func AddOneDatasource(c echo.Context) error {
 		datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
 	}
 
-	datasource.Status = "AVAILABLE"
+	datasource.Available = true
 
 	if err := database.DBInstance.CreateDatasource(datasource); err != nil {
 		return err
@@ -58,6 +61,84 @@ func AddOneDatasource(c echo.Context) error {
 	SendStatus()
 
 	return c.JSON(http.StatusCreated, datasource.Did)
+}
+
+// AddExampleDatasources create example datasources
+// AddExampleDatasources godoc
+// @Summary Create example datasources
+// @Description Create example datasources
+// @Tags dev
+// @Accept json
+// @Produce json
+// @Success 201 {string} string "Success"
+// @Failure 400 {string} string "Error creating datasources"
+// @Router /add-example-datasources [post]
+func AddExampleDatasources(c echo.Context) error {
+
+	count := 0
+
+	datasource := new(database.Datasource)
+	datasource.Name = "file 1"
+	datasource.Available = true
+	datasource.Type = "FILE"
+	datasource.Host = "https://file-examples.com/wp-content/uploads/2017/02/file_example_XLS_10.xls"
+	rand, _ := utils.GenerateRandomStringURLSafe(10)
+	datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
+	if err := database.DBInstance.CreateDatasource(datasource); err != nil {
+		return err
+	}
+	count++
+
+	datasource = new(database.Datasource)
+	datasource.Name = "file 2"
+	datasource.Available = true
+	datasource.Type = "FILE"
+	datasource.Host = "https://file-examples.com/wp-content/uploads/2017/02/file_example_XLSX_10.xlsx"
+	rand, _ = utils.GenerateRandomStringURLSafe(10)
+	datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
+	if err := database.DBInstance.CreateDatasource(datasource); err != nil {
+		return err
+	}
+	count++
+
+	datasource = new(database.Datasource)
+	datasource.Name = "file 3 (ftp)"
+	datasource.Available = true
+	datasource.Type = "FILE"
+	datasource.Host = "ftp://speedtest.tele2.net/100KB.zip"
+	rand, _ = utils.GenerateRandomStringURLSafe(10)
+	datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
+	if err := database.DBInstance.CreateDatasource(datasource); err != nil {
+		return err
+	}
+	count++
+
+	datasource = new(database.Datasource)
+	datasource.Name = "api 1"
+	datasource.Available = true
+	datasource.Type = "API"
+	datasource.Host = "https://jsonplaceholder.typicode.com/todos/1"
+	rand, _ = utils.GenerateRandomStringURLSafe(10)
+	datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
+	if err := database.DBInstance.CreateDatasource(datasource); err != nil {
+		return err
+	}
+	count++
+
+	datasource = new(database.Datasource)
+	datasource.Name = "api 2"
+	datasource.Available = true
+	datasource.Type = "API"
+	datasource.Host = "https://jsonplaceholder.typicode.com/comments?postId=1"
+	rand, _ = utils.GenerateRandomStringURLSafe(10)
+	datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
+	if err := database.DBInstance.CreateDatasource(datasource); err != nil {
+		return err
+	}
+	count++
+
+	SendStatus()
+	return c.String(http.StatusCreated, fmt.Sprintf("%d example datasources successfully created!", count))
 }
 
 // GetAllDatasources return all datasources
@@ -140,9 +221,17 @@ func GetData(c echo.Context) error {
 		return c.String(http.StatusNotFound, errors.Wrap(err, "data source not found in db").Error())
 	}
 
-	// if datasource.Type == "FILE" {
-	// 	return c.Attachment(filepath, fileName)
-	// }
+	if datasource.Type == "FILE" {
+
+		filename := path.Base(datasource.Host)
+		err := downloadFile(filename, datasource.Host)
+		if err != nil {
+			return c.String(http.StatusInternalServerError, "could not download file. error: "+err.Error())
+		}
+		defer os.Remove(filename)
+
+		return c.Attachment(filename, filename)
+	}
 
 	return c.JSON(http.StatusAccepted, datasource.Host)
 }
@@ -293,4 +382,25 @@ func trimLastSlash(host string) (h string) {
 		h = strings.TrimSuffix(h, "/")
 	}
 	return h
+}
+
+func downloadFile(filepath string, url string) error {
+
+	// Get the data
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	// Create the file
+	out, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	// Write the body to file
+	_, err = io.Copy(out, resp.Body)
+	return err
 }

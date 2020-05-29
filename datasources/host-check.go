@@ -22,17 +22,13 @@ func CheckHost() {
 		for _, datasource := range *datasources {
 			if datasource.Host != "" && datasource.Host != "N/A" && datasource.Name != "" {
 				_, err = http.Get(datasource.Host)
-				if err != nil {
-					datasource.Status = "UNAVAILABLE"
-				} else {
-					datasource.Status = "AVAILABLE"
-				}
+				datasource.Available = err == nil
 				database.DBInstance.UpdateDatasource(&datasource)
 			}
 		}
 	}
 
-	yellow := color.New(color.FgHiGreen).SprintFunc()
+	green := color.New(color.FgHiGreen).SprintFunc()
 
-	defer color.White("Finished checking datasource liveness %s", yellow("\nCurrent datasource count: ", len(*datasources)))
+	defer color.White("Finished checking datasource liveness %s", green("\nCurrent datasource count: ", len(*datasources)))
 }

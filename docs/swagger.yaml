@@ -2,7 +2,7 @@ definitions:
   database.Datasource:
     properties:
       available:
-        type: string
+        type: boolean
       did:
         type: string
       host:
@@ -39,6 +39,25 @@ info:
   title: DXC
   version: "1.0"
 paths:
+  /add-example-datasources:
+    post:
+      consumes:
+      - application/json
+      description: Create example datasources
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Error creating datasources
+          schema:
+            type: string
+      summary: Create example datasources
+      tags:
+      - dev
   /datasource:
     post:
       consumes:

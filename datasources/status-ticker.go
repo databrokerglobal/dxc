@@ -26,10 +26,10 @@ type DXCObject struct {
 
 // DXCDatasource struct to make a json of the datasources in DXCObject
 type DXCDatasource struct {
-	Name   string `json:"name"`
-	DID    string `json:"did"`
-	Type   string `json:"type"`
-	Status string `json:"status"`
+	Name      string `json:"name"`
+	DID       string `json:"did"`
+	Type      string `json:"type"`
+	Available bool   `json:"available"`
 }
 
 // DXSAPIKey object allows to decode the api key and get the dxs host
@@ -114,10 +114,10 @@ func SendStatus() {
 		if datasource.Did != "" {
 
 			dxcDatasource := DXCDatasource{
-				DID:    datasource.Did,
-				Status: datasource.Status,
-				Name:   datasource.Name,
-				Type:   datasource.Type,
+				DID:       datasource.Did,
+				Available: datasource.Available,
+				Name:      datasource.Name,
+				Type:      datasource.Type,
 			}
 
 			bodyRequest.Datasources = append(bodyRequest.Datasources, dxcDatasource)

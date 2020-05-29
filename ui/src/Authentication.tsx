@@ -51,7 +51,6 @@ export const Authentication = () => {
   });
 
   const getData = async () => {
-    console.log("jony");
     axios
       .get(`${LOCAL_HOST}/user/authinfo`)
       .then(data => {

@@ -7,11 +7,11 @@ import (
 // Datasource struct
 type Datasource struct {
 	gorm.Model
-	Name   string `json:"name"`
-	Type   string `json:"type"`
-	Did    string `json:"did"`
-	Host   string `json:"host"`
-	Status string `json:"available"`
+	Name      string `json:"name"`
+	Type      string `json:"type"`
+	Did       string `json:"did"`
+	Host      string `json:"host"`
+	Available bool   `json:"available"`
 }
 
 // Challenge struct
