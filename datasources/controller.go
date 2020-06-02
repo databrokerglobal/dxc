@@ -192,7 +192,7 @@ func GetOneDatasource(c echo.Context) error {
 // @Description Get the file (for users)
 // @Tags data
 // @Accept json
-// @Param verificationdata query string true "Signed verification data"
+// @Param verificationData query string true "Signed verification data"
 // @Produce octet-stream
 // @Success 200 {file} string true
 // @Failure 401 {string} string "Request not authorized. Signature and verification data invalid"
@@ -201,7 +201,7 @@ func GetOneDatasource(c echo.Context) error {
 // @Router /getfile [get]
 func GetFile(c echo.Context) error {
 
-	did, err := url.QueryUnescape(c.Param("did"))
+	did, err := url.QueryUnescape(c.Request().Header.Get("did"))
 	if err != nil {
 		return c.String(http.StatusInternalServerError, "Could not read the did")
 	}
@@ -231,7 +231,6 @@ func GetFile(c echo.Context) error {
 
 	if datasource.Type == "API" {
 
-		// proxyReq := buildProxyRequest(c, c.Request(), "https", datasource.Host)
 		body, err := ioutil.ReadAll(c.Request().Body)
 		if err != nil {
 			c.String(http.StatusInternalServerError, err.Error())
@@ -241,20 +240,11 @@ func GetFile(c echo.Context) error {
 		// if body is of multipart type, reassign it here
 		c.Request().Body = ioutil.NopCloser(bytes.NewReader(body))
 
-		// build new url
-		// url := fmt.Sprintf("%s://%s%s", protocol, host, r.RequestURI)
-
 		proxyReq, err := http.NewRequest("GET", datasource.Host, nil)
 		if err != nil {
 			c.String(http.StatusInternalServerError, err.Error())
 			return nil
 		}
-
-		// Copy header, filter logic could be added later
-		// proxyReq.Header = make(http.Header)
-		// for index, value := range c.Request().Header {
-		// 	proxyReq.Header[index] = value
-		// }
 
 		err = executeRequest(c, proxyReq)
 		return c.String(http.StatusAccepted, "")
@@ -263,44 +253,58 @@ func GetFile(c echo.Context) error {
 	return c.String(http.StatusBadRequest, "datasource type not supported")
 }
 
-// // RedirectToHost based on product uuid path check if api or stream and subsequently redirect
-// func RedirectToHost(c echo.Context) error {
-// 	var omit bool
+// ProxyAPI redirects api
+func ProxyAPI(c echo.Context) error {
 
-// 	if len(os.Args) > 1 && os.Args[1][:5] == "-test" {
-// 		omit = true
-// 	}
+	did, err := url.QueryUnescape(c.Request().Header.Get("did"))
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Could not read the did")
+	}
 
-// 	slice := strings.Split(c.Request().RequestURI, "/")
+	if did == "" {
+		return c.String(http.StatusBadRequest, "no did included in the verification data")
+	}
 
-// 	var p *database.Product
+	datasource, err := database.DBInstance.GetDatasourceByDID(did)
+	if err != nil {
+		return c.String(http.StatusNotFound, errors.Wrap(err, "data source not found in db").Error())
+	}
 
-// 	// Check if string in path matches uuid regex, is valid uuid and matches product that is type API or STREAM
-// 	for _, str := range slice {
+	if datasource.Type != "API" {
+		return c.String(http.StatusBadRequest, "datasource is not of type API")
+	}
 
-// 		_, err := uuid.Parse(str)
-// 		if err != nil {
-// 			return c.String(http.StatusNoContent, "")
-// 		}
+	req := c.Request()
 
-// 		if !omit {
-// 			p, err = database.DBInstance.GetProductByDID(str)
-// 			if err != nil {
-// 				return c.String(http.StatusNoContent, "")
-// 			}
-// 		}
+	body, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return nil
+	}
 
-// 		if status := checkProductForRedirect(p); status == http.StatusNoContent {
-// 			return c.String(http.StatusNoContent, "")
-// 		}
+	// if body is of multipart type, reassign it here
+	req.Body = ioutil.NopCloser(bytes.NewReader(body))
 
-// 		r := buildProxyRequest(c, c.Request(), "http", p.Host)
+	// build new url
+	url := fmt.Sprintf("%s%s", datasource.Host, strings.Replace(req.RequestURI, "/api", "", 1))
 
-// 		err = executeRequest(c, r)
-// 	}
+	proxyReq, err := http.NewRequest(req.Method, url, bytes.NewReader(body))
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return nil
+	}
 
-// 	return c.String(http.StatusNoContent, "")
-// }
+	// Copy header, filter logic could be added later
+	proxyReq.Header = make(http.Header)
+	for index, value := range req.Header {
+		if !strings.EqualFold("did", index) && !strings.EqualFold("verificationData", index) { // do not include headers we use ourselves
+			proxyReq.Header[index] = value
+		}
+	}
+
+	err = executeRequest(c, proxyReq)
+	return c.String(http.StatusAccepted, "")
+}
 
 func checkDatasource(datasource *database.Datasource) int {
 	var status int
@@ -317,65 +321,6 @@ func checkDatasource(datasource *database.Datasource) int {
 		status = http.StatusContinue
 	}
 	return status
-}
-
-// func checkProductForRedirect(p *database.Product) int {
-// 	var status int
-// 	switch {
-// 	case p == nil:
-// 		status = http.StatusNoContent
-// 	case p.Name == "":
-// 		status = http.StatusNoContent
-// 	case p.Type == "":
-// 		status = http.StatusNoContent
-// 	case p.Host == "":
-// 		status = http.StatusNoContent
-// 	case p.Type == "FILE":
-// 		status = http.StatusNoContent
-// 	default:
-// 		status = http.StatusContinue
-// 	}
-// 	return status
-// }
-
-// func parseRequestURL(requestURI string, p *database.Product) string {
-// 	// replace first encounter of product uuid
-// 	newRequestURI := strings.TrimPrefix(strings.Replace(requestURI, p.Did, "", 1), "/")
-
-// 	requestURLSlice := []string{p.Host, newRequestURI}
-
-// 	requestURL := strings.Join(requestURLSlice, "")
-
-// 	return requestURL
-// }
-
-// Take a request and build a proxy request from a host string with a certain protocol (http or https here)
-func buildProxyRequest(c echo.Context, r *http.Request, protocol string, host string) *http.Request {
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		c.String(http.StatusInternalServerError, err.Error())
-		return nil
-	}
-
-	// if body is of multipart type, reassign it here
-	r.Body = ioutil.NopCloser(bytes.NewReader(body))
-
-	// build new url
-	url := fmt.Sprintf("%s://%s%s", protocol, host, r.RequestURI)
-
-	proxyReq, err := http.NewRequest(r.Method, url, bytes.NewReader(body))
-	if err != nil {
-		c.String(http.StatusInternalServerError, err.Error())
-		return nil
-	}
-
-	// Copy header, filter logic could be added later
-	proxyReq.Header = make(http.Header)
-	for index, value := range r.Header {
-		proxyReq.Header[index] = value
-	}
-
-	return proxyReq
 }
 
 func executeRequest(c echo.Context, r *http.Request) error {

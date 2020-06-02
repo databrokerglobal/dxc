@@ -48,7 +48,14 @@ type ChallengeDataObject struct {
 func DataAccessVerification(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 
-		verificationDataB64 := c.QueryParam("verificationdata")
+		verificationDataB64 := c.QueryParam("verificationData")
+
+		if verificationDataB64 == "" {
+			verificationDataB64 = c.Request().Header.Get("verificationData")
+			if verificationDataB64 == "" {
+				return c.JSON(http.StatusUnauthorized, "verificationData is not included")
+			}
+		}
 
 		verificationData, err := base64.RawURLEncoding.DecodeString(verificationDataB64)
 		if err != nil {
@@ -90,8 +97,7 @@ func DataAccessVerification(next echo.HandlerFunc) echo.HandlerFunc {
 		// TODO: check address (take from public key -- use crypto utils) is allowed to use that did
 
 		// pass did to the request
-		c.SetParamNames("did")
-		c.SetParamValues(challengeDataObject.DID)
+		c.Request().Header.Set("did", challengeDataObject.DID)
 
 		if err := next(c); err != nil {
 			c.Error(err)

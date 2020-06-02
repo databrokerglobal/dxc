@@ -97,8 +97,8 @@ func main() {
 
 	e.GET("/getfile", datasources.GetFile, middlewares.DataAccessVerification)
 
-	// Datasources Request Redirect
-	// e.Any("/api/*", datasources.RedirectToHost)
+	// API Datasources Request Redirect
+	e.Any("/api/*", datasources.ProxyAPI, middlewares.DataAccessVerification)
 
 	// Loading env file
 	err := godotenv.Load()

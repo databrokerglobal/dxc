@@ -136,7 +136,7 @@ paths:
       parameters:
       - description: Signed verification data
         in: query
-        name: verificationdata
+        name: verificationData
         required: true
         type: string
       produces:

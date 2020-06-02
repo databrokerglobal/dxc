@@ -167,7 +167,7 @@
                     {
                         "type": "string",
                         "description": "Signed verification data",
-                        "name": "verificationdata",
+                        "name": "verificationData",
                         "in": "query",
                         "required": true
                     }
