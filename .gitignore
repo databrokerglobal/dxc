@@ -30,6 +30,8 @@ test.json
 
 node_modules/
 
+tempFiles/
+
 .idea
 
 build/

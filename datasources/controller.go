@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/databrokerglobal/dxc/database"
@@ -224,13 +225,15 @@ func GetData(c echo.Context) error {
 	if datasource.Type == "FILE" {
 
 		filename := path.Base(datasource.Host)
-		err := downloadFile(filename, datasource.Host)
+		rand, _ := utils.GenerateRandomStringURLSafe(10)
+		pathToFile := "tempFiles/" + rand + "/" + filename
+		err := downloadFile(pathToFile, datasource.Host)
 		if err != nil {
 			return c.String(http.StatusInternalServerError, "could not download file. error: "+err.Error())
 		}
-		defer os.Remove(filename)
+		defer os.RemoveAll(filepath.Dir(pathToFile))
 
-		return c.Attachment(filename, filename)
+		return c.Attachment(pathToFile, filename)
 	}
 
 	return c.JSON(http.StatusAccepted, datasource.Host)
@@ -384,7 +387,7 @@ func trimLastSlash(host string) (h string) {
 	return h
 }
 
-func downloadFile(filepath string, url string) error {
+func downloadFile(pathToFile string, url string) error {
 
 	// Get the data
 	resp, err := http.Get(url)
@@ -394,7 +397,10 @@ func downloadFile(filepath string, url string) error {
 	defer resp.Body.Close()
 
 	// Create the file
-	out, err := os.Create(filepath)
+	if err = os.MkdirAll(filepath.Dir(pathToFile), 0770); err != nil {
+		return err
+	}
+	out, err := os.Create(pathToFile)
 	if err != nil {
 		return err
 	}
