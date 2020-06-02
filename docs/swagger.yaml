@@ -128,17 +128,12 @@ paths:
       summary: Get all datasources
       tags:
       - datasources
-  /getdata/{did}:
+  /getfile:
     get:
       consumes:
       - application/json
-      description: Get the data (for users)
+      description: Get the file (for users)
       parameters:
-      - description: Digital identifier of the data source bought
-        in: path
-        name: did
-        required: true
-        type: string
       - description: Signed verification data
         in: query
         name: verificationdata
@@ -163,7 +158,7 @@ paths:
           description: Internal server error
           schema:
             type: string
-      summary: Get the data (for users)
+      summary: Get the file (for users)
       tags:
       - data
   /user/authinfo:

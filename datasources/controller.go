@@ -1,8 +1,10 @@
 package datasources
 
 import (
+	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -82,7 +84,7 @@ func AddExampleDatasources(c echo.Context) error {
 	datasource.Name = "file 1"
 	datasource.Available = true
 	datasource.Type = "FILE"
-	datasource.Host = "https://file-examples.com/wp-content/uploads/2017/02/file_example_XLS_10.xls"
+	datasource.Host = trimLastSlash("https://file-examples.com/wp-content/uploads/2017/02/file_example_XLS_10.xls")
 	rand, _ := utils.GenerateRandomStringURLSafe(10)
 	datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
 	if err := database.DBInstance.CreateDatasource(datasource); err != nil {
@@ -94,7 +96,7 @@ func AddExampleDatasources(c echo.Context) error {
 	datasource.Name = "file 2"
 	datasource.Available = true
 	datasource.Type = "FILE"
-	datasource.Host = "https://file-examples.com/wp-content/uploads/2017/02/file_example_XLSX_10.xlsx"
+	datasource.Host = trimLastSlash("https://file-examples.com/wp-content/uploads/2017/02/file_example_XLSX_10.xlsx")
 	rand, _ = utils.GenerateRandomStringURLSafe(10)
 	datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
 	if err := database.DBInstance.CreateDatasource(datasource); err != nil {
@@ -106,7 +108,7 @@ func AddExampleDatasources(c echo.Context) error {
 	datasource.Name = "file 3 (ftp)"
 	datasource.Available = true
 	datasource.Type = "FILE"
-	datasource.Host = "ftp://speedtest.tele2.net/100KB.zip"
+	datasource.Host = trimLastSlash("ftp://speedtest.tele2.net/100KB.zip")
 	rand, _ = utils.GenerateRandomStringURLSafe(10)
 	datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
 	if err := database.DBInstance.CreateDatasource(datasource); err != nil {
@@ -118,19 +120,7 @@ func AddExampleDatasources(c echo.Context) error {
 	datasource.Name = "api 1"
 	datasource.Available = true
 	datasource.Type = "API"
-	datasource.Host = "https://jsonplaceholder.typicode.com/todos/1"
-	rand, _ = utils.GenerateRandomStringURLSafe(10)
-	datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
-	if err := database.DBInstance.CreateDatasource(datasource); err != nil {
-		return err
-	}
-	count++
-
-	datasource = new(database.Datasource)
-	datasource.Name = "api 2"
-	datasource.Available = true
-	datasource.Type = "API"
-	datasource.Host = "https://jsonplaceholder.typicode.com/comments?postId=1"
+	datasource.Host = trimLastSlash("https://jsonplaceholder.typicode.com")
 	rand, _ = utils.GenerateRandomStringURLSafe(10)
 	datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
 	if err := database.DBInstance.CreateDatasource(datasource); err != nil {
@@ -196,25 +186,28 @@ func GetOneDatasource(c echo.Context) error {
 	return c.JSON(http.StatusOK, datasource)
 }
 
-// GetData for the user to get the data source data
-// GetData godoc
-// @Summary Get the data (for users)
-// @Description Get the data (for users)
+// GetFile for the user to get the data source data
+// GetFile godoc
+// @Summary Get the file (for users)
+// @Description Get the file (for users)
 // @Tags data
 // @Accept json
-// @Param did path string true "Digital identifier of the data source bought"
 // @Param verificationdata query string true "Signed verification data"
 // @Produce octet-stream
 // @Success 200 {file} string true
 // @Failure 401 {string} string "Request not authorized. Signature and verification data invalid"
 // @Failure 404 {string} string "Datasource not found"
 // @Failure 500 {string} string "Internal server error"
-// @Router /getdata/{did} [get]
-func GetData(c echo.Context) error {
+// @Router /getfile [get]
+func GetFile(c echo.Context) error {
 
 	did, err := url.QueryUnescape(c.Param("did"))
 	if err != nil {
 		return c.String(http.StatusInternalServerError, "Could not read the did")
+	}
+
+	if did == "" {
+		return c.String(http.StatusBadRequest, "no did included in the verification data")
 	}
 
 	datasource, err := database.DBInstance.GetDatasourceByDID(did)
@@ -236,7 +229,38 @@ func GetData(c echo.Context) error {
 		return c.Attachment(pathToFile, filename)
 	}
 
-	return c.JSON(http.StatusAccepted, datasource.Host)
+	if datasource.Type == "API" {
+
+		// proxyReq := buildProxyRequest(c, c.Request(), "https", datasource.Host)
+		body, err := ioutil.ReadAll(c.Request().Body)
+		if err != nil {
+			c.String(http.StatusInternalServerError, err.Error())
+			return nil
+		}
+
+		// if body is of multipart type, reassign it here
+		c.Request().Body = ioutil.NopCloser(bytes.NewReader(body))
+
+		// build new url
+		// url := fmt.Sprintf("%s://%s%s", protocol, host, r.RequestURI)
+
+		proxyReq, err := http.NewRequest("GET", datasource.Host, nil)
+		if err != nil {
+			c.String(http.StatusInternalServerError, err.Error())
+			return nil
+		}
+
+		// Copy header, filter logic could be added later
+		// proxyReq.Header = make(http.Header)
+		// for index, value := range c.Request().Header {
+		// 	proxyReq.Header[index] = value
+		// }
+
+		err = executeRequest(c, proxyReq)
+		return c.String(http.StatusAccepted, "")
+	}
+
+	return c.String(http.StatusBadRequest, "datasource type not supported")
 }
 
 // // RedirectToHost based on product uuid path check if api or stream and subsequently redirect
@@ -325,59 +349,59 @@ func checkDatasource(datasource *database.Datasource) int {
 // 	return requestURL
 // }
 
-// // Take a request and build a proxy request from a host string with a certain protocol (http or https here)
-// func buildProxyRequest(c echo.Context, r *http.Request, protocol string, host string) *http.Request {
-// 	body, err := ioutil.ReadAll(r.Body)
-// 	if err != nil {
-// 		c.String(http.StatusInternalServerError, err.Error())
-// 		return nil
-// 	}
+// Take a request and build a proxy request from a host string with a certain protocol (http or https here)
+func buildProxyRequest(c echo.Context, r *http.Request, protocol string, host string) *http.Request {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return nil
+	}
 
-// 	// if body is of multipart type, reassign it here
-// 	r.Body = ioutil.NopCloser(bytes.NewReader(body))
+	// if body is of multipart type, reassign it here
+	r.Body = ioutil.NopCloser(bytes.NewReader(body))
 
-// 	// build new url
-// 	url := fmt.Sprintf("%s://%s%s", protocol, host, r.RequestURI)
+	// build new url
+	url := fmt.Sprintf("%s://%s%s", protocol, host, r.RequestURI)
 
-// 	proxyReq, err := http.NewRequest(r.Method, url, bytes.NewReader(body))
-// 	if err != nil {
-// 		c.String(http.StatusInternalServerError, err.Error())
-// 		return nil
-// 	}
+	proxyReq, err := http.NewRequest(r.Method, url, bytes.NewReader(body))
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return nil
+	}
 
-// 	// Copy header, filter logic could be added later
-// 	proxyReq.Header = make(http.Header)
-// 	for index, value := range r.Header {
-// 		proxyReq.Header[index] = value
-// 	}
+	// Copy header, filter logic could be added later
+	proxyReq.Header = make(http.Header)
+	for index, value := range r.Header {
+		proxyReq.Header[index] = value
+	}
 
-// 	return proxyReq
-// }
+	return proxyReq
+}
 
-// func executeRequest(c echo.Context, r *http.Request) error {
+func executeRequest(c echo.Context, r *http.Request) error {
 
-// 	// Instantiate http client
-// 	client := http.Client{}
+	// Instantiate http client
+	client := http.Client{}
 
-// 	resp, err := client.Do(r)
-// 	if err != nil {
-// 		return c.String(http.StatusBadGateway, err.Error())
-// 	}
+	resp, err := client.Do(r)
+	if err != nil {
+		return c.String(http.StatusBadGateway, err.Error())
+	}
 
-// 	// Read body
-// 	stream, err := ioutil.ReadAll(resp.Body)
-// 	if err != nil {
-// 		if err != nil {
-// 			c.String(http.StatusInternalServerError, err.Error())
-// 			return nil
-// 		}
-// 	}
+	// Read body
+	stream, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		if err != nil {
+			c.String(http.StatusInternalServerError, err.Error())
+			return nil
+		}
+	}
 
-// 	// Close reader when response is returned
-// 	defer resp.Body.Close()
+	// Close reader when response is returned
+	defer resp.Body.Close()
 
-// 	return c.Blob(resp.StatusCode, resp.Header.Get("Content-Type"), stream)
-// }
+	return c.Blob(resp.StatusCode, resp.Header.Get("Content-Type"), stream)
+}
 
 func trimLastSlash(host string) (h string) {
 	h = host

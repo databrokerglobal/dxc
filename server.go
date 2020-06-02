@@ -95,7 +95,7 @@ func main() {
 	// routes accessible by users
 	////
 
-	e.GET("/getdata/:did", datasources.GetData, middlewares.DataAccessVerification)
+	e.GET("/getfile", datasources.GetFile, middlewares.DataAccessVerification)
 
 	// Datasources Request Redirect
 	// e.Any("/api/*", datasources.RedirectToHost)

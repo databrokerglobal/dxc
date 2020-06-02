@@ -49,7 +49,6 @@ func DataAccessVerification(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 
 		verificationDataB64 := c.QueryParam("verificationdata")
-		did := c.Param("did")
 
 		verificationData, err := base64.RawURLEncoding.DecodeString(verificationDataB64)
 		if err != nil {
@@ -68,7 +67,7 @@ func DataAccessVerification(next echo.HandlerFunc) echo.HandlerFunc {
 			return c.String(http.StatusUnauthorized, "Signature is not valid.")
 		}
 
-		// check did in signed data is same in param
+		// check address in signed data is same as address derived from public key
 
 		challengeData, err := base64.StdEncoding.DecodeString(verificationDataObject.UnsignedData)
 		if err != nil {
@@ -77,11 +76,6 @@ func DataAccessVerification(next echo.HandlerFunc) echo.HandlerFunc {
 		challengeDataObject := ChallengeDataObject{}
 		json.Unmarshal(challengeData, &challengeDataObject)
 
-		if did != challengeDataObject.DID {
-			return c.String(http.StatusBadRequest, "The DID of the data source in signed data is not the same as the one passed as a parameter.")
-		}
-
-		// check address in signed data is same as address derived from public key
 		addressFromPubKey, err := utils.AddressFromHexPublicKey(verificationDataObject.PublicKey)
 		if err != nil {
 			return c.String(http.StatusBadRequest, "Provided public key is not valid: "+err.Error())
@@ -94,6 +88,10 @@ func DataAccessVerification(next echo.HandlerFunc) echo.HandlerFunc {
 		// TODO: check supplied challenge exists in db and is not older that the start of the deal
 
 		// TODO: check address (take from public key -- use crypto utils) is allowed to use that did
+
+		// pass did to the request
+		c.SetParamNames("did")
+		c.SetParamValues(challengeDataObject.DID)
 
 		if err := next(c); err != nil {
 			c.Error(err)

@@ -150,9 +150,9 @@
                 }
             }
         },
-        "/getdata/{did}": {
+        "/getfile": {
             "get": {
-                "description": "Get the data (for users)",
+                "description": "Get the file (for users)",
                 "consumes": [
                     "application/json"
                 ],
@@ -162,15 +162,8 @@
                 "tags": [
                     "data"
                 ],
-                "summary": "Get the data (for users)",
+                "summary": "Get the file (for users)",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Digital identifier of the data source bought",
-                        "name": "did",
-                        "in": "path",
-                        "required": true
-                    },
                     {
                         "type": "string",
                         "description": "Signed verification data",
