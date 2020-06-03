@@ -239,42 +239,20 @@ func GetFile(c echo.Context) error {
 		return c.String(http.StatusNotFound, errors.Wrap(err, "data source not found in db").Error())
 	}
 
-	if datasource.Type == "FILE" {
-
-		filename := path.Base(datasource.Host)
-		rand, _ := utils.GenerateRandomStringURLSafe(10)
-		pathToFile := "tempFiles/" + rand + "/" + filename
-		err := downloadFile(pathToFile, datasource.Host)
-		if err != nil {
-			return c.String(http.StatusInternalServerError, "could not download file. error: "+err.Error())
-		}
-		defer os.RemoveAll(filepath.Dir(pathToFile))
-
-		return c.Attachment(pathToFile, filename)
+	if datasource.Type != "FILE" {
+		return c.String(http.StatusBadRequest, "datasource is not of type FILE")
 	}
 
-	if datasource.Type == "API" {
-
-		body, err := ioutil.ReadAll(c.Request().Body)
-		if err != nil {
-			c.String(http.StatusInternalServerError, err.Error())
-			return nil
-		}
-
-		// if body is of multipart type, reassign it here
-		c.Request().Body = ioutil.NopCloser(bytes.NewReader(body))
-
-		proxyReq, err := http.NewRequest("GET", datasource.Host, nil)
-		if err != nil {
-			c.String(http.StatusInternalServerError, err.Error())
-			return nil
-		}
-
-		err = executeRequest(c, proxyReq)
-		return c.String(http.StatusAccepted, "")
+	filename := path.Base(datasource.Host)
+	rand, _ := utils.GenerateRandomStringURLSafe(10)
+	pathToFile := "tempFiles/" + rand + "/" + filename
+	err = downloadFile(pathToFile, datasource.Host)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "could not download file. error: "+err.Error())
 	}
+	defer os.RemoveAll(filepath.Dir(pathToFile))
 
-	return c.String(http.StatusBadRequest, "datasource type not supported")
+	return c.Attachment(pathToFile, filename)
 }
 
 // ProxyAPI redirects api
