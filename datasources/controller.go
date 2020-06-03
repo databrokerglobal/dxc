@@ -186,6 +186,30 @@ func GetOneDatasource(c echo.Context) error {
 	return c.JSON(http.StatusOK, datasource)
 }
 
+// DeleteDatasource datasource
+// DeleteDatasource godoc
+// @Summary Delete one datasource
+// @Description Delete one datasource given a did
+// @Tags datasources
+// @Param did path string true "Digital identifier of the datasource"
+// @Success 200 {string} string "datasource successfully deleted"
+// @Failure 500 {string} string "Error retrieving datasource from database"
+// @Router /datasource/{did} [delete]
+func DeleteDatasource(c echo.Context) error {
+	did, err := url.QueryUnescape(c.Param("did"))
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Could not read the did")
+	}
+
+	err = database.DBInstance.DeleteDatasource(did)
+
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Error retrieving datasource from database")
+	}
+
+	return c.JSON(http.StatusOK, "datasource successfully deleted")
+}
+
 // GetFile for the user to get the data source data
 // GetFile godoc
 // @Summary Get the file (for users)

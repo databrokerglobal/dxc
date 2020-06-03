@@ -47,7 +47,7 @@ func (m *Manager) GetDatasources() (ds *[]Datasource, err error) {
 
 // DeleteDatasource delete a Datasource
 func (m *Manager) DeleteDatasource(did string) (err error) {
-	m.DB.Delete(&Datasource{Did: did})
+	m.DB.Delete(Datasource{}, "Did LIKE ?", did)
 	if errs := m.DB.GetErrors(); len(errs) > 0 {
 		err = errs[0]
 		return

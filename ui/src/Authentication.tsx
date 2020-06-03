@@ -115,9 +115,9 @@ export const Authentication = () => {
           error={body?.apiKey?.length === 0}
           required
           id="apiKey"
-          label="API Key"
+          label="DXC_KEY"
           fullWidth={true}
-          helperText="This API key is displayed on your seller account."
+          helperText="The DXC_KEY is displayed on your seller account."
           value={body?.apiKey}
           onChange={handleApiKey}
         />

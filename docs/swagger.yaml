@@ -85,6 +85,26 @@ paths:
       tags:
       - datasources
   /datasource/{did}:
+    delete:
+      description: Delete one datasource given a did
+      parameters:
+      - description: Digital identifier of the datasource
+        in: path
+        name: did
+        required: true
+        type: string
+      responses:
+        "200":
+          description: datasource successfully deleted
+          schema:
+            type: string
+        "500":
+          description: Error retrieving datasource from database
+          schema:
+            type: string
+      summary: Delete one datasource
+      tags:
+      - datasources
     get:
       description: Get one datasource given a did
       parameters:

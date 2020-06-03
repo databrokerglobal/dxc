@@ -85,6 +85,7 @@ func main() {
 	e.POST("/datasource", datasources.AddOneDatasource)                   //, middlewares.CheckLocalhost)
 	e.POST("/add-example-datasources", datasources.AddExampleDatasources) //, middlewares.CheckLocalhost)
 	e.GET("/datasource/:did", datasources.GetOneDatasource)               //, middlewares.CheckLocalhost)
+	e.DELETE("/datasource/:did", datasources.DeleteDatasource)            //, middlewares.CheckLocalhost)
 	e.GET("/datasources", datasources.GetAllDatasources)                  //, middlewares.CheckLocalhost)
 
 	// USERS
@@ -119,7 +120,7 @@ func main() {
 	//////////////////////////
 
 	go func() {
-		datasources.CheckHost()
+		// datasources.CheckHost()
 		wg.Done()
 	}()
 
