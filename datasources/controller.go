@@ -216,7 +216,7 @@ func DeleteDatasource(c echo.Context) error {
 // @Description Get the file (for users)
 // @Tags data
 // @Accept json
-// @Param DXC_KEY query string true "Signed verification data"
+// @Param DXC_PRODUCT_KEY query string true "Signed verification data"
 // @Produce octet-stream
 // @Success 200 {file} string true
 // @Failure 401 {string} string "Request not authorized. Signature and verification data invalid"
@@ -321,7 +321,7 @@ func ProxyAPI(c echo.Context) error {
 	// Copy header, filter logic could be added later
 	proxyReq.Header = make(http.Header)
 	for index, value := range req.Header {
-		if !strings.EqualFold("did", index) && !strings.EqualFold("DXC_KEY", index) { // do not include headers we use ourselves
+		if !strings.EqualFold("did", index) && !strings.EqualFold("DXC_PRODUCT_KEY", index) { // do not include headers we use ourselves
 			proxyReq.Header[index] = value
 		}
 	}

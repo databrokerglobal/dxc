@@ -156,7 +156,7 @@ paths:
       parameters:
       - description: Signed verification data
         in: query
-        name: DXC_KEY
+        name: DXC_PRODUCT_KEY
         required: true
         type: string
       produces:

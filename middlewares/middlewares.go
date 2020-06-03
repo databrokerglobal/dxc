@@ -48,18 +48,18 @@ type ChallengeDataObject struct {
 func DataAccessVerification(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 
-		verificationDataB64 := c.QueryParam("DXC_KEY")
+		verificationDataB64 := c.QueryParam("DXC_PRODUCT_KEY")
 
 		if verificationDataB64 == "" {
-			verificationDataB64 = c.Request().Header.Get("DXC_KEY")
+			verificationDataB64 = c.Request().Header.Get("DXC_PRODUCT_KEY")
 			if verificationDataB64 == "" {
-				return c.JSON(http.StatusUnauthorized, "DXC_KEY is not included")
+				return c.JSON(http.StatusUnauthorized, "DXC_PRODUCT_KEY is not included")
 			}
 		}
 
 		verificationData, err := base64.RawURLEncoding.DecodeString(verificationDataB64)
 		if err != nil {
-			return c.String(http.StatusBadRequest, "Base64 encoding of DXC_KEY is not valid. err: "+err.Error())
+			return c.String(http.StatusBadRequest, "Base64 encoding of DXC_PRODUCT_KEY is not valid. err: "+err.Error())
 		}
 		verificationDataObject := VerificationData{}
 		json.Unmarshal(verificationData, &verificationDataObject)
@@ -68,7 +68,7 @@ func DataAccessVerification(next echo.HandlerFunc) echo.HandlerFunc {
 
 		sigIsValid, err := utils.VerifySignature(verificationDataObject.UnsignedData, verificationDataObject.Signature, verificationDataObject.PublicKey)
 		if err != nil {
-			return c.String(http.StatusBadRequest, "DXC_KEY is not valid. err: "+err.Error())
+			return c.String(http.StatusBadRequest, "DXC_PRODUCT_KEY is not valid. err: "+err.Error())
 		}
 		if !sigIsValid {
 			return c.String(http.StatusUnauthorized, "Signature is not valid.")

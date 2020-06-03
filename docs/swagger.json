@@ -197,7 +197,7 @@
                     {
                         "type": "string",
                         "description": "Signed verification data",
-                        "name": "DXC_KEY",
+                        "name": "DXC_PRODUCT_KEY",
                         "in": "query",
                         "required": true
                     }
