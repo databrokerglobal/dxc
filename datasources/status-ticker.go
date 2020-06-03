@@ -6,11 +6,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 
 	"github.com/databrokerglobal/dxc/database"
-	"github.com/databrokerglobal/dxc/utils"
 
 	"github.com/fatih/color"
 )
@@ -104,7 +104,7 @@ func SendStatus() {
 	bodyRequest := &DXCObject{
 		Challenge: challenge.Challenge,
 		Address:   userAuth.Address,
-		Host:      utils.GetOutboundIP().String(),
+		Host:      os.Getenv("REACT_APP_DXC_HOST"),
 		Port:      "8080",
 	}
 
