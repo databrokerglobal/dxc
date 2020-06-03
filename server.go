@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"sync"
 
 	"github.com/fatih/color"
@@ -143,9 +144,11 @@ func main() {
 	go datasources.ExecuteStatusTicker()
 
 	port := "8080"
-	color.Blue("\nIP address of server (1): %s:%s\n", utils.GetOutboundIP().String(), port)
-	color.Blue("\nIP address of server (2): %s:%s\n", utils.ResolveHostIP(), port)
-	color.Blue("\nIP address of server (3): %s:%s\n", utils.GetInternalIP(), port)
+	ipAddress, err := utils.GetIPAddress()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	color.Blue("\nIP address of server: %s - port: %s\n\n", ipAddress, port)
 
 	// Log stuff if port is busy f.e.
 	e.Logger.Fatal(e.Start(":" + port))

@@ -6,11 +6,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 	"sync"
 	"time"
 
 	"github.com/databrokerglobal/dxc/database"
+	"github.com/databrokerglobal/dxc/utils"
 
 	"github.com/fatih/color"
 )
@@ -101,10 +101,16 @@ func SendStatus() {
 		return
 	}
 
+	ipAddress, err := utils.GetIPAddress()
+	if err != nil {
+		color.Red("Error sending status request because of error getting local ip address. err: ", err)
+		return
+	}
+
 	bodyRequest := &DXCObject{
 		Challenge: challenge.Challenge,
 		Address:   userAuth.Address,
-		Host:      os.Getenv("REACT_APP_DXC_HOST"),
+		Host:      ipAddress,
 		Port:      "8080",
 	}
 

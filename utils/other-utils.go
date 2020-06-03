@@ -1,64 +1,31 @@
 package utils
 
 import (
-	"log"
+	"errors"
 	"net"
+	"strings"
 )
 
-// GetOutboundIP Get preferred outbound ip of this machine
-func GetOutboundIP() net.IP {
-	conn, err := net.Dial("tcp", "google.com:80")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer conn.Close()
-
-	localAddr := conn.LocalAddr().(*net.TCPAddr)
-
-	return localAddr.IP
-}
-
-// ResolveHostIP Get local ip
-func ResolveHostIP() string {
-
-	netInterfaceAddresses, err := net.InterfaceAddrs()
-
-	if err != nil {
-		return ""
-	}
-
-	for _, netInterfaceAddress := range netInterfaceAddresses {
-
-		networkIP, ok := netInterfaceAddress.(*net.IPNet)
-
-		if ok && !networkIP.IP.IsLoopback() && networkIP.IP.To4() != nil {
-
-			ip := networkIP.IP.String()
-
-			return ip
-		}
-	}
-	return ""
-}
-
-// GetInternalIP Get local ip
-func GetInternalIP() string {
-	itf, _ := net.InterfaceByName("eth0") //here your interface
-	item, _ := itf.Addrs()
-	var ip net.IP
-	for _, addr := range item {
-		switch v := addr.(type) {
-		case *net.IPNet:
-			if !v.IP.IsLoopback() {
-				if v.IP.To4() != nil { //Verify if IP is IPV4
-					ip = v.IP
+// GetIPAddress Get ip of this machine
+func GetIPAddress() (ip string, err error) {
+	if interfaces, err := net.Interfaces(); err == nil {
+		for _, interfac := range interfaces {
+			if interfac.HardwareAddr.String() != "" {
+				if strings.Index(interfac.Name, "en") == 0 ||
+					strings.Index(interfac.Name, "eth") == 0 {
+					if addrs, err := interfac.Addrs(); err == nil {
+						for _, addr := range addrs {
+							if addr.Network() == "ip+net" {
+								pr := strings.Split(addr.String(), "/")
+								if len(pr) == 2 && len(strings.Split(pr[0], ".")) == 4 {
+									return pr[0], nil
+								}
+							}
+						}
+					}
 				}
 			}
 		}
 	}
-	if ip != nil {
-		return ip.String()
-	} else {
-		return "127:0:0:1"
-	}
+	return "", errors.New("Could not find local IP address")
 }
