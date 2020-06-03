@@ -7,13 +7,13 @@ import (
 
 // GetOutboundIP Get preferred outbound ip of this machine
 func GetOutboundIP() net.IP {
-	conn, err := net.Dial("udp", "8.8.8.8:80")
+	conn, err := net.Dial("tcp", "google.com:80")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer conn.Close()
 
-	localAddr := conn.LocalAddr().(*net.UDPAddr)
+	localAddr := conn.LocalAddr().(*net.TCPAddr)
 
 	return localAddr.IP
 }
