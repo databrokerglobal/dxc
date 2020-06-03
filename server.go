@@ -143,7 +143,9 @@ func main() {
 	go datasources.ExecuteStatusTicker()
 
 	port := "8080"
-	color.Blue("\nIP address of server: %s:%s\n", utils.GetOutboundIP().String(), port)
+	color.Blue("\nIP address of server (1): %s:%s\n", utils.GetOutboundIP().String(), port)
+	color.Blue("\nIP address of server (2): %s:%s\n", utils.ResolveHostIP(), port)
+	color.Blue("\nIP address of server (3): %s:%s\n", utils.GetInternalIP(), port)
 
 	// Log stuff if port is busy f.e.
 	e.Logger.Fatal(e.Start(":" + port))
