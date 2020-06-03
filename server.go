@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"sync"
 
 	"github.com/fatih/color"
@@ -12,7 +11,6 @@ import (
 	"github.com/databrokerglobal/dxc/ethereum"
 	"github.com/databrokerglobal/dxc/middlewares"
 	"github.com/databrokerglobal/dxc/usermanager"
-	"github.com/databrokerglobal/dxc/utils"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -144,11 +142,6 @@ func main() {
 	go datasources.ExecuteStatusTicker()
 
 	port := "8080"
-	ipAddress, err := utils.GetIPAddress()
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	color.Blue("\nIP address of server: %s - port: %s\n\n", ipAddress, port)
 
 	// Log stuff if port is busy f.e.
 	e.Logger.Fatal(e.Start(":" + port))
