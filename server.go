@@ -11,6 +11,7 @@ import (
 	"github.com/databrokerglobal/dxc/ethereum"
 	"github.com/databrokerglobal/dxc/middlewares"
 	"github.com/databrokerglobal/dxc/usermanager"
+	"github.com/databrokerglobal/dxc/utils"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -141,7 +142,9 @@ func main() {
 
 	go datasources.ExecuteStatusTicker()
 
-	// Log stuff if port is busy f.e.
-	e.Logger.Fatal(e.Start(":8080"))
+	port := "8080"
+	color.Blue("\nIP address of server: %s:%s\n", utils.GetOutboundIP().String(), port)
 
+	// Log stuff if port is busy f.e.
+	e.Logger.Fatal(e.Start(":" + port))
 }
