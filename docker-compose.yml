@@ -2,12 +2,14 @@ version: "3"
 
 services:
   dxc-server:
-    image: dxc-server
+    image: databrokerdao/dxc-server:alpha-latest
     ports:
       - "8080:8080"
     env_file:
       - .env
   dxc-ui:
-    image: dxc-ui
+    image: databrokerdao/dxc-ui:alpha-latest
     ports:
       - "1337:80"
+    env_file:
+      - .env
