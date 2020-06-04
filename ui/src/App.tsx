@@ -13,10 +13,14 @@ import {
   Tab,
 } from "@material-ui/core";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import { useWindowSize } from "./WindowSizeHook";
+
+declare global {
+  interface Window {
+    DXC_SERVER_HOST: string
+  }
+}
 
 function App() {
-  const [width] = useWindowSize();
   const [tabValue, setTabValue] = React.useState<string>("pane-DS");
 
   const handleChangedTab = (event: any, newValue: string) => {
@@ -41,10 +45,9 @@ function App() {
         container
         style={{ marginTop: "2%" }}
         spacing={2}
-        direction={width < 1286 ? "column" : "row"}
       >
         {tabValue === "pane-DS" ?
-          <Grid item xs={width < 1286 ? 12 : 6}>
+          <Grid item xs={12}>
             <Grid style={{ marginBottom: "50px", }} item xs={12}>
               <DatasourceForm />
             </Grid>
@@ -55,7 +58,7 @@ function App() {
             </Grid>
           </Grid> : null}
         {tabValue === "pane-AUTH" ?
-          <Grid item xs={width < 1286 ? 12 : 6}>
+          <Grid item xs={12}>
             <Typography variant="subtitle1">Authentication</Typography>
             <Divider />
             <Grid item xs={12}>

@@ -38,8 +38,8 @@ Navigate to localhost:8080
 INFURA_ID=111111111111111111
 
 # DXC IP
-REACT_APP_DXC_HOST=localhost
-#REACT_APP_DXC_HOST=xx:xx:xx:xx
+DXC_HOST=localhost
+#DXC_HOST=xx:xx:xx:xx
 ```
 
 ### Dependencies

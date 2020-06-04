@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+	"os"
 	"sync"
 
 	"github.com/fatih/color"
@@ -104,7 +106,12 @@ func main() {
 	// Loading env file
 	err := godotenv.Load()
 	if err != nil {
-		e.Logger.Error("No env file loaded...")
+		e.Logger.Info("No env file loaded. It's ok if you are running with docker and if you passed the .enf file that way.")
+	}
+
+	dxcHost := os.Getenv("DXC_HOST")
+	if dxcHost == "" {
+		log.Fatalf("DXC_HOST env variable is not set!")
 	}
 
 	/////////////////

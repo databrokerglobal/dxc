@@ -104,7 +104,7 @@ func SendStatus() {
 	bodyRequest := &DXCObject{
 		Challenge: challenge.Challenge,
 		Address:   userAuth.Address,
-		Host:      os.Getenv("REACT_APP_DXC_HOST"),
+		Host:      os.Getenv("DXC_HOST"),
 		Port:      "8080",
 	}
 

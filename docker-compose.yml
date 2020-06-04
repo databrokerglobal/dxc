@@ -1,15 +1,15 @@
 version: "3"
 
 services:
-  client:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-      - REACT_APP_DXC_HOST=${REACT_APP_DXC_HOST}
-    volumes:
-      - ${LOCAL_FILES_DIR}:/var/files
+  dxc-server:
+    image: databrokerdao/dxc-server:alpha-latest
     ports:
       - "8080:8080"
+    env_file:
+      - .env
+  dxc-ui:
+    image: databrokerdao/dxc-ui:alpha-latest
+    ports:
+      - "1337:80"
     env_file:
       - .env
