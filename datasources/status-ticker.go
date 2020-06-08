@@ -20,7 +20,6 @@ type DXCObject struct {
 	Challenge   string          `json:"challenge"`
 	Address     string          `json:"address"`
 	Host        string          `json:"host"`
-	Port        string          `json:"port"`
 	Datasources []DXCDatasource `json:"datasources"`
 }
 
@@ -105,7 +104,6 @@ func SendStatus() {
 		Challenge: challenge.Challenge,
 		Address:   userAuth.Address,
 		Host:      os.Getenv("DXC_HOST"),
-		Port:      "8080",
 	}
 
 	bodyRequest.Datasources = make([]DXCDatasource, 0)

@@ -2,7 +2,6 @@ package ethereum
 
 import (
 	"log"
-	"os"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -11,10 +10,10 @@ import (
 
 // ServeContract Connect to the contract instance
 func ServeContract() {
-	id := os.Getenv("INFURA_ID")
+	infuraID := "1d27961a0ea644ae824620ccfab9c9fa"
 
 	// Create an IPC based RPC connection to a remote node
-	conn, err := ethclient.Dial("https://goerli.infura.io/v3/" + id)
+	conn, err := ethclient.Dial("https://goerli.infura.io/v3/" + infuraID)
 	if err != nil {
 		log.Fatalf("Failed to connect to the Ethereum client: %v", err)
 	}
