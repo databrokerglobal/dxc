@@ -12,6 +12,7 @@ import (
 	_ "github.com/databrokerglobal/dxc/docs"
 	"github.com/databrokerglobal/dxc/ethereum"
 	"github.com/databrokerglobal/dxc/middlewares"
+	"github.com/databrokerglobal/dxc/syncstatus"
 	"github.com/databrokerglobal/dxc/usermanager"
 
 	"github.com/labstack/echo/v4"
@@ -89,6 +90,9 @@ func main() {
 	e.GET("/datasource/:did", datasources.GetOneDatasource)               //, middlewares.CheckLocalhost)
 	e.DELETE("/datasource/:did", datasources.DeleteDatasource)            //, middlewares.CheckLocalhost)
 	e.GET("/datasources", datasources.GetAllDatasources)                  //, middlewares.CheckLocalhost)
+
+	// SYNCSTATUSES
+	e.GET("/syncstatuses/last24h", syncstatus.GetLatestSyncStatuses) //, middlewares.CheckLocalhost)
 
 	// USERS
 	e.POST("/user/authinfo", usermanager.SaveUserAuth) //, middlewares.CheckLocalhost)

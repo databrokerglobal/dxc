@@ -230,6 +230,38 @@
                 }
             }
         },
+        "/syncstatuses/last24h": {
+            "get": {
+                "description": "Get all sync statuses of the last 24hrs",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "syncstatus"
+                ],
+                "summary": "Get all sync statuses of the last 24hrs",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/database.SyncStatus"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error retrieving sync statuses from database",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/user/authinfo": {
             "get": {
                 "description": "Get address and api key for authentication with DXS",
@@ -318,6 +350,23 @@
                 },
                 "type": {
                     "type": "string"
+                }
+            }
+        },
+        "database.SyncStatus": {
+            "type": "object",
+            "properties": {
+                "errorResp": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "statusCode": {
+                    "type": "integer"
+                },
+                "success": {
+                    "type": "boolean"
                 }
             }
         },

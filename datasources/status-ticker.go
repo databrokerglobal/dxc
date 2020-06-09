@@ -151,15 +151,6 @@ func SendStatus() {
 	req.SetBasicAuth(userAuth.Address, userAuth.APIKey)
 	resp, err := client.Do(req)
 
-	fmt.Println("\n***************************\n********** jony ***********\n***************************")
-	fmt.Println()
-	fmt.Printf("resp.Status: %s", resp.Status)
-	fmt.Println()
-	fmt.Printf("resp.StatusCode: %d", resp.StatusCode)
-	fmt.Println()
-	fmt.Println("\n***************************\n***************************")
-	fmt.Println()
-
 	errorRespString := ""
 	if resp.StatusCode != 201 {
 		bodyBytes, err := ioutil.ReadAll(resp.Body)
@@ -184,9 +175,4 @@ func SendStatus() {
 			color.Red("Error sending status request to the DXS host (%s): %s", dxsURL, errorRespString)
 		}
 	}
-
-	// syncStatuses, err = database.DBInstance.GetMostRecentSyncStatuses(time.Now().Add(time.Duration(-24) * time.Hour))
-	// if err != nil {
-	// 	color.Red("Error getting sync statuses: %s", err.Error())
-	// }
 }
