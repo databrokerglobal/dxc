@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "axios";
-import { DateTime } from "luxon";
+import dayjs from "dayjs";
 import { LOCAL_HOST, fetcher } from "./fetchers";
 import useSWR, {mutate} from "swr";
 import {
@@ -184,11 +184,6 @@ export const DatasourceForm = () => {
 export const DatasourcesList = () => {
   const { data, error } = useSWR("/datasources", fetcher);
 
-  const dateFromStringTime = (stringTime: string) => {
-    let time = DateTime.fromISO(stringTime);
-    return time.toISODate();
-  };
-
   return (
     <Grid container spacing={2}>
       {!error &&
@@ -211,7 +206,7 @@ export const DatasourcesList = () => {
                     <TableCell>{datasource.name}</TableCell>
                     <TableCell>{datasource.type}</TableCell>
                     <TableCell>{datasource.host}</TableCell>
-                    <TableCell>{dateFromStringTime(datasource.CreatedAt)}</TableCell>
+                    <TableCell>{dayjs(datasource.CreatedAt).format('YYYY-MM-DD')}</TableCell>
                     <TableCell component="th" scope="row">{datasource.did}</TableCell>
                   </TableRow> : null
               ))}

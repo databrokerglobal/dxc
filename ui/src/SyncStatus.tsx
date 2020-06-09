@@ -1,5 +1,6 @@
 import React from "react";
-import { DateTime } from "luxon";
+import dayjs from "dayjs";
+import localizedFormat from "dayjs/plugin/localizedFormat";
 import { fetcher } from "./fetchers";
 import useSWR from "swr";
 import {
@@ -19,10 +20,7 @@ import { isEmptyArray } from "formik";
 export const SyncStatusList = () => {
   const { data, error } = useSWR("/syncstatuses/last24h", fetcher);
 
-  const timeFromISOTime = (stringTime: string) => {
-    let time = DateTime.fromISO(stringTime);
-    return time.toHTTP();
-  };
+  dayjs.extend(localizedFormat);
 
   return (
     <Grid container spacing={2}>
@@ -40,7 +38,7 @@ export const SyncStatusList = () => {
             <TableBody>
               {(data.data as any).map((syncStatus: any) => (
                 <TableRow key={syncStatus.ID}>
-                  <TableCell>{timeFromISOTime(syncStatus.CreatedAt)}</TableCell>
+                  <TableCell>{dayjs(syncStatus.CreatedAt).format('L LT')}</TableCell>
                   <TableCell>{syncStatus.success ? "OK" : "Sync Error"}</TableCell>
                   <TableCell>{syncStatus.success ? "" : syncStatus.errorResp}</TableCell>
                 </TableRow>
