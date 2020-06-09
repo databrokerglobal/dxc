@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"sync"
@@ -132,7 +133,12 @@ func SendStatus() {
 	dxsAPIKeyB64 := userAuth.APIKey
 	dxsAPIKeyData, err := base64.StdEncoding.DecodeString(dxsAPIKeyB64)
 	if err != nil {
-		color.Red("Error decoding api key. err: ", err.Error())
+		errorMsg := "Error decoding api key. err: " + err.Error()
+		color.Red(errorMsg)
+		err = database.DBInstance.CreateSyncStatus(false, errorMsg, 0, "")
+		if err != nil {
+			color.Red("Error saving sync status to db. err: ", err.Error())
+		}
 		return
 	}
 	dxsAPIKey := DXSAPIKey{}
@@ -145,9 +151,42 @@ func SendStatus() {
 	req.SetBasicAuth(userAuth.Address, userAuth.APIKey)
 	resp, err := client.Do(req)
 
+	fmt.Println("\n***************************\n********** jony ***********\n***************************")
+	fmt.Println()
+	fmt.Printf("resp.Status: %s", resp.Status)
+	fmt.Println()
+	fmt.Printf("resp.StatusCode: %d", resp.StatusCode)
+	fmt.Println()
+	fmt.Println("\n***************************\n***************************")
+	fmt.Println()
+
+	errorRespString := ""
+	if resp.StatusCode != 201 {
+		bodyBytes, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			color.Red("Error reading response body. err: ", err.Error())
+			return
+		}
+		errorRespString = string(bodyBytes)
+	}
+
+	err = database.DBInstance.CreateSyncStatus(resp.StatusCode == 201, errorRespString, resp.StatusCode, resp.Status)
+	if err != nil {
+		color.Red("Error saving sync status to db. err: ", err.Error())
+	}
+
 	if err != nil {
 		color.Red("Error sending status request to the DXS host (%s): %v", dxsURL, err)
 	} else {
-		color.Green("Successfully sent status to the DXS host (%s): %v", dxsURL, *resp)
+		if resp.StatusCode == 201 {
+			color.Green("Successfully sent status to the DXS host (%s): %+v", dxsURL, *resp)
+		} else {
+			color.Red("Error sending status request to the DXS host (%s): %s", dxsURL, errorRespString)
+		}
 	}
+
+	// syncStatuses, err = database.DBInstance.GetMostRecentSyncStatuses(time.Now().Add(time.Duration(-24) * time.Hour))
+	// if err != nil {
+	// 	color.Red("Error getting sync statuses: %s", err.Error())
+	// }
 }
