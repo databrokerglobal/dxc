@@ -18,4 +18,8 @@ type Repository interface {
 	GetDatasources() (ds *[]Datasource, err error)
 	DeleteDatasource(did string) (err error)
 	UpdateDatasource(datasource *Datasource) (err error)
+
+	// Datasources
+	CreateInfuraID(infuraID string) (err error)
+	GetLatestInfuraID() (infuraID string, err error)
 }

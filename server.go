@@ -84,15 +84,15 @@ func main() {
 	////
 
 	// DATASOURCES
-	e.POST("/datasource", datasources.AddOneDatasource)                   //, middlewares.CheckLocalhost)
-	e.POST("/add-example-datasources", datasources.AddExampleDatasources) //, middlewares.CheckLocalhost)
-	e.GET("/datasource/:did", datasources.GetOneDatasource)               //, middlewares.CheckLocalhost)
-	e.DELETE("/datasource/:did", datasources.DeleteDatasource)            //, middlewares.CheckLocalhost)
-	e.GET("/datasources", datasources.GetAllDatasources)                  //, middlewares.CheckLocalhost)
+	e.POST("/datasource", datasources.AddOneDatasource)
+	e.POST("/add-example-datasources", datasources.AddExampleDatasources)
+	e.GET("/datasource/:did", datasources.GetOneDatasource)
+	e.DELETE("/datasource/:did", datasources.DeleteDatasource)
+	e.GET("/datasources", datasources.GetAllDatasources)
 
 	// USERS
-	e.POST("/user/authinfo", usermanager.SaveUserAuth) //, middlewares.CheckLocalhost)
-	e.GET("/user/authinfo", usermanager.GetUserAuth)   //, middlewares.CheckLocalhost)
+	e.POST("/user/authinfo", usermanager.SaveUserAuth)
+	e.GET("/user/authinfo", usermanager.GetUserAuth)
 
 	////
 	// routes accessible by users

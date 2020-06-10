@@ -15,8 +15,12 @@ The data exchange controller has three parts:
 - Docker
 
 ```
-# Infura project id
-INFURA_ID=111111111111111111
+
+# DXC IP/URL for access from outside. include http/https and port. no trailing slash
+DXC_HOST=http://xx.xx.xx.xx:xxxx
+
+# DXC IP for access from ui to server. localhost does not work if you use docker. include http/https and port (that you set in docker-compose).
+DXC_SERVER_HOST=http://xx.xx.xx.xx:xxxx
 
 ```
 
@@ -34,12 +38,11 @@ Navigate to localhost:8080
 - Local
 
 ```
-# Infura project id
-INFURA_ID=111111111111111111
+# DXC IP/URL for access from outside. include http/https and port. no trailing slash
+DXC_HOST=http://xx.xx.xx.xx:xxxx
 
-# DXC IP
-DXC_HOST=localhost
-#DXC_HOST=xx:xx:xx:xx
+# DXC IP for access from ui to server. localhost does not work if you use docker. include http/https and port (that you set in docker-compose).
+DXC_SERVER_HOST=http://xx.xx.xx.xx:xxxx
 ```
 
 ### Dependencies

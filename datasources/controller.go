@@ -49,7 +49,7 @@ func AddOneDatasource(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "Name, Type or Host are empty but are required")
 	}
 
-	datasource.Host = trimLastSlash(datasource.Host)
+	datasource.Host = utils.TrimLastSlash(datasource.Host)
 
 	if datasource.Did == "" {
 		rand, _ := utils.GenerateRandomStringURLSafe(10)
@@ -84,7 +84,7 @@ func AddExampleDatasources(c echo.Context) error {
 	datasource.Name = "file 1"
 	datasource.Available = true
 	datasource.Type = "FILE"
-	datasource.Host = trimLastSlash("https://file-examples.com/wp-content/uploads/2017/02/file_example_XLS_10.xls")
+	datasource.Host = utils.TrimLastSlash("https://file-examples.com/wp-content/uploads/2017/02/file_example_XLS_10.xls")
 	rand, _ := utils.GenerateRandomStringURLSafe(10)
 	datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
 	if err := database.DBInstance.CreateDatasource(datasource); err != nil {
@@ -96,7 +96,7 @@ func AddExampleDatasources(c echo.Context) error {
 	datasource.Name = "file 2"
 	datasource.Available = true
 	datasource.Type = "FILE"
-	datasource.Host = trimLastSlash("https://file-examples.com/wp-content/uploads/2017/02/file_example_XLSX_10.xlsx")
+	datasource.Host = utils.TrimLastSlash("https://file-examples.com/wp-content/uploads/2017/02/file_example_XLSX_10.xlsx")
 	rand, _ = utils.GenerateRandomStringURLSafe(10)
 	datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
 	if err := database.DBInstance.CreateDatasource(datasource); err != nil {
@@ -108,7 +108,7 @@ func AddExampleDatasources(c echo.Context) error {
 	datasource.Name = "file 3 (ftp)"
 	datasource.Available = true
 	datasource.Type = "FILE"
-	datasource.Host = trimLastSlash("ftp://speedtest.tele2.net/100KB.zip")
+	datasource.Host = utils.TrimLastSlash("ftp://speedtest.tele2.net/100KB.zip")
 	rand, _ = utils.GenerateRandomStringURLSafe(10)
 	datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
 	if err := database.DBInstance.CreateDatasource(datasource); err != nil {
@@ -120,7 +120,7 @@ func AddExampleDatasources(c echo.Context) error {
 	datasource.Name = "api 1"
 	datasource.Available = true
 	datasource.Type = "API"
-	datasource.Host = trimLastSlash("https://jsonplaceholder.typicode.com")
+	datasource.Host = utils.TrimLastSlash("https://jsonplaceholder.typicode.com")
 	rand, _ = utils.GenerateRandomStringURLSafe(10)
 	datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
 	if err := database.DBInstance.CreateDatasource(datasource); err != nil {
@@ -348,14 +348,6 @@ func executeRequest(c echo.Context, r *http.Request) error {
 	defer resp.Body.Close()
 
 	return c.Blob(resp.StatusCode, resp.Header.Get("Content-Type"), stream)
-}
-
-func trimLastSlash(host string) (h string) {
-	h = host
-	for strings.Split(h, "")[len(h)-1] == "/" {
-		h = strings.TrimSuffix(h, "/")
-	}
-	return h
 }
 
 func downloadFile(pathToFile string, url string) error {
