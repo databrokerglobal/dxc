@@ -4,13 +4,13 @@ services:
   dxc-server:
     image: databrokerdao/dxc-server:alpha-latest
     volumes:
-      - ./db-data:/db-data
+      - ./db-data:/go/db-data
     ports:
       - "8080:8080"
     env_file:
       - .env
   dxc-ui:
-    image: databrokerdao/dxc-ui:latest
+    image: databrokerdao/dxc-ui:alpha-latest
     ports:
       - "1337:80"
     env_file:
