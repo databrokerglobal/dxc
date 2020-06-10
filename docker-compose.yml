@@ -10,7 +10,7 @@ services:
     env_file:
       - .env
   dxc-ui:
-    image: databrokerdao/dxc-ui:alpha-latest
+    image: databrokerdao/dxc-ui:latest
     ports:
       - "1337:80"
     env_file:

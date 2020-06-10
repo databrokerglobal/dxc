@@ -1,5 +1,7 @@
 package database
 
+import "time"
+
 // Repository inteface
 type Repository interface {
 
@@ -18,4 +20,13 @@ type Repository interface {
 	GetDatasources() (ds *[]Datasource, err error)
 	DeleteDatasource(did string) (err error)
 	UpdateDatasource(datasource *Datasource) (err error)
+
+	// SyncStatus
+	CreateSyncStatus(success bool, errorResp string, statusCode int, status string) (err error)
+	GetMostRecentSyncStatuses(fromTime time.Time) (syncStatuses []SyncStatus, err error)
+	GetAllSyncStatuses() (syncStatuses []SyncStatus, err error)
+
+  // Datasources
+	CreateInfuraID(infuraID string) (err error)
+	GetLatestInfuraID() (infuraID string, err error)
 }

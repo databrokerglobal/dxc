@@ -14,6 +14,15 @@ type Datasource struct {
 	Available bool   `json:"available"`
 }
 
+// SyncStatus struct
+type SyncStatus struct {
+	gorm.Model
+	Success    bool   `json:"success"`
+	ErrorResp  string `json:"errorResp"`
+	StatusCode int    `json:"statusCode"`
+	Status     string `json:"status"`
+}
+
 // Challenge struct
 type Challenge struct {
 	gorm.Model
@@ -25,4 +34,10 @@ type UserAuth struct {
 	gorm.Model
 	Address string `json:"address"`
 	APIKey  string `json:"api_key"`
+}
+
+// InfuraID struct to
+type InfuraID struct {
+	gorm.Model
+	InfuraID string `json:"infuraID"`
 }
