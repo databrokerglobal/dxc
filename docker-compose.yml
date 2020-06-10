@@ -2,7 +2,9 @@ version: "3"
 
 services:
   dxc-server:
-    image: databrokerdao/dxc-server:latest
+    image: databrokerdao/dxc-server:alpha-latest
+    volumes:
+      - ./db-data:/db-data
     ports:
       - "8080:8080"
     env_file:
