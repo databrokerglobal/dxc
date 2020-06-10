@@ -2,6 +2,7 @@ import React from "react";
 import "./App.css";
 import { DatasourceForm, DatasourcesList } from "./Datasources";
 import { Authentication } from "./Authentication";
+import { SyncStatusList } from "./SyncStatus";
 import {
   Container,
   AppBar,
@@ -61,8 +62,13 @@ function App() {
           <Grid item xs={12}>
             <Typography variant="subtitle1">Authentication</Typography>
             <Divider />
-            <Grid item xs={12}>
+            <Grid style={{ marginBottom: "70px", }} item xs={12}>
               <Authentication />
+            </Grid>
+            <Typography variant="h5">Last 24h sync</Typography>
+            <Divider />
+            <Grid style={{ marginTop: "15px", }} item xs={12}>
+              <SyncStatusList />
             </Grid>
           </Grid> : null}
       </Grid>

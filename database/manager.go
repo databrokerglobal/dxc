@@ -41,6 +41,7 @@ func init() {
 	DBInstance = Manager{db}
 	DBInstance.DB.LogMode(false)
 	DBInstance.DB.AutoMigrate(&Datasource{})
+	DBInstance.DB.AutoMigrate(&SyncStatus{})
 	DBInstance.DB.AutoMigrate(&Challenge{})
 	DBInstance.DB.AutoMigrate(&UserAuth{})
 	DBInstance.DB.AutoMigrate(&InfuraID{})

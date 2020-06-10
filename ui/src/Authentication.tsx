@@ -12,6 +12,7 @@ import {
 } from "@material-ui/icons";
 import * as R from "ramda";
 import * as Yup from "yup";
+import { mutate } from "swr";
 
 interface IAuth {
   ID?: string;
@@ -74,6 +75,7 @@ export const Authentication = () => {
     try {
       await axios.post(`${LOCAL_HOST}/user/authinfo?address=${body.address}&apiKey=${body.apiKey}`);
       setResp(`Authentication data successfully saved.`);
+      mutate('/syncstatuses/last24h')
     } catch (error) {
       setErr(error.toString());
     }
