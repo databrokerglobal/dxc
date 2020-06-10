@@ -64,7 +64,6 @@ func ExecuteStatusTicker() {
 
 func doChecks() {
 	var wg sync.WaitGroup
-	wg.Add(1)
 
 	wg.Add(1)
 
