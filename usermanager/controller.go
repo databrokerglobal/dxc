@@ -1,14 +1,27 @@
 package usermanager
 
 import (
+	"encoding/base64"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 
+	"github.com/fatih/color"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 
 	"github.com/databrokerglobal/dxc/database"
 	"github.com/databrokerglobal/dxc/datasources"
+	"github.com/databrokerglobal/dxc/ethereum"
+	"github.com/databrokerglobal/dxc/utils"
 )
+
+// DXSAPIKey object allows to decode the api key and get the dxs host
+type DXSAPIKey struct {
+	Key  string `json:"k"`
+	Host string `json:"h"`
+}
 
 // SaveUserAuth to save the address and api key
 // Create godoc
@@ -36,6 +49,8 @@ func SaveUserAuth(c echo.Context) error {
 
 	datasources.SendStatus()
 
+	getInfuraIDAndServeContract(address, apiKey)
+
 	return c.JSON(http.StatusAccepted, "success saving the data")
 }
 
@@ -60,4 +75,38 @@ func GetUserAuth(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, userAuth)
+}
+
+func getInfuraIDAndServeContract(address string, apiKey string) {
+	// get dxs url from api key
+	dxsAPIKeyData, err := base64.StdEncoding.DecodeString(apiKey)
+	if err != nil {
+		color.Red("Error decoding api key. err: ", err.Error())
+	} else {
+		dxsAPIKey := DXSAPIKey{}
+		json.Unmarshal(dxsAPIKeyData, &dxsAPIKey)
+
+		dxsURL := dxsAPIKey.Host
+
+		client := &http.Client{}
+		req, _ := http.NewRequest("GET", fmt.Sprintf("%s/infura/getID", utils.TrimLastSlash(dxsURL)), nil)
+		req.SetBasicAuth(address, apiKey)
+		resp, _ := client.Do(req)
+
+		if resp.StatusCode == 200 {
+			bodyBytes, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				color.Red("Error reading response body. err: ", err.Error())
+			} else {
+				infuraID := string(bodyBytes)
+
+				err = database.DBInstance.CreateInfuraID(infuraID)
+				if err != nil {
+					color.Red("Error saving infura ID. err: ", err.Error())
+				} else {
+					go ethereum.ServeContract()
+				}
+			}
+		}
+	}
 }

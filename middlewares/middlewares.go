@@ -4,31 +4,12 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"net/http"
-	"strings"
 
 	"github.com/databrokerglobal/dxc/utils"
 
 	_ "github.com/databrokerglobal/dxc/docs"
 	"github.com/labstack/echo/v4"
 )
-
-// CheckLocalhost is middlewaere to check if request if from localhost
-func CheckLocalhost(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
-
-		arrayHost := strings.Split(c.Request().Host, ":") // splits the host and the port
-
-		if arrayHost[0] != "localhost" {
-			return c.String(http.StatusUnauthorized, "this route is only accessible locally")
-		}
-
-		if err := next(c); err != nil {
-			c.Error(err)
-		}
-
-		return nil
-	}
-}
 
 // VerificationData is a struct to convert url verification data to json
 type VerificationData struct {

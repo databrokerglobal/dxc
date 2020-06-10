@@ -26,3 +26,9 @@ type UserAuth struct {
 	Address string `json:"address"`
 	APIKey  string `json:"api_key"`
 }
+
+// InfuraID struct to
+type InfuraID struct {
+	gorm.Model
+	InfuraID string `json:"infuraID"`
+}

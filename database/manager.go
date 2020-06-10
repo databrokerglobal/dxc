@@ -43,4 +43,5 @@ func init() {
 	DBInstance.DB.AutoMigrate(&Datasource{})
 	DBInstance.DB.AutoMigrate(&Challenge{})
 	DBInstance.DB.AutoMigrate(&UserAuth{})
+	DBInstance.DB.AutoMigrate(&InfuraID{})
 }
