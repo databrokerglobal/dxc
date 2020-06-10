@@ -34,7 +34,11 @@ func init() {
 		return
 	}
 
-	db, err := gorm.Open("sqlite3", "./dxc.db")
+	dirDB := "./db-data"
+	if _, err := os.Stat(dirDB); os.IsNotExist(err) {
+		os.Mkdir(dirDB, 0770)
+	}
+	db, err := gorm.Open("sqlite3", dirDB+"/dxc.db")
 	if err != nil {
 		log.Fatal("Error connecting to database: ", err)
 	}
