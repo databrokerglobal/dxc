@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/databrokerglobal/dxc/database"
+	"github.com/databrokerglobal/dxc/utils"
 
 	"github.com/fatih/color"
 )
@@ -147,7 +148,7 @@ func SendStatus() {
 	dxsURL := dxsAPIKey.Host
 
 	client := &http.Client{}
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/dxc", trimLastSlash(dxsURL)), bytes.NewBuffer(bodyRequestJSON))
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/dxc", utils.TrimLastSlash(dxsURL)), bytes.NewBuffer(bodyRequestJSON))
 	req.SetBasicAuth(userAuth.Address, userAuth.APIKey)
 	resp, err := client.Do(req)
 
