@@ -3,6 +3,7 @@ import "./App.css";
 import { DatasourceForm, DatasourcesList } from "./Datasources";
 import { Authentication } from "./Authentication";
 import { SyncStatusList } from "./SyncStatus";
+import { LOCAL_HOST } from "./fetchers";
 import {
   Container,
   AppBar,
@@ -12,6 +13,7 @@ import {
   Grid,
   Tabs,
   Tab,
+  Link,
 } from "@material-ui/core";
 import CssBaseline from "@material-ui/core/CssBaseline";
 
@@ -27,6 +29,8 @@ function App() {
   const handleChangedTab = (event: any, newValue: string) => {
     setTabValue(newValue);
   };
+
+  const linkSwagger = LOCAL_HOST + "/swagger/index.html";
 
   return (
     <Container>
@@ -60,10 +64,17 @@ function App() {
           </Grid> : null}
         {tabValue === "pane-AUTH" ?
           <Grid item xs={12}>
-            <Typography variant="subtitle1">Authentication</Typography>
+            <Typography variant="h5">Authentication</Typography>
             <Divider />
-            <Grid style={{ marginBottom: "70px", }} item xs={12}>
+            <Grid style={{ marginBottom: "40px", }} item xs={12}>
               <Authentication />
+            </Grid>
+            <Typography variant="h5">Access DXC API</Typography>
+            <Divider />
+            <Grid style={{ marginTop: "15px", marginBottom: "40px", }} item xs={12}>
+              <Link href={linkSwagger} target="_blank" rel="noreferrer">
+                {linkSwagger}
+              </Link>
             </Grid>
             <Typography variant="h5">Last 24h sync</Typography>
             <Divider />
