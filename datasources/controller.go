@@ -210,6 +210,55 @@ func DeleteDatasource(c echo.Context) error {
 	return c.JSON(http.StatusOK, "datasource successfully deleted")
 }
 
+// UpdateDatasource datasource
+// UpdateDatasource godoc
+// @Summary Update one datasource
+// @Description Modify one datasource (new name and/or host) given a did
+// @Tags datasources
+// @Param did path string true "Digital identifier of the datasource"
+// @Param newName query string false "New name. Keep empty to keep existing name."
+// @Param newHost query string false "New host. Keep empty to keep existing host."
+// @Success 200 {string} string "datasource successfully updated"
+// @Failure 400 {string} string "Bad request"
+// @Failure 404 {string} string "Datasource not found"
+// @Failure 500 {string} string "Error retrieving datasource from database"
+// @Router /datasource/{did} [put]
+func UpdateDatasource(c echo.Context) error {
+	did, err := url.QueryUnescape(c.Param("did"))
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Could not read the did. err: "+err.Error())
+	}
+
+	newName := c.QueryParam("newName")
+	newHost := c.QueryParam("newHost")
+
+	if newName == "" && newHost == "" {
+		return c.String(http.StatusBadRequest, "Bad request. newName and newHost cannot both be empty.")
+	}
+
+	datasource, err := database.DBInstance.GetDatasourceByDID(did)
+	if err != nil {
+		return c.String(http.StatusNotFound, "Could not retreave datasource. err: "+err.Error())
+	}
+
+	if newName != "" {
+		datasource.Name = newName
+	}
+
+	if newHost != "" {
+		datasource.Host = newHost
+	}
+
+	err = database.DBInstance.UpdateDatasource(datasource)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Could not update the datasource. err: "+err.Error())
+	}
+
+	SendStatus()
+
+	return c.JSON(http.StatusOK, "datasource successfully updated")
+}
+
 // GetFile for the user to get the data source data
 // GetFile godoc
 // @Summary Get the file (for users)
@@ -219,6 +268,7 @@ func DeleteDatasource(c echo.Context) error {
 // @Param DXC_PRODUCT_KEY query string true "Signed verification data"
 // @Produce octet-stream
 // @Success 200 {file} string true
+// @Failure 400 {string} string "Bad request"
 // @Failure 401 {string} string "Request not authorized. Signature and verification data invalid"
 // @Failure 404 {string} string "Datasource not found"
 // @Failure 500 {string} string "Internal server error"

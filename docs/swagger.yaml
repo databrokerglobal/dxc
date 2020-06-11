@@ -138,6 +138,42 @@ paths:
       summary: Get one datasource
       tags:
       - datasources
+    put:
+      description: Modify one datasource (new name and/or host) given a did
+      parameters:
+      - description: Digital identifier of the datasource
+        in: path
+        name: did
+        required: true
+        type: string
+      - description: New name. Keep empty to keep existing name.
+        in: query
+        name: newName
+        type: string
+      - description: New host. Keep empty to keep existing host.
+        in: query
+        name: newHost
+        type: string
+      responses:
+        "200":
+          description: datasource successfully updated
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "404":
+          description: Datasource not found
+          schema:
+            type: string
+        "500":
+          description: Error retrieving datasource from database
+          schema:
+            type: string
+      summary: Update one datasource
+      tags:
+      - datasources
   /datasources:
     get:
       consumes:
@@ -177,6 +213,10 @@ paths:
           description: OK
           schema:
             type: file
+        "400":
+          description: Bad request
+          schema:
+            type: string
         "401":
           description: Request not authorized. Signature and verification data invalid
           schema:
