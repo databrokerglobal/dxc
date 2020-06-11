@@ -89,6 +89,7 @@ func main() {
 	e.POST("/add-example-datasources", datasources.AddExampleDatasources)
 	e.GET("/datasource/:did", datasources.GetOneDatasource)
 	e.DELETE("/datasource/:did", datasources.DeleteDatasource)
+	e.PUT("/datasource/:did", datasources.UpdateDatasource)
 	e.GET("/datasources", datasources.GetAllDatasources)
 
 	// SYNCSTATUSES
