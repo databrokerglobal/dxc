@@ -1,6 +1,7 @@
 import React from "react";
 import dayjs from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat";
+import relativeTime from "dayjs/plugin/relativeTime";
 import { fetcher } from "./fetchers";
 import useSWR from "swr";
 import {
@@ -21,6 +22,11 @@ export const SyncStatusList = () => {
   const { data, error } = useSWR("/syncstatuses/last24h", fetcher);
 
   dayjs.extend(localizedFormat);
+  dayjs.extend(relativeTime);
+
+  const statusColor = (success: boolean): string => {
+    return success ? "green" : "red";
+  };
 
   return (
     <Grid container spacing={2}>
@@ -30,17 +36,19 @@ export const SyncStatusList = () => {
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>
-                <TableCell>Time</TableCell>
+                <TableCell>When</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell>Error Message</TableCell>
+                <TableCell>Time</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {(data.data as any).map((syncStatus: any) => (
                 <TableRow key={syncStatus.ID}>
-                  <TableCell>{dayjs(syncStatus.CreatedAt).format('L LT')}</TableCell>
-                  <TableCell>{syncStatus.success ? "OK" : "Sync Error"}</TableCell>
+                  <TableCell>{dayjs(syncStatus.CreatedAt).fromNow()}</TableCell>
+                  <TableCell style={{ color: statusColor(syncStatus.success), }}>{syncStatus.success ? "Sync OK" : "Sync Error"}</TableCell>
                   <TableCell>{syncStatus.success ? "" : syncStatus.errorResp}</TableCell>
+                  <TableCell>{dayjs(syncStatus.CreatedAt).format('L LT')}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
