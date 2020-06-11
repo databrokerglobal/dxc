@@ -1,11 +1,17 @@
-FROM alpine:edge
-RUN apk update
-RUN apk upgrade
-RUN apk add --update go=1.13.10-r0 gcc=9.3.0-r2 g++=9.3.0-r2 linux-headers
-WORKDIR /
-COPY go.mod go.sum ./
-RUN go mod download
+FROM golang:alpine AS builder
+
+RUN apk update && apk add --no-cache git gcc=9.3.0-r2 g++=9.3.0-r2 linux-headers
+
+WORKDIR $GOPATH/src/github.com/databrokerglobal/dxc/
 COPY . .
-# CGO_ENABLED=1 is required for sqlite to work
-RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o main .
-CMD ["./main"]
+
+RUN go get -d -v
+
+RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /go/bin/dxc
+
+
+FROM golang:alpine
+
+COPY --from=builder /go/bin/dxc /go/bin/dxc
+
+ENTRYPOINT ["/go/bin/dxc"]
