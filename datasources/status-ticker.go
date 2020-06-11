@@ -150,6 +150,14 @@ func SendStatus() {
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/dxc", utils.TrimLastSlash(dxsURL)), bytes.NewBuffer(bodyRequestJSON))
 	req.SetBasicAuth(userAuth.Address, userAuth.APIKey)
 	resp, err := client.Do(req)
+	if err != nil {
+		color.Red("Error sending status request to the DXS host (%s): %v", dxsURL, err)
+		err = database.DBInstance.CreateSyncStatus(false, err.Error(), 0, "no connection")
+		if err != nil {
+			color.Red("Error saving sync status to db. err: ", err.Error())
+		}
+		return
+	}
 
 	errorRespString := ""
 	if resp.StatusCode != 201 {
@@ -166,13 +174,9 @@ func SendStatus() {
 		color.Red("Error saving sync status to db. err: ", err.Error())
 	}
 
-	if err != nil {
-		color.Red("Error sending status request to the DXS host (%s): %v", dxsURL, err)
+	if resp.StatusCode == 201 {
+		color.Green("Successfully sent status to the DXS host (%s): %+v", dxsURL, *resp)
 	} else {
-		if resp.StatusCode == 201 {
-			color.Green("Successfully sent status to the DXS host (%s): %+v", dxsURL, *resp)
-		} else {
-			color.Red("Error sending status request to the DXS host (%s): %s", dxsURL, errorRespString)
-		}
+		color.Red("Error sending status request to the DXS host (%s): %s", dxsURL, errorRespString)
 	}
 }
