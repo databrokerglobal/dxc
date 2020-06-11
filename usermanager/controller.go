@@ -91,9 +91,9 @@ func getInfuraIDAndServeContract(address string, apiKey string) {
 		client := &http.Client{}
 		req, _ := http.NewRequest("GET", fmt.Sprintf("%s/infura/getID", utils.TrimLastSlash(dxsURL)), nil)
 		req.SetBasicAuth(address, apiKey)
-		resp, _ := client.Do(req)
+		resp, err := client.Do(req)
 
-		if resp.StatusCode == 200 {
+		if err == nil && resp.StatusCode == 200 {
 			bodyBytes, err := ioutil.ReadAll(resp.Body)
 			if err != nil {
 				color.Red("Error reading response body. err: ", err.Error())
