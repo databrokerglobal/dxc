@@ -26,7 +26,10 @@ module.exports = {
     },
     launchpad: {
       provider: () => {
-        return new PrivateKeyProvider('PRIVATEKEY', `RPCENDPOINT`);
+        return new PrivateKeyProvider(
+          '2c869d243f546e327f6335c0b8973f1a37f1779eeef1572146da49b6dab60b42',
+          `https://brown-falcon.settlemint.com/a0e9cb23/besu`
+        );
       },
       gasPrice: '0',
       network_id: '*',

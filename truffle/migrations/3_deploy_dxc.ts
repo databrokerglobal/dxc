@@ -1,4 +1,4 @@
-import {encodeCall} from '../test/utils/encodeCall';
+//import {encodeCall} from '../test/utils/encodeCall';
 import {
   DTXTokenContract,
   DTXTokenInstance,
@@ -24,17 +24,18 @@ const performMigration = async (
   await deployer.deploy(Proxy);
 
   const dDxc = await DXC.deployed();
-  const dProxy = await Proxy.deployed();
+  await dDxc.initialize(dTXTokenInstance.address);
+  // const dProxy = await Proxy.deployed();
 
-  // encode the calling of the initializer, which here acts as the constructor for the DXC contract
-  const data = encodeCall(
-    'initialize',
-    ['address'],
-    [dTXTokenInstance.address]
-  );
+  // // encode the calling of the initializer, which here acts as the constructor for the DXC contract
+  // const data = encodeCall(
+  //   'initialize',
+  //   ['address'],
+  //   [dTXTokenInstance.address]
+  // );
 
-  // point proxy to DXC contract and call the constructor (aka the initializer)
-  await dProxy.upgradeToAndCall(dDxc.address, data, {from: accounts[0]});
+  // // point proxy to DXC contract and call the constructor (aka the initializer)
+  // await dProxy.upgradeToAndCall(dDxc.address, data, {from: accounts[0]});
 };
 
 module.exports = (deployer: any, network: string, accounts: string[]) => {
