@@ -58,27 +58,25 @@
 				
 				<option value="file1">github.com/databrokerglobal/dxc/database/challenge.go (0.0%)</option>
 				
-				<option value="file2">github.com/databrokerglobal/dxc/database/files.go (73.7%)</option>
+				<option value="file2">github.com/databrokerglobal/dxc/database/datasource.go (0.0%)</option>
 				
-				<option value="file3">github.com/databrokerglobal/dxc/database/manager.go (30.8%)</option>
+				<option value="file3">github.com/databrokerglobal/dxc/database/infuraID.go (0.0%)</option>
 				
-				<option value="file4">github.com/databrokerglobal/dxc/database/products.go (52.0%)</option>
+				<option value="file4">github.com/databrokerglobal/dxc/database/manager.go (23.5%)</option>
 				
 				<option value="file5">github.com/databrokerglobal/dxc/database/provide-mock-db.go (80.0%)</option>
 				
-				<option value="file6">github.com/databrokerglobal/dxc/database/user_auth.go (0.0%)</option>
+				<option value="file6">github.com/databrokerglobal/dxc/database/syncStatus.go (0.0%)</option>
 				
-				<option value="file7">github.com/databrokerglobal/dxc/filemanager/controller.go (36.4%)</option>
+				<option value="file7">github.com/databrokerglobal/dxc/database/user_auth.go (0.0%)</option>
 				
-				<option value="file8">github.com/databrokerglobal/dxc/filemanager/file-checker.go (0.0%)</option>
+				<option value="file8">github.com/databrokerglobal/dxc/utils/crypto.go (89.8%)</option>
 				
-				<option value="file9">github.com/databrokerglobal/dxc/filemanager/file-parser.go (9.1%)</option>
+				<option value="file9">github.com/databrokerglobal/dxc/utils/echo-request-builder.go (0.0%)</option>
 				
-				<option value="file10">github.com/databrokerglobal/dxc/products/controller.go (60.0%)</option>
+				<option value="file10">github.com/databrokerglobal/dxc/utils/other-utils.go (100.0%)</option>
 				
-				<option value="file11">github.com/databrokerglobal/dxc/products/host-check.go (0.0%)</option>
-				
-				<option value="file12">github.com/databrokerglobal/dxc/products/status-ticker.go (0.0%)</option>
+				<option value="file11">github.com/databrokerglobal/dxc/utils/random.go (73.7%)</option>
 				
 				</select>
 			</div>
@@ -164,52 +162,99 @@ func (m *Manager) GetCurrentChallenge() (c *Challenge, err error) <span class="c
 		
 		<pre class="file" id="file2" style="display: none">package database
 
-import (
-        errors "github.com/pkg/errors"
-)
+import errors "github.com/pkg/errors"
 
-// CreateFile Query
-func (m *Manager) CreateFile(f *File) (err error) <span class="cov8" title="1">{
-        m.DB.Create(f)
+// CreateDatasource Query
+func (m *Manager) CreateDatasource(datasource *Datasource) (err error) <span class="cov0" title="0">{
+        m.DB.Create(datasource)
         if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
                 err = errs[0]
+                return
         }</span>
-        <span class="cov8" title="1">return</span>
+        <span class="cov0" title="0">return</span>
 }
 
-// GetFile Query
-func (m *Manager) GetFile(n string) (f *File, err error) <span class="cov8" title="1">{
-        file := File{}
-        if m.DB.Where(&amp;File{Name: n}).First(&amp;file).RecordNotFound() </span><span class="cov0" title="0">{
+// GetDatasourceByDID Query
+func (m *Manager) GetDatasourceByDID(did string) (d *Datasource, err error) <span class="cov0" title="0">{
+        datasource := Datasource{}
+        if m.DB.Where(&amp;Datasource{Did: did}).First(&amp;datasource).RecordNotFound() </span><span class="cov0" title="0">{
                 return nil, errors.New("record not found")
         }</span>
-        <span class="cov8" title="1">if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
+        <span class="cov0" title="0">if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
                 err = errs[0]
+                return
         }</span>
-        <span class="cov8" title="1">return &amp;file, nil</span>
+        <span class="cov0" title="0">return &amp;datasource, nil</span>
 }
 
-// GetFiles Get all files query
-func (m *Manager) GetFiles() (fs *[]File, err error) <span class="cov8" title="1">{
-        files := []File{}
-        m.DB.Table("files").Find(&amp;files)
-        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
-                err = errs[0]
+// GetDatasourceByID Query
+func (m *Manager) GetDatasourceByID(id uint) (d *Datasource, err error) <span class="cov0" title="0">{
+        datasource := Datasource{}
+        if m.DB.Where("id = ?", id).First(&amp;datasource).RecordNotFound() </span><span class="cov0" title="0">{
+                return nil, errors.New("record not found")
         }</span>
-        <span class="cov8" title="1">return &amp;files, nil</span>
+        <span class="cov0" title="0">if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
+                err = errs[0]
+                return
+        }</span>
+        <span class="cov0" title="0">return &amp;datasource, nil</span>
 }
 
-// DeleteFile delete a file
-func (m *Manager) DeleteFile(fileName string) (err error) <span class="cov8" title="1">{
-        m.DB.Delete(&amp;File{Name: fileName})
+// GetDatasources Get all Datasources query
+func (m *Manager) GetDatasources() (ds *[]Datasource, err error) <span class="cov0" title="0">{
+        datasources := []Datasource{}
+        m.DB.Table("Datasources").Find(&amp;datasources)
+        return &amp;datasources, nil
+}</span>
+
+// DeleteDatasource delete a Datasource
+func (m *Manager) DeleteDatasource(did string) (err error) <span class="cov0" title="0">{
+        m.DB.Delete(Datasource{}, "Did LIKE ?", did)
         if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
                 err = errs[0]
+                return
         }</span>
-        <span class="cov8" title="1">return</span>
+        <span class="cov0" title="0">return</span>
+}
+
+// UpdateDatasource update a datasource entry
+func (m *Manager) UpdateDatasource(datasource *Datasource) (err error) <span class="cov0" title="0">{
+        m.DB.Save(datasource)
+        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
+                err = errs[0]
+                return
+        }</span>
+        <span class="cov0" title="0">return</span>
 }
 </pre>
 		
 		<pre class="file" id="file3" style="display: none">package database
+
+import errors "github.com/pkg/errors"
+
+// CreateInfuraID Query
+func (m *Manager) CreateInfuraID(infuraID string) (err error) <span class="cov0" title="0">{
+        infuraIDObject := new(InfuraID)
+        infuraIDObject.InfuraID = infuraID
+        m.DB.Create(infuraIDObject)
+        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
+                err = errs[0]
+                return
+        }</span>
+        <span class="cov0" title="0">return</span>
+}
+
+// GetLatestInfuraID Query
+func (m *Manager) GetLatestInfuraID() (infuraID string, err error) <span class="cov0" title="0">{
+        infuraIDObject := InfuraID{}
+        if m.DB.Order("created_at desc").First(&amp;infuraIDObject).RecordNotFound() </span><span class="cov0" title="0">{
+                return "", errors.New("no record found")
+        }</span>
+        <span class="cov0" title="0">return infuraIDObject.InfuraID, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package database
 
 import (
         "log"
@@ -245,73 +290,21 @@ func init() <span class="cov8" title="1">{
                 return
         }</span>
 
-        <span class="cov0" title="0">db, err := gorm.Open("sqlite3", "./dxc.db")
+        <span class="cov0" title="0">dirDB := "./db-data"
+        if _, err := os.Stat(dirDB); os.IsNotExist(err) </span><span class="cov0" title="0">{
+                os.Mkdir(dirDB, 0770)
+        }</span>
+        <span class="cov0" title="0">db, err := gorm.Open("sqlite3", dirDB+"/dxc.db")
         if err != nil </span><span class="cov0" title="0">{
                 log.Fatal("Error connecting to database: ", err)
         }</span>
         <span class="cov0" title="0">DBInstance = Manager{db}
         DBInstance.DB.LogMode(false)
-        DBInstance.DB.AutoMigrate(&amp;File{})
-        DBInstance.DB.AutoMigrate(&amp;Product{})
+        DBInstance.DB.AutoMigrate(&amp;Datasource{})
+        DBInstance.DB.AutoMigrate(&amp;SyncStatus{})
         DBInstance.DB.AutoMigrate(&amp;Challenge{})
-        DBInstance.DB.AutoMigrate(&amp;UserAuth{})</span>
-}
-</pre>
-		
-		<pre class="file" id="file4" style="display: none">package database
-
-// CreateProduct Query
-func (m *Manager) CreateProduct(p *Product) (err error) <span class="cov8" title="1">{
-        m.DB.Create(p)
-        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
-                err = errs[0]
-        }</span>
-        <span class="cov8" title="1">return</span>
-}
-
-// GetProductByDID Query
-func (m *Manager) GetProductByDID(d string) (p *Product, err error) <span class="cov8" title="1">{
-        product := Product{}
-        m.DB.Preload("Files").Where(&amp;Product{Did: d}).First(&amp;product)
-        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
-                err = errs[0]
-        }</span>
-        <span class="cov8" title="1">return &amp;product, nil</span>
-}
-
-// GetProductByID Query
-func (m *Manager) GetProductByID(id uint) (p *Product, err error) <span class="cov0" title="0">{
-        product := Product{}
-        m.DB.Preload("Files").Where("id = ?", id).First(&amp;product)
-        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
-                err = errs[0]
-        }</span>
-        <span class="cov0" title="0">return &amp;product, nil</span>
-}
-
-// GetProducts Get all Products query
-func (m *Manager) GetProducts() (ps *[]Product, err error) <span class="cov8" title="1">{
-        products := []Product{}
-        m.DB.Table("Products").Preload("Files").Find(&amp;products)
-        return &amp;products, nil
-}</span>
-
-// DeleteProduct delete a Product
-func (m *Manager) DeleteProduct(ProductName string) (err error) <span class="cov8" title="1">{
-        m.DB.Delete(&amp;Product{Name: ProductName})
-        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
-                err = errs[0]
-        }</span>
-        <span class="cov8" title="1">return</span>
-}
-
-// UpdateProduct update a product entry
-func (m *Manager) UpdateProduct(p *Product) (err error) <span class="cov0" title="0">{
-        m.DB.Save(p)
-        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
-                err = errs[0]
-        }</span>
-        <span class="cov0" title="0">return</span>
+        DBInstance.DB.AutoMigrate(&amp;UserAuth{})
+        DBInstance.DB.AutoMigrate(&amp;InfuraID{})</span>
 }
 </pre>
 		
@@ -346,6 +339,39 @@ func provideMockDB() (sqlmock.Sqlmock, *gorm.DB, Repository) <span class="cov8" 
 </pre>
 		
 		<pre class="file" id="file6" style="display: none">package database
+
+import "time"
+
+// CreateSyncStatus Query
+func (m *Manager) CreateSyncStatus(success bool, errorResp string, statusCode int, status string) (err error) <span class="cov0" title="0">{
+        syncStatus := new(SyncStatus)
+        syncStatus.Success = success
+        syncStatus.ErrorResp = errorResp
+        syncStatus.StatusCode = statusCode
+        syncStatus.Status = status
+        m.DB.Create(syncStatus)
+        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
+                err = errs[0]
+                return
+        }</span>
+        <span class="cov0" title="0">return</span>
+}
+
+// GetMostRecentSyncStatuses Query
+// example use: set fromTime to "time.Now().Add(time.Duration(-24) * time.Hour)" to get the last 24 hours
+func (m *Manager) GetMostRecentSyncStatuses(fromTime time.Time) (syncStatuses []SyncStatus, err error) <span class="cov0" title="0">{
+        m.DB.Order("created_at desc").Where("created_at &gt; ?", fromTime).Find(&amp;syncStatuses)
+        return syncStatuses, nil
+}</span>
+
+// GetAllSyncStatuses Query
+func (m *Manager) GetAllSyncStatuses() (syncStatuses []SyncStatus, err error) <span class="cov0" title="0">{
+        m.DB.Order("created_at desc").Find(&amp;syncStatuses)
+        return syncStatuses, nil
+}</span>
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package database
 
 import (
         errors "github.com/pkg/errors"
@@ -382,350 +408,169 @@ func (m *Manager) GetLatestUserAuth() (u *UserAuth, err error) <span class="cov0
 }
 </pre>
 		
-		<pre class="file" id="file7" style="display: none">package filemanager
+		<pre class="file" id="file8" style="display: none">// go-ethereum crypto stuff explanation: https://goethereumbook.org/en/
 
-import (
-        "fmt"
-        "io/ioutil"
-        "net/http"
-        "net/url"
-        "os"
-
-        errors "github.com/pkg/errors"
-
-        "github.com/databrokerglobal/dxc/database"
-        "github.com/labstack/echo/v4"
-)
-
-// Upload file controller
-// Upload godoc
-// @Summary Upload a file
-// @Description Link a file from the LOCAL_FILES_DIR to the DXC
-// @Tags files
-// @Accept mpfd
-// @Param file formData file true "File to Upload"
-// @Produce json
-// @Success 200 {string} string true
-// @Failure 400 {string} string "File invalid or empty"
-// @Failure 404 {string} string "File not found, is the uploaded file in the rigth directory or correctly bound to your docker volume?""
-// @Failure 500 {string} string "Error inserting file metadata in database"
-// @Router /files/upload [post]
-func Upload(c echo.Context) error <span class="cov8" title="1">{
-
-        // Source - File stream from upload
-        file, err := c.FormFile("file")
-
-        if err != nil </span><span class="cov8" title="1">{
-                return c.String(http.StatusBadRequest, fmt.Sprint("File invalid or empty"))
-        }</span>
-
-        // Read file, then open mirror file in dir, read it and check if same file
-        <span class="cov0" title="0">err = parseFile(file)
-        if err != nil </span><span class="cov0" title="0">{
-                return c.String(http.StatusNotFound, "File not found, is the uploaded file in the rigth directory or correctly bound to your docker volume?")
-        }</span>
-
-        <span class="cov0" title="0">err = database.DBInstance.CreateFile(&amp;database.File{Name: file.Filename})
-        if err != nil </span><span class="cov0" title="0">{
-                return c.String(http.StatusInternalServerError, "Error inserting file metadata in database")
-        }</span>
-
-        // Return succes message
-        <span class="cov0" title="0">return c.String(http.StatusOK, fmt.Sprintf("File %s uploaded successfully. File checksum result: OK", file.Filename))</span>
-}
-
-// Download a file
-// Download godoc
-// @Summary Download a file
-// @Description Download a file from the DXC
-// @Tags files
-// @Accept json
-// @Param name query string true "File name"
-// @Produce octet-stream
-// @Success 200 {file} string true
-// @Failure 404 {string} string "File not found"
-// @Router /file/download [get]
-func Download(c echo.Context) error <span class="cov8" title="1">{
-
-        name := c.QueryParam("name")
-
-        filepath, err := findFile(name)
-        if err != nil </span><span class="cov8" title="1">{
-                return c.String(http.StatusNotFound, err.Error())
-        }</span>
-
-        <span class="cov0" title="0">return c.Attachment(filepath, name)</span>
-}
-
-// GetAll get all files
-// GetFiles godoc
-// @Summary Get files
-// @Description Get all files linked
-// @Tags files
-// @Accept json
-// @Produce json
-// @Success 200 {array} database.File true
-// @Failure 500 {string} string "Error retrieving item from database"
-// @Router /files [get]
-func GetAll(c echo.Context) error <span class="cov0" title="0">{
-        var fs *[]database.File
-
-        fs, err := database.DBInstance.GetFiles()
-
-        if err != nil </span><span class="cov0" title="0">{
-                return c.String(http.StatusInternalServerError, "Error retrieving item from database")
-        }</span>
-
-        <span class="cov0" title="0">return c.JSON(http.StatusOK, fs)</span>
-}
-
-// GetDataFile for the user to get a file
-// GetDataFile godoc
-// @Summary Download a file (for users)
-// @Description Download a file from the DXC
-// @Tags files
-// @Accept json
-// @Param did path string true "Digital identifier of the product bought"
-// @Param verificationdata query string true "Signed verification data"
-// @Produce octet-stream
-// @Success 200 {file} string true
-// @Failure 401 {string} string "Request not authorized. Signature and verification data invalid"
-// @Failure 404 {string} string "Product not found"
-// @Failure 500 {string} string "Internal server error"
-// @Router /getdata/{did}/file [get]
-func GetDataFile(c echo.Context) error <span class="cov0" title="0">{
-
-        did, err := url.QueryUnescape(c.Param("did"))
-        if err != nil </span><span class="cov0" title="0">{
-                return c.String(http.StatusInternalServerError, "Could not read the did")
-        }</span>
-
-        <span class="cov0" title="0">product, err := database.DBInstance.GetProductByDID(did)
-        if err != nil </span><span class="cov0" title="0">{
-                return c.String(http.StatusNotFound, errors.Wrap(err, "product not found in db").Error())
-        }</span>
-
-        <span class="cov0" title="0">if len(product.Files) &lt; 1 </span><span class="cov0" title="0">{
-                return c.String(http.StatusNotFound, errors.New("product has no file").Error())
-        }</span>
-
-        <span class="cov0" title="0">file := product.Files[0]
-        fileName := file.Name
-
-        if fileName == "" </span><span class="cov0" title="0">{
-                return c.String(http.StatusInternalServerError, "Filename is empty")
-        }</span>
-
-        <span class="cov0" title="0">filepath, err := findFile(fileName)
-        if err != nil </span><span class="cov0" title="0">{
-                return c.String(http.StatusNotFound, err.Error())
-        }</span>
-
-        <span class="cov0" title="0">return c.Attachment(filepath, fileName)</span>
-}
-
-func findFile(fileName string) (filePath string, err error) <span class="cov8" title="1">{
-
-        var omit bool
-
-        if len(os.Args) &gt; 1 &amp;&amp; os.Args[1][:5] == "-test" </span><span class="cov8" title="1">{
-                omit = true
-        }</span>
-
-        <span class="cov8" title="1">if !omit </span><span class="cov0" title="0">{
-                _, err := database.DBInstance.GetFile(fileName)
-                if err != nil </span><span class="cov0" title="0">{
-                        return "", errors.Wrap(err, "error getting file from db")
-                }</span>
-        }
-
-        <span class="cov8" title="1">var fileDir string
-
-        if os.Getenv("GO_ENV") == "local" </span><span class="cov0" title="0">{
-                fileDir = os.Getenv("LOCAL_FILES_DIR")
-        }</span> else<span class="cov8" title="1"> {
-                fileDir = "/var/files"
-        }</span>
-
-        <span class="cov8" title="1">filePath = fmt.Sprintf("%s/%s", fileDir, fileName)
-
-        if omit </span><span class="cov8" title="1">{
-                fileDir = "/tmp"
-                testdata := []byte("test")
-                if err := ioutil.WriteFile(filePath, testdata, 0644); err != nil </span><span class="cov8" title="1">{
-                        return "", errors.Wrap(err, "error writing test file")
-                }</span>
-        }
-
-        <span class="cov0" title="0">return</span>
-}
-
-// TestRequest for testing the server
-// TestRequest godoc
-// @Summary Test the server
-// @Description returns "test dxc ok"
-// @Tags test
-// @Success 200 {string} string true
-// @Router /test [get]
-func TestRequest(c echo.Context) error <span class="cov0" title="0">{
-
-        return c.String(http.StatusOK, "test dxc ok")
-}</span>
-</pre>
-		
-		<pre class="file" id="file8" style="display: none">package filemanager
-
-import (
-        "log"
-
-        "github.com/databrokerglobal/dxc/database"
-        "github.com/fatih/color"
-)
-
-// CheckingFiles Delete files that are not in directory anymore, restore files that were deleted but now back in their directory
-func CheckingFiles() <span class="cov0" title="0">{
-
-        // Fetch all files
-        color.Magenta("Checking file integrity...")
-        files, err := database.DBInstance.GetFiles()
-        if err != nil </span><span class="cov0" title="0">{
-                log.Fatal(err)
-        }</span>
-
-        // Update file status
-        <span class="cov0" title="0">for _, file := range *files </span><span class="cov0" title="0">{
-                _, err := open(file.Name)
-                if err != nil </span><span class="cov0" title="0">{
-                        p, err := database.DBInstance.GetProductByID(file.ProductID)
-                        if err != nil </span><span class="cov0" title="0">{
-                                log.Fatal(err)
-                        }</span>
-                        <span class="cov0" title="0">p.Status = "UNAVAILABLE"
-                        if err := database.DBInstance.UpdateProduct(p); err != nil </span><span class="cov0" title="0">{
-                                log.Fatal(err)
-                        }</span>
-                } else<span class="cov0" title="0"> {
-                        p, err := database.DBInstance.GetProductByID(file.ProductID)
-                        if err != nil </span><span class="cov0" title="0">{
-                                log.Fatal(err)
-                        }</span>
-                        <span class="cov0" title="0">p.Status = "AVAILABLE"
-                        if err := database.DBInstance.UpdateProduct(p); err != nil </span><span class="cov0" title="0">{
-                                log.Fatal(err)
-                        }</span>
-                }
-        }
-
-        <span class="cov0" title="0">yellow := color.New(color.FgYellow).SprintFunc()
-
-        defer color.Green("Finished checking file integrity %s", yellow("\nCurrent file count: ", len(*files), "\n"))</span>
-}
-</pre>
-		
-		<pre class="file" id="file9" style="display: none">package filemanager
-
-import (
-        "errors"
-        "fmt"
-        "io"
-        "mime/multipart"
-        "os"
-
-        "github.com/ethereum/go-ethereum/crypto"
-)
-
-// ReadFile read a multipart uploaded file from controller
-func parseFile(file *multipart.FileHeader) error <span class="cov0" title="0">{
-        // Open file to return its data source
-        src, err := file.Open()
-        if err != nil </span><span class="cov0" title="0">{
-                return err
-        }</span>
-        <span class="cov0" title="0">defer src.Close()
-
-        uploadedFileSnippet, err := readBytes(src)
-        if err != nil </span><span class="cov0" title="0">{
-                return err
-        }</span>
-
-        <span class="cov0" title="0">from, err := open(file.Filename)
-        if err != nil </span><span class="cov0" title="0">{
-                return err
-        }</span>
-        <span class="cov0" title="0">defer from.Close()
-
-        localFileSnippet, err := readBytes(from)
-        if err != nil </span><span class="cov0" title="0">{
-                return err
-        }</span>
-
-        <span class="cov0" title="0">if matches := CompareHashes(uploadedFileSnippet, localFileSnippet); !matches </span><span class="cov0" title="0">{
-                return errors.New("Files don't match")
-        }</span>
-
-        <span class="cov0" title="0">return nil</span>
-}
-
-// Read 22 first bytes and return them
-/*
-   Because the file can be of type os.File (local dir) or multipart.File (uploaded file),
-         we pass the io.Reader interface as an argument which has the Read method used for both types.
-*/
-func readBytes(file io.Reader) ([]byte, error) <span class="cov0" title="0">{
-        b1 := make([]byte, 22)
-        n1, err := file.Read(b1)
-        if err != nil </span><span class="cov0" title="0">{
-                return nil, err
-        }</span>
-        <span class="cov0" title="0">return b1[:n1], nil</span>
-}
-
-// CompareHashes checking if hashes are identical
-func CompareHashes(file1 []byte, file2 []byte) bool <span class="cov8" title="1">{
-        hash1 := crypto.Keccak256(file1)
-        hash2 := crypto.Keccak256(file2)
-
-        return string(hash1) == string(hash2)
-}</span>
-
-// open file
-func open(filename string) (*os.File, error) <span class="cov0" title="0">{
-        // Load file path
-        var filePath string
-        if os.Getenv("GO_ENV") == "local" </span><span class="cov0" title="0">{
-                filePath = os.Getenv("LOCAL_FILES_DIR")
-        }</span> else<span class="cov0" title="0"> {
-                filePath = "/var/files"
-        }</span>
-
-        // Open same file in the mounted docker volume (or just local dir if go_env=local)
-        <span class="cov0" title="0">from, err := os.Open(fmt.Sprintf("%s/%s", filePath, filename))
-        if err != nil </span><span class="cov0" title="0">{
-                return nil, err
-        }</span>
-        <span class="cov0" title="0">return from, nil</span>
-}
-</pre>
-		
-		<pre class="file" id="file10" style="display: none">package products
+package utils
 
 import (
         "bytes"
-        "fmt"
-        "io/ioutil"
-        "net/http"
-        "net/url"
-        "os"
-        "strings"
+        "crypto/ecdsa"
 
-        "github.com/databrokerglobal/dxc/database"
-        "github.com/databrokerglobal/dxc/utils"
+        errors "github.com/pkg/errors"
 
-        "github.com/google/uuid"
+        "github.com/ethereum/go-ethereum/common/hexutil"
+        "github.com/ethereum/go-ethereum/crypto"
+)
+
+// HexPublicKeyFromHexPrivateKey takes a private key in hex format and returns the corresponding public key in hex format
+func HexPublicKeyFromHexPrivateKey(hexPrivateKey string) (hexPublicKey string, err error) <span class="cov8" title="1">{
+
+        privateKey, err := privateKeyFromHexPrivateKey(hexPrivateKey)
+        if err != nil </span><span class="cov8" title="1">{
+                return "", errors.Wrap(err, "could not calculate private key from hex private key")
+        }</span>
+
+        <span class="cov8" title="1">publicKey := privateKey.Public()
+        publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
+        if !ok </span><span class="cov0" title="0">{
+                return "", errors.New("error casting public key to ECDSA")
+        }</span>
+        <span class="cov8" title="1">publicKeyBytes := crypto.FromECDSAPub(publicKeyECDSA)
+        hexPublicKey = hexutil.Encode(publicKeyBytes)
+
+        return</span>
+}
+
+// AddressFromHexPrivateKey takes a private key in hex format and returns the corresponding address
+func AddressFromHexPrivateKey(hexPrivateKey string) (address string, err error) <span class="cov8" title="1">{
+
+        privateKey, err := privateKeyFromHexPrivateKey(hexPrivateKey)
+        if err != nil </span><span class="cov8" title="1">{
+                return "", errors.Wrap(err, "could not calculate private key from hex private key")
+        }</span>
+
+        <span class="cov8" title="1">publicKey := privateKey.Public()
+        publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
+        if !ok </span><span class="cov0" title="0">{
+                return "", errors.New("error casting public key to ECDSA")
+        }</span>
+
+        <span class="cov8" title="1">address = crypto.PubkeyToAddress(*publicKeyECDSA).Hex()
+
+        return</span>
+}
+
+// AddressFromHexPublicKey takes a public key in hex format and returns the corresponding address
+func AddressFromHexPublicKey(hexPublicKey string) (address string, err error) <span class="cov8" title="1">{
+
+        publicKeyECDSA, err := publicKeyFromHexPublicKey(hexPublicKey)
+        if err != nil </span><span class="cov8" title="1">{
+                return "", errors.Wrap(err, "could not calculate public key from hex public key")
+        }</span>
+
+        <span class="cov8" title="1">address = crypto.PubkeyToAddress(*publicKeyECDSA).Hex()
+
+        return</span>
+}
+
+// SignDataWithPrivateKey takes a piece of data (string), and signs the hash of that piece of data with the provided private key (hex string)
+func SignDataWithPrivateKey(data string, hexPrivateKey string) (signature string, err error) <span class="cov8" title="1">{
+
+        privateKey, err := privateKeyFromHexPrivateKey(hexPrivateKey)
+        if err != nil </span><span class="cov8" title="1">{
+                return "", errors.Wrap(err, "could not calculate private key from hex private key")
+        }</span>
+
+        <span class="cov8" title="1">dataBytes := []byte(data)
+        hashData := crypto.Keccak256Hash(dataBytes)
+
+        signatureBytes, err := crypto.Sign(hashData.Bytes(), privateKey)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", errors.Wrap(err, "error of the signing function")
+        }</span>
+
+        <span class="cov8" title="1">signature = hexutil.Encode(signatureBytes)
+
+        return</span>
+}
+
+// VerifySignature takes a signature and verify that it correspond to the provided piece of data and public key (in hex format)
+func VerifySignature(data string, signature string, hexPublicKey string) (valid bool, err error) <span class="cov8" title="1">{
+
+        publicKeyBytes, err := hexutil.Decode(hexPublicKey)
+        if err != nil </span><span class="cov0" title="0">{
+                return false, errors.Wrap(err, "error decoding hex public key")
+        }</span>
+
+        <span class="cov8" title="1">dataBytes := []byte(data)
+        hashData := crypto.Keccak256Hash(dataBytes)
+
+        signatureBytes, err := hexutil.Decode(signature)
+        if err != nil </span><span class="cov0" title="0">{
+                return false, errors.Wrap(err, "error decoding signature")
+        }</span>
+        <span class="cov8" title="1">sigPublicKeyECDSA, err := crypto.SigToPub(hashData.Bytes(), signatureBytes)
+        if err != nil </span><span class="cov8" title="1">{
+                return false, errors.Wrap(err, "error finding public key from signature")
+        }</span>
+
+        <span class="cov8" title="1">sigPublicKeyBytes := crypto.FromECDSAPub(sigPublicKeyECDSA)
+
+        valid = bytes.Equal(sigPublicKeyBytes, publicKeyBytes)
+
+        return</span>
+}
+
+func privateKeyFromHexPrivateKey(hexPrivateKey string) (privateKey *ecdsa.PrivateKey, err error) <span class="cov8" title="1">{
+
+        privateKey, err = crypto.HexToECDSA(hexPrivateKey[2:])
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, errors.Wrap(err, "error of HexToECDSA")
+        }</span>
+
+        <span class="cov8" title="1">return</span>
+}
+
+func publicKeyFromHexPublicKey(hexPublicKey string) (publicKey *ecdsa.PublicKey, err error) <span class="cov8" title="1">{
+
+        publicKeyBytes, err := hexutil.Decode(hexPublicKey)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, errors.Wrap(err, "error decoding hex public key")
+        }</span>
+
+        <span class="cov8" title="1">publicKey, err = crypto.UnmarshalPubkey(publicKeyBytes)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, errors.Wrap(err, "error unmarshaling public key")
+        }</span>
+
+        <span class="cov8" title="1">return</span>
+}
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package utils
+
+import (
+        "io"
+        "net/http/httptest"
+
         "github.com/labstack/echo/v4"
 )
 
-// TrimLastSlash Trim the last slash
+// GenerateTestEchoRequest generate echo request for testing purposes
+func GenerateTestEchoRequest(method string, path string, body io.Reader) echo.Context <span class="cov0" title="0">{
+        e := echo.New()
+        req := httptest.NewRequest(method, path, body)
+        rec := httptest.NewRecorder()
+        c := e.NewContext(req, rec)
+        return c
+}</span>
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package utils
+
+import "strings"
+
+// TrimLastSlash trims the last slash of a url
 func TrimLastSlash(host string) (h string) <span class="cov8" title="1">{
         h = host
         for strings.Split(h, "")[len(h)-1] == "/" </span><span class="cov8" title="1">{
@@ -733,502 +578,77 @@ func TrimLastSlash(host string) (h string) <span class="cov8" title="1">{
         }</span>
         <span class="cov8" title="1">return h</span>
 }
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package utils
 
-// ProductController safe type for the controller
-type ProductController struct {
-        Name  string `json:"name"`
-        Type  string `json:"producttype"`
-        Host  string `json:"host"`
-        Files []database.File
-}
+import (
+        "crypto/rand"
+        "encoding/base64"
+        "fmt"
+        "io"
+)
 
-// AddOne product
-// Create godoc
-// @Summary Create Product
-// @Description Create a product
-// @Tags products
-// @Accept json
-// @Produce json
-// @Param p body ProductController true "Product"
-// @Success 201 {object} ProductController "Success"
-// @Failure 400 {string} string "Error creating product"
-// @Router /product [post]
-func AddOne(c echo.Context) error <span class="cov8" title="1">{
-        p := new(database.Product)
+// Adapted from https://elithrar.github.io/article/generating-secure-random-numbers-crypto-rand/
+// Source https://gist.github.com/dopey/c69559607800d2f2f90b1b1ed4e550fb
 
-        if err := c.Bind(p); err != nil </span><span class="cov0" title="0">{
-                return err
-        }</span>
-
-        <span class="cov8" title="1">status := checkProduct(p)
-        if status == http.StatusBadRequest </span><span class="cov0" title="0">{
-                return c.String(http.StatusBadRequest, "Name, Type or Host (if product type is not FILE) are empty but are required")
-        }</span>
-
-        <span class="cov8" title="1">if p.Type == "FILE" </span><span class="cov0" title="0">{
-                p.Host = "N/A"
-        }</span>
-
-        <span class="cov8" title="1">if p.Type == "FILE" </span><span class="cov0" title="0">{
-                if p.Files == nil </span><span class="cov0" title="0">{
-                        return c.String(http.StatusBadRequest, "Product is of type File but no files linked")
-                }</span>
-                <span class="cov0" title="0">if len(p.Files) == 0 </span><span class="cov0" title="0">{
-                        return c.String(http.StatusBadRequest, "Product is of type File but no files linked")
-                }</span>
-        }
-
-        <span class="cov8" title="1">if p.Type != "FILE" </span><span class="cov8" title="1">{
-                newHost := TrimLastSlash(p.Host)
-                p.Host = newHost
-        }</span>
-
-        <span class="cov8" title="1">if p.Did == "" </span><span class="cov0" title="0">{
-                rand, _ := utils.GenerateRandomStringURLSafe(10)
-                p.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(p.Name, " ", "", -1), p.Type, rand)
-        }</span>
-
-        <span class="cov8" title="1">p.Status = "AVAILABLE"
-
-        var omit bool
-
-        if len(os.Args) &gt; 1 &amp;&amp; os.Args[1][:5] == "-test" </span><span class="cov8" title="1">{
-                omit = true
-        }</span>
-
-        <span class="cov8" title="1">if !omit </span><span class="cov0" title="0">{
-                if err := database.DBInstance.CreateProduct(p); err != nil </span><span class="cov0" title="0">{
-                        return err
-                }</span>
-                <span class="cov0" title="0">SendStatus()</span>
-        }
-
-        <span class="cov8" title="1">return c.JSON(http.StatusCreated, p)</span>
-}
-
-// GetAll return all products
-// GetProducts godoc
-// @Summary Get products
-// @Description Get all products
-// @Tags products
-// @Accept json
-// @Produce json
-// @Success 200 {array} database.Product true
-// @Failure 500 {string} string "Error retrieving item from database"
-// @Router /products [get]
-func GetAll(c echo.Context) error <span class="cov0" title="0">{
-
-        var ps *[]database.Product
-
-        ps, err := database.DBInstance.GetProducts()
-
-        if err != nil </span><span class="cov0" title="0">{
-                return c.String(http.StatusInternalServerError, "Error retrieving item from database")
-        }</span>
-
-        <span class="cov0" title="0">return c.JSON(http.StatusOK, ps)</span>
-}
-
-// GetOne product
-// GetOne godoc
-// @Summary Get one product
-// @Description Get one products given a did
-// @Tags products
-// @Produce json
-// @Param did path string true "Digital identifier of the product"
-// @Success 200 {object} database.Product true
-// @Failure 500 {string} string "Error retrieving item from database"
-// @Router /product/{did} [get]
-func GetOne(c echo.Context) error <span class="cov8" title="1">{
-        did, err := url.QueryUnescape(c.Param("did"))
-        if err != nil </span><span class="cov0" title="0">{
-                return c.String(http.StatusInternalServerError, "Could not read the did")
-        }</span>
-
-        <span class="cov8" title="1">var omit bool
-
-        if len(os.Args) &gt; 1 &amp;&amp; os.Args[1][:5] == "-test" </span><span class="cov8" title="1">{
-                omit = true
-        }</span>
-
-        <span class="cov8" title="1">var p *database.Product
-
-        if !omit </span><span class="cov0" title="0">{
-                p, err = database.DBInstance.GetProductByDID(did)
-        }</span>
-
-        <span class="cov8" title="1">if err != nil </span><span class="cov0" title="0">{
-                return c.String(http.StatusInternalServerError, "Error retrieving item from database")
-        }</span>
-
-        <span class="cov8" title="1">if p == nil </span><span class="cov8" title="1">{
-                return c.String(http.StatusNotFound, "Product not found")
-        }</span>
-
-        <span class="cov0" title="0">return c.JSON(http.StatusOK, p)</span>
-}
-
-func checkProduct(p *database.Product) int <span class="cov8" title="1">{
-        var status int
-        switch </span>{
-        case p == nil:<span class="cov8" title="1">
-                status = http.StatusBadRequest</span>
-        case p.Name == "":<span class="cov8" title="1">
-                status = http.StatusBadRequest</span>
-        case p.Type == "":<span class="cov8" title="1">
-                status = http.StatusBadRequest</span>
-        case p.Host == "" &amp;&amp; p.Type != "FILE":<span class="cov8" title="1">
-                status = http.StatusBadRequest</span>
-        default:<span class="cov8" title="1">
-                status = http.StatusContinue</span>
-        }
-        <span class="cov8" title="1">return status</span>
-}
-
-func checkProductForRedirect(p *database.Product) int <span class="cov8" title="1">{
-        var status int
-        switch </span>{
-        case p == nil:<span class="cov8" title="1">
-                status = http.StatusNoContent</span>
-        case p.Name == "":<span class="cov8" title="1">
-                status = http.StatusNoContent</span>
-        case p.Type == "":<span class="cov8" title="1">
-                status = http.StatusNoContent</span>
-        case p.Host == "":<span class="cov8" title="1">
-                status = http.StatusNoContent</span>
-        case p.Type == "FILE":<span class="cov8" title="1">
-                status = http.StatusNoContent</span>
-        default:<span class="cov8" title="1">
-                status = http.StatusContinue</span>
-        }
-        <span class="cov8" title="1">return status</span>
-}
-
-func parseRequestURL(requestURI string, p *database.Product) string <span class="cov8" title="1">{
-        // replace first encounter of product uuid
-        newRequestURI := strings.TrimPrefix(strings.Replace(requestURI, p.Did, "", 1), "/")
-
-        requestURLSlice := []string{p.Host, newRequestURI}
-
-        requestURL := strings.Join(requestURLSlice, "")
-
-        return requestURL
+func init() <span class="cov8" title="1">{
+        assertAvailablePRNG()
 }</span>
 
-// RedirectToHost based on product uuid path check if api or stream and subsequently redirect
-func RedirectToHost(c echo.Context) error <span class="cov8" title="1">{
-        var omit bool
+func assertAvailablePRNG() <span class="cov8" title="1">{
+        // Assert that a cryptographically secure PRNG is available.
+        // Panic otherwise.
+        buf := make([]byte, 1)
 
-        if len(os.Args) &gt; 1 &amp;&amp; os.Args[1][:5] == "-test" </span><span class="cov8" title="1">{
-                omit = true
-        }</span>
-
-        <span class="cov8" title="1">slice := strings.Split(c.Request().RequestURI, "/")
-
-        var p *database.Product
-
-        // Check if string in path matches uuid regex, is valid uuid and matches product that is type API or STREAM
-        for _, str := range slice </span><span class="cov8" title="1">{
-
-                _, err := uuid.Parse(str)
-                if err != nil </span><span class="cov8" title="1">{
-                        return c.String(http.StatusNoContent, "")
-                }</span>
-
-                <span class="cov0" title="0">if !omit </span><span class="cov0" title="0">{
-                        p, err = database.DBInstance.GetProductByDID(str)
-                        if err != nil </span><span class="cov0" title="0">{
-                                return c.String(http.StatusNoContent, "")
-                        }</span>
-                }
-
-                <span class="cov0" title="0">if status := checkProductForRedirect(p); status == http.StatusNoContent </span><span class="cov0" title="0">{
-                        return c.String(http.StatusNoContent, "")
-                }</span>
-
-                <span class="cov0" title="0">r := buildProxyRequest(c, c.Request(), "http", p.Host)
-
-                err = executeRequest(c, r)</span>
-        }
-
-        <span class="cov0" title="0">return c.String(http.StatusNoContent, "")</span>
-}
-
-// Take a request and build a proxy request from a host string with a certain protocol (http or https here)
-func buildProxyRequest(c echo.Context, r *http.Request, protocol string, host string) *http.Request <span class="cov8" title="1">{
-        body, err := ioutil.ReadAll(r.Body)
+        _, err := io.ReadFull(rand.Reader, buf)
         if err != nil </span><span class="cov0" title="0">{
-                c.String(http.StatusInternalServerError, err.Error())
-                return nil
-        }</span>
-
-        // if body is of multipart type, reassign it here
-        <span class="cov8" title="1">r.Body = ioutil.NopCloser(bytes.NewReader(body))
-
-        // build new url
-        url := fmt.Sprintf("%s://%s%s", protocol, host, r.RequestURI)
-
-        proxyReq, err := http.NewRequest(r.Method, url, bytes.NewReader(body))
-        if err != nil </span><span class="cov0" title="0">{
-                c.String(http.StatusInternalServerError, err.Error())
-                return nil
-        }</span>
-
-        // Copy header, filter logic could be added later
-        <span class="cov8" title="1">proxyReq.Header = make(http.Header)
-        for index, value := range r.Header </span><span class="cov0" title="0">{
-                proxyReq.Header[index] = value
-        }</span>
-
-        <span class="cov8" title="1">return proxyReq</span>
-}
-
-func executeRequest(c echo.Context, r *http.Request) error <span class="cov0" title="0">{
-
-        // Instantiate http client
-        client := http.Client{}
-
-        resp, err := client.Do(r)
-        if err != nil </span><span class="cov0" title="0">{
-                return c.String(http.StatusBadGateway, err.Error())
-        }</span>
-
-        // Read body
-        <span class="cov0" title="0">stream, err := ioutil.ReadAll(resp.Body)
-        if err != nil </span><span class="cov0" title="0">{
-                if err != nil </span><span class="cov0" title="0">{
-                        c.String(http.StatusInternalServerError, err.Error())
-                        return nil
-                }</span>
-        }
-
-        // Close reader when response is returned
-        <span class="cov0" title="0">defer resp.Body.Close()
-
-        return c.Blob(resp.StatusCode, resp.Header.Get("Content-Type"), stream)</span>
-}
-</pre>
-		
-		<pre class="file" id="file11" style="display: none">package products
-
-import (
-        "log"
-        "net/http"
-
-        "github.com/databrokerglobal/dxc/database"
-        "github.com/fatih/color"
-)
-
-// CheckHost check for a host resp
-func CheckHost() <span class="cov0" title="0">{
-
-        color.Cyan("Verifying API/Stream status...")
-
-        ps, err := database.DBInstance.GetProducts()
-        if err != nil </span><span class="cov0" title="0">{
-                log.Fatal(err)
-        }</span>
-
-        <span class="cov0" title="0">if len(*ps) &gt; 0 </span><span class="cov0" title="0">{
-                for _, p := range *ps </span><span class="cov0" title="0">{
-                        if p.Host != "" &amp;&amp; p.Host != "N/A" &amp;&amp; p.Name != "" &amp;&amp; p.Type != "FILE" </span><span class="cov0" title="0">{
-                                _, err = http.Get(p.Host)
-                                if err != nil </span><span class="cov0" title="0">{
-                                        p.Status = "UNAVAILABLE"
-                                }</span> else<span class="cov0" title="0"> {
-                                        p.Status = "AVAILABLE"
-                                }</span>
-                                <span class="cov0" title="0">database.DBInstance.UpdateProduct(&amp;p)</span>
-                        }
-                }
-        }
-
-        <span class="cov0" title="0">yellow := color.New(color.FgHiGreen).SprintFunc()
-
-        defer color.White("Finished checking product liveness %s", yellow("\nCurrent product count: ", len(*ps)))</span>
-}
-</pre>
-		
-		<pre class="file" id="file12" style="display: none">package products
-
-import (
-        "bytes"
-        "encoding/base64"
-        "encoding/json"
-        "fmt"
-        "net/http"
-        "os"
-        "sync"
-        "time"
-
-        "github.com/databrokerglobal/dxc/database"
-
-        "github.com/databrokerglobal/dxc/filemanager"
-        "github.com/fatih/color"
-)
-
-// DXCObject to make the json object for posting the /dxc
-type DXCObject struct {
-        Challenge string       `json:"challenge"`
-        Address   string       `json:"address"`
-        Host      string       `json:"host"`
-        Port      string       `json:"port"`
-        Products  []DXCProduct `json:"products"`
-}
-
-// DXCProduct struct to make a json of the products in DXCObject
-type DXCProduct struct {
-        Name   string    `json:"name"`
-        DID    string    `json:"did"`
-        Type   string    `json:"type"`
-        Status string    `json:"status"`
-        Files  []DXCFile `json:"files"`
-}
-
-// DXCFile struct to make a json of the files in DXCProduct
-type DXCFile struct {
-        ID   string `json:"id"`
-        Name string `json:"name"`
-}
-
-// DXSAPIKey object allows to decode the api key and get the dxs host
-type DXSAPIKey struct {
-        Key  string `json:"k"`
-        Host string `json:"h"`
-}
-
-// ExecuteStatusTicker execute 10 min interval ticker
-func ExecuteStatusTicker() <span class="cov0" title="0">{
-        ticker := time.NewTicker(10 * time.Minute)
-
-        color.Blue("\nPreparing status request to the DXS...")
-
-        for range ticker.C </span><span class="cov0" title="0">{
-                var wg sync.WaitGroup
-                wg.Add(1)
-
-                go func() </span><span class="cov0" title="0">{
-                        doChecks()
-                        wg.Done()
-                }</span>()
-
-                <span class="cov0" title="0">wg.Wait()
-
-                go func() </span><span class="cov0" title="0">{
-                        SendStatus()
-                }</span>()
+                panic(fmt.Sprintf("crypto/rand is unavailable: Read() failed with %#v", err))</span>
         }
 }
 
-func doChecks() <span class="cov0" title="0">{
-        var wg sync.WaitGroup
-        wg.Add(1)
+// GenerateRandomBytes returns securely generated random bytes.
+// It will return an error if the system's secure random
+// number generator fails to function correctly, in which
+// case the caller should not continue.
+func GenerateRandomBytes(n int) ([]byte, error) <span class="cov8" title="1">{
+        b := make([]byte, n)
+        _, err := rand.Read(b)
+        // Note that err == nil only if we read len(b) bytes.
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
 
-        go func() </span><span class="cov0" title="0">{
-                filemanager.CheckingFiles()
-                wg.Done()
-        }</span>()
-
-        <span class="cov0" title="0">wg.Wait()
-
-        wg.Add(1)
-
-        go func() </span><span class="cov0" title="0">{
-                CheckHost()
-                wg.Done()
-        }</span>()
-
-        <span class="cov0" title="0">wg.Wait()
-
-        defer color.Magenta("Finished checking product files and hosts...")</span>
+        <span class="cov8" title="1">return b, nil</span>
 }
 
-// SendStatus sends the dxc status and products to the DXS
-func SendStatus() <span class="cov0" title="0">{
-        products, err := database.DBInstance.GetProducts()
+// GenerateRandomString returns a securely generated random string.
+// It will return an error if the system's secure random
+// number generator fails to function correctly, in which
+// case the caller should not continue.
+// n = 32 =&gt; 32 bytes
+func GenerateRandomString(n int) (string, error) <span class="cov8" title="1">{
+        const letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-"
+        bytes, err := GenerateRandomBytes(n)
         if err != nil </span><span class="cov0" title="0">{
-                color.Red("Error sending status request because of error getting products from db. err: ", err)
-                return
+                return "", err
         }</span>
-
-        <span class="cov0" title="0">challenge, err := database.DBInstance.GetCurrentChallenge()
-        if err != nil </span><span class="cov0" title="0">{
-                color.Red("Error sending status request because of error getting current challenge. err: ", err)
-                return
+        <span class="cov8" title="1">for i, b := range bytes </span><span class="cov8" title="1">{
+                bytes[i] = letters[b%byte(len(letters))]
         }</span>
-
-        <span class="cov0" title="0">userAuth, err := database.DBInstance.GetLatestUserAuth()
-        if err != nil </span><span class="cov0" title="0">{
-                color.Red("Error sending status request because of error getting user auth. err: ", err)
-                return
-        }</span>
-        <span class="cov0" title="0">if userAuth == nil </span><span class="cov0" title="0">{
-                color.Red("Error sending status request because no user auth data exist in db")
-                return
-        }</span>
-
-        <span class="cov0" title="0">bodyRequest := &amp;DXCObject{
-                Challenge: challenge.Challenge,
-                Address:   userAuth.Address,
-                Host:      os.Getenv("REACT_APP_DXC_HOST"),
-                Port:      "8080",
-        }
-
-        bodyRequest.Products = make([]DXCProduct, 0)
-
-        for _, product := range *products </span><span class="cov0" title="0">{
-                if product.Did != "" &amp;&amp; product.Type == "FILE" &amp;&amp; len(product.Files) &gt; 0 </span><span class="cov0" title="0">{
-
-                        dxcProduct := DXCProduct{
-                                DID:    product.Did,
-                                Status: product.Status,
-                                Name:   product.Name,
-                                Type:   product.Type,
-                        }
-
-                        dxcProduct.Files = make([]DXCFile, 0)
-
-                        for _, file := range product.Files </span><span class="cov0" title="0">{
-                                dxcFile := DXCFile{
-                                        ID:   fmt.Sprint(file.ID),
-                                        Name: file.Name,
-                                }
-                                dxcProduct.Files = append(dxcProduct.Files, dxcFile)
-                        }</span>
-
-                        <span class="cov0" title="0">bodyRequest.Products = append(bodyRequest.Products, dxcProduct)</span>
-                }
-        }
-
-        <span class="cov0" title="0">bodyRequestJSON, err := json.Marshal(bodyRequest)
-        if err != nil </span><span class="cov0" title="0">{
-                color.Red("Error marshalling DXCObject json. err: ", err)
-                return
-        }</span>
-
-        // get dxs url from api key
-        <span class="cov0" title="0">dxsAPIKeyB64 := userAuth.APIKey
-        dxsAPIKeyData, err := base64.StdEncoding.DecodeString(dxsAPIKeyB64)
-        if err != nil </span><span class="cov0" title="0">{
-                color.Red("Error decoding api key. err: ", err.Error())
-                return
-        }</span>
-        <span class="cov0" title="0">dxsAPIKey := DXSAPIKey{}
-        json.Unmarshal(dxsAPIKeyData, &amp;dxsAPIKey)
-
-        dxsURL := dxsAPIKey.Host
-
-        client := &amp;http.Client{}
-        req, err := http.NewRequest("POST", fmt.Sprintf("%s/dxc", TrimLastSlash(dxsURL)), bytes.NewBuffer(bodyRequestJSON))
-        req.SetBasicAuth(userAuth.Address, userAuth.APIKey)
-        resp, err := client.Do(req)
-
-        if err != nil </span><span class="cov0" title="0">{
-                color.Red("Error sending status request to the DXS host (%s): %v", dxsURL, err)
-        }</span> else<span class="cov0" title="0"> {
-                color.Green("Successfully sent status to the DXS host (%s): %v", dxsURL, *resp)
-        }</span>
+        <span class="cov8" title="1">return string(bytes), nil</span>
 }
+
+// GenerateRandomStringURLSafe returns a URL-safe, base64 encoded
+// securely generated random string.
+// It will return an error if the system's secure random
+// number generator fails to function correctly, in which
+// case the caller should not continue.
+// n 32 =&gt; 44 bytes
+func GenerateRandomStringURLSafe(n int) (string, error) <span class="cov0" title="0">{
+        b, err := GenerateRandomBytes(n)
+        return base64.URLEncoding.EncodeToString(b), err
+}</span>
 </pre>
 		
 		</div>
