@@ -36,10 +36,10 @@ export const SyncStatusList = () => {
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>
-                <TableCell>When</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Error Message</TableCell>
-                <TableCell>Time</TableCell>
+                <TableCell style={{ width: '15%' }}>When</TableCell>
+                <TableCell style={{ width: '12%' }}>Status</TableCell>
+                <TableCell style={{ width: '53%' }}>Error Message</TableCell>
+                <TableCell style={{ width: '20%' }}>Time</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
