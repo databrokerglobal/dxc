@@ -17,12 +17,14 @@ var signCmd = &cobra.Command{
 example use:
 
 go run main.go sign -p 0xae78c8b502571dba876742437f8bc78b689cf8518356c0921393d89caaf284ce -d bou`,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 
 		data, _ := cmd.Flags().GetString("data")
 		privateKey, _ := cmd.Flags().GetString("privateKey")
 
 		sign(data, privateKey)
+
+		return nil
 	},
 }
 
