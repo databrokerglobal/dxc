@@ -6,8 +6,7 @@ import "time"
 type Repository interface {
 
 	// Challenges
-	GenerateNewChallenge() (err error)
-	GetCurrentChallenge() (c *Challenge, err error)
+	GetNewChallenge() (c *Challenge, err error)
 
 	// UserAuth
 	SaveNewUserAuth(address string, apiKey string) (err error)
@@ -26,7 +25,7 @@ type Repository interface {
 	GetMostRecentSyncStatuses(fromTime time.Time) (syncStatuses []SyncStatus, err error)
 	GetAllSyncStatuses() (syncStatuses []SyncStatus, err error)
 
-  // Datasources
+	// Datasources
 	CreateInfuraID(infuraID string) (err error)
 	GetLatestInfuraID() (infuraID string, err error)
 }
