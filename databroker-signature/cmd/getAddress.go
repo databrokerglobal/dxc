@@ -36,6 +36,7 @@ func GetAddressCmd() *cobra.Command {
 	}
 	cmd.Flags().StringP("privateKey", "p", "", "private key in hex format")
 	cmd.MarkFlagRequired("privateKey")
+
 	return cmd
 }
 

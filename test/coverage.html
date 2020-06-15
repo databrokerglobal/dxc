@@ -70,13 +70,21 @@
 				
 				<option value="file7">github.com/databrokerglobal/dxc/database/user_auth.go (0.0%)</option>
 				
-				<option value="file8">github.com/databrokerglobal/dxc/utils/crypto.go (89.8%)</option>
+				<option value="file8">github.com/databrokerglobal/dxc/databroker-signature/cmd/getAddress.go (81.8%)</option>
 				
-				<option value="file9">github.com/databrokerglobal/dxc/utils/echo-request-builder.go (0.0%)</option>
+				<option value="file9">github.com/databrokerglobal/dxc/databroker-signature/cmd/root.go (58.8%)</option>
 				
-				<option value="file10">github.com/databrokerglobal/dxc/utils/other-utils.go (100.0%)</option>
+				<option value="file10">github.com/databrokerglobal/dxc/databroker-signature/cmd/sign.go (85.0%)</option>
 				
-				<option value="file11">github.com/databrokerglobal/dxc/utils/random.go (73.7%)</option>
+				<option value="file11">github.com/databrokerglobal/dxc/databroker-signature/cmd/verify.go (36.8%)</option>
+				
+				<option value="file12">github.com/databrokerglobal/dxc/utils/crypto.go (89.8%)</option>
+				
+				<option value="file13">github.com/databrokerglobal/dxc/utils/echo-request-builder.go (0.0%)</option>
+				
+				<option value="file14">github.com/databrokerglobal/dxc/utils/other-utils.go (100.0%)</option>
+				
+				<option value="file15">github.com/databrokerglobal/dxc/utils/random.go (73.7%)</option>
 				
 				</select>
 			</div>
@@ -408,7 +416,272 @@ func (m *Manager) GetLatestUserAuth() (u *UserAuth, err error) <span class="cov0
 }
 </pre>
 		
-		<pre class="file" id="file8" style="display: none">// go-ethereum crypto stuff explanation: https://goethereumbook.org/en/
+		<pre class="file" id="file8" style="display: none">package cmd
+
+import (
+        "github.com/databrokerglobal/dxc/utils"
+        "github.com/pkg/errors"
+
+        "fmt"
+
+        "github.com/spf13/cobra"
+)
+
+// GetAddressCmd represents the getAddress command
+func GetAddressCmd() *cobra.Command <span class="cov8" title="1">{
+        cmd := &amp;cobra.Command{
+                Use:   "getAddress",
+                Short: "get public key and address from private key",
+                Long: `get public key and address from private key.
+                
+        example use:
+
+        go run main.go getAddress -p 0xae78c8b502571dba876742437f8bc78b689cf8518356c0921393d89caaf284ce`,
+                RunE: func(cmd *cobra.Command, args []string) error </span><span class="cov8" title="1">{
+
+                        privateKey, _ := cmd.Flags().GetString("privateKey")
+
+                        output, err := getAddress(privateKey)
+                        if err != nil </span><span class="cov0" title="0">{
+                                fmt.Fprintf(cmd.OutOrStdout(), err.Error())
+                                return err
+                        }</span>
+
+                        <span class="cov8" title="1">fmt.Fprintf(cmd.OutOrStdout(), output)
+
+                        return nil</span>
+                },
+        }
+        <span class="cov8" title="1">cmd.Flags().StringP("privateKey", "p", "", "private key in hex format")
+        cmd.MarkFlagRequired("privateKey")
+        return cmd</span>
+}
+
+func init() <span class="cov8" title="1">{
+
+        rootCmd.AddCommand(GetAddressCmd())
+}</span>
+
+func getAddress(privateKeyHex string) (output string, err error) <span class="cov8" title="1">{
+
+        output = ""
+
+        hexPublicKey, err := utils.HexPublicKeyFromHexPrivateKey(privateKeyHex)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", errors.Wrap(err, "error calculating public key from private key")
+        }</span>
+        <span class="cov8" title="1">output += fmt.Sprintf("publicKey: %s\n", hexPublicKey)
+
+        address, err := utils.AddressFromHexPrivateKey(privateKeyHex)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", errors.Wrap(err, "error calculating address from private key")
+        }</span>
+        <span class="cov8" title="1">output += fmt.Sprintf("address: %s\n", address)
+
+        return output, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package cmd
+
+import (
+        "fmt"
+        "os"
+
+        "github.com/spf13/cobra"
+
+        homedir "github.com/mitchellh/go-homedir"
+        "github.com/spf13/viper"
+)
+
+var cfgFile string
+
+// rootCmd represents the base command when called without any subcommands
+var rootCmd = &amp;cobra.Command{
+        Use:   "databroker-signature",
+        Short: "sign or verify dxc related data with ethereum public and private keys",
+        Long:  `sign or verify dxc related data with ethereum public and private keys`,
+}
+
+// Execute adds all child commands to the root command and sets flags appropriately.
+// This is called by main.main(). It only needs to happen once to the rootCmd.
+func Execute() <span class="cov0" title="0">{
+        if err := rootCmd.Execute(); err != nil </span><span class="cov0" title="0">{
+                fmt.Println(err)
+                os.Exit(1)
+        }</span>
+}
+
+func init() <span class="cov8" title="1">{
+        cobra.OnInitialize(initConfig)
+
+        // Here you will define your flags and configuration settings.
+        // Cobra supports persistent flags, which, if defined here,
+        // will be global for your application.
+
+        rootCmd.PersistentFlags().StringVar(&amp;cfgFile, "config", "", "config file (default is $HOME/.databroker-signature.yaml)")
+
+        // Cobra also supports local flags, which will only run
+        // when this action is called directly.
+        rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}</span>
+
+// initConfig reads in config file and ENV variables if set.
+func initConfig() <span class="cov8" title="1">{
+        if cfgFile != "" </span><span class="cov0" title="0">{
+                // Use config file from the flag.
+                viper.SetConfigFile(cfgFile)
+        }</span> else<span class="cov8" title="1"> {
+                // Find home directory.
+                home, err := homedir.Dir()
+                if err != nil </span><span class="cov0" title="0">{
+                        fmt.Println(err)
+                        os.Exit(1)
+                }</span>
+
+                // Search config in home directory with name ".databroker-signature" (without extension).
+                <span class="cov8" title="1">viper.AddConfigPath(home)
+                viper.SetConfigName(".databroker-signature")</span>
+        }
+
+        <span class="cov8" title="1">viper.AutomaticEnv() // read in environment variables that match
+
+        // If a config file is found, read it in.
+        if err := viper.ReadInConfig(); err == nil </span><span class="cov0" title="0">{
+                fmt.Println("Using config file:", viper.ConfigFileUsed())
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package cmd
+
+import (
+        "github.com/databrokerglobal/dxc/utils"
+        "github.com/pkg/errors"
+
+        "fmt"
+
+        "github.com/spf13/cobra"
+)
+
+// signCmd represents the sign command
+func SignCmd() *cobra.Command <span class="cov8" title="1">{
+        cmd := &amp;cobra.Command{
+                Use:   "sign",
+                Short: "sign a piece of data with your private key",
+                Long: `sign a piece of data with your private key
+                
+        example use:
+
+        go run main.go sign -p 0xae78c8b502571dba876742437f8bc78b689cf8518356c0921393d89caaf284ce -d settlemint`,
+                RunE: func(cmd *cobra.Command, args []string) error </span><span class="cov8" title="1">{
+
+                        data, _ := cmd.Flags().GetString("data")
+                        privateKey, _ := cmd.Flags().GetString("privateKey")
+
+                        output, err := sign(data, privateKey)
+                        if err != nil </span><span class="cov0" title="0">{
+                                fmt.Fprintf(cmd.OutOrStdout(), err.Error())
+                                return err
+                        }</span>
+
+                        <span class="cov8" title="1">fmt.Fprintf(cmd.OutOrStdout(), output)
+
+                        return nil</span>
+                },
+        }
+        <span class="cov8" title="1">cmd.Flags().StringP("data", "d", "", "data to be signed (string)")
+        cmd.MarkFlagRequired("data")
+
+        cmd.Flags().StringP("privateKey", "p", "", "private key in hex format")
+        cmd.MarkFlagRequired("privateKey")
+
+        return cmd</span>
+}
+
+func init() <span class="cov8" title="1">{
+
+        rootCmd.AddCommand(SignCmd())
+}</span>
+
+func sign(data string, privateKeyHex string) (output string, err error) <span class="cov8" title="1">{
+
+        signature, err := utils.SignDataWithPrivateKey(data, privateKeyHex)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", errors.Wrap(err, "error signing data with private key")
+        }</span>
+        <span class="cov8" title="1">output = fmt.Sprintf("signature: %s\n", signature)
+
+        return output, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package cmd
+
+import (
+        "github.com/databrokerglobal/dxc/utils"
+
+        "fmt"
+
+        "github.com/spf13/cobra"
+)
+
+// verifyCmd represents the verify command
+var verifyCmd = &amp;cobra.Command{
+        Use:   "verify",
+        Short: "Verify a signature",
+        Long: `Verify a provided signature.
+        
+You must provide the signature, the data that was signed, and the public key corresponding to the private key used to generate the signature
+        
+example use:
+
+go run main.go verify -k 0x04a7c36f8064f2c4075ed38db509e46bfd29ebe73bb3c23afeaa039ef8b9803b93fa95790cb386c7204c483c0c057c8d1a1b08a536caddc0c8e8e12d72d255916d -s 0xc83d417a3b99535e784a72af0d9772c019c776aa0dfe4313c001a5548f6cf254477f5334c30da59531bb521278edc98f1959009253dda4ee9f63fe5562ead5aa00 -d bou
+
+above example assumes you used the below private key when signing:
+
+go run main.go sign -p 0xae78c8b502571dba876742437f8bc78b689cf8518356c0921393d89caaf284ce -d bou`,
+        RunE: func(cmd *cobra.Command, args []string) error <span class="cov0" title="0">{
+
+                data, _ := cmd.Flags().GetString("data")
+                signature, _ := cmd.Flags().GetString("signature")
+                publicKey, _ := cmd.Flags().GetString("publicKey")
+
+                verify(data, signature, publicKey)
+
+                return nil
+        }</span>,
+}
+
+func init() <span class="cov8" title="1">{
+        rootCmd.AddCommand(verifyCmd)
+
+        verifyCmd.Flags().StringP("data", "d", "", "data that was signed (string)")
+        verifyCmd.MarkFlagRequired("data")
+
+        verifyCmd.Flags().StringP("signature", "s", "", "signature in hex format (string)")
+        verifyCmd.MarkFlagRequired("signature")
+
+        verifyCmd.Flags().StringP("publicKey", "k", "", "public key in hex format (string")
+        verifyCmd.MarkFlagRequired("publicKey")
+}</span>
+
+func verify(data string, signature string, publicKeyHex string) <span class="cov0" title="0">{
+
+        valid, err := utils.VerifySignature(data, signature, publicKeyHex)
+        if err != nil </span><span class="cov0" title="0">{
+                fmt.Println("error verifying signature. err: " + err.Error())
+                return
+        }</span>
+        <span class="cov0" title="0">if valid </span><span class="cov0" title="0">{
+                fmt.Println("✔️✔️ the signature is valid ✔️✔️")
+        }</span> else<span class="cov0" title="0"> {
+                fmt.Println("⚠️⚠️ !! the signature is not valid !! ⚠️⚠️")
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">// go-ethereum crypto stuff explanation: https://goethereumbook.org/en/
 
 package utils
 
@@ -547,7 +820,7 @@ func publicKeyFromHexPublicKey(hexPublicKey string) (publicKey *ecdsa.PublicKey,
 }
 </pre>
 		
-		<pre class="file" id="file9" style="display: none">package utils
+		<pre class="file" id="file13" style="display: none">package utils
 
 import (
         "io"
@@ -566,7 +839,7 @@ func GenerateTestEchoRequest(method string, path string, body io.Reader) echo.Co
 }</span>
 </pre>
 		
-		<pre class="file" id="file10" style="display: none">package utils
+		<pre class="file" id="file14" style="display: none">package utils
 
 import "strings"
 
@@ -580,7 +853,7 @@ func TrimLastSlash(host string) (h string) <span class="cov8" title="1">{
 }
 </pre>
 		
-		<pre class="file" id="file11" style="display: none">package utils
+		<pre class="file" id="file15" style="display: none">package utils
 
 import (
         "crypto/rand"
