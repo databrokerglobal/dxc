@@ -58,17 +58,15 @@
 				
 				<option value="file1">github.com/databrokerglobal/dxc/database/challenge.go (0.0%)</option>
 				
-				<option value="file2">github.com/databrokerglobal/dxc/database/datasource.go (21.9%)</option>
+				<option value="file2">github.com/databrokerglobal/dxc/database/datasource.go (28.0%)</option>
 				
 				<option value="file3">github.com/databrokerglobal/dxc/database/infuraID.go (0.0%)</option>
 				
 				<option value="file4">github.com/databrokerglobal/dxc/database/manager.go (23.5%)</option>
 				
-				<option value="file5">github.com/databrokerglobal/dxc/database/provide-mock-db.go (80.0%)</option>
+				<option value="file5">github.com/databrokerglobal/dxc/database/syncStatus.go (0.0%)</option>
 				
-				<option value="file6">github.com/databrokerglobal/dxc/database/syncStatus.go (0.0%)</option>
-				
-				<option value="file7">github.com/databrokerglobal/dxc/database/user_auth.go (0.0%)</option>
+				<option value="file6">github.com/databrokerglobal/dxc/database/user_auth.go (0.0%)</option>
 				
 				</select>
 			</div>
@@ -177,19 +175,6 @@ func (m *Manager) GetDatasourceByDID(did string) (d *Datasource, err error) <spa
                 return
         }</span>
         <span class="cov8" title="1">return &amp;datasource, nil</span>
-}
-
-// GetDatasourceByID Query
-func (m *Manager) GetDatasourceByID(id uint) (d *Datasource, err error) <span class="cov0" title="0">{
-        datasource := Datasource{}
-        if m.DB.Where("id = ?", id).First(&amp;datasource).RecordNotFound() </span><span class="cov0" title="0">{
-                return nil, errors.New("record not found")
-        }</span>
-        <span class="cov0" title="0">if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
-                err = errs[0]
-                return
-        }</span>
-        <span class="cov0" title="0">return &amp;datasource, nil</span>
 }
 
 // GetDatasources Get all Datasources query
@@ -302,36 +287,6 @@ func init() <span class="cov8" title="1">{
 		
 		<pre class="file" id="file5" style="display: none">package database
 
-import (
-        "fmt"
-
-        "github.com/DATA-DOG/go-sqlmock"
-        "github.com/jinzhu/gorm"
-)
-
-var (
-        dsnCount int64
-)
-
-func provideMockDB() (sqlmock.Sqlmock, *gorm.DB, Repository) <span class="cov8" title="1">{
-        dsn := fmt.Sprintf("sqlmock_db_%d", dsnCount)
-        _, mock, err := sqlmock.NewWithDSN(dsn)
-        if err != nil </span><span class="cov0" title="0">{
-                panic(err)</span>
-        }
-        <span class="cov8" title="1">mockGorm, err := gorm.Open("sqlmock", dsn)
-        if err != nil </span><span class="cov0" title="0">{
-                panic(err)</span>
-        }
-        <span class="cov8" title="1">mgr := NewRepository(mockGorm)
-        dsnCount++
-
-        return mock, mockGorm, mgr</span>
-}
-</pre>
-		
-		<pre class="file" id="file6" style="display: none">package database
-
 import "time"
 
 // CreateSyncStatus Query
@@ -363,7 +318,7 @@ func (m *Manager) GetAllSyncStatuses() (syncStatuses []SyncStatus, err error) <s
 }</span>
 </pre>
 		
-		<pre class="file" id="file7" style="display: none">package database
+		<pre class="file" id="file6" style="display: none">package database
 
 import (
         errors "github.com/pkg/errors"
