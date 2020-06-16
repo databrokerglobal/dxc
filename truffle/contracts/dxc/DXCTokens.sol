@@ -121,25 +121,26 @@ contract DXCTokens is Ownable, Pausable {
     emit WithdrawDTX(msg.sender, available);
   }
 
-  function transfer(address from, address to, uint256 amount)
-    internal
-    whenNotPaused
-  {
+  function transfer(
+    address from,
+    address to,
+    uint256 amount
+  ) internal whenNotPaused {
     (, , , uint256 available, ) = balanceOf(from);
     require(
       amount <= available,
       "Not enough available DTX to execute this transfer"
     );
-    require(msg.sender == _dealContract);
     balances[from].balance = balances[from].balance.sub(amount);
     balances[to].balance = balances[to].balance.add(amount);
     emit TransferDTX(from, to, amount);
   }
 
-  function transferEx(address from, address to, uint256 amount)
-    public
-    whenNotPaused
-  {
+  function transferEx(
+    address from,
+    address to,
+    uint256 amount
+  ) public whenNotPaused {
     require(msg.sender == _dealContract, "Sender is not _dealContract");
     (, , , uint256 available, ) = balanceOf(from);
     require(
