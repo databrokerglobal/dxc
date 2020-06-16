@@ -68,7 +68,7 @@
 				
 				<option value="file6">github.com/databrokerglobal/dxc/database/user_auth.go (37.5%)</option>
 				
-				<option value="file7">github.com/databrokerglobal/dxc/datasources/controller.go (41.6%)</option>
+				<option value="file7">github.com/databrokerglobal/dxc/datasources/controller.go (43.2%)</option>
 				
 				<option value="file8">github.com/databrokerglobal/dxc/datasources/host-check.go (0.0%)</option>
 				
@@ -756,13 +756,13 @@ func ProxyAPI(c echo.Context) error <span class="cov0" title="0">{
 func checkDatasource(datasource *database.Datasource) int <span class="cov8" title="1">{
         var status int
         switch </span>{
-        case datasource == nil:<span class="cov0" title="0">
+        case datasource == nil:<span class="cov8" title="1">
                 status = http.StatusBadRequest</span>
         case datasource.Name == "":<span class="cov8" title="1">
                 status = http.StatusBadRequest</span>
-        case datasource.Type == "":<span class="cov0" title="0">
+        case datasource.Type == "":<span class="cov8" title="1">
                 status = http.StatusBadRequest</span>
-        case datasource.Host == "":<span class="cov0" title="0">
+        case datasource.Host == "":<span class="cov8" title="1">
                 status = http.StatusBadRequest</span>
         default:<span class="cov8" title="1">
                 status = http.StatusContinue</span>
