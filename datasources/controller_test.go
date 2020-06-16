@@ -1,204 +1,215 @@
 package datasources
 
 import (
-	"errors"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
+	"os"
+	"strconv"
 	"strings"
 	"testing"
 
 	"github.com/labstack/echo/v4"
+	"github.com/stretchr/testify/assert"
 )
 
-var datasourceJSON = "{\"host\":\"https://file-examples.com/wp-content/uploads/2017/02/file_example_XLS_10.xls\",\"name\":\"file 1\",\"type\":\"FILE\",\"did\":\"eb5cefe0-891c-40c2-a36d-c2d81e1aeb3d\"}\n"
-var mockDB = map[string]*TestDatasource{
-	"eb5cefe0-891c-40c2-a36d-c2d81e1aeb3d": {
-		Name:      "test",
-		Type:      "FILE",
-		Did:       "eb5cefe0-891c-40c2-a36d-c2d81e1aeb3d",
-		Host:      "N/A",
-		Available: true,
-	},
+func TestMain(m *testing.M) {
+
+	RunningTest = true
+
+	os.Exit(m.Run())
 }
 
-// func TestAddOneCleanRequest(t *testing.T) {
-// 	e := echo.New()
-// 	req := httptest.NewRequest(http.MethodPost, "/datasource", strings.NewReader(datasourceJSON))
-// 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-// 	rec := httptest.NewRecorder()
-// 	c := e.NewContext(req, rec)
-
-// 	if assert.NoError(t, MockAddOne(c)) {
-// 		assert.Equal(t, http.StatusCreated, rec.Code)
-// 		assert.Equal(t, datasourceJSON, rec.Body.String())
-// 	}
-// }
-
-type TestDatasource struct {
-	Name      string `json:"name"`
-	Type      string `json:"type"`
-	Did       string `json:"did"`
-	Host      string `json:"host"`
-	Available bool   `json:"available"`
-}
-
-// AddOne product
-func MockAddOne(c echo.Context) error {
-	datasource := new(TestDatasource)
-
-	if err := c.Bind(datasource); err != nil {
-		return err
+func generateAddOneDatasourceRequest(t *testing.T, datasource DatasourceReq) echo.Context {
+	datasourceJSON, err := json.Marshal(datasource)
+	if err != nil {
+		t.Fatalf("error marshaling datasource: %s", err.Error())
+		return nil
 	}
-
-	if len(datasource.Name) == 0 {
-		return errors.New("empty name")
-	}
-
-	if len(datasource.Type) == 0 {
-		return errors.New("empty type")
-	}
-
-	if len(datasource.Host) == 0 {
-		return errors.New("empty host")
-	}
-
-	if strings.Split(datasource.Host, "")[len(datasource.Host)-1] == "/" {
-		datasource.Host = strings.TrimSuffix(datasource.Host, "/")
-	}
-
-	datasource.Did = "eb5cefe0-891c-40c2-a36d-c2d81e1aeb3d"
-
-	mockDB[datasource.Did] = datasource
-
-	return c.JSON(http.StatusCreated, datasource)
-}
-
-func generateAddOneRequest(jsonString string) echo.Context {
 	e := echo.New()
-	req := httptest.NewRequest(http.MethodPost, "/datasource", strings.NewReader(jsonString))
+	req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(string(datasourceJSON)))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	return c
 }
 
-// func TestMockAddOne(t *testing.T) {
-
-// 	req1 := generateAddOneRequest("{\"name\":\"PLC123\",\"producttype\":\"API\",\"did\":\"eb5cefe0-891c-40c2-a36d-c2d81e1aeb3d\",\"host\":\"http://localhost:3100\"}\n")
-// 	req2 := generateAddOneRequest(`{"name":"","producttype":"API","did":"eb5cefe0-891c-40c2-a36d-c2d81e1aeb3d","host":"http://localhost:3100"}`)
-// 	req3 := generateAddOneRequest(`{"name":"Hello","producttype":"","did":"eb5cefe0-891c-40c2-a36d-c2d81e1aeb3d","host":"http://localhost:3100"}`)
-// 	req4 := generateAddOneRequest(`{"name":"Hello","producttype":"API","did":"eb5cefe0-891c-40c2-a36d-c2d81e1aeb3d","host":""}`)
-// 	req5 := generateAddOneRequest(``)
-
-// 	type args struct {
-// 		c echo.Context
-// 	}
-
-// 	tests := []struct {
-// 		name    string
-// 		args    args
-// 		wantErr bool
-// 	}{
-// 		{"Normal run", args{c: req1}, false},
-// 		{"Empty name", args{c: req2}, true},
-// 		{"Empty type", args{c: req3}, true},
-// 		{"Empty host", args{c: req4}, true},
-// 		{"Empty string", args{c: req5}, true},
-// 	}
-
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			if err := MockAddOne(tt.args.c); (err != nil) != tt.wantErr {
-// 				t.Errorf("MockAddOne() error = %v, wantErr %v", err, tt.wantErr)
-// 			}
-// 		})
-// 	}
-// }
-
-// func generateGetOneRequest(did string) echo.Context {
-// 	e := echo.New()
-// 	req := httptest.NewRequest(http.MethodPost, "/", nil)
-// 	rec := httptest.NewRecorder()
-// 	c := e.NewContext(req, rec)
-// 	c.SetPath("/product/:did")
-// 	c.SetParamNames("did")
-// 	c.SetParamValues(did)
-// 	return c
-// }
-
-// // GetOne product
-// func GetOneMock(c echo.Context) error {
-// 	did := c.Param("did")
-
-// 	p := mockDB[did]
-
-// 	if p == nil {
-// 		return errors.New("No such product")
-// 	}
-
-// 	return c.JSON(http.StatusOK, p)
-// }
-
-// func TestGetOneMock(t *testing.T) {
-// 	type args struct {
-// 		c echo.Context
-// 	}
-// 	tests := []struct {
-// 		name    string
-// 		args    args
-// 		wantErr bool
-// 	}{
-// 		{"Normal run", args{c: generateGetOneRequest("eb5cefe0-891c-40c2-a36d-c2d81e1aeb3d")}, false},
-// 		{"Invalid key", args{c: generateGetOneRequest("eb5cefe0-891c-40c2-a36d-c2d81e1aeb5f")}, true},
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			if err := GetOneMock(tt.args.c); (err != nil) != tt.wantErr {
-// 				t.Errorf("GetOne() error = %v, wantErr %v", err, tt.wantErr)
-// 			}
-// 		})
-// 	}
-// }
-
 func TestAddOneDatasource(t *testing.T) {
 	type args struct {
 		c echo.Context
 	}
 	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
+		args          args
+		wantErr       bool
+		requestStatus int
 	}{
-		{"First pass", args{generateAddOneRequest("{\"host\":\"https://file-examples.com/wp-content/uploads/2017/02/file_example_XLS_10.xls\",\"name\":\"file 1\",\"type\":\"FILE\",\"did\":\"eb5cefe0-891c-40c2-a36d-c2d81e1aeb3d\"}\n")}, false},
+		{
+			args{generateAddOneDatasourceRequest(t, DatasourceReq{
+				Name: "file 1",
+				Type: "FILE",
+				Host: "https://file-examples.com/wp-content/uploads/2017/02/file_example_XLS_10.xls",
+			}),
+			},
+			false,
+			http.StatusCreated,
+		},
+		{
+			args{generateAddOneDatasourceRequest(t, DatasourceReq{
+				Name: "",
+				Type: "FILE",
+				Host: "https://file-examples.com/wp-content/uploads/2017/02/file_example_XLS_10.xls",
+			}),
+			},
+			false,
+			http.StatusBadRequest, // missing name
+		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := AddOneDatasource(tt.args.c); (err != nil) != tt.wantErr {
-				t.Errorf("AddOneDatasource() error = %v, wantErr %v", err, tt.wantErr)
+	for i, test := range tests {
+		t.Run("case "+strconv.Itoa(i), func(t *testing.T) {
+			if (test.wantErr && assert.Error(t, AddOneDatasource(test.args.c))) || assert.NoError(t, AddOneDatasource(test.args.c)) {
+				assert.Equal(t, test.args.c.Response().Status, test.requestStatus)
 			}
 		})
 	}
 }
 
-// func TestGetOne(t *testing.T) {
-// 	type args struct {
-// 		c echo.Context
-// 	}
-// 	tests := []struct {
-// 		name    string
-// 		args    args
-// 		wantErr bool
-// 	}{
-// 		{"First pass", args{generateGetOneRequest("eb5cefe0-891c-40c2-a36d-c2d81e1aeb3d")}, false},
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			if err := GetOne(tt.args.c); (err != nil) != tt.wantErr {
-// 				t.Errorf("GetOne() error = %v, wantErr %v", err, tt.wantErr)
-// 			}
-// 		})
-// 	}
-// }
+func generateDatasourceRequest(includeDid bool, newName string, newHost string) echo.Context {
+	e := echo.New()
+	// query params
+	q := make(url.Values)
+	if newName != "" {
+		q.Set("newName", newName)
+	}
+	if newHost != "" {
+		q.Set("newHost", newHost)
+	}
+
+	req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	// path params
+	if includeDid {
+		c.SetPath("/datasource/:did")
+		c.SetParamNames("did")
+		c.SetParamValues("a did")
+	}
+	return c
+}
+
+func TestGetOneDatasource(t *testing.T) {
+	type args struct {
+		c echo.Context
+	}
+	tests := []struct {
+		args          args
+		wantErr       bool
+		requestStatus int
+	}{
+		{
+			args{generateDatasourceRequest(true, "", "")},
+			false,
+			http.StatusOK,
+		},
+		{
+			args{generateDatasourceRequest(false, "", "")},
+			false,
+			http.StatusBadRequest, // missing did
+		},
+	}
+	for i, test := range tests {
+		t.Run("case "+strconv.Itoa(i), func(t *testing.T) {
+			if (test.wantErr && assert.Error(t, GetOneDatasource(test.args.c))) || assert.NoError(t, GetOneDatasource(test.args.c)) {
+				assert.Equal(t, test.args.c.Response().Status, test.requestStatus)
+			}
+		})
+	}
+}
+
+func TestAddExampleDatasources(t *testing.T) {
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	if assert.NoError(t, AddExampleDatasources(c)) {
+		assert.Equal(t, http.StatusCreated, rec.Code)
+	}
+}
+
+func TestDeleteDatasource(t *testing.T) {
+	type args struct {
+		c echo.Context
+	}
+	tests := []struct {
+		args          args
+		wantErr       bool
+		requestStatus int
+	}{
+		{
+			args{generateDatasourceRequest(true, "", "")},
+			false,
+			200,
+		},
+		{
+			args{generateDatasourceRequest(false, "", "")},
+			false,
+			400, // bad request, missing did
+		},
+	}
+	for i, test := range tests {
+		t.Run("case "+strconv.Itoa(i), func(t *testing.T) {
+			if (test.wantErr && assert.Error(t, DeleteDatasource(test.args.c))) || assert.NoError(t, DeleteDatasource(test.args.c)) {
+				assert.Equal(t, test.args.c.Response().Status, test.requestStatus)
+			}
+		})
+	}
+}
+
+func TestUpdateDatasource(t *testing.T) {
+	type args struct {
+		c echo.Context
+	}
+	tests := []struct {
+		args          args
+		wantErr       bool
+		requestStatus int
+	}{
+		{
+			args{generateDatasourceRequest(true, "a name", "a host")},
+			false,
+			http.StatusOK,
+		},
+		{
+			args{generateDatasourceRequest(true, "a name", "")},
+			false,
+			http.StatusOK,
+		},
+		{
+			args{generateDatasourceRequest(true, "", "a host")},
+			false,
+			http.StatusOK,
+		},
+		{
+			args{generateDatasourceRequest(false, "", "")},
+			false,
+			http.StatusBadRequest, // missing did
+		},
+		{
+			args{generateDatasourceRequest(true, "", "")},
+			false,
+			http.StatusBadRequest, // missing newName and newHost
+		},
+	}
+	for i, test := range tests {
+		t.Run("case "+strconv.Itoa(i), func(t *testing.T) {
+			if (test.wantErr && assert.Error(t, UpdateDatasource(test.args.c))) || assert.NoError(t, UpdateDatasource(test.args.c)) {
+				assert.Equal(t, test.args.c.Response().Status, test.requestStatus)
+			}
+		})
+	}
+}
 
 // func generateRedirectRequest(method string) echo.Context {
 // 	c := utils.GenerateTestEchoRequest(http.MethodGet, "/eb5cefe0-891c-40c2-a36d-c2d81e1aeb3d", nil)
