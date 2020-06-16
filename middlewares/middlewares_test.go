@@ -83,8 +83,6 @@ func TestDataAccessVerification(t *testing.T) {
 			e, req, rec := createRequestToTestDataAccessVerification(test.dxcAPIKEY)
 			e.ServeHTTP(rec, req)
 			assert.Equal(t, test.expectedHTTPStatus, rec.Code)
-			t.Logf(rec.Body.String())
-			// assert.Equal(t, "body output", rec.Body.String())
 		})
 	}
 }
