@@ -38,6 +38,15 @@ type DatasourceReq struct {
 // @Failure 400 {string} string "Error creating datasource"
 // @Router /datasource [post]
 func AddOneDatasource(c echo.Context) error {
+
+	fmt.Println("\n***************************\n********** jony ***********\n***************************")
+	fmt.Println()
+	fmt.Println("c")
+	fmt.Println()
+	fmt.Println(c)
+	fmt.Println("\n***************************\n***************************")
+	fmt.Println()
+
 	datasource := new(database.Datasource)
 
 	if err := c.Bind(datasource); err != nil {
