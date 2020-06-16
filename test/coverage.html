@@ -123,48 +123,18 @@ import (
         "github.com/databrokerglobal/dxc/utils"
 )
 
-// GenerateNewChallenge Query
-func (m *Manager) GenerateNewChallenge() (err error) <span class="cov0" title="0">{
-        c := Challenge{}
-        c.Challenge, err = utils.GenerateRandomStringURLSafe(32)
+// GetNewChallenge Query
+func (m *Manager) GetNewChallenge() (challenge *Challenge, err error) <span class="cov0" title="0">{
+        challenge.Challenge, err = utils.GenerateRandomStringURLSafe(32)
         if err != nil </span><span class="cov0" title="0">{
-                return err
+                return nil, err
         }</span>
 
-        // Get old challenge(s)
-        <span class="cov0" title="0">var challenges []Challenge
-        m.DB.Table("challenges").Find(&amp;challenges)
-        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
-                err = errs[0]
+        <span class="cov0" title="0">if err := m.DB.Create(&amp;challenge).Error; err != nil </span><span class="cov0" title="0">{
+                return nil, err
         }</span>
 
-        // Delete all previous challenges
-        <span class="cov0" title="0">m.DB.Delete(challenges)
-        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
-                err = errs[0]
-        }</span>
-
-        // Generate new one
-        <span class="cov0" title="0">m.DB.Create(&amp;c)
-        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
-                err = errs[0]
-        }</span>
         <span class="cov0" title="0">return</span>
-}
-
-// GetCurrentChallenge Query
-func (m *Manager) GetCurrentChallenge() (c *Challenge, err error) <span class="cov0" title="0">{
-        challenge := Challenge{}
-        var n int
-        m.DB.Table("challenge").Count(&amp;n)
-        if n == 0 </span><span class="cov0" title="0">{
-                m.GenerateNewChallenge()
-        }</span>
-        <span class="cov0" title="0">m.DB.First(&amp;challenge)
-        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
-                err = errs[0]
-        }</span>
-        <span class="cov0" title="0">return &amp;challenge, nil</span>
 }
 </pre>
 		
@@ -175,7 +145,6 @@ import errors "github.com/pkg/errors"
 // CreateDatasource Query
 
 func (m *Manager) CreateDatasource(datasource *Datasource) (err error) <span class="cov0" title="0">{
-
         m.DB.Create(datasource)
         if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
                 err = errs[0]
@@ -187,12 +156,12 @@ func (m *Manager) CreateDatasource(datasource *Datasource) (err error) <span cla
 // GetDatasourceByDID Query
 
 func (m *Manager) GetDatasourceByDID(did string) (d *Datasource, err error) <span class="cov0" title="0">{
-
         datasource := Datasource{}
         if m.DB.Where(&amp;Datasource{Did: did}).First(&amp;datasource).RecordNotFound() </span><span class="cov0" title="0">{
                 return nil, errors.New("record not found")
         }</span>
         <span class="cov0" title="0">if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
+
                 err = errs[0]
                 return
         }</span>
@@ -224,13 +193,14 @@ func (m *Manager) GetDatasources() (ds *[]Datasource, err error) <span class="co
 // DeleteDatasource delete a Datasource
 func (m *Manager) DeleteDatasource(did string) (err error) <span class="cov0" title="0">{
         m.DB.Delete(Datasource{}, "Did LIKE ?", did)
+
         if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
                 err = errs[0]
                 return
         }</span>
         <span class="cov0" title="0">return</span>
 }
-
+      
 // UpdateDatasource update a datasource entry
 func (m *Manager) UpdateDatasource(datasource *Datasource) (err error) <span class="cov0" title="0">{
         m.DB.Save(datasource)
@@ -330,6 +300,39 @@ func init() <span class="cov8" title="1">{
 </pre>
 		
 		<pre class="file" id="file5" style="display: none">package database
+import (
+        "fmt"
+
+        "github.com/DATA-DOG/go-sqlmock"
+        "github.com/jinzhu/gorm"
+)
+
+var (
+        dsnCount int64
+)
+
+func provideMockDB() (sqlmock.Sqlmock, *gorm.DB, Repository) <span class="cov8" title="1">{
+        dsn := fmt.Sprintf("sqlmock_db_%d", dsnCount)
+        _, mock, err := sqlmock.NewWithDSN(dsn)
+        if err != nil </span><span class="cov0" title="0">{
+                panic(err)</span>
+        }
+        <span class="cov8" title="1">mockGorm, err := gorm.Open("sqlmock", dsn)
+        if err != nil </span><span class="cov0" title="0">{
+                panic(err)</span>
+        }
+        <span class="cov8" title="1">mgr := NewRepository(mockGorm)
+        dsnCount++
+
+
+// GetAllSyncStatuses Query
+func (m *Manager) GetAllSyncStatuses() (syncStatuses []SyncStatus, err error) <span class="cov0" title="0">{
+        m.DB.Order("created_at desc").Find(&amp;syncStatuses)
+        return syncStatuses, nil
+}</span>
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package database
 
 
 import (

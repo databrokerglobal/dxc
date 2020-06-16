@@ -6,8 +6,7 @@ import "time"
 type Repository interface {
 
 	// Challenges
-	GenerateNewChallenge() (err error)
-	GetCurrentChallenge() (c *Challenge, err error)
+	GetNewChallenge() (c *Challenge, err error)
 
 	// UserAuth
 	SaveNewUserAuth(address string, apiKey string) (err error)
