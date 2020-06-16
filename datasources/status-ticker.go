@@ -85,7 +85,7 @@ func SendStatus() {
 		return
 	}
 
-	challenge, err := database.DBInstance.GetCurrentChallenge()
+	challenge, err := database.DBInstance.GetNewChallenge()
 	if err != nil {
 		color.Red("Error sending status request because of error getting current challenge. err: ", err)
 		return
