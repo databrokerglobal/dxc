@@ -10,6 +10,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/databrokerglobal/dxc/database"
+
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
@@ -211,6 +213,48 @@ func TestUpdateDatasource(t *testing.T) {
 	}
 }
 
+func Test_checkDatasource(t *testing.T) {
+	type args struct {
+		datasource *database.Datasource
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{"first pass", args{&database.Datasource{
+			Name: "file 1",
+			Type: "FILE",
+			Host: "https://file-examples.com/wp-content/uploads/2017/02/file_example_XLS_10.xls",
+		}}, http.StatusContinue},
+		{"datasource has empty name", args{&database.Datasource{
+			Name: "",
+			Type: "FILE",
+			Host: "https://file-examples.com/wp-content/uploads/2017/02/file_example_XLS_10.xls",
+		}}, http.StatusBadRequest},
+		{"datasource is of empty type", args{&database.Datasource{
+			Name: "file 1",
+			Type: "",
+			Host: "https://file-examples.com/wp-content/uploads/2017/02/file_example_XLS_10.xls",
+		}}, http.StatusBadRequest},
+		{"datasource has no host", args{&database.Datasource{
+			Name: "file 1",
+			Type: "FILE",
+			Host: "",
+		}}, http.StatusBadRequest},
+		{"datasource is nil", args{
+			nil,
+		}, http.StatusBadRequest},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := checkDatasource(tt.args.datasource); got != tt.want {
+				t.Errorf("checkDatasource() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 // func generateRedirectRequest(method string) echo.Context {
 // 	c := utils.GenerateTestEchoRequest(http.MethodGet, "/eb5cefe0-891c-40c2-a36d-c2d81e1aeb3d", nil)
 // 	return c
@@ -232,50 +276,6 @@ func TestUpdateDatasource(t *testing.T) {
 // 		t.Run(tt.name, func(t *testing.T) {
 // 			if err := RedirectToHost(tt.args.c); (err != nil) != tt.wantErr {
 // 				t.Errorf("RedirectToHost() error = %v, wantErr %v", err, tt.wantErr)
-// 			}
-// 		})
-// 	}
-// }
-
-// func Test_checkProduct(t *testing.T) {
-// 	type args struct {
-// 		p *database.Product
-// 	}
-// 	tests := []struct {
-// 		name string
-// 		args args
-// 		want int
-// 	}{
-// 		{"first pass", args{p: &database.Product{
-// 			Name: "plc number 1231323",
-// 			Type: "API",
-// 			Did:  "did",
-// 			Host: "http://localhost:4000",
-// 		}}, 100},
-// 		{"product has empty name", args{p: &database.Product{
-// 			Name: "",
-// 			Type: "FILE",
-// 			Did:  "did",
-// 			Host: "http://localhost:4000",
-// 		}}, 400},
-// 		{"product is of empty type", args{p: &database.Product{
-// 			Name: "plc number 1231323",
-// 			Type: "",
-// 			Did:  "did",
-// 			Host: "http://localhost:4000",
-// 		}}, 400},
-// 		{"product has no host", args{p: &database.Product{
-// 			Name: "Stuff",
-// 			Type: "API",
-// 			Did:  "did",
-// 			Host: "",
-// 		}}, 400},
-// 		{"product is nil", args{p: nil}, 400},
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			if got := checkProduct(tt.args.p); got != tt.want {
-// 				t.Errorf("checkProduct() = %v, want %v", got, tt.want)
 // 			}
 // 		})
 // 	}
