@@ -25,19 +25,6 @@ func (m *Manager) GetDatasourceByDID(did string) (d *Datasource, err error) {
 	return &datasource, nil
 }
 
-// GetDatasourceByID Query
-func (m *Manager) GetDatasourceByID(id uint) (d *Datasource, err error) {
-	datasource := Datasource{}
-	if m.DB.Where("id = ?", id).First(&datasource).RecordNotFound() {
-		return nil, errors.New("record not found")
-	}
-	if errs := m.DB.GetErrors(); len(errs) > 0 {
-		err = errs[0]
-		return
-	}
-	return &datasource, nil
-}
-
 // GetDatasources Get all Datasources query
 func (m *Manager) GetDatasources() (ds *[]Datasource, err error) {
 	datasources := []Datasource{}
