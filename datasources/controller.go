@@ -19,6 +19,9 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// RunningTest is true when we are running tests
+var RunningTest = false
+
 // DatasourceReq safe type for the controller
 type DatasourceReq struct {
 	Name string `json:"name"`
@@ -38,6 +41,7 @@ type DatasourceReq struct {
 // @Failure 400 {string} string "Error creating datasource"
 // @Router /datasource [post]
 func AddOneDatasource(c echo.Context) error {
+
 	datasource := new(database.Datasource)
 
 	if err := c.Bind(datasource); err != nil {
@@ -58,10 +62,12 @@ func AddOneDatasource(c echo.Context) error {
 
 	datasource.Available = true
 
-	if err := database.DBInstance.CreateDatasource(datasource); err != nil {
-		return err
+	if !RunningTest {
+		if err := database.DBInstance.CreateDatasource(datasource); err != nil {
+			return err
+		}
+		SendStatus()
 	}
-	SendStatus()
 
 	return c.JSON(http.StatusCreated, datasource.Did)
 }
@@ -87,8 +93,10 @@ func AddExampleDatasources(c echo.Context) error {
 	datasource.Host = utils.TrimLastSlash("https://file-examples.com/wp-content/uploads/2017/02/file_example_XLS_10.xls")
 	rand, _ := utils.GenerateRandomStringURLSafe(10)
 	datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
-	if err := database.DBInstance.CreateDatasource(datasource); err != nil {
-		return err
+	if !RunningTest {
+		if err := database.DBInstance.CreateDatasource(datasource); err != nil {
+			return err
+		}
 	}
 	count++
 
@@ -99,8 +107,10 @@ func AddExampleDatasources(c echo.Context) error {
 	datasource.Host = utils.TrimLastSlash("https://file-examples.com/wp-content/uploads/2017/02/file_example_XLSX_10.xlsx")
 	rand, _ = utils.GenerateRandomStringURLSafe(10)
 	datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
-	if err := database.DBInstance.CreateDatasource(datasource); err != nil {
-		return err
+	if !RunningTest {
+		if err := database.DBInstance.CreateDatasource(datasource); err != nil {
+			return err
+		}
 	}
 	count++
 
@@ -111,8 +121,10 @@ func AddExampleDatasources(c echo.Context) error {
 	datasource.Host = utils.TrimLastSlash("ftp://speedtest.tele2.net/100KB.zip")
 	rand, _ = utils.GenerateRandomStringURLSafe(10)
 	datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
-	if err := database.DBInstance.CreateDatasource(datasource); err != nil {
-		return err
+	if !RunningTest {
+		if err := database.DBInstance.CreateDatasource(datasource); err != nil {
+			return err
+		}
 	}
 	count++
 
@@ -123,12 +135,17 @@ func AddExampleDatasources(c echo.Context) error {
 	datasource.Host = utils.TrimLastSlash("https://jsonplaceholder.typicode.com")
 	rand, _ = utils.GenerateRandomStringURLSafe(10)
 	datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
-	if err := database.DBInstance.CreateDatasource(datasource); err != nil {
-		return err
+	if !RunningTest {
+		if err := database.DBInstance.CreateDatasource(datasource); err != nil {
+			return err
+		}
 	}
 	count++
 
-	SendStatus()
+	if !RunningTest {
+		SendStatus()
+	}
+
 	return c.String(http.StatusCreated, fmt.Sprintf("%d example datasources successfully created!", count))
 }
 
@@ -163,6 +180,7 @@ func GetAllDatasources(c echo.Context) error {
 // @Produce json
 // @Param did path string true "Digital identifier of the datasource"
 // @Success 200 {object} database.Datasource true
+// @Failure 400 {string} string "Bad request"
 // @Failure 500 {string} string "Error retrieving datasource from database"
 // @Router /datasource/{did} [get]
 func GetOneDatasource(c echo.Context) error {
@@ -170,17 +188,21 @@ func GetOneDatasource(c echo.Context) error {
 	if err != nil {
 		return c.String(http.StatusInternalServerError, "Could not read the did")
 	}
+	if did == "" {
+		return c.String(http.StatusBadRequest, "Bad request. did cannot be empty.")
+	}
 
 	var datasource *database.Datasource
 
-	datasource, err = database.DBInstance.GetDatasourceByDID(did)
+	if !RunningTest {
+		datasource, err = database.DBInstance.GetDatasourceByDID(did)
+		if err != nil {
+			return c.String(http.StatusInternalServerError, "Error retrieving datasource from database")
+		}
 
-	if err != nil {
-		return c.String(http.StatusInternalServerError, "Error retrieving datasource from database")
-	}
-
-	if datasource == nil {
-		return c.String(http.StatusNotFound, "Datasource not found")
+		if datasource == nil {
+			return c.String(http.StatusNotFound, "Datasource not found")
+		}
 	}
 
 	return c.JSON(http.StatusOK, datasource)
@@ -193,6 +215,7 @@ func GetOneDatasource(c echo.Context) error {
 // @Tags datasources
 // @Param did path string true "Digital identifier of the datasource"
 // @Success 200 {string} string "datasource successfully deleted"
+// @Failure 400 {string} string "Bad request"
 // @Failure 500 {string} string "Error retrieving datasource from database"
 // @Router /datasource/{did} [delete]
 func DeleteDatasource(c echo.Context) error {
@@ -200,11 +223,15 @@ func DeleteDatasource(c echo.Context) error {
 	if err != nil {
 		return c.String(http.StatusInternalServerError, "Could not read the did")
 	}
+	if did == "" {
+		return c.String(http.StatusBadRequest, "Bad request. did cannot be empty.")
+	}
 
-	err = database.DBInstance.DeleteDatasource(did)
-
-	if err != nil {
-		return c.String(http.StatusInternalServerError, "Error retrieving datasource from database")
+	if !RunningTest {
+		err = database.DBInstance.DeleteDatasource(did)
+		if err != nil {
+			return c.String(http.StatusInternalServerError, "Error retrieving datasource from database")
+		}
 	}
 
 	return c.JSON(http.StatusOK, "datasource successfully deleted")
@@ -228,6 +255,9 @@ func UpdateDatasource(c echo.Context) error {
 	if err != nil {
 		return c.String(http.StatusInternalServerError, "Could not read the did. err: "+err.Error())
 	}
+	if did == "" {
+		return c.String(http.StatusBadRequest, "Bad request. did cannot be empty.")
+	}
 
 	newName := c.QueryParam("newName")
 	newHost := c.QueryParam("newHost")
@@ -236,25 +266,27 @@ func UpdateDatasource(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "Bad request. newName and newHost cannot both be empty.")
 	}
 
-	datasource, err := database.DBInstance.GetDatasourceByDID(did)
-	if err != nil {
-		return c.String(http.StatusNotFound, "Could not retreave datasource. err: "+err.Error())
-	}
+	if !RunningTest {
+		datasource, err := database.DBInstance.GetDatasourceByDID(did)
+		if err != nil {
+			return c.String(http.StatusNotFound, "Could not retreave datasource. err: "+err.Error())
+		}
 
-	if newName != "" {
-		datasource.Name = newName
-	}
+		if newName != "" {
+			datasource.Name = newName
+		}
 
-	if newHost != "" {
-		datasource.Host = newHost
-	}
+		if newHost != "" {
+			datasource.Host = newHost
+		}
 
-	err = database.DBInstance.UpdateDatasource(datasource)
-	if err != nil {
-		return c.String(http.StatusInternalServerError, "Could not update the datasource. err: "+err.Error())
-	}
+		err = database.DBInstance.UpdateDatasource(datasource)
+		if err != nil {
+			return c.String(http.StatusInternalServerError, "Could not update the datasource. err: "+err.Error())
+		}
 
-	SendStatus()
+		SendStatus()
+	}
 
 	return c.JSON(http.StatusOK, "datasource successfully updated")
 }

@@ -109,6 +109,10 @@ paths:
           description: datasource successfully deleted
           schema:
             type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
         "500":
           description: Error retrieving datasource from database
           schema:
@@ -131,6 +135,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/database.Datasource'
+        "400":
+          description: Bad request
+          schema:
+            type: string
         "500":
           description: Error retrieving datasource from database
           schema:

@@ -109,6 +109,12 @@
                             "$ref": "#/definitions/database.Datasource"
                         }
                     },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
                     "500": {
                         "description": "Error retrieving datasource from database",
                         "schema": {
@@ -189,6 +195,12 @@
                 "responses": {
                     "200": {
                         "description": "datasource successfully deleted",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
                         "schema": {
                             "type": "string"
                         }
