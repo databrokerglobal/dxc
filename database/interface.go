@@ -16,7 +16,6 @@ type Repository interface {
 	// Datasources
 	CreateDatasource(datasource *Datasource) (err error)
 	GetDatasourceByDID(did string) (d *Datasource, err error)
-	GetDatasourceByID(id uint) (d *Datasource, err error)
 	GetDatasources() (ds *[]Datasource, err error)
 	DeleteDatasource(did string) (err error)
 	UpdateDatasource(datasource *Datasource) (err error)
@@ -26,7 +25,7 @@ type Repository interface {
 	GetMostRecentSyncStatuses(fromTime time.Time) (syncStatuses []SyncStatus, err error)
 	GetAllSyncStatuses() (syncStatuses []SyncStatus, err error)
 
-  // Datasources
+	// Datasources
 	CreateInfuraID(infuraID string) (err error)
 	GetLatestInfuraID() (infuraID string, err error)
 }
