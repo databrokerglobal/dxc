@@ -17,6 +17,9 @@ import (
 	"github.com/databrokerglobal/dxc/utils"
 )
 
+// RunningTest is true when we are running tests
+var RunningTest = false
+
 // DXSAPIKey object allows to decode the api key and get the dxs host
 type DXSAPIKey struct {
 	Key  string `json:"k"`
@@ -42,12 +45,14 @@ func SaveUserAuth(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "address and api key cannot be empty")
 	}
 
-	err := database.DBInstance.SaveNewUserAuth(address, apiKey)
-	if err != nil {
-		return c.String(http.StatusInternalServerError, errors.Wrap(err, "error saving user auth").Error())
-	}
+	if !RunningTest {
+		err := database.DBInstance.SaveNewUserAuth(address, apiKey)
+		if err != nil {
+			return c.String(http.StatusInternalServerError, errors.Wrap(err, "error saving user auth").Error())
+		}
 
-	datasources.SendStatus()
+		datasources.SendStatus()
+	}
 
 	getInfuraIDAndServeContract(address, apiKey)
 
@@ -91,20 +96,22 @@ func getInfuraIDAndServeContract(address string, apiKey string) {
 		client := &http.Client{}
 		req, _ := http.NewRequest("GET", fmt.Sprintf("%s/infura/getID", utils.TrimLastSlash(dxsURL)), nil)
 		req.SetBasicAuth(address, apiKey)
-		resp, err := client.Do(req)
+		if !RunningTest {
+			resp, err := client.Do(req)
 
-		if err == nil && resp.StatusCode == 200 {
-			bodyBytes, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				color.Red("Error reading response body. err: ", err.Error())
-			} else {
-				infuraID := string(bodyBytes)
-
-				err = database.DBInstance.CreateInfuraID(infuraID)
+			if err == nil && resp.StatusCode == 200 {
+				bodyBytes, err := ioutil.ReadAll(resp.Body)
 				if err != nil {
-					color.Red("Error saving infura ID. err: ", err.Error())
+					color.Red("Error reading response body. err: ", err.Error())
 				} else {
-					go ethereum.ServeContract()
+					infuraID := string(bodyBytes)
+
+					err = database.DBInstance.CreateInfuraID(infuraID)
+					if err != nil {
+						color.Red("Error saving infura ID. err: ", err.Error())
+					} else {
+						go ethereum.ServeContract()
+					}
 				}
 			}
 		}
