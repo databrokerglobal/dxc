@@ -2,13 +2,20 @@
 import {
   DTXTokenContract,
   DTXTokenInstance,
-  DXCContract,
+  DXCDealsContract,
+  DXCDealsInstance,
+  DXCTokensContract,
+  DXCTokensInstance,
   OwnedUpgradeabilityProxyContract,
 } from '../types/truffle-contracts';
 
 const DTXMiniMe: DTXTokenContract = artifacts.require('DTXToken');
-const DXC: DXCContract = artifacts.require('DXC');
-const Proxy: OwnedUpgradeabilityProxyContract = artifacts.require(
+const DXCTokens: DXCTokensContract = artifacts.require('DXCTokens');
+const DXCDeals: DXCDealsContract = artifacts.require('DXCDeals');
+const ProxyDeals: OwnedUpgradeabilityProxyContract = artifacts.require(
+  'OwnedUpgradeabilityProxy'
+);
+const ProxyTokens: OwnedUpgradeabilityProxyContract = artifacts.require(
   'OwnedUpgradeabilityProxy'
 );
 
@@ -20,22 +27,27 @@ const performMigration = async (
   const dTXTokenInstance: DTXTokenInstance = await DTXMiniMe.deployed();
 
   // We are going to deploy the DXC using a proxy pattern, allowing us to upgrade the DXC contract later
-  await deployer.deploy(DXC);
-  await deployer.deploy(Proxy);
+  await deployer.deploy(DXCTokens);
+  await deployer.deploy(DXCDeals);
+  await deployer.deploy(ProxyDeals);
+  await deployer.deploy(ProxyTokens);
 
-  const dDxc = await DXC.deployed();
-  await dDxc.initialize(dTXTokenInstance.address);
-  // const dProxy = await Proxy.deployed();
+  const dDxcTokens: DXCTokensInstance = await DXCTokens.deployed();
+  const dDxcDeals: DXCDealsInstance = await DXCDeals.deployed();
 
-  // // encode the calling of the initializer, which here acts as the constructor for the DXC contract
-  // const data = encodeCall(
-  //   'initialize',
-  //   ['address'],
-  //   [dTXTokenInstance.address]
-  // );
+  const dProxyTokens = await ProxyTokens.deployed();
+  const dProxyDeals = await ProxyDeals.deployed();
 
-  // // point proxy to DXC contract and call the constructor (aka the initializer)
-  // await dProxy.upgradeToAndCall(dDxc.address, data, {from: accounts[0]});
+  await dProxyTokens.upgradeTo(dDxcTokens.address);
+  await ((dProxyTokens as any) as DXCTokensInstance).initialize(
+    dTXTokenInstance.address,
+    dProxyDeals.address
+  );
+
+  await dProxyDeals.upgradeTo(dDxcDeals.address);
+  await ((dProxyDeals as any) as DXCDealsInstance).initialize(
+    dProxyTokens.address
+  );
 };
 
 module.exports = (deployer: any, network: string, accounts: string[]) => {
