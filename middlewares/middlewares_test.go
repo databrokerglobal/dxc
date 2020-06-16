@@ -5,7 +5,6 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"os"
-	"strconv"
 	"testing"
 
 	"github.com/labstack/echo/v4"
@@ -54,32 +53,38 @@ func TestDataAccessVerification(t *testing.T) {
 	*/
 
 	tests := []struct {
+		nameTest           string
 		dxcAPIKEY          string
 		expectedHTTPStatus int
 	}{
-		{ // OK
+		{
+			"OK",
 			"eyJ1bnNpZ25lZERhdGEiOiJleUprYVdRaU9pSmthV1E2WkdGMFlXSnliMnRsY2pwbWFXeGxNVHBHU1V4Rk9uSXpSRW90ZERsd1RUQkViblozUFQwaUxDSmphR0ZzYkdWdVoyVWlPaUpwZDBwVExXRnhlRGR3TTJKd1dqUnJlVVZpWWpoNmJVTmZRbFkwVm1wb2FuTkJhVlF6ZEZCMlFXMXZQU0lzSW1Ga1pISmxjM01pT2lJd2VESm1NVEV5WVdReU1qVkZNREV4WmpBMk4ySXlSVFExTmpVek1qa3hPRVUyUkRZM09VWTVOemdpZlE9PSIsInNpZ25hdHVyZSI6IjB4NDUyMWRkMjM1OGFiNDlkZTMzZTlkOGYyNmQ2N2E2YzViZTIyMzIzZWRkNWM1NDZhMTkzNDg5NjFiZDM0MDhjMjI3ZDg4N2ZkZTcxYjdhOWFiOGYwOWY2N2ViMWFmMzM5MzE3ZGExN2I4YTI5ZjM5NTVlMzlhN2I1NzhlNmNkNzQwMSIsInB1YmxpY0tleSI6IjB4MDRhN2MzNmY4MDY0ZjJjNDA3NWVkMzhkYjUwOWU0NmJmZDI5ZWJlNzNiYjNjMjNhZmVhYTAzOWVmOGI5ODAzYjkzZmE5NTc5MGNiMzg2YzcyMDRjNDgzYzBjMDU3YzhkMWExYjA4YTUzNmNhZGRjMGM4ZThlMTJkNzJkMjU1OTE2ZCJ9",
 			http.StatusOK,
 		},
-		{ // Base64 encoding not valid
+		{
+			"Base64 encoding not valid",
 			"e",
 			http.StatusBadRequest,
 		},
-		{ // DXC_PRODUCT_KEY is not valid. err: error finding public key from signature: recovery failed
+		{
+			"DXC_PRODUCT_KEY is not valid. error finding public key from signature",
 			"eyJ1bnNpZ25lZERhdGEiOiJleUprYVdRaU9pSmthV1E2WkdGMFlXSnliMnRsY2pwbWFXeGxNVHBHU1V4Rk9uSXpSRW90ZERsd1RUQkViblozUFQwaUxDSmphR0ZzYkdWdVoyVWlPaUpwZDBwVExXRnhlRGR3TTJKd1dqUnJlVVZpWWpoNmJVTmZRbFkwVm1wb2FuTkJhVlF6ZEZCMlFXMXZQU0lzSW1Ga1pISmxjM01pT2lJd2VESm1NVEV5WVdReU1qVkZNREV4WmpBMk4ySXlSVFExTmpVek1qa3hPRVUyUkRZM09VWTVOemdpZlE9PSIsInNpZ25hdHVyZSI6IjB4NTUyMWRkMjM1OGFiNDlkZTMzZTlkOGYyNmQ2N2E2YzViZTIyMzIzZWRkNWM1NDZhMTkzNDg5NjFiZDM0MDhjMjI3ZDg4N2ZkZTcxYjdhOWFiOGYwOWY2N2ViMWFmMzM5MzE3ZGExN2I4YTI5ZjM5NTVlMzlhN2I1NzhlNmNkNzQwMSIsInB1YmxpY0tleSI6IjB4MDRhN2MzNmY4MDY0ZjJjNDA3NWVkMzhkYjUwOWU0NmJmZDI5ZWJlNzNiYjNjMjNhZmVhYTAzOWVmOGI5ODAzYjkzZmE5NTc5MGNiMzg2YzcyMDRjNDgzYzBjMDU3YzhkMWExYjA4YTUzNmNhZGRjMGM4ZThlMTJkNzJkMjU1OTE2ZCJ9",
 			http.StatusBadRequest,
 		},
-		{ // signature not valid
+		{
+			"signature not valid",
 			"eyJ1bnNpZ25lZERhdGEiOiJmeUprYVdRaU9pSmthV1E2WkdGMFlXSnliMnRsY2pwbWFXeGxNVHBHU1V4Rk9uSXpSRW90ZERsd1RUQkViblozUFQwaUxDSmphR0ZzYkdWdVoyVWlPaUpwZDBwVExXRnhlRGR3TTJKd1dqUnJlVVZpWWpoNmJVTmZRbFkwVm1wb2FuTkJhVlF6ZEZCMlFXMXZQU0lzSW1Ga1pISmxjM01pT2lJd2VESm1NVEV5WVdReU1qVkZNREV4WmpBMk4ySXlSVFExTmpVek1qa3hPRVUyUkRZM09VWTVOemdpZlE9PSIsInNpZ25hdHVyZSI6IjB4NDUyMWRkMjM1OGFiNDlkZTMzZTlkOGYyNmQ2N2E2YzViZTIyMzIzZWRkNWM1NDZhMTkzNDg5NjFiZDM0MDhjMjI3ZDg4N2ZkZTcxYjdhOWFiOGYwOWY2N2ViMWFmMzM5MzE3ZGExN2I4YTI5ZjM5NTVlMzlhN2I1NzhlNmNkNzQwMSIsInB1YmxpY0tleSI6IjB4MDRhN2MzNmY4MDY0ZjJjNDA3NWVkMzhkYjUwOWU0NmJmZDI5ZWJlNzNiYjNjMjNhZmVhYTAzOWVmOGI5ODAzYjkzZmE5NTc5MGNiMzg2YzcyMDRjNDgzYzBjMDU3YzhkMWExYjA4YTUzNmNhZGRjMGM4ZThlMTJkNzJkMjU1OTE2ZCJ9",
 			http.StatusUnauthorized,
 		},
-		{ // DXC_PRODUCT_KEY not provided
+		{
+			"DXC_PRODUCT_KEY not provided",
 			"",
 			http.StatusUnauthorized,
 		},
 	}
-	for i, test := range tests {
-		t.Run("case "+strconv.Itoa(i), func(t *testing.T) {
+	for _, test := range tests {
+		t.Run(test.nameTest, func(t *testing.T) {
 			e, req, rec := createRequestToTestDataAccessVerification(test.dxcAPIKEY)
 			e.ServeHTTP(rec, req)
 			assert.Equal(t, test.expectedHTTPStatus, rec.Code)
