@@ -30,11 +30,11 @@ contract DXCDeals is Ownable, Pausable {
   struct Deal {
     string did; // the did of the data share in question
     uint256 index;
-    address owner;
-    uint8 ownerPercentage;
+    address seller;
+    uint8 sellerPercentage;
     address publisher;
     uint8 publisherPercentage;
-    address user;
+    address buyer;
     address marketplace;
     uint8 marketplacePercentage;
     uint256 amount;
@@ -79,9 +79,9 @@ contract DXCDeals is Ownable, Pausable {
   event NewDeal(
     uint256 index,
     string did,
-    address owner,
+    address seller,
     address publisher,
-    address user,
+    address buyer,
     address marketplace,
     uint256 amount,
     uint256 validFrom,
@@ -90,11 +90,11 @@ contract DXCDeals is Ownable, Pausable {
 
   function createDeal(
     string memory did,
-    address owner,
-    uint8 ownerPercentage,
+    address seller,
+    uint8 sellerPercentage,
     address publisher,
     uint8 publisherPercentage,
-    address user,
+    address buyer,
     address marketplace,
     uint8 marketplacePercentage,
     uint256 amount,
@@ -102,11 +102,11 @@ contract DXCDeals is Ownable, Pausable {
     uint256 validUntil
   ) public onlyOwner whenNotPaused returns (uint256) {
     dxcTokens.escrow(
-      owner,
-      ownerPercentage,
+      seller,
+      sellerPercentage,
       publisher,
       publisherPercentage,
-      user,
+      buyer,
       marketplace,
       marketplacePercentage,
       amount
@@ -115,11 +115,11 @@ contract DXCDeals is Ownable, Pausable {
     Deal memory newDeal = Deal(
       did,
       _dealCount,
-      owner,
-      ownerPercentage,
+      seller,
+      sellerPercentage,
       publisher,
       publisherPercentage,
-      user,
+      buyer,
       marketplace,
       marketplacePercentage,
       amount,
@@ -132,24 +132,24 @@ contract DXCDeals is Ownable, Pausable {
     _dealCount++;
 
     didToDeals[did].push(newDeal);
-    userToDeals[user].push(newDeal);
-    if (owner != user) {
-      userToDeals[owner].push(newDeal);
+    userToDeals[buyer].push(newDeal);
+    if (seller != buyer) {
+      userToDeals[seller].push(newDeal);
     }
-    if (publisher != owner && publisher != user) {
+    if (publisher != seller && publisher != buyer) {
       userToDeals[publisher].push(newDeal);
     }
     if (
-      marketplace != owner && marketplace != user && marketplace != publisher
+      marketplace != seller && marketplace != buyer && marketplace != publisher
     ) {
       userToDeals[marketplace].push(newDeal);
     }
     emit NewDeal(
       _dealCount,
       did,
-      owner,
+      seller,
       publisher,
-      user,
+      buyer,
       marketplace,
       amount,
       validFrom,
@@ -211,7 +211,7 @@ contract DXCDeals is Ownable, Pausable {
 
     Deal memory d = getDealByIndex(index);
 
-    accessToDid = d.user == user;
+    accessToDid = d.buyer == user;
 
     if (!accessToDid) {
       return accessToDid;
@@ -280,12 +280,12 @@ contract DXCDeals is Ownable, Pausable {
       now >= _deal.validFrom + 14 days,
       "Payouts can only happen 14 days after the start of the deal (validFrom)"
     );
-    TokenAvailability memory userBalance = getUserBalance(_deal.user);
+    TokenAvailability memory userBalance = getUserBalance(_deal.buyer);
 
     // release escrow
     userBalance.escrowOutgoing = userBalance.escrowOutgoing.sub(_deal.amount);
     userBalance.escrowIncoming = userBalance.escrowIncoming.sub(
-      _deal.amount.mul(_deal.ownerPercentage).div(100)
+      _deal.amount.mul(_deal.sellerPercentage).div(100)
     );
     userBalance.escrowIncoming = userBalance.escrowIncoming.sub(
       _deal.amount.mul(_deal.publisherPercentage).div(100)
@@ -295,25 +295,25 @@ contract DXCDeals is Ownable, Pausable {
     );
     // transfer DTX
     dxcTokens.transferEx(
-      _deal.user,
-      _deal.owner,
-      _deal.amount.mul(_deal.ownerPercentage).div(100)
+      _deal.buyer,
+      _deal.seller,
+      _deal.amount.mul(_deal.sellerPercentage).div(100)
     );
     dxcTokens.transferEx(
-      _deal.user,
+      _deal.buyer,
       _deal.publisher,
       _deal.amount.mul(_deal.publisherPercentage).div(100)
     );
     dxcTokens.transferEx(
-      _deal.user,
+      _deal.buyer,
       _deal.marketplace,
       _deal.amount.mul(_deal.marketplacePercentage).div(100)
     );
     uint256 protocolAmount = _deal.amount.sub(
-      (_deal.amount.mul(_deal.ownerPercentage).div(100))
+      (_deal.amount.mul(_deal.sellerPercentage).div(100))
         .add(_deal.amount.mul(_deal.publisherPercentage).div(100))
         .add(_deal.amount.mul(_deal.marketplacePercentage).div(100))
     );
-    dxcTokens.transferEx(_deal.user, address(this), protocolAmount);
+    dxcTokens.transferEx(_deal.buyer, address(this), protocolAmount);
   }
 }

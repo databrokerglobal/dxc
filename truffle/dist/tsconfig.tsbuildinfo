@@ -494,8 +494,8 @@
         "signature": "7185c75f0b599a5636b0559967d0c70053828c24307bfbea24dbeb9cbb5d7e1f"
       },
       "../types/truffle-contracts/index.d.ts": {
-        "version": "c98106bf0c02b35475de778420323fe73e5a70b9268b257e05278d360935a4c4",
-        "signature": "c98106bf0c02b35475de778420323fe73e5a70b9268b257e05278d360935a4c4"
+        "version": "30fbda829b56174e211415c4966acac7c13114053c2a91b0220053e3d3f62185",
+        "signature": "30fbda829b56174e211415c4966acac7c13114053c2a91b0220053e3d3f62185"
       },
       "../node_modules/axios/index.d.ts": {
         "version": "e7df7eb51c5090db4bdcdbf9efe053530dff0e33796f40b08b1a3be6c3a351d0",
@@ -506,7 +506,7 @@
         "signature": "0ff0fa8a1efdd6d4863de1a762a16f48e96244cd577493365a21292007a4dda2"
       },
       "../test/dxc.ts": {
-        "version": "ac0a826fdc30b830d58484140ea23592379944f2d1a8bfcc599189cf243ba5dd",
+        "version": "919dbdb937933e62a169a98730b947d1cc49c16cb2e87678673b8e79427d3565",
         "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
       },
       "../test/migrations.ts": {
@@ -3244,12 +3244,8 @@
       "../node_modules/web3/node_modules/web3-shh/types/index.d.ts",
       "../node_modules/web3/types/index.d.ts",
       "../node_modules/truffle-typings/index.d.ts",
-      "../types/truffle-contracts/index.d.ts",
       "../node_modules/axios/index.d.ts",
       "../test/utils/getlatestquote.ts",
-      "../test/migrations.ts",
-      "../test/pausable.ts",
-      "../test/upgradeability.ts",
       "../node_modules/@types/ethereumjs-abi/index.d.ts",
       "../node_modules/ethers/utils/bytes.d.ts",
       "../node_modules/ethers/utils/bignumber.d.ts",
@@ -3279,15 +3275,19 @@
       "../node_modules/ethers/utils/secret-storage.d.ts",
       "../node_modules/ethers/utils/index.d.ts",
       "../test/utils/encodecall.ts",
-      "../migrations/1_initial_migration.ts",
-      "../migrations/2_deploy_dtx_mimime.ts",
-      "../migrations/3_deploy_dxc.ts",
       "../node_modules/@types/faker/index.d.ts",
       "../node_modules/@types/lru-cache/index.d.ts",
       "../node_modules/@types/mkdirp/index.d.ts",
       "../node_modules/@types/prettier/index.d.ts",
       "../node_modules/@types/resolve/index.d.ts",
-      "../test/dxc.ts"
+      "../types/truffle-contracts/index.d.ts",
+      "../test/dxc.ts",
+      "../test/migrations.ts",
+      "../test/pausable.ts",
+      "../test/upgradeability.ts",
+      "../migrations/1_initial_migration.ts",
+      "../migrations/2_deploy_dtx_mimime.ts",
+      "../migrations/3_deploy_dxc.ts"
     ]
   },
   "version": "3.8.3"
