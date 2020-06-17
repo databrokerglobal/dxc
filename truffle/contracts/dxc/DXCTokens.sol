@@ -73,7 +73,7 @@ contract DXCTokens is Ownable, Pausable {
     balance = balances[owner].balance;
     escrowOutgoing = balances[owner].escrowOutgoing;
     escrowIncoming = balances[owner].escrowIncoming;
-    available = balances[owner].balance.sub(balances[owner].escrowOutgoing);
+    available = balance.sub(escrowOutgoing);
     globalBalance = dtxToken.balanceOf(owner);
   }
 
