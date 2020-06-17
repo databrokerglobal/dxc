@@ -494,8 +494,8 @@
         "signature": "7185c75f0b599a5636b0559967d0c70053828c24307bfbea24dbeb9cbb5d7e1f"
       },
       "../types/truffle-contracts/index.d.ts": {
-        "version": "d6f6c56811dea045ea049f8fe9717e2834c0650c7ed5561f6bff5f17579fa047",
-        "signature": "d6f6c56811dea045ea049f8fe9717e2834c0650c7ed5561f6bff5f17579fa047"
+        "version": "c98106bf0c02b35475de778420323fe73e5a70b9268b257e05278d360935a4c4",
+        "signature": "c98106bf0c02b35475de778420323fe73e5a70b9268b257e05278d360935a4c4"
       },
       "../node_modules/axios/index.d.ts": {
         "version": "e7df7eb51c5090db4bdcdbf9efe053530dff0e33796f40b08b1a3be6c3a351d0",
@@ -511,6 +511,10 @@
       },
       "../test/migrations.ts": {
         "version": "466e10e1d63bba2cb7e7a7497a9118099aa676de634f7b6f68dfd3a30d1b1388",
+        "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
+      },
+      "../test/pausable.ts": {
+        "version": "7899aa893b3dea0956a6d9d00ef6bdbc7396db7e3619a3b4a69f0b1e88b3771e",
         "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
       },
       "../node_modules/@types/ethereumjs-abi/index.d.ts": {
@@ -629,10 +633,6 @@
         "version": "5e0c4dd1aba623422a94c63f7c63434ed95c13fe27da400c8294cbea966c72e3",
         "signature": "feb571d6888d725d451c7327e4f2334e3228c1bd88ef7438bf4692833dcce109"
       },
-      "../test/pausable.ts": {
-        "version": "c4ee7f7fa50d097d89c2e668e9f965ca68c61c3c7a35b78b924042c0144d8f49",
-        "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
-      },
       "../test/upgradeability.ts": {
         "version": "60290263c7c0bafe4f2cc7b89d1cfc666c71dd96c94630d09e366c809a8bd303",
         "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
@@ -646,7 +646,7 @@
         "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
       },
       "../migrations/3_deploy_dxc.ts": {
-        "version": "fb1e9f7ec2fbe137f2fe448d05b26c1c4790a91750878557404c91bbb0bcb093",
+        "version": "31fa0f44c8175d8bcd18ad834a9ff7bff5ca9624bdc01028c1089ea555b5cbfd",
         "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
       },
       "../node_modules/@types/faker/index.d.ts": {
@@ -1664,6 +1664,13 @@
         "../node_modules/@types/node/util.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts"
       ],
+      "../test/pausable.ts": [
+        "../types/truffle-contracts/index.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
       "../node_modules/@types/ethereumjs-abi/index.d.ts": [
         "../node_modules/@types/node/ts3.2/index.d.ts",
         "../node_modules/@types/node/fs.d.ts",
@@ -1891,14 +1898,6 @@
       "../test/utils/encodecall.ts": [
         "../node_modules/@types/ethereumjs-abi/index.d.ts",
         "../node_modules/ethers/utils/index.d.ts",
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../test/pausable.ts": [
-        "../types/truffle-contracts/index.d.ts",
-        "../test/utils/encodecall.ts",
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/util.d.ts",
@@ -2892,38 +2891,6 @@
         "../node_modules/@types/node/util.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts"
       ],
-      "../node_modules/@types/faker/index.d.ts": [
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/@types/lru-cache/index.d.ts": [
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/@types/mkdirp/index.d.ts": [
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/index.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/@types/prettier/index.d.ts": [
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/@types/resolve/index.d.ts": [
-        "../node_modules/@types/node/ts3.2/index.d.ts",
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
       "../node_modules/ethers/utils/address.d.ts": [
         "../node_modules/ethers/utils/bignumber.d.ts",
         "../node_modules/ethers/utils/bytes.d.ts",
@@ -3119,6 +3086,38 @@
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/util.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/@types/faker/index.d.ts": [
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/@types/lru-cache/index.d.ts": [
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/@types/mkdirp/index.d.ts": [
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/index.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/@types/prettier/index.d.ts": [
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/@types/resolve/index.d.ts": [
+        "../node_modules/@types/node/ts3.2/index.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
       ]
     },
     "semanticDiagnosticsPerFile": [
@@ -3249,20 +3248,12 @@
       "../types/truffle-contracts/index.d.ts",
       "../node_modules/axios/index.d.ts",
       "../test/utils/getlatestquote.ts",
+      "../test/dxc.ts",
       "../test/migrations.ts",
       "../node_modules/@types/ethereumjs-abi/index.d.ts",
       "../node_modules/ethers/utils/bytes.d.ts",
       "../node_modules/ethers/utils/bignumber.d.ts",
       "../node_modules/ethers/utils/abi-coder.d.ts",
-      "../migrations/1_initial_migration.ts",
-      "../migrations/2_deploy_dtx_mimime.ts",
-      "../migrations/3_deploy_dxc.ts",
-      "../node_modules/@types/faker/index.d.ts",
-      "../node_modules/@types/lru-cache/index.d.ts",
-      "../node_modules/@types/mkdirp/index.d.ts",
-      "../node_modules/@types/prettier/index.d.ts",
-      "../node_modules/@types/resolve/index.d.ts",
-      "../test/dxc.ts",
       "../node_modules/ethers/utils/address.d.ts",
       "../node_modules/ethers/utils/base64.d.ts",
       "../node_modules/ethers/utils/hash.d.ts",
@@ -3280,6 +3271,7 @@
       "../node_modules/ethers/utils/secp256k1.d.ts",
       "../node_modules/ethers/utils/signing-key.d.ts",
       "../node_modules/ethers/utils/web.d.ts",
+      "../node_modules/ethers/providers/abstract-provider.d.ts",
       "../node_modules/ethers/utils/transaction.d.ts",
       "../node_modules/ethers/utils/utf8.d.ts",
       "../node_modules/ethers/utils/units.d.ts",
@@ -3287,9 +3279,16 @@
       "../node_modules/ethers/utils/secret-storage.d.ts",
       "../node_modules/ethers/utils/index.d.ts",
       "../test/utils/encodecall.ts",
-      "../node_modules/ethers/providers/abstract-provider.d.ts",
-      "../test/pausable.ts",
-      "../test/upgradeability.ts"
+      "../test/upgradeability.ts",
+      "../migrations/1_initial_migration.ts",
+      "../migrations/2_deploy_dtx_mimime.ts",
+      "../migrations/3_deploy_dxc.ts",
+      "../node_modules/@types/faker/index.d.ts",
+      "../node_modules/@types/lru-cache/index.d.ts",
+      "../node_modules/@types/mkdirp/index.d.ts",
+      "../node_modules/@types/prettier/index.d.ts",
+      "../node_modules/@types/resolve/index.d.ts",
+      "../test/pausable.ts"
     ]
   },
   "version": "3.8.3"
