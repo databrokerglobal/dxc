@@ -1,3 +1,5 @@
+import fs from 'fs';
+
 import {
   DTXTokenContract,
   DTXTokenInstance,
@@ -40,6 +42,19 @@ const performMigration = async (
 
   const tokenProxy = await DXCTokens.at(dProxyTokens.address);
   const dealsProxy = await DXCDeals.at(dProxyDeals.address);
+
+  fs.writeFileSync(
+    `./migration-reports/migration-${network}-${Date.now().toString()}.json`,
+    JSON.stringify({
+      Time: Date.now().toString(),
+      Network: network,
+      DtxToken: dTXTokenInstance.address,
+      dxcdeals: dDxcDeals.address,
+      dxctokens: dDxcTokens.address,
+      dxctokenProxy: tokenProxy.address,
+      dxcdealsProxy: dealsProxy.address,
+    })
+  );
 
   await dealsProxy.initialize(tokenProxy.address);
   await tokenProxy.initialize(dTXTokenInstance.address, dealsProxy.address);

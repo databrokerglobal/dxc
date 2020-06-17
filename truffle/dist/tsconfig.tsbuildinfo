@@ -646,7 +646,7 @@
         "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
       },
       "../migrations/3_deploy_dxc.ts": {
-        "version": "e43012dd57c71cddb2caebb17ddc2f2e26abcb9c8be54c2e90fa5b50d23b3cdb",
+        "version": "5b376cc84713ad0c0083ba37c6ac225dec8e10752c02495cf7013ac14a81378c",
         "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
       },
       "../node_modules/@types/faker/index.d.ts": {
@@ -1925,8 +1925,8 @@
         "../node_modules/@types/node/ts3.2/util.d.ts"
       ],
       "../migrations/3_deploy_dxc.ts": [
-        "../types/truffle-contracts/index.d.ts",
         "../node_modules/@types/node/fs.d.ts",
+        "../types/truffle-contracts/index.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/util.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts"

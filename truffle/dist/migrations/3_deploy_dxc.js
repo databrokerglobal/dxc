@@ -1,5 +1,9 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const fs_1 = __importDefault(require("fs"));
 const DTXMiniMe = artifacts.require('DTXToken');
 const DXCTokens = artifacts.require('DXCTokens');
 const DXCDeals = artifacts.require('DXCDeals');
@@ -18,6 +22,15 @@ const performMigration = async (deployer, network, accounts) => {
     await dProxyDeals.upgradeTo(dDxcDeals.address);
     const tokenProxy = await DXCTokens.at(dProxyTokens.address);
     const dealsProxy = await DXCDeals.at(dProxyDeals.address);
+    fs_1.default.writeFileSync(`./migration-reports/migration-${network}-${Date.now().toString()}.json`, JSON.stringify({
+        Time: Date.now().toString(),
+        Network: network,
+        DtxToken: dTXTokenInstance.address,
+        dxcdeals: dDxcDeals.address,
+        dxctokens: dDxcTokens.address,
+        dxctokenProxy: tokenProxy.address,
+        dxcdealsProxy: dealsProxy.address,
+    }));
     await dealsProxy.initialize(tokenProxy.address);
     await tokenProxy.initialize(dTXTokenInstance.address, dealsProxy.address);
 };
