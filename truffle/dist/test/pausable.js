@@ -25,8 +25,8 @@ contract('Pausable', accounts => {
             }));
             // Intitialize the proxied dxc instance
             proxiedTokensDxc = await DXCTokens.at(oUPTokensinstance.address);
-            await proxiedTokensDxc.initialize(dtxInstance.address, proxiedDealsDxc.address);
             proxiedDealsDxc = await DXCDeals.at(oUPDealsinstance.address);
+            await proxiedTokensDxc.initialize(dtxInstance.address, proxiedDealsDxc.address);
             await proxiedDealsDxc.initialize(proxiedTokensDxc.address);
         });
         it('Initial state cannot be changed', async () => {
