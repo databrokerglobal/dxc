@@ -5,7 +5,6 @@ import "./DXCTokens.sol";
 import "../ownership/Ownable.sol";
 import "../ownership/Pausable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@nomiclabs/buidler/console.sol";
 
 
 contract DXCDeals is Ownable, Pausable {
