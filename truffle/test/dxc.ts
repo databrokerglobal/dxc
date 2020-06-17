@@ -190,7 +190,7 @@ contract('DXC', async accounts => {
       expect(balanceResult[0].toString()).to.be.equal(new BN(0).toString());
     });
 
-    it('Cannot deposit DTX tokens if their is not enough DTX available', async () => {
+    it('Cannot deposit DTX tokens if there is not enough DTX available', async () => {
       let balanceResult = await proxiedDxcTokens.balanceOf(accounts[5]);
       expect(balanceResult[0].toString()).to.be.equal(new BN(0).toString());
       await dtxInstance.approve(
