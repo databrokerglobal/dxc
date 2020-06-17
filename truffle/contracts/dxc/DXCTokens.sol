@@ -147,7 +147,6 @@ contract DXCTokens is Ownable, Pausable {
       amount <= available,
       "Not enough available DTX to execute this transfer"
     );
-    require(msg.sender == _dealContract);
     balances[from].balance = balances[from].balance.sub(amount);
     balances[to].balance = balances[to].balance.add(amount);
     emit TransferDTX(from, to, amount);
