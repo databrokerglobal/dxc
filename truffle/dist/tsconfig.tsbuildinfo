@@ -506,7 +506,7 @@
         "signature": "0ff0fa8a1efdd6d4863de1a762a16f48e96244cd577493365a21292007a4dda2"
       },
       "../test/dxc.ts": {
-        "version": "633307555d17946fa05a7fe3254d4005da1baf9b3e12c0535dcf5b35007c51f5",
+        "version": "ac0a826fdc30b830d58484140ea23592379944f2d1a8bfcc599189cf243ba5dd",
         "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
       },
       "../test/migrations.ts": {
@@ -3247,7 +3247,6 @@
       "../types/truffle-contracts/index.d.ts",
       "../node_modules/axios/index.d.ts",
       "../test/utils/getlatestquote.ts",
-      "../test/dxc.ts",
       "../test/migrations.ts",
       "../test/pausable.ts",
       "../test/upgradeability.ts",
@@ -3282,12 +3281,13 @@
       "../test/utils/encodecall.ts",
       "../migrations/1_initial_migration.ts",
       "../migrations/2_deploy_dtx_mimime.ts",
+      "../migrations/3_deploy_dxc.ts",
       "../node_modules/@types/faker/index.d.ts",
       "../node_modules/@types/lru-cache/index.d.ts",
       "../node_modules/@types/mkdirp/index.d.ts",
       "../node_modules/@types/prettier/index.d.ts",
       "../node_modules/@types/resolve/index.d.ts",
-      "../migrations/3_deploy_dxc.ts"
+      "../test/dxc.ts"
     ]
   },
   "version": "3.8.3"

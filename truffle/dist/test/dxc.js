@@ -57,13 +57,11 @@ contract('DXC', async (accounts) => {
             expect(balanceResult[0].toString()).to.be.equal(web3.utils.toWei('0'));
         });
         it('Can convert from fiat money', async () => {
-            const balanceResult = await proxiedDxcTokens.balanceOf(accounts[1]);
+            let balanceResult = await proxiedDxcTokens.balanceOf(accounts[1]);
             expect(balanceResult[0].toString()).to.be.equal(web3.utils.toWei('0'));
             await proxiedDxcTokens.convertFiatToToken(accounts[1], web3.utils.toWei(amountOfDTXFor(1)));
-            // balanceResult = await proxiedDxcTokens.balanceOf(accounts[1]);
-            // expect(balanceResult[0].toString()).to.be.equal(
-            //   web3.utils.toWei(amountOfDTXFor(1).toString())
-            // );
+            balanceResult = await proxiedDxcTokens.balanceOf(accounts[1]);
+            expect(balanceResult[0].toString()).to.be.equal(web3.utils.toWei(amountOfDTXFor(1).toString()));
         });
         it('Cannot convert from fiat money if the user is not the owner', async () => {
             let balanceResult = await proxiedDxcTokens.balanceOf(accounts[2]);
