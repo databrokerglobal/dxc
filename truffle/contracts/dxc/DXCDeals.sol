@@ -5,6 +5,7 @@ import "./DXCTokens.sol";
 import "../ownership/Ownable.sol";
 import "../ownership/Pausable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@nomiclabs/buidler/console.sol";
 
 
 contract DXCDeals is Ownable, Pausable {
@@ -217,6 +218,15 @@ contract DXCDeals is Ownable, Pausable {
       return accessToDid;
     }
 
+    if (d.validFrom != 0 && d.validUntil != 0) {
+      if (d.validFrom > now) {
+        return false;
+      }
+      if (d.validUntil < now) {
+        return false;
+      }
+    }
+
     DealAccess memory da = _dealIndexToAccessList[index];
 
     bool blackListed;
@@ -229,8 +239,7 @@ contract DXCDeals is Ownable, Pausable {
     for (uint256 i = 0; i < da.whitelist.length; i++) {
       if (!whiteListed) {
         whiteListed = da.whitelist[i] == user;
-      }
-      else {
+      } else {
         break;
       }
     }
