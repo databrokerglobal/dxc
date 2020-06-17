@@ -230,11 +230,16 @@ contract DXCDeals is Ownable, Pausable {
       if (!whiteListed) {
         whiteListed = da.whitelist[i] == user;
       }
+      else {
+        break;
+      }
     }
 
     for (uint256 j = 0; j < da.blacklist.length; j++) {
       if (!blackListed) {
         blackListed = da.blacklist[j] == user;
+      } else {
+        break;
       }
     }
 
