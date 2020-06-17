@@ -58,7 +58,7 @@ contract DXCTokens is Ownable, Pausable {
   event WithdrawDTX(address indexed to, uint256 amount);
   event TransferDTX(address indexed from, address indexed to, uint256 value);
 
-  function balanceOf(address owner)
+  function balanceOf(address holder)
     public
     view
     whenNotPaused
@@ -70,11 +70,11 @@ contract DXCTokens is Ownable, Pausable {
       uint256 globalBalance
     )
   {
-    balance = balances[owner].balance;
-    escrowOutgoing = balances[owner].escrowOutgoing;
-    escrowIncoming = balances[owner].escrowIncoming;
+    balance = balances[holder].balance;
+    escrowOutgoing = balances[holder].escrowOutgoing;
+    escrowIncoming = balances[holder].escrowIncoming;
     available = balance.sub(escrowOutgoing);
-    globalBalance = dtxToken.balanceOf(owner);
+    globalBalance = dtxToken.balanceOf(holder);
   }
 
   function platformBalance() public view whenNotPaused returns (uint256) {
