@@ -1,8 +1,10 @@
 package middlewares
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/databrokerglobal/dxc/utils"
@@ -32,12 +34,31 @@ type ChallengeDataObject struct {
 func DataAccessVerification(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 
-		verificationDataB64 := c.QueryParam("DXC_PRODUCT_KEY")
+		verificationDataB64 := c.QueryParam("DXC_PRODUCT_KEY") // File type request
 
 		if verificationDataB64 == "" {
-			verificationDataB64 = c.Request().Header.Get("DXC_PRODUCT_KEY")
+			verificationDataB64 = c.Request().Header.Get("DXC_PRODUCT_KEY") // API type request
 			if verificationDataB64 == "" {
-				return c.JSON(http.StatusUnauthorized, "DXC_PRODUCT_KEY is not included")
+				// check if MQTT type request
+				var bodyBytes []byte
+				if c.Request().Body != nil {
+					bodyBytes, _ = ioutil.ReadAll(c.Request().Body)
+				}
+				// Restore the io.ReadCloser to its original state
+				c.Request().Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+
+				body := map[string]interface{}{}
+				if err := json.Unmarshal(bodyBytes, &body); err == nil {
+					username := body["Username"].(string)
+					password := body["Password"].(string)
+					if username != "" && password != "" {
+						verificationDataB64 = password
+					} else {
+						return c.JSON(http.StatusUnauthorized, "DXC_PRODUCT_KEY or password are not included")
+					}
+				} else {
+					return c.JSON(http.StatusUnauthorized, "DXC_PRODUCT_KEY or password are not included")
+				}
 			}
 		}
 

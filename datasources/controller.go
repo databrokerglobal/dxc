@@ -398,31 +398,18 @@ func CheckMQTT(c echo.Context) error {
 	if err != nil {
 		fmt.Println(err)
 	}
-
-	fmt.Println("\n***************************\n********** jony ***********\n***************************")
-	fmt.Println()
-	fmt.Println("string(requestDump)")
-	fmt.Println()
 	fmt.Println(string(requestDump))
-	fmt.Println("\n***************************\n***************************")
-	fmt.Println()
 
 	cmd, err := url.QueryUnescape(c.Param("cmd"))
 	if err != nil {
 		return c.String(http.StatusForbidden, "no cmd included")
 	}
+
 	if cmd == "connect" {
 		body := map[string]interface{}{}
 		if err := c.Bind(&body); err != nil {
 			return err
 		}
-		fmt.Println("\n***************************\n********** jony ***********\n***************************")
-		fmt.Println()
-		fmt.Println("body")
-		fmt.Println()
-		fmt.Printf("%+v", body)
-		fmt.Println("\n***************************\n***************************")
-		fmt.Println()
 		type RespConnect struct {
 			Username         string `json:"Username"`
 			Password         string `json:"Password"`

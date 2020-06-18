@@ -109,7 +109,7 @@ func main() {
 	e.Any("/api/*", datasources.ProxyAPI, middlewares.DataAccessVerification)
 
 	// Validate mqtt access for mqtt proxy
-	e.Any("/mqtt/:cmd", datasources.CheckMQTT)
+	e.Any("/mqtt/:cmd", datasources.CheckMQTT, middlewares.DataAccessVerification)
 
 	// Loading env file
 	err := godotenv.Load()
