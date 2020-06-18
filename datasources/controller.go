@@ -2,6 +2,8 @@ package datasources
 
 import (
 	"bytes"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -15,8 +17,9 @@ import (
 
 	"github.com/databrokerglobal/dxc/database"
 	"github.com/databrokerglobal/dxc/utils"
-	"github.com/pkg/errors"
+	"github.com/databrokerglobal/dxc/middlewares"
 
+	"github.com/pkg/errors"
 	"github.com/labstack/echo/v4"
 )
 
@@ -398,7 +401,7 @@ func CheckMQTT(c echo.Context) error {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(string(requestDump))
+	fmt.Println(string(requestDump) + "\n\n\n")
 
 	cmd, err := url.QueryUnescape(c.Param("cmd"))
 	if err != nil {
@@ -415,12 +418,19 @@ func CheckMQTT(c echo.Context) error {
 			Password         string `json:"Password"`
 			ClientIdentifier string `json:"ClientIdentifier"`
 		}
-		response := RespConnect{
-			Username:         "",
-			Password:         "",
-			ClientIdentifier: body["ClientIdentifier"].(string),
+		if valPassword, passwordExists := body["Password"]; passwordExists {
+			err := middlewares.CheckDXCProductKey(valPassword.(string))
+			if err != nil {
+				return c.String(http.StatusForbidden, err.Error())
+			}
+			response := RespConnect{
+				Username:         "",
+				Password:         "",
+				ClientIdentifier: body["ClientIdentifier"].(string),
+			}
+			return c.JSON(http.StatusOK, response)
 		}
-		return c.JSON(http.StatusOK, response)
+		return c.String(http.StatusForbidden, "password missing")
 	} else if cmd == "subscribe" {
 		body := map[string]interface{}{}
 		if err := c.Bind(&body); err != nil {

@@ -93,7 +93,7 @@ func main() {
 	e.GET("/datasources", datasources.GetAllDatasources)
 
 	// SYNCSTATUSES
-	e.GET("/syncstatuses/last24h", syncstatus.GetLatestSyncStatuses) //, middlewares.CheckLocalhost)
+	e.GET("/syncstatuses/last24h", syncstatus.GetLatestSyncStatuses)
 
 	// USERS
 	e.POST("/user/authinfo", usermanager.SaveUserAuth)
@@ -109,7 +109,7 @@ func main() {
 	e.Any("/api/*", datasources.ProxyAPI, middlewares.DataAccessVerification)
 
 	// Validate mqtt access for mqtt proxy
-	e.Any("/mqtt/:cmd", datasources.CheckMQTT) //middlewares.DataAccessVerification)
+	e.Any("/mqtt/:cmd", datasources.CheckMQTT)
 
 	// Loading env file
 	err := godotenv.Load()
