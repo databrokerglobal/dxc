@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -49,6 +50,13 @@ func DataAccessVerification(next echo.HandlerFunc) echo.HandlerFunc {
 
 				body := map[string]interface{}{}
 				if err := json.Unmarshal(bodyBytes, &body); err == nil {
+					fmt.Println("\n***************************\n********** jony ***********\n***************************")
+					fmt.Println()
+					fmt.Println("body")
+					fmt.Println()
+					fmt.Printf("%+v", body)
+					fmt.Println("\n***************************\n***************************")
+					fmt.Println()
 					username := body["Username"].(string)
 					password := body["Password"].(string)
 					if username != "" && password != "" {
