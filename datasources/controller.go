@@ -394,21 +394,6 @@ func ProxyAPI(c echo.Context) error {
 // CheckMQTT is a route to validate mqtt access
 func CheckMQTT(c echo.Context) error {
 
-	// fmt.Println("\n***************************\n********** jony ***********\n***************************")
-	// fmt.Println()
-	// fmt.Println("c.Request().Header")
-	// fmt.Println()
-	// fmt.Printf("%+v", c.Request().Header)
-	// fmt.Println("\n***************************\n***************************")
-	// fmt.Println()
-	// fmt.Println("\n***************************\n********** jony ***********\n***************************")
-	// fmt.Println()
-	// fmt.Println("c.Request().Header")
-	// fmt.Println()
-	// fmt.Printf("%+v", c.Request().Body)
-	// fmt.Println("\n***************************\n***************************")
-	// fmt.Println()
-
 	requestDump, err := httputil.DumpRequest(c.Request(), true)
 	if err != nil {
 		fmt.Println(err)
@@ -422,7 +407,62 @@ func CheckMQTT(c echo.Context) error {
 	fmt.Println("\n***************************\n***************************")
 	fmt.Println()
 
-	return c.String(http.StatusOK, "access OK")
+	cmd, err := url.QueryUnescape(c.Param("cmd"))
+	if err != nil {
+		return c.String(http.StatusForbidden, "no cmd included")
+	}
+	if cmd == "connect" {
+		body := map[string]interface{}{}
+		if err := c.Bind(&body); err != nil {
+			return err
+		}
+		fmt.Println("\n***************************\n********** jony ***********\n***************************")
+		fmt.Println()
+		fmt.Println("body")
+		fmt.Println()
+		fmt.Printf("%+v", body)
+		fmt.Println("\n***************************\n***************************")
+		fmt.Println()
+		type RespConnect struct {
+			Username string `json:"Username"`
+			Password string `json:"Password"`
+			ClientID string `json:"ClientID"`
+		}
+		response := RespConnect{
+			Username: "",
+			Password: "",
+			ClientID: body["ClientID"].(string),
+		}
+		return c.JSON(http.StatusOK, response)
+	} else if cmd == "subscribe" {
+		body := map[string]interface{}{}
+		if err := c.Bind(&body); err != nil {
+			return err
+		}
+		type RespSubscribe struct {
+			Topic string `json:"Topic"`
+		}
+		response := RespSubscribe{
+			Topic: body["Topic"].(string),
+		}
+		return c.JSON(http.StatusOK, response)
+	} else if cmd == "publish" || cmd == "receive" {
+		body := map[string]interface{}{}
+		if err := c.Bind(&body); err != nil {
+			return err
+		}
+		type RespSubscribe struct {
+			Topic   string `json:"Topic"`
+			Message string `json:"Message"`
+		}
+		response := RespSubscribe{
+			Topic:   body["Topic"].(string),
+			Message: body["Message"].(string),
+		}
+		return c.JSON(http.StatusOK, response)
+	}
+
+	return c.String(http.StatusForbidden, "unknown cmd")
 }
 
 func checkDatasource(datasource *database.Datasource) int {
