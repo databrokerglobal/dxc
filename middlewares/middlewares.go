@@ -57,17 +57,24 @@ func DataAccessVerification(next echo.HandlerFunc) echo.HandlerFunc {
 					fmt.Printf("%+v", body)
 					fmt.Println("\n***************************\n***************************")
 					fmt.Println()
-					username := body["Username"].(string)
-					password := body["Password"].(string)
-					if username != "" && password != "" {
-						verificationDataB64 = password
-					} else {
-						return c.JSON(http.StatusUnauthorized, "DXC_PRODUCT_KEY or password are not included")
+					// username := body["Username"].(string)
+					// password := body["Password"].(string)
+					// if username != "" && password != "" {
+					// 	verificationDataB64 = password
+					// } else {
+					// 	return c.JSON(http.StatusUnauthorized, "DXC_PRODUCT_KEY or password are not included")
+					// }
+					if _, usernameExists := body["Username"]; usernameExists {
+						if valPassword, passwordExists := body["Password"]; passwordExists {
+							verificationDataB64 = valPassword.(string)
+						}
 					}
-				} else {
-					return c.JSON(http.StatusUnauthorized, "DXC_PRODUCT_KEY or password are not included")
 				}
 			}
+		}
+
+		if verificationDataB64 == "" {
+			return c.JSON(http.StatusUnauthorized, "DXC_PRODUCT_KEY or password are not included")
 		}
 
 		verificationData, err := base64.RawURLEncoding.DecodeString(verificationDataB64)
