@@ -82,7 +82,7 @@
 				
 				<option value="file13">github.com/databrokerglobal/dxc/datasources/status-ticker.go (0.0%)</option>
 				
-				<option value="file14">github.com/databrokerglobal/dxc/usermanager/controller.go (43.2%)</option>
+				<option value="file14">github.com/databrokerglobal/dxc/middlewares/middlewares.go (83.9%)</option>
 				
 				<option value="file15">github.com/databrokerglobal/dxc/utils/crypto.go (89.8%)</option>
 				
@@ -1307,123 +1307,98 @@ func SendStatus() <span class="cov0" title="0">{
 }
 </pre>
 		
-		<pre class="file" id="file14" style="display: none">package usermanager
+		<pre class="file" id="file14" style="display: none">package middlewares
 
 import (
         "encoding/base64"
         "encoding/json"
-        "fmt"
-        "io/ioutil"
         "net/http"
 
-        "github.com/fatih/color"
-        "github.com/labstack/echo/v4"
-        "github.com/pkg/errors"
-
-        "github.com/databrokerglobal/dxc/database"
-        "github.com/databrokerglobal/dxc/datasources"
-        "github.com/databrokerglobal/dxc/ethereum"
         "github.com/databrokerglobal/dxc/utils"
+
+        _ "github.com/databrokerglobal/dxc/docs"
+        "github.com/labstack/echo/v4"
 )
 
 // RunningTest is true when we are running tests
 var RunningTest = false
 
-// DXSAPIKey object allows to decode the api key and get the dxs host
-type DXSAPIKey struct {
-        Key  string `json:"k"`
-        Host string `json:"h"`
+// VerificationData is a struct to convert url verification data to json
+type VerificationData struct {
+        UnsignedData string `json:"unsignedData"`
+        Signature    string `json:"signature"`
+        PublicKey    string `json:"publicKey"`
 }
 
-// SaveUserAuth to save the address and api key
-// Create godoc
-// @Summary Save auth info
-// @Description Save address and api key for authentication with DXS
-// @Tags user
-// @Param address query string true "Address"
-// @Param apiKey query string true "API Key"
-// @Success 200 {string} string true
-// @Failure 500 {string} string "Error saving auth info"
-// @Router /user/authinfo [post]
-func SaveUserAuth(c echo.Context) error <span class="cov8" title="1">{
+// ChallengeDataObject is a struct to convert data that was used for the signature to json
+type ChallengeDataObject struct {
+        DID       string `json:"did"`
+        Challenge string `json:"challenge"`
+        Address   string `json:"address"`
+}
 
-        address := c.QueryParam("address")
-        apiKey := c.QueryParam("apiKey")
+// DataAccessVerification is middlewaere to check access to data
+func DataAccessVerification(next echo.HandlerFunc) echo.HandlerFunc <span class="cov8" title="1">{
+        return func(c echo.Context) error </span><span class="cov8" title="1">{
 
-        if address == "" || apiKey == "" </span><span class="cov8" title="1">{
-                return c.String(http.StatusBadRequest, "address and api key cannot be empty")
-        }</span>
+                verificationDataB64 := c.QueryParam("DXC_PRODUCT_KEY")
 
-        <span class="cov8" title="1">if !RunningTest </span><span class="cov0" title="0">{
-                err := database.DBInstance.SaveNewUserAuth(address, apiKey)
-                if err != nil </span><span class="cov0" title="0">{
-                        return c.String(http.StatusInternalServerError, errors.Wrap(err, "error saving user auth").Error())
+                if verificationDataB64 == "" </span><span class="cov8" title="1">{
+                        verificationDataB64 = c.Request().Header.Get("DXC_PRODUCT_KEY")
+                        if verificationDataB64 == "" </span><span class="cov8" title="1">{
+                                return c.JSON(http.StatusUnauthorized, "DXC_PRODUCT_KEY is not included")
+                        }</span>
+                }
+
+                <span class="cov8" title="1">verificationData, err := base64.RawURLEncoding.DecodeString(verificationDataB64)
+                if err != nil </span><span class="cov8" title="1">{
+                        return c.String(http.StatusBadRequest, "Base64 encoding of DXC_PRODUCT_KEY is not valid. err: "+err.Error())
+                }</span>
+                <span class="cov8" title="1">verificationDataObject := VerificationData{}
+                json.Unmarshal(verificationData, &amp;verificationDataObject)
+
+                // check signature is valid
+
+                sigIsValid, err := utils.VerifySignature(verificationDataObject.UnsignedData, verificationDataObject.Signature, verificationDataObject.PublicKey)
+                if err != nil </span><span class="cov8" title="1">{
+                        return c.String(http.StatusBadRequest, "DXC_PRODUCT_KEY is not valid. err: "+err.Error())
+                }</span>
+                <span class="cov8" title="1">if !sigIsValid </span><span class="cov8" title="1">{
+                        return c.String(http.StatusUnauthorized, "Signature is not valid.")
                 }</span>
 
-                <span class="cov0" title="0">datasources.SendStatus()</span>
-        }
+                // check address in signed data is same as address derived from public key
 
-        <span class="cov8" title="1">getInfuraIDAndServeContract(address, apiKey)
+                <span class="cov8" title="1">challengeData, err := base64.StdEncoding.DecodeString(verificationDataObject.UnsignedData)
+                if err != nil </span><span class="cov0" title="0">{
+                        return c.String(http.StatusBadRequest, "Base64 encoding of challenge data is not valid. err: "+err.Error())
+                }</span>
+                <span class="cov8" title="1">challengeDataObject := ChallengeDataObject{}
+                json.Unmarshal(challengeData, &amp;challengeDataObject)
 
-        return c.JSON(http.StatusAccepted, "success saving the data")</span>
-}
+                addressFromPubKey, err := utils.AddressFromHexPublicKey(verificationDataObject.PublicKey)
+                if err != nil </span><span class="cov0" title="0">{
+                        return c.String(http.StatusBadRequest, "Provided public key is not valid: "+err.Error())
+                }</span>
 
-// GetUserAuth to get the address and api key
-// Create godoc
-// @Summary Get auth info
-// @Description Get address and api key for authentication with DXS
-// @Tags user
-// @Produce json
-// @Success 200 {object} database.UserAuth true
-// @Failure 404 {string} string "Not data found"
-// @Failure 500 {string} string "Error getting auth info"
-// @Router /user/authinfo [get]
-func GetUserAuth(c echo.Context) error <span class="cov0" title="0">{
+                <span class="cov8" title="1">if addressFromPubKey != challengeDataObject.Address </span><span class="cov0" title="0">{
+                        return c.String(http.StatusBadRequest, "The address in signed data is not the same as the one created from the public key passed as a parameter.")
+                }</span>
 
-        userAuth, err := database.DBInstance.GetLatestUserAuth()
-        if err != nil </span><span class="cov0" title="0">{
-                return c.String(http.StatusInternalServerError, errors.Wrap(err, "error getting user auth").Error())
-        }</span>
-        <span class="cov0" title="0">if userAuth == nil </span><span class="cov0" title="0">{
-                return c.String(http.StatusNotFound, "no user auth data in exist in db")
-        }</span>
+                // TODO: check supplied challenge exists in db and is not older that the start of the deal
 
-        <span class="cov0" title="0">return c.JSON(http.StatusOK, userAuth)</span>
-}
+                // TODO: check address (take from public key -- use crypto utils) is allowed to use that did
 
-func getInfuraIDAndServeContract(address string, apiKey string) <span class="cov8" title="1">{
-        // get dxs url from api key
-        dxsAPIKeyData, err := base64.StdEncoding.DecodeString(apiKey)
-        if err != nil </span><span class="cov0" title="0">{
-                color.Red("Error decoding api key. err: ", err.Error())
-        }</span> else<span class="cov8" title="1"> {
-                dxsAPIKey := DXSAPIKey{}
-                json.Unmarshal(dxsAPIKeyData, &amp;dxsAPIKey)
+                // pass did to the request
+                <span class="cov8" title="1">c.Request().Header.Set("did", challengeDataObject.DID)
 
-                dxsURL := dxsAPIKey.Host
-
-                client := &amp;http.Client{}
-                req, _ := http.NewRequest("GET", fmt.Sprintf("%s/infura/getID", utils.TrimLastSlash(dxsURL)), nil)
-                req.SetBasicAuth(address, apiKey)
                 if !RunningTest </span><span class="cov0" title="0">{
-                        resp, err := client.Do(req)
-
-                        if err == nil &amp;&amp; resp.StatusCode == 200 </span><span class="cov0" title="0">{
-                                bodyBytes, err := ioutil.ReadAll(resp.Body)
-                                if err != nil </span><span class="cov0" title="0">{
-                                        color.Red("Error reading response body. err: ", err.Error())
-                                }</span> else<span class="cov0" title="0"> {
-                                        infuraID := string(bodyBytes)
-
-                                        err = database.DBInstance.CreateInfuraID(infuraID)
-                                        if err != nil </span><span class="cov0" title="0">{
-                                                color.Red("Error saving infura ID. err: ", err.Error())
-                                        }</span> else<span class="cov0" title="0"> {
-                                                go ethereum.ServeContract()
-                                        }</span>
-                                }
-                        }
+                        if err := next(c); err != nil </span><span class="cov0" title="0">{
+                                c.Error(err)
+                        }</span>
                 }
+
+                <span class="cov8" title="1">return nil</span>
         }
 }
 </pre>
@@ -1521,6 +1496,7 @@ func VerifySignature(data string, signature string, hexPublicKey string) (valid 
         if err != nil </span><span class="cov0" title="0">{
                 return false, errors.Wrap(err, "error decoding hex public key")
         }</span>
+
 
         <span class="cov8" title="1">dataBytes := []byte(data)
         hashData := crypto.Keccak256Hash(dataBytes)

@@ -11,6 +11,9 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// RunningTest is true when we are running tests
+var RunningTest = false
+
 // VerificationData is a struct to convert url verification data to json
 type VerificationData struct {
 	UnsignedData string `json:"unsignedData"`
@@ -80,8 +83,10 @@ func DataAccessVerification(next echo.HandlerFunc) echo.HandlerFunc {
 		// pass did to the request
 		c.Request().Header.Set("did", challengeDataObject.DID)
 
-		if err := next(c); err != nil {
-			c.Error(err)
+		if !RunningTest {
+			if err := next(c); err != nil {
+				c.Error(err)
+			}
 		}
 
 		return nil
