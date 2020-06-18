@@ -14,11 +14,11 @@ contract DXCTokens is Ownable, Pausable {
   using SafeMath for uint8;
   using SafeERC20 for ERC20;
 
-  ERC20 public dtxToken;
+  ERC20 internal dtxToken;
   uint8 public protocolPercentage;
   bool private initialized;
 
-  address public _dealContract;
+  address internal _dealContract;
 
   function initialize(address token, address deal) public whenNotPaused {
     require(!initialized);
@@ -142,7 +142,7 @@ contract DXCTokens is Ownable, Pausable {
     address to,
     uint256 amount
   ) public whenNotPaused {
-    // require(msg.sender == _dealContract, "Sender is not _dealContract");
+    require(msg.sender == _dealContract, "Sender is not _dealContract");
     (, , , uint256 available, ) = balanceOf(from);
     require(
       amount <= available,
@@ -163,7 +163,7 @@ contract DXCTokens is Ownable, Pausable {
     uint8 publisherpct,
     uint8 marketplacepct
   ) external {
-    // require(msg.sender == _dealContract, "msg.sender is not the deal contract");
+    require(msg.sender == _dealContract, "msg.sender is not the deal contract");
     balances[buyer].escrowOutgoing = balances[buyer].escrowOutgoing.sub(amount);
     balances[seller].escrowIncoming = balances[seller].escrowIncoming.sub(
       amount.mul(sellerpct).div(100)

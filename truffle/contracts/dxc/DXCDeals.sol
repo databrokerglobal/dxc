@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 
 
 contract DXCDeals is Ownable, Pausable {
-  DXCTokens public dxcTokens;
+  DXCTokens internal dxcTokens;
   bool private initialized;
   using SafeMath for uint256;
   using SafeMath for uint8;
