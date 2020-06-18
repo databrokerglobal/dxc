@@ -6,8 +6,6 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "../ownership/Ownable.sol";
 import "../ownership/Pausable.sol";
-import "@nomiclabs/buidler/console.sol";
-
 
 contract DXCTokens is Ownable, Pausable {
   using SafeMath for uint256;

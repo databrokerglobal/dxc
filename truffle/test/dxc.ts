@@ -244,6 +244,7 @@ contract('DXC', async accounts => {
     });
 
     it('Can create a new deal only when the percentages add up to 100', async () => {
+      // Case where 90 + 5 == 95
       try {
         await proxiedDxcDeals.createDeal(
           'did:dxc:12345',
@@ -265,6 +266,44 @@ contract('DXC', async accounts => {
             .includes('All percentages need to add up to exactly 100')
         );
       }
+
+      // case where 100 + 5 == 105
+      try {
+        await proxiedDxcDeals.createDeal(
+          'did:dxc:12345',
+          accounts[1],
+          new BN('70'),
+          accounts[2],
+          new BN('10'),
+          accounts[3],
+          accounts[0],
+          new BN('20'),
+          web3.utils.toWei(amountOfDTXFor(50)),
+          Math.floor(Date.now() / 1000),
+          Math.floor(Date.now() / 1000) + 3600 * 24 * 30
+        );
+      } catch (error) {
+        assert.isTrue(
+          error
+            .toString()
+            .includes('All percentages need to add up to exactly 100')
+        );
+      }
+
+      // Good case where 95 + 5 == 100
+      await proxiedDxcDeals.createDeal(
+        'did:dxc:12345',
+        accounts[1],
+        new BN('70'),
+        accounts[2],
+        new BN('10'),
+        accounts[3],
+        accounts[0],
+        new BN('15'),
+        web3.utils.toWei(amountOfDTXFor(50)),
+        Math.floor(Date.now() / 1000),
+        Math.floor(Date.now() / 1000) + 3600 * 24 * 30
+      );
     });
 
     it('Can list all deals', async () => {
@@ -282,7 +321,7 @@ contract('DXC', async accounts => {
         Math.floor(Date.now() / 1000) + 3600 * 24 * 30
       );
       const deals = await proxiedDxcDeals.allDeals();
-      expect(deals.length).to.be.equal(2);
+      expect(deals.length).to.be.equal(3);
     });
 
     it('Can get the info for a deal', async () => {
@@ -305,7 +344,7 @@ contract('DXC', async accounts => {
 
     it('Can get all the deals for a did', async () => {
       const deals = await proxiedDxcDeals.dealsForDID('did:dxc:12345');
-      expect(deals).to.be.length(2);
+      expect(deals).to.be.length(3);
     });
 
     it('Can signal access to a did whithout blacklist/whitelist', async () => {

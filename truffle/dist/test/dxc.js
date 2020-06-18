@@ -140,6 +140,7 @@ contract('DXC', async (accounts) => {
             await proxiedDxcDeals.createDeal('did:databroker:deal2:weatherdata', accounts[1], 15, accounts[2], 70, accounts[3], accounts[4], 10, 5, 0, 0);
         });
         it('Can create a new deal only when the percentages add up to 100', async () => {
+            // Case where 90 + 5 == 95
             try {
                 await proxiedDxcDeals.createDeal('did:dxc:12345', accounts[1], new bn_js_1.default('70'), accounts[2], new bn_js_1.default('10'), accounts[3], accounts[0], new bn_js_1.default('10'), web3.utils.toWei(amountOfDTXFor(50)), Math.floor(Date.now() / 1000), Math.floor(Date.now() / 1000) + 3600 * 24 * 30);
             }
@@ -148,11 +149,22 @@ contract('DXC', async (accounts) => {
                     .toString()
                     .includes('All percentages need to add up to exactly 100'));
             }
+            // case where 100 + 5 == 105
+            try {
+                await proxiedDxcDeals.createDeal('did:dxc:12345', accounts[1], new bn_js_1.default('70'), accounts[2], new bn_js_1.default('10'), accounts[3], accounts[0], new bn_js_1.default('20'), web3.utils.toWei(amountOfDTXFor(50)), Math.floor(Date.now() / 1000), Math.floor(Date.now() / 1000) + 3600 * 24 * 30);
+            }
+            catch (error) {
+                assert.isTrue(error
+                    .toString()
+                    .includes('All percentages need to add up to exactly 100'));
+            }
+            // Good case where 95 + 5 == 100
+            await proxiedDxcDeals.createDeal('did:dxc:12345', accounts[1], new bn_js_1.default('70'), accounts[2], new bn_js_1.default('10'), accounts[3], accounts[0], new bn_js_1.default('15'), web3.utils.toWei(amountOfDTXFor(50)), Math.floor(Date.now() / 1000), Math.floor(Date.now() / 1000) + 3600 * 24 * 30);
         });
         it('Can list all deals', async () => {
             await proxiedDxcDeals.createDeal('did:dxc:12345', accounts[3], new bn_js_1.default('70'), accounts[2], new bn_js_1.default('10'), accounts[1], accounts[0], new bn_js_1.default('15'), web3.utils.toWei(amountOfDTXFor(50)), Math.floor(Date.now() / 1000), Math.floor(Date.now() / 1000) + 3600 * 24 * 30);
             const deals = await proxiedDxcDeals.allDeals();
-            expect(deals.length).to.be.equal(2);
+            expect(deals.length).to.be.equal(3);
         });
         it('Can get the info for a deal', async () => {
             await proxiedDxcDeals.createDeal('did:dxc:12345', accounts[3], new bn_js_1.default('70'), accounts[2], new bn_js_1.default('10'), accounts[1], accounts[0], new bn_js_1.default('15'), web3.utils.toWei(amountOfDTXFor(50)), Math.floor(Date.now() / 1000), Math.floor(Date.now() / 1000) + 3600 * 24 * 30);
@@ -161,7 +173,7 @@ contract('DXC', async (accounts) => {
         });
         it('Can get all the deals for a did', async () => {
             const deals = await proxiedDxcDeals.dealsForDID('did:dxc:12345');
-            expect(deals).to.be.length(2);
+            expect(deals).to.be.length(3);
         });
         it('Can signal access to a did whithout blacklist/whitelist', async () => {
             let access = await proxiedDxcDeals.hasAccessToDeal(2, accounts[1]);
