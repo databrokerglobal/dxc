@@ -56,26 +56,6 @@ contract DXCDeals is Ownable, Pausable {
 
   mapping(uint256 => DealAccess) internal _dealIndexToAccessList;
 
-  function getUserBalance(address user)
-    internal
-    view
-    returns (TokenAvailability memory)
-  {
-    TokenAvailability memory b;
-
-    (
-      uint256 balance,
-      uint256 escrowOutgoing,
-      uint256 escrowIncoming
-    ) = dxcTokens.balances(user);
-
-    b.balance = balance;
-    b.escrowOutgoing = escrowOutgoing;
-    b.escrowIncoming = escrowIncoming;
-
-    return b;
-  }
-
   event NewDeal(
     uint256 index,
     string did,
@@ -280,19 +260,19 @@ contract DXCDeals is Ownable, Pausable {
       now >= _deal.validFrom + 14 days,
       "Payouts can only happen 14 days after the start of the deal (validFrom)"
     );
-    TokenAvailability memory userBalance = getUserBalance(_deal.buyer);
 
     // release escrow
-    userBalance.escrowOutgoing = userBalance.escrowOutgoing.sub(_deal.amount);
-    userBalance.escrowIncoming = userBalance.escrowIncoming.sub(
-      _deal.amount.mul(_deal.sellerPercentage).div(100)
+    dxcTokens.releaseEscrow(
+      _deal.buyer,
+      _deal.seller,
+      _deal.publisher,
+      _deal.marketplace,
+      _deal.amount,
+      _deal.sellerPercentage,
+      _deal.publisherPercentage,
+      _deal.marketplacePercentage
     );
-    userBalance.escrowIncoming = userBalance.escrowIncoming.sub(
-      _deal.amount.mul(_deal.publisherPercentage).div(100)
-    );
-    userBalance.escrowIncoming = userBalance.escrowIncoming.add(
-      _deal.amount.mul(_deal.marketplacePercentage).div(100)
-    );
+
     // transfer DTX
     dxcTokens.transferEx(
       _deal.buyer,

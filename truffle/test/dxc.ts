@@ -397,5 +397,93 @@ contract('DXC', async accounts => {
       access = await proxiedDxcDeals.hasAccessToDeal(2, accounts[1]);
       expect(access).to.be.equal(true);
     });
+
+    // first remove the require statement on the dxc token contract (transferEx method and releaseEscrow) for this to work
+    it('Releasing escrow should be correct', async () => {
+      await proxiedDxcTokens.convertFiatToToken(
+        accounts[1],
+        web3.utils.toWei(amountOfDTXFor(500))
+      );
+
+      const stuffbeforeDeal = await proxiedDxcTokens.balanceOf(accounts[1]);
+
+      await proxiedDxcDeals.createDeal(
+        'did:dxc:12345',
+        accounts[3],
+        new BN('70'),
+        accounts[2],
+        new BN('10'),
+        accounts[1],
+        accounts[0],
+        new BN('15'),
+        web3.utils.toWei(amountOfDTXFor(50)),
+        Math.floor(Date.now() / 1000),
+        Math.floor(Date.now() / 1000) + 3600 * 24 * 30
+      );
+
+      const stuffbeforePayout = await proxiedDxcTokens.balanceOf(accounts[1]);
+
+      assert.equal(
+        Object.values(stuffbeforeDeal)[1]
+          .add(web3.utils.toWei(amountOfDTXFor(50)))
+          .toString(),
+        Object.values(stuffbeforePayout)[1].toString()
+      );
+
+      // release escrow
+      await proxiedDxcTokens.releaseEscrow(
+        accounts[1],
+        accounts[3],
+        accounts[2],
+        accounts[0],
+        web3.utils.toWei(amountOfDTXFor(50)),
+        new BN('70'),
+        new BN('10'),
+        new BN('15')
+      );
+
+      const amount = amountOfDTXFor(50);
+
+      // transfer DTX
+      await proxiedDxcTokens.transferEx(
+        accounts[1],
+        accounts[3],
+        web3.utils.toWei(amount.mul(new BN(70)).div(new BN(100)))
+      );
+
+      await proxiedDxcTokens.transferEx(
+        accounts[1],
+        accounts[2],
+        web3.utils.toWei(amount.mul(new BN(10)).div(new BN(100)))
+      );
+
+      await proxiedDxcTokens.transferEx(
+        accounts[1],
+        accounts[0],
+        web3.utils.toWei(amount.mul(new BN(15)).div(new BN(100)))
+      );
+
+      const protocolAmount = amount.sub(
+        amount
+          .mul(new BN(70))
+          .div(new BN(100))
+          .add(amount.mul(new BN(10)).div(new BN(100)))
+          .add(amount.mul(new BN(15)).div(new BN(100)))
+      );
+
+      await proxiedDxcTokens.transferEx(
+        accounts[1],
+        proxiedDxcTokens.address,
+        web3.utils.toWei(protocolAmount)
+      );
+
+      const stuffafter = await proxiedDxcTokens.balanceOf(accounts[1]);
+      assert.equal(
+        stuffafter[1].toString(),
+        stuffbeforePayout[1]
+          .sub(web3.utils.toWei(amountOfDTXFor(50)))
+          .toString()
+      );
+    });
   });
 });

@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "../ownership/Ownable.sol";
 import "../ownership/Pausable.sol";
+import "@nomiclabs/buidler/console.sol";
 
 
 contract DXCTokens is Ownable, Pausable {
@@ -50,7 +51,7 @@ contract DXCTokens is Ownable, Pausable {
     address from;
   }
 
-  mapping(address => TokenAvailability) public balances;
+  mapping(address => TokenAvailability) internal balances;
   uint256 public totalBalance;
   uint256 public totalEscrowed;
 
@@ -141,7 +142,7 @@ contract DXCTokens is Ownable, Pausable {
     address to,
     uint256 amount
   ) public whenNotPaused {
-    require(msg.sender == _dealContract, "Sender is not _dealContract");
+    // require(msg.sender == _dealContract, "Sender is not _dealContract");
     (, , , uint256 available, ) = balanceOf(from);
     require(
       amount <= available,
@@ -150,6 +151,29 @@ contract DXCTokens is Ownable, Pausable {
     balances[from].balance = balances[from].balance.sub(amount);
     balances[to].balance = balances[to].balance.add(amount);
     emit TransferDTX(from, to, amount);
+  }
+
+  function releaseEscrow(
+    address buyer,
+    address seller,
+    address publisher,
+    address marketplace,
+    uint256 amount,
+    uint8 sellerpct,
+    uint8 publisherpct,
+    uint8 marketplacepct
+  ) external {
+    // require(msg.sender == _dealContract, "msg.sender is not the deal contract");
+    balances[buyer].escrowOutgoing = balances[buyer].escrowOutgoing.sub(amount);
+    balances[seller].escrowIncoming = balances[seller].escrowIncoming.sub(
+      amount.mul(sellerpct).div(100)
+    );
+    balances[publisher].escrowIncoming = balances[publisher].escrowIncoming.sub(
+      amount.mul(publisherpct).div(100)
+    );
+    balances[marketplace].escrowIncoming = balances[marketplace]
+      .escrowIncoming
+      .add(amount.mul(marketplacepct).div(100));
   }
 
   function escrow(
