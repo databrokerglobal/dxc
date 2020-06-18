@@ -108,6 +108,9 @@ func main() {
 	// API Datasources Request Redirect
 	e.Any("/api/*", datasources.ProxyAPI, middlewares.DataAccessVerification)
 
+	// Validate mqtt access for mqtt proxy
+	e.Any("/mqtt/*", datasources.CheckMQTT)
+
 	// Loading env file
 	err := godotenv.Load()
 	if err != nil {
@@ -153,7 +156,7 @@ func main() {
 
 	go datasources.ExecuteStatusTicker()
 
-	port := "8080"
+	port := "8082"
 
 	// Log stuff if port is busy f.e.
 	e.Logger.Fatal(e.Start(":" + port))

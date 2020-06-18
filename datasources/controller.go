@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"os"
 	"path"
@@ -388,6 +389,40 @@ func ProxyAPI(c echo.Context) error {
 
 	err = executeRequest(c, proxyReq)
 	return c.String(http.StatusAccepted, "")
+}
+
+// CheckMQTT is a route to validate mqtt access
+func CheckMQTT(c echo.Context) error {
+
+	// fmt.Println("\n***************************\n********** jony ***********\n***************************")
+	// fmt.Println()
+	// fmt.Println("c.Request().Header")
+	// fmt.Println()
+	// fmt.Printf("%+v", c.Request().Header)
+	// fmt.Println("\n***************************\n***************************")
+	// fmt.Println()
+	// fmt.Println("\n***************************\n********** jony ***********\n***************************")
+	// fmt.Println()
+	// fmt.Println("c.Request().Header")
+	// fmt.Println()
+	// fmt.Printf("%+v", c.Request().Body)
+	// fmt.Println("\n***************************\n***************************")
+	// fmt.Println()
+
+	requestDump, err := httputil.DumpRequest(c.Request(), true)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println("\n***************************\n********** jony ***********\n***************************")
+	fmt.Println()
+	fmt.Println("string(requestDump)")
+	fmt.Println()
+	fmt.Println(string(requestDump))
+	fmt.Println("\n***************************\n***************************")
+	fmt.Println()
+
+	return c.String(http.StatusOK, "access OK")
 }
 
 func checkDatasource(datasource *database.Datasource) int {
