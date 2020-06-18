@@ -494,8 +494,8 @@
         "signature": "7185c75f0b599a5636b0559967d0c70053828c24307bfbea24dbeb9cbb5d7e1f"
       },
       "../types/truffle-contracts/index.d.ts": {
-        "version": "b0d03585ad4e2df2b9e7b3df3692e47f0cfc3e60309bb6b618873d581dee99ec",
-        "signature": "b0d03585ad4e2df2b9e7b3df3692e47f0cfc3e60309bb6b618873d581dee99ec"
+        "version": "406e84056d7d37f82120456e7617b8ab02677835a40bef98fa54866a80820340",
+        "signature": "406e84056d7d37f82120456e7617b8ab02677835a40bef98fa54866a80820340"
       },
       "../node_modules/axios/index.d.ts": {
         "version": "e7df7eb51c5090db4bdcdbf9efe053530dff0e33796f40b08b1a3be6c3a351d0",
@@ -3244,12 +3244,8 @@
       "../node_modules/web3/node_modules/web3-shh/types/index.d.ts",
       "../node_modules/web3/types/index.d.ts",
       "../node_modules/truffle-typings/index.d.ts",
-      "../types/truffle-contracts/index.d.ts",
       "../node_modules/axios/index.d.ts",
       "../test/utils/getlatestquote.ts",
-      "../test/migrations.ts",
-      "../test/pausable.ts",
-      "../test/upgradeability.ts",
       "../node_modules/@types/ethereumjs-abi/index.d.ts",
       "../node_modules/ethers/utils/bytes.d.ts",
       "../node_modules/ethers/utils/bignumber.d.ts",
@@ -3279,15 +3275,19 @@
       "../node_modules/ethers/utils/secret-storage.d.ts",
       "../node_modules/ethers/utils/index.d.ts",
       "../test/utils/encodecall.ts",
-      "../migrations/1_initial_migration.ts",
-      "../migrations/2_deploy_dtx_mimime.ts",
-      "../migrations/3_deploy_dxc.ts",
       "../node_modules/@types/faker/index.d.ts",
       "../node_modules/@types/lru-cache/index.d.ts",
       "../node_modules/@types/mkdirp/index.d.ts",
       "../node_modules/@types/prettier/index.d.ts",
       "../node_modules/@types/resolve/index.d.ts",
-      "../test/dxc.ts"
+      "../types/truffle-contracts/index.d.ts",
+      "../test/dxc.ts",
+      "../test/migrations.ts",
+      "../test/pausable.ts",
+      "../test/upgradeability.ts",
+      "../migrations/1_initial_migration.ts",
+      "../migrations/2_deploy_dtx_mimime.ts",
+      "../migrations/3_deploy_dxc.ts"
     ]
   },
   "version": "3.8.3"

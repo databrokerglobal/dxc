@@ -45,6 +45,10 @@ contract DXCDeals is Ownable, Pausable {
   Deal[] internal _dealRegistry;
   uint256 internal _dealCount;
 
+  function getCurrentIndex() public view onlyOwner returns (uint256) {
+    return _dealCount;
+  }
+
   mapping(uint256 => bool) internal _dealExists;
   mapping(string => Deal[]) public didToDeals;
   mapping(address => Deal[]) public userToDeals;
@@ -135,7 +139,6 @@ contract DXCDeals is Ownable, Pausable {
       validFrom,
       validUntil
     );
-    return _dealCount - 1;
   }
 
   function allDeals()
