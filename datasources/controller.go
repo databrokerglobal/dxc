@@ -2,8 +2,6 @@ package datasources
 
 import (
 	"bytes"
-	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -16,11 +14,11 @@ import (
 	"strings"
 
 	"github.com/databrokerglobal/dxc/database"
-	"github.com/databrokerglobal/dxc/utils"
 	"github.com/databrokerglobal/dxc/middlewares"
+	"github.com/databrokerglobal/dxc/utils"
 
-	"github.com/pkg/errors"
 	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 )
 
 // RunningTest is true when we are running tests
