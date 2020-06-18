@@ -453,11 +453,11 @@ func CheckMQTT(c echo.Context) error {
 		}
 		type RespSubscribe struct {
 			Topic   string `json:"Topic"`
-			Message string `json:"Message"`
+			Payload string `json:"Payload"`
 		}
 		response := RespSubscribe{
 			Topic:   body["Topic"].(string),
-			Message: body["Message"].(string),
+			Payload: body["Payload"].(string),
 		}
 		return c.JSON(http.StatusOK, response)
 	}
