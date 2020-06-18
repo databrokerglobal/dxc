@@ -1497,6 +1497,7 @@ func VerifySignature(data string, signature string, hexPublicKey string) (valid 
                 return false, errors.Wrap(err, "error decoding hex public key")
         }</span>
 
+
         <span class="cov8" title="1">dataBytes := []byte(data)
         hashData := crypto.Keccak256Hash(dataBytes)
 
