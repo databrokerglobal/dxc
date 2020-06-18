@@ -424,14 +424,14 @@ func CheckMQTT(c echo.Context) error {
 		fmt.Println("\n***************************\n***************************")
 		fmt.Println()
 		type RespConnect struct {
-			Username string `json:"Username"`
-			Password string `json:"Password"`
-			ClientID string `json:"ClientID"`
+			Username         string `json:"Username"`
+			Password         string `json:"Password"`
+			ClientIdentifier string `json:"ClientIdentifier"`
 		}
 		response := RespConnect{
-			Username: "",
-			Password: "",
-			ClientID: body["ClientID"].(string),
+			Username:         "",
+			Password:         "",
+			ClientIdentifier: body["ClientIdentifier"].(string),
 		}
 		return c.JSON(http.StatusOK, response)
 	} else if cmd == "subscribe" {
