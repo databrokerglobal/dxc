@@ -11,7 +11,6 @@ import (
 	"github.com/databrokerglobal/dxc/datasources"
 	_ "github.com/databrokerglobal/dxc/docs"
 	"github.com/databrokerglobal/dxc/ethereum"
-	"github.com/databrokerglobal/dxc/middlewares"
 	"github.com/databrokerglobal/dxc/syncstatus"
 	"github.com/databrokerglobal/dxc/usermanager"
 
@@ -103,10 +102,10 @@ func main() {
 	// routes accessible by users
 	////
 
-	e.GET("/getfile", datasources.GetFile, middlewares.DataAccessVerification)
+	e.GET("/getfile", datasources.GetFile)
 
 	// API Datasources Request Redirect
-	e.Any("/api/*", datasources.ProxyAPI, middlewares.DataAccessVerification)
+	e.Any("/api/*", datasources.ProxyAPI)
 
 	// Validate mqtt access for mqtt proxy
 	e.Any("/mqtt/:cmd", datasources.CheckMQTT)

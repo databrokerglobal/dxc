@@ -309,9 +309,13 @@ func UpdateDatasource(c echo.Context) error {
 // @Router /getfile [get]
 func GetFile(c echo.Context) error {
 
-	did, err := url.QueryUnescape(c.Request().Header.Get("did"))
+	verificationDataB64 := c.QueryParam("DXC_PRODUCT_KEY") // File type request
+	if verificationDataB64 == "" {
+		return c.String(http.StatusUnauthorized, "DXC_PRODUCT_KEY is not included")
+	}
+	did, err := middlewares.CheckDXCProductKey(verificationDataB64)
 	if err != nil {
-		return c.String(http.StatusInternalServerError, "Could not read the did")
+		return c.String(http.StatusUnauthorized, err.Error())
 	}
 
 	if did == "" {
@@ -342,9 +346,13 @@ func GetFile(c echo.Context) error {
 // ProxyAPI redirects api
 func ProxyAPI(c echo.Context) error {
 
-	did, err := url.QueryUnescape(c.Request().Header.Get("did"))
+	verificationDataB64 := c.Request().Header.Get("DXC_PRODUCT_KEY")
+	if verificationDataB64 == "" {
+		return c.String(http.StatusUnauthorized, "DXC_PRODUCT_KEY is not included")
+	}
+	did, err := middlewares.CheckDXCProductKey(verificationDataB64)
 	if err != nil {
-		return c.String(http.StatusInternalServerError, "Could not read the did")
+		return c.String(http.StatusUnauthorized, err.Error())
 	}
 
 	if did == "" {
@@ -417,7 +425,7 @@ func CheckMQTT(c echo.Context) error {
 			ClientIdentifier string `json:"ClientIdentifier"`
 		}
 		if valPassword, passwordExists := body["Password"]; passwordExists {
-			err := middlewares.CheckDXCProductKey(valPassword.(string))
+			_, err := middlewares.CheckDXCProductKey(valPassword.(string))
 			if err != nil {
 				return c.String(http.StatusForbidden, err.Error())
 			}
