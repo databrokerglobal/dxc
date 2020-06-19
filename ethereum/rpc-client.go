@@ -5,11 +5,10 @@ import (
 	"log"
 	"math/big"
 
+	"github.com/databrokerglobal/dxc/database"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fatih/color"
-
-	"github.com/databrokerglobal/dxc/database"
 )
 
 var (
@@ -28,24 +27,24 @@ func ServeContract() {
 		conn, err := ethclient.Dial("https://goerli.infura.io/v3/" + infuraID)
 		if err != nil {
 			log.Printf("Failed to connect to the Ethereum client: %v", err)
-			return
 		}
 		// Instantiate the contract and display its name
-		deals, err = NewEthereum(common.HexToAddress("0x8774f98C752062B6e96E5f5dcDcE011214a8dc1D"), conn)
+		deals, err = NewEthereum(common.HexToAddress("0x79C16Fa93Dea2F881DA22A9478b214752EFC30FA"), conn)
 		if err != nil {
 			log.Printf("Failed to instantiate the DXC Deals contract: %v", err)
-			return
 		}
 
 		color.Cyan(`
-		/////////////////////////////////////////////////////////////
-		// Connected to the DXC Deals Contract on the Görli Test Network //
-		/////////////////////////////////////////////////////////////
-		`)
+
+///////////////////////////////////////////////////////////////////
+// Connected to the DXC Deals Contract on the Görli Test Network //
+///////////////////////////////////////////////////////////////////
+
+    `)
 
 		contractServed = true
 
-		color.Yellow("Contract address: 0x8774f98C752062B6e96E5f5dcDcE011214a8dc1D")
+		color.Yellow("Contract address: 0x79C16Fa93Dea2F881DA22A9478b214752EFC30FA")
 	}
 }
 
@@ -55,9 +54,7 @@ func HasAccessToDeal(index int64, address string) (bool, error) {
 		return false, errors.New("Deals contract is not served")
 	}
 
-	addressByteSlice := []byte(address)
-
-	hasaccess, err := deals.HasAccessToDeal(nil, big.NewInt(index), common.BytesToAddress(addressByteSlice))
+	hasaccess, err := deals.HasAccessToDeal(nil, big.NewInt(index), common.HexToAddress(address))
 	if err != nil {
 		return false, err
 	}
