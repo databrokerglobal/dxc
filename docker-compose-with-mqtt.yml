@@ -15,3 +15,12 @@ services:
       - "1337:80"
     env_file:
       - .env
+  mqtt-proxy:
+    image: databrokerdao/dxc-mqtt-proxy:0.0.1
+    ports:
+      - 1884:1883
+    environment:
+      - PORT=1884
+      - AUTH_URL=${DXC_SERVER_HOST}/mqtt
+    env_file:
+      - .env

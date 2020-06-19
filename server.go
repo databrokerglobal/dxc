@@ -156,7 +156,7 @@ func main() {
 
 	go datasources.ExecuteStatusTicker()
 
-	port := "8085"
+	port := "8080"
 
 	// Log stuff if port is busy f.e.
 	e.Logger.Fatal(e.Start(":" + port))
