@@ -1,7 +1,9 @@
 package ethereum
 
 import (
+	"errors"
 	"log"
+	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -10,7 +12,10 @@ import (
 	"github.com/databrokerglobal/dxc/database"
 )
 
-var contractServed bool = false
+var (
+	contractServed bool = false
+	deals          *Ethereum
+)
 
 // ServeContract Connect to the contract instance
 func ServeContract() {
@@ -26,32 +31,36 @@ func ServeContract() {
 			return
 		}
 		// Instantiate the contract and display its name
-		dxc, err := NewEthereum(common.HexToAddress("0x8774f98C752062B6e96E5f5dcDcE011214a8dc1D"), conn)
+		deals, err = NewEthereum(common.HexToAddress("0x8774f98C752062B6e96E5f5dcDcE011214a8dc1D"), conn)
 		if err != nil {
-			log.Printf("Failed to instantiate a DXC contract: %v", err)
+			log.Printf("Failed to instantiate the DXC Deals contract: %v", err)
 			return
 		}
 
 		color.Cyan(`
 		/////////////////////////////////////////////////////////////
-		// Connected to the DXC Contract on the Görli Test Network //
+		// Connected to the DXC Deals Contract on the Görli Test Network //
 		/////////////////////////////////////////////////////////////
 		`)
-
-		pp, err := dxc.ProtocolPercentage(nil)
-		if err != nil {
-			log.Printf("Failed to get protocol percentage: %v", err)
-		}
-
-		balance, err := dxc.PlatformBalance(nil)
-		if err != nil {
-			log.Printf("Failed to get platform balance: %v", err)
-		}
 
 		contractServed = true
 
 		color.Yellow("Contract address: 0x8774f98C752062B6e96E5f5dcDcE011214a8dc1D")
-		color.Magenta("Current protocol percentage: %d", pp)
-		color.Green("Platform balance: %d", balance)
 	}
+}
+
+// HasAccessToDeal check if user has access to a deal
+func HasAccessToDeal(index int64, address string) (bool, error) {
+	if deals == nil {
+		return false, errors.New("Deals contract is not served")
+	}
+
+	addressByteSlice := []byte(address)
+
+	hasaccess, err := deals.HasAccessToDeal(nil, big.NewInt(index), common.BytesToAddress(addressByteSlice))
+	if err != nil {
+		return false, err
+	}
+
+	return hasaccess, nil
 }
