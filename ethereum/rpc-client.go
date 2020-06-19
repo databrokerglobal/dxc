@@ -27,11 +27,13 @@ func ServeContract() {
 		conn, err := ethclient.Dial("https://goerli.infura.io/v3/" + infuraID)
 		if err != nil {
 			log.Printf("Failed to connect to the Ethereum client: %v", err)
+      return
 		}
 		// Instantiate the contract and display its name
 		deals, err = NewEthereum(common.HexToAddress("0x79C16Fa93Dea2F881DA22A9478b214752EFC30FA"), conn)
 		if err != nil {
 			log.Printf("Failed to instantiate the DXC Deals contract: %v", err)
+      return
 		}
 
 		color.Cyan(`
