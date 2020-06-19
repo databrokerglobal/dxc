@@ -80,23 +80,3 @@ $ ./run-tests.sh
 
 After running the test script an outfile is converted into a coverage.html file detailing the test coverage for each golang package in go project. This file is located in the test folder in the root of the project
 
-## To Do
-
-- [x] Upload file and make it match with file in volum
-- [x] Nice error handling when file doesn't match
-- [x] Store the upload event in db
-- [x] Unit test the crap out of it
-- [x] Add/Get products
-- [x] Request redirect to Host API (GET)
-- [x] Request redirect to Host API (POST)
-- [x] More clever file checker, files can be restored
-- [x] Fully functional U
-- [ ] Authentication
-- [x] Smart contracts
-- [ ] Support for streaming protocols
-- [x] Docker image working
-- [ ] Delete file / product button in UI
-- [ ] Update file / products feature
-- [x] Detailed files and products list
-- [ ] Products and file status status
-- [ ] Add multiple files at once
