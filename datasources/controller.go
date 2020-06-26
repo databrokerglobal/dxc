@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"os"
 	"path"
@@ -13,10 +14,11 @@ import (
 	"strings"
 
 	"github.com/databrokerglobal/dxc/database"
+	"github.com/databrokerglobal/dxc/middlewares"
 	"github.com/databrokerglobal/dxc/utils"
-	"github.com/pkg/errors"
 
 	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 )
 
 // RunningTest is true when we are running tests
@@ -307,9 +309,13 @@ func UpdateDatasource(c echo.Context) error {
 // @Router /getfile [get]
 func GetFile(c echo.Context) error {
 
-	did, err := url.QueryUnescape(c.Request().Header.Get("did"))
+	verificationDataB64 := c.QueryParam("DXC_PRODUCT_KEY") // File type request
+	if verificationDataB64 == "" {
+		return c.String(http.StatusUnauthorized, "DXC_PRODUCT_KEY is not included")
+	}
+	did, err := middlewares.CheckDXCProductKey(verificationDataB64)
 	if err != nil {
-		return c.String(http.StatusInternalServerError, "Could not read the did")
+		return c.String(http.StatusUnauthorized, err.Error())
 	}
 
 	if did == "" {
@@ -340,9 +346,13 @@ func GetFile(c echo.Context) error {
 // ProxyAPI redirects api
 func ProxyAPI(c echo.Context) error {
 
-	did, err := url.QueryUnescape(c.Request().Header.Get("did"))
+	verificationDataB64 := c.Request().Header.Get("DXC_PRODUCT_KEY")
+	if verificationDataB64 == "" {
+		return c.String(http.StatusUnauthorized, "DXC_PRODUCT_KEY is not included")
+	}
+	did, err := middlewares.CheckDXCProductKey(verificationDataB64)
 	if err != nil {
-		return c.String(http.StatusInternalServerError, "Could not read the did")
+		return c.String(http.StatusUnauthorized, err.Error())
 	}
 
 	if did == "" {
@@ -388,6 +398,74 @@ func ProxyAPI(c echo.Context) error {
 
 	err = executeRequest(c, proxyReq)
 	return c.String(http.StatusAccepted, "")
+}
+
+// CheckMQTT is a route to validate mqtt access
+func CheckMQTT(c echo.Context) error {
+
+	requestDump, err := httputil.DumpRequest(c.Request(), true)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(string(requestDump) + "\n\n\n")
+
+	cmd, err := url.QueryUnescape(c.Param("cmd"))
+	if err != nil {
+		return c.String(http.StatusForbidden, "no cmd included")
+	}
+
+	if cmd == "connect" {
+		body := map[string]interface{}{}
+		if err := c.Bind(&body); err != nil {
+			return err
+		}
+		type RespConnect struct {
+			Username         string `json:"Username"`
+			Password         string `json:"Password"`
+			ClientIdentifier string `json:"ClientIdentifier"`
+		}
+		if valPassword, passwordExists := body["Password"]; passwordExists {
+			_, err := middlewares.CheckDXCProductKey(valPassword.(string))
+			if err != nil {
+				return c.String(http.StatusForbidden, err.Error())
+			}
+			response := RespConnect{
+				Username:         "",
+				Password:         "",
+				ClientIdentifier: body["ClientIdentifier"].(string),
+			}
+			return c.JSON(http.StatusOK, response)
+		}
+		return c.String(http.StatusForbidden, "password missing")
+	} else if cmd == "subscribe" {
+		body := map[string]interface{}{}
+		if err := c.Bind(&body); err != nil {
+			return err
+		}
+		type RespSubscribe struct {
+			Topic string `json:"Topic"`
+		}
+		response := RespSubscribe{
+			Topic: body["Topic"].(string),
+		}
+		return c.JSON(http.StatusOK, response)
+	} else if cmd == "publish" || cmd == "receive" {
+		body := map[string]interface{}{}
+		if err := c.Bind(&body); err != nil {
+			return err
+		}
+		type RespSubscribe struct {
+			Topic   string `json:"Topic"`
+			Payload string `json:"Payload"`
+		}
+		response := RespSubscribe{
+			Topic:   body["Topic"].(string),
+			Payload: body["Payload"].(string),
+		}
+		return c.JSON(http.StatusOK, response)
+	}
+
+	return c.String(http.StatusForbidden, "unknown cmd")
 }
 
 func checkDatasource(datasource *database.Datasource) int {

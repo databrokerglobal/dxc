@@ -76,21 +76,23 @@
 				
 				<option value="file10">github.com/databrokerglobal/dxc/databroker-signature/cmd/verify.go (88.0%)</option>
 				
-				<option value="file11">github.com/databrokerglobal/dxc/datasources/controller.go (43.2%)</option>
+				<option value="file11">github.com/databrokerglobal/dxc/datasources/controller.go (35.7%)</option>
 				
 				<option value="file12">github.com/databrokerglobal/dxc/datasources/host-check.go (0.0%)</option>
 				
 				<option value="file13">github.com/databrokerglobal/dxc/datasources/status-ticker.go (0.0%)</option>
 				
-				<option value="file14">github.com/databrokerglobal/dxc/middlewares/middlewares.go (83.9%)</option>
+				<option value="file14">github.com/databrokerglobal/dxc/middlewares/middlewares.go (87.0%)</option>
 				
-				<option value="file15">github.com/databrokerglobal/dxc/utils/crypto.go (89.8%)</option>
+				<option value="file15">github.com/databrokerglobal/dxc/usermanager/controller.go (43.2%)</option>
 				
-				<option value="file16">github.com/databrokerglobal/dxc/utils/echo-request-builder.go (0.0%)</option>
+				<option value="file16">github.com/databrokerglobal/dxc/utils/crypto.go (89.8%)</option>
 				
-				<option value="file17">github.com/databrokerglobal/dxc/utils/other-utils.go (100.0%)</option>
+				<option value="file17">github.com/databrokerglobal/dxc/utils/echo-request-builder.go (0.0%)</option>
 				
-				<option value="file18">github.com/databrokerglobal/dxc/utils/random.go (73.7%)</option>
+				<option value="file18">github.com/databrokerglobal/dxc/utils/other-utils.go (100.0%)</option>
+				
+				<option value="file19">github.com/databrokerglobal/dxc/utils/random.go (73.7%)</option>
 				
 				</select>
 			</div>
@@ -636,6 +638,7 @@ import (
         "io"
         "io/ioutil"
         "net/http"
+        "net/http/httputil"
         "net/url"
         "os"
         "path"
@@ -643,10 +646,11 @@ import (
         "strings"
 
         "github.com/databrokerglobal/dxc/database"
+        "github.com/databrokerglobal/dxc/middlewares"
         "github.com/databrokerglobal/dxc/utils"
-        "github.com/pkg/errors"
 
         "github.com/labstack/echo/v4"
+        "github.com/pkg/errors"
 )
 
 // RunningTest is true when we are running tests
@@ -937,9 +941,13 @@ func UpdateDatasource(c echo.Context) error <span class="cov8" title="1">{
 // @Router /getfile [get]
 func GetFile(c echo.Context) error <span class="cov0" title="0">{
 
-        did, err := url.QueryUnescape(c.Request().Header.Get("did"))
+        verificationDataB64 := c.QueryParam("DXC_PRODUCT_KEY") // File type request
+        if verificationDataB64 == "" </span><span class="cov0" title="0">{
+                return c.String(http.StatusUnauthorized, "DXC_PRODUCT_KEY is not included")
+        }</span>
+        <span class="cov0" title="0">did, err := middlewares.CheckDXCProductKey(verificationDataB64)
         if err != nil </span><span class="cov0" title="0">{
-                return c.String(http.StatusInternalServerError, "Could not read the did")
+                return c.String(http.StatusUnauthorized, err.Error())
         }</span>
 
         <span class="cov0" title="0">if did == "" </span><span class="cov0" title="0">{
@@ -970,9 +978,13 @@ func GetFile(c echo.Context) error <span class="cov0" title="0">{
 // ProxyAPI redirects api
 func ProxyAPI(c echo.Context) error <span class="cov0" title="0">{
 
-        did, err := url.QueryUnescape(c.Request().Header.Get("did"))
+        verificationDataB64 := c.Request().Header.Get("DXC_PRODUCT_KEY")
+        if verificationDataB64 == "" </span><span class="cov0" title="0">{
+                return c.String(http.StatusUnauthorized, "DXC_PRODUCT_KEY is not included")
+        }</span>
+        <span class="cov0" title="0">did, err := middlewares.CheckDXCProductKey(verificationDataB64)
         if err != nil </span><span class="cov0" title="0">{
-                return c.String(http.StatusInternalServerError, "Could not read the did")
+                return c.String(http.StatusUnauthorized, err.Error())
         }</span>
 
         <span class="cov0" title="0">if did == "" </span><span class="cov0" title="0">{
@@ -1018,6 +1030,74 @@ func ProxyAPI(c echo.Context) error <span class="cov0" title="0">{
 
         <span class="cov0" title="0">err = executeRequest(c, proxyReq)
         return c.String(http.StatusAccepted, "")</span>
+}
+
+// CheckMQTT is a route to validate mqtt access
+func CheckMQTT(c echo.Context) error <span class="cov0" title="0">{
+
+        requestDump, err := httputil.DumpRequest(c.Request(), true)
+        if err != nil </span><span class="cov0" title="0">{
+                fmt.Println(err)
+        }</span>
+        <span class="cov0" title="0">fmt.Println(string(requestDump) + "\n\n\n")
+
+        cmd, err := url.QueryUnescape(c.Param("cmd"))
+        if err != nil </span><span class="cov0" title="0">{
+                return c.String(http.StatusForbidden, "no cmd included")
+        }</span>
+
+        <span class="cov0" title="0">if cmd == "connect" </span><span class="cov0" title="0">{
+                body := map[string]interface{}{}
+                if err := c.Bind(&amp;body); err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov0" title="0">type RespConnect struct {
+                        Username         string `json:"Username"`
+                        Password         string `json:"Password"`
+                        ClientIdentifier string `json:"ClientIdentifier"`
+                }
+                if valPassword, passwordExists := body["Password"]; passwordExists </span><span class="cov0" title="0">{
+                        _, err := middlewares.CheckDXCProductKey(valPassword.(string))
+                        if err != nil </span><span class="cov0" title="0">{
+                                return c.String(http.StatusForbidden, err.Error())
+                        }</span>
+                        <span class="cov0" title="0">response := RespConnect{
+                                Username:         "",
+                                Password:         "",
+                                ClientIdentifier: body["ClientIdentifier"].(string),
+                        }
+                        return c.JSON(http.StatusOK, response)</span>
+                }
+                <span class="cov0" title="0">return c.String(http.StatusForbidden, "password missing")</span>
+        } else<span class="cov0" title="0"> if cmd == "subscribe" </span><span class="cov0" title="0">{
+                body := map[string]interface{}{}
+                if err := c.Bind(&amp;body); err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov0" title="0">type RespSubscribe struct {
+                        Topic string `json:"Topic"`
+                }
+                response := RespSubscribe{
+                        Topic: body["Topic"].(string),
+                }
+                return c.JSON(http.StatusOK, response)</span>
+        } else<span class="cov0" title="0"> if cmd == "publish" || cmd == "receive" </span><span class="cov0" title="0">{
+                body := map[string]interface{}{}
+                if err := c.Bind(&amp;body); err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov0" title="0">type RespSubscribe struct {
+                        Topic   string `json:"Topic"`
+                        Payload string `json:"Payload"`
+                }
+                response := RespSubscribe{
+                        Topic:   body["Topic"].(string),
+                        Payload: body["Payload"].(string),
+                }
+                return c.JSON(http.StatusOK, response)</span>
+        }
+
+        <span class="cov0" title="0">return c.String(http.StatusForbidden, "unknown cmd")</span>
 }
 
 func checkDatasource(datasource *database.Datasource) int <span class="cov8" title="1">{
@@ -1312,12 +1392,9 @@ func SendStatus() <span class="cov0" title="0">{
 import (
         "encoding/base64"
         "encoding/json"
-        "net/http"
 
         "github.com/databrokerglobal/dxc/utils"
-
-        _ "github.com/databrokerglobal/dxc/docs"
-        "github.com/labstack/echo/v4"
+        "github.com/pkg/errors"
 )
 
 // RunningTest is true when we are running tests
@@ -1337,73 +1414,178 @@ type ChallengeDataObject struct {
         Address   string `json:"address"`
 }
 
-// DataAccessVerification is middlewaere to check access to data
-func DataAccessVerification(next echo.HandlerFunc) echo.HandlerFunc <span class="cov8" title="1">{
-        return func(c echo.Context) error </span><span class="cov8" title="1">{
+// CheckDXCProductKey is generic function to check the key
+func CheckDXCProductKey(verificationDataB64 string) (did string, err error) <span class="cov8" title="1">{
 
-                verificationDataB64 := c.QueryParam("DXC_PRODUCT_KEY")
+        if verificationDataB64 == "" </span><span class="cov8" title="1">{
+                return "", errors.New("DXC_PRODUCT_KEY or password are not included")
+        }</span>
 
-                if verificationDataB64 == "" </span><span class="cov8" title="1">{
-                        verificationDataB64 = c.Request().Header.Get("DXC_PRODUCT_KEY")
-                        if verificationDataB64 == "" </span><span class="cov8" title="1">{
-                                return c.JSON(http.StatusUnauthorized, "DXC_PRODUCT_KEY is not included")
-                        }</span>
-                }
+        <span class="cov8" title="1">verificationData, err := base64.RawURLEncoding.DecodeString(verificationDataB64)
+        if err != nil </span><span class="cov8" title="1">{
+                return "", errors.Wrap(err, "Base64 encoding of DXC_PRODUCT_KEY is not valid")
+        }</span>
+        <span class="cov8" title="1">verificationDataObject := VerificationData{}
+        json.Unmarshal(verificationData, &amp;verificationDataObject)
 
-                <span class="cov8" title="1">verificationData, err := base64.RawURLEncoding.DecodeString(verificationDataB64)
-                if err != nil </span><span class="cov8" title="1">{
-                        return c.String(http.StatusBadRequest, "Base64 encoding of DXC_PRODUCT_KEY is not valid. err: "+err.Error())
-                }</span>
-                <span class="cov8" title="1">verificationDataObject := VerificationData{}
-                json.Unmarshal(verificationData, &amp;verificationDataObject)
+        // check signature is valid
 
-                // check signature is valid
+        sigIsValid, err := utils.VerifySignature(verificationDataObject.UnsignedData, verificationDataObject.Signature, verificationDataObject.PublicKey)
+        if err != nil </span><span class="cov8" title="1">{
+                return "", errors.Wrap(err, "DXC_PRODUCT_KEY is not valid")
+        }</span>
+        <span class="cov8" title="1">if !sigIsValid </span><span class="cov8" title="1">{
+                return "", errors.New("Signature is not valid")
+        }</span>
 
-                sigIsValid, err := utils.VerifySignature(verificationDataObject.UnsignedData, verificationDataObject.Signature, verificationDataObject.PublicKey)
-                if err != nil </span><span class="cov8" title="1">{
-                        return c.String(http.StatusBadRequest, "DXC_PRODUCT_KEY is not valid. err: "+err.Error())
-                }</span>
-                <span class="cov8" title="1">if !sigIsValid </span><span class="cov8" title="1">{
-                        return c.String(http.StatusUnauthorized, "Signature is not valid.")
-                }</span>
+        // check address in signed data is same as address derived from public key
 
-                // check address in signed data is same as address derived from public key
+        <span class="cov8" title="1">challengeData, err := base64.StdEncoding.DecodeString(verificationDataObject.UnsignedData)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", errors.Wrap(err, "ase64 encoding of challenge data is not valid")
+        }</span>
+        <span class="cov8" title="1">challengeDataObject := ChallengeDataObject{}
+        json.Unmarshal(challengeData, &amp;challengeDataObject)
 
-                <span class="cov8" title="1">challengeData, err := base64.StdEncoding.DecodeString(verificationDataObject.UnsignedData)
+        addressFromPubKey, err := utils.AddressFromHexPublicKey(verificationDataObject.PublicKey)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", errors.Wrap(err, "Provided public key is not valid")
+        }</span>
+
+        <span class="cov8" title="1">if addressFromPubKey != challengeDataObject.Address </span><span class="cov0" title="0">{
+                return "", errors.New("The address in signed data is not the same as the one created from the public key passed as a parameter")
+        }</span>
+
+        // TODO: check supplied challenge exists in db and is not older that the start of the deal
+
+        // TODO: check address (take from public key -- use crypto utils) is allowed to use that did
+
+        <span class="cov8" title="1">return challengeDataObject.DID, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file15" style="display: none">package usermanager
+
+import (
+        "encoding/base64"
+        "encoding/json"
+        "fmt"
+        "io/ioutil"
+        "net/http"
+
+        "github.com/fatih/color"
+        "github.com/labstack/echo/v4"
+        "github.com/pkg/errors"
+
+        "github.com/databrokerglobal/dxc/database"
+        "github.com/databrokerglobal/dxc/datasources"
+        "github.com/databrokerglobal/dxc/ethereum"
+        "github.com/databrokerglobal/dxc/utils"
+)
+
+// RunningTest is true when we are running tests
+var RunningTest = false
+
+// DXSAPIKey object allows to decode the api key and get the dxs host
+type DXSAPIKey struct {
+        Key  string `json:"k"`
+        Host string `json:"h"`
+}
+
+// SaveUserAuth to save the address and api key
+// Create godoc
+// @Summary Save auth info
+// @Description Save address and api key for authentication with DXS
+// @Tags user
+// @Param address query string true "Address"
+// @Param apiKey query string true "API Key"
+// @Success 200 {string} string true
+// @Failure 500 {string} string "Error saving auth info"
+// @Router /user/authinfo [post]
+func SaveUserAuth(c echo.Context) error <span class="cov8" title="1">{
+
+        address := c.QueryParam("address")
+        apiKey := c.QueryParam("apiKey")
+
+        if address == "" || apiKey == "" </span><span class="cov8" title="1">{
+                return c.String(http.StatusBadRequest, "address and api key cannot be empty")
+        }</span>
+
+        <span class="cov8" title="1">if !RunningTest </span><span class="cov0" title="0">{
+                err := database.DBInstance.SaveNewUserAuth(address, apiKey)
                 if err != nil </span><span class="cov0" title="0">{
-                        return c.String(http.StatusBadRequest, "Base64 encoding of challenge data is not valid. err: "+err.Error())
-                }</span>
-                <span class="cov8" title="1">challengeDataObject := ChallengeDataObject{}
-                json.Unmarshal(challengeData, &amp;challengeDataObject)
-
-                addressFromPubKey, err := utils.AddressFromHexPublicKey(verificationDataObject.PublicKey)
-                if err != nil </span><span class="cov0" title="0">{
-                        return c.String(http.StatusBadRequest, "Provided public key is not valid: "+err.Error())
+                        return c.String(http.StatusInternalServerError, errors.Wrap(err, "error saving user auth").Error())
                 }</span>
 
-                <span class="cov8" title="1">if addressFromPubKey != challengeDataObject.Address </span><span class="cov0" title="0">{
-                        return c.String(http.StatusBadRequest, "The address in signed data is not the same as the one created from the public key passed as a parameter.")
-                }</span>
+                <span class="cov0" title="0">datasources.SendStatus()</span>
+        }
 
-                // TODO: check supplied challenge exists in db and is not older that the start of the deal
+        <span class="cov8" title="1">getInfuraIDAndServeContract(address, apiKey)
 
-                // TODO: check address (take from public key -- use crypto utils) is allowed to use that did
+        return c.JSON(http.StatusAccepted, "success saving the data")</span>
+}
 
-                // pass did to the request
-                <span class="cov8" title="1">c.Request().Header.Set("did", challengeDataObject.DID)
+// GetUserAuth to get the address and api key
+// Create godoc
+// @Summary Get auth info
+// @Description Get address and api key for authentication with DXS
+// @Tags user
+// @Produce json
+// @Success 200 {object} database.UserAuth true
+// @Failure 404 {string} string "Not data found"
+// @Failure 500 {string} string "Error getting auth info"
+// @Router /user/authinfo [get]
+func GetUserAuth(c echo.Context) error <span class="cov0" title="0">{
 
+        userAuth, err := database.DBInstance.GetLatestUserAuth()
+        if err != nil </span><span class="cov0" title="0">{
+                return c.String(http.StatusInternalServerError, errors.Wrap(err, "error getting user auth").Error())
+        }</span>
+        <span class="cov0" title="0">if userAuth == nil </span><span class="cov0" title="0">{
+                return c.String(http.StatusNotFound, "no user auth data in exist in db")
+        }</span>
+
+        <span class="cov0" title="0">return c.JSON(http.StatusOK, userAuth)</span>
+}
+
+func getInfuraIDAndServeContract(address string, apiKey string) <span class="cov8" title="1">{
+        // get dxs url from api key
+        dxsAPIKeyData, err := base64.StdEncoding.DecodeString(apiKey)
+        if err != nil </span><span class="cov0" title="0">{
+                color.Red("Error decoding api key. err: ", err.Error())
+        }</span> else<span class="cov8" title="1"> {
+                dxsAPIKey := DXSAPIKey{}
+                json.Unmarshal(dxsAPIKeyData, &amp;dxsAPIKey)
+
+                dxsURL := dxsAPIKey.Host
+
+                client := &amp;http.Client{}
+                req, _ := http.NewRequest("GET", fmt.Sprintf("%s/infura/getID", utils.TrimLastSlash(dxsURL)), nil)
+                req.SetBasicAuth(address, apiKey)
                 if !RunningTest </span><span class="cov0" title="0">{
-                        if err := next(c); err != nil </span><span class="cov0" title="0">{
-                                c.Error(err)
-                        }</span>
-                }
+                        resp, err := client.Do(req)
 
-                <span class="cov8" title="1">return nil</span>
+                        if err == nil &amp;&amp; resp.StatusCode == 200 </span><span class="cov0" title="0">{
+                                bodyBytes, err := ioutil.ReadAll(resp.Body)
+                                if err != nil </span><span class="cov0" title="0">{
+                                        color.Red("Error reading response body. err: ", err.Error())
+                                }</span> else<span class="cov0" title="0"> {
+                                        infuraID := string(bodyBytes)
+
+                                        err = database.DBInstance.CreateInfuraID(infuraID)
+                                        if err != nil </span><span class="cov0" title="0">{
+                                                color.Red("Error saving infura ID. err: ", err.Error())
+                                        }</span> else<span class="cov0" title="0"> {
+                                                go ethereum.ServeContract()
+                                        }</span>
+                                }
+                        }
+                }
         }
 }
 </pre>
 		
-		<pre class="file" id="file15" style="display: none">// go-ethereum crypto stuff explanation: https://goethereumbook.org/en/
+		<pre class="file" id="file16" style="display: none">// go-ethereum crypto stuff explanation: https://goethereumbook.org/en/
 
 package utils
 
@@ -1497,7 +1679,6 @@ func VerifySignature(data string, signature string, hexPublicKey string) (valid 
                 return false, errors.Wrap(err, "error decoding hex public key")
         }</span>
 
-
         <span class="cov8" title="1">dataBytes := []byte(data)
         hashData := crypto.Keccak256Hash(dataBytes)
 
@@ -1543,7 +1724,7 @@ func publicKeyFromHexPublicKey(hexPublicKey string) (publicKey *ecdsa.PublicKey,
 }
 </pre>
 		
-		<pre class="file" id="file16" style="display: none">package utils
+		<pre class="file" id="file17" style="display: none">package utils
 
 import (
         "io"
@@ -1562,7 +1743,7 @@ func GenerateTestEchoRequest(method string, path string, body io.Reader) echo.Co
 }</span>
 </pre>
 		
-		<pre class="file" id="file17" style="display: none">package utils
+		<pre class="file" id="file18" style="display: none">package utils
 
 import "strings"
 
@@ -1576,7 +1757,7 @@ func TrimLastSlash(host string) (h string) <span class="cov8" title="1">{
 }
 </pre>
 		
-		<pre class="file" id="file18" style="display: none">package utils
+		<pre class="file" id="file19" style="display: none">package utils
 
 import (
         "crypto/rand"
