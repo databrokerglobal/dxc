@@ -12,7 +12,6 @@ cd databroker-signature
 go build -o databroker-signature
 cd ..
 mv ./databroker-signature/databroker-signature ${BUILD_DIR}
-touch ${BUILD_DIR}/dxc.db
 cp .env ${BUILD_DIR}/.env
 pushd ui
 npm i
