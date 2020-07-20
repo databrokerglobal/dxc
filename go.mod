@@ -13,7 +13,7 @@ require (
 	github.com/go-openapi/swag v0.19.9 // indirect
 	github.com/go-test/deep v1.0.6
 	github.com/google/uuid v1.1.1
-	github.com/jinzhu/gorm v1.9.12
+	github.com/jinzhu/gorm v1.9.15
 	github.com/joho/godotenv v1.3.0
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/echo/v4 v4.1.16
