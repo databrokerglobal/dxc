@@ -6,7 +6,7 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.4.1
 	github.com/Rosaniline/gorm-ut v0.0.0-20190331143837-786b71894576
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
-	github.com/ethereum/go-ethereum v1.9.13
+	github.com/ethereum/go-ethereum v1.9.19
 	github.com/fatih/color v1.9.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-openapi/spec v0.19.7 // indirect
@@ -35,8 +35,6 @@ require (
 	github.com/swaggo/echo-swagger v1.0.0
 	github.com/swaggo/swag v1.6.5
 	github.com/urfave/cli v1.22.4 // indirect
-	golang.org/x/crypto v0.0.0-20200427165652-729f1e841bcc // indirect
-	golang.org/x/net v0.0.0-20200506145744-7e3656a0809f // indirect
 	golang.org/x/sys v0.0.0-20200501145240-bc7a7d42d5c3 // indirect
 	golang.org/x/tools v0.0.0-20200509030707-2212a7e161a5 // indirect
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0
