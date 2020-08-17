@@ -10,7 +10,7 @@
     "@testing-library/user-event": "^10.1.0",
     "@types/ramda": "^0.27.3",
     "@types/react-select": "^3.0.12",
-    "@types/yup": "^0.28.0",
+    "@types/yup": "^0.29.5",
     "axios": "^0.19.2",
     "dayjs": "^1.8.25",
     "formik": "^2.1.4",
