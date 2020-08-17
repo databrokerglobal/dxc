@@ -3,7 +3,7 @@ module github.com/databrokerglobal/dxc
 go 1.12
 
 require (
-	github.com/DATA-DOG/go-sqlmock v1.4.1
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/Rosaniline/gorm-ut v0.0.0-20190331143837-786b71894576
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/ethereum/go-ethereum v1.9.13
