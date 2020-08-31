@@ -16,7 +16,7 @@ require (
 	github.com/jinzhu/gorm v1.9.12
 	github.com/joho/godotenv v1.3.0
 	github.com/labstack/echo v3.3.10+incompatible
-	github.com/labstack/echo/v4 v4.1.16
+	github.com/labstack/echo/v4 v4.1.17
 	github.com/mailru/easyjson v0.7.1 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.3.0 // indirect
@@ -35,9 +35,6 @@ require (
 	github.com/swaggo/echo-swagger v1.0.0
 	github.com/swaggo/swag v1.6.5
 	github.com/urfave/cli v1.22.4 // indirect
-	golang.org/x/crypto v0.0.0-20200427165652-729f1e841bcc // indirect
-	golang.org/x/net v0.0.0-20200506145744-7e3656a0809f // indirect
-	golang.org/x/sys v0.0.0-20200501145240-bc7a7d42d5c3 // indirect
 	golang.org/x/tools v0.0.0-20200509030707-2212a7e161a5 // indirect
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0
 	gopkg.in/ini.v1 v1.55.0 // indirect
