@@ -28,6 +28,11 @@ import (
 
 // @license.name License details
 // @license.url https://github.com/databrokerglobal/dxc/blob/master/dbdao-license.txt
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name DXC_SECURE_KEY
+
 func main() {
 
 	color.Blue(`
@@ -50,6 +55,12 @@ func main() {
   `)
 
 	e := echo.New()
+
+	// Loading env file
+	err := godotenv.Load()
+	if err != nil {
+		e.Logger.Info("No env file loaded. It's ok if you are running with docker and if you passed the .enf file that way.")
+	}
 
 	//////////////////////////
 	// Middleware          //
@@ -109,12 +120,6 @@ func main() {
 
 	// Validate mqtt access for mqtt proxy
 	e.Any("/mqtt/:cmd", datasources.CheckMQTT)
-
-	// Loading env file
-	err := godotenv.Load()
-	if err != nil {
-		e.Logger.Info("No env file loaded. It's ok if you are running with docker and if you passed the .enf file that way.")
-	}
 
 	dxcHost := os.Getenv("DXC_HOST")
 	if dxcHost == "" {

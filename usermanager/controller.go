@@ -14,6 +14,7 @@ import (
 	"github.com/databrokerglobal/dxc/database"
 	"github.com/databrokerglobal/dxc/datasources"
 	"github.com/databrokerglobal/dxc/ethereum"
+	"github.com/databrokerglobal/dxc/middlewares"
 	"github.com/databrokerglobal/dxc/utils"
 )
 
@@ -36,7 +37,14 @@ type DXSAPIKey struct {
 // @Success 200 {string} string true
 // @Failure 500 {string} string "Error saving auth info"
 // @Router /user/authinfo [post]
+// @Security ApiKeyAuth
 func SaveUserAuth(c echo.Context) error {
+
+	dxcSecureKey := c.Request().Header.Get("DXC_SECURE_KEY")
+	err := middlewares.CheckDXCSecureKey(dxcSecureKey)
+	if err != nil {
+		return c.String(http.StatusUnauthorized, err.Error())
+	}
 
 	address := c.QueryParam("address")
 	apiKey := c.QueryParam("apiKey")
@@ -69,7 +77,14 @@ func SaveUserAuth(c echo.Context) error {
 // @Failure 404 {string} string "Not data found"
 // @Failure 500 {string} string "Error getting auth info"
 // @Router /user/authinfo [get]
+// @Security ApiKeyAuth
 func GetUserAuth(c echo.Context) error {
+
+	dxcSecureKey := c.Request().Header.Get("DXC_SECURE_KEY")
+	err := middlewares.CheckDXCSecureKey(dxcSecureKey)
+	if err != nil {
+		return c.String(http.StatusUnauthorized, err.Error())
+	}
 
 	userAuth, err := database.DBInstance.GetLatestUserAuth()
 	if err != nil {

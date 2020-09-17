@@ -7,4 +7,6 @@ if (typeof (window.DXC_SERVER_HOST) !== "undefined") {
   LOCAL_HOST = "http://localhost:8080";
 }
 
-export const fetcher = (ROUTE: string) => axios(`${LOCAL_HOST}${ROUTE}`);
+export const fetcher = (ROUTE: string) => axios(`${LOCAL_HOST}${ROUTE}`, {
+  headers: { 'DXC_SECURE_KEY': localStorage.getItem('DXC_SECURE_KEY') }
+});

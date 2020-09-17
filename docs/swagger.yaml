@@ -70,6 +70,8 @@ paths:
           description: Error creating datasources
           schema:
             type: string
+      security:
+      - ApiKeyAuth: []
       summary: Create example datasources
       tags:
       - dev
@@ -96,6 +98,8 @@ paths:
           description: Error creating datasource
           schema:
             type: string
+      security:
+      - ApiKeyAuth: []
       summary: Create datasource
       tags:
       - datasources
@@ -121,6 +125,8 @@ paths:
           description: Error retrieving datasource from database
           schema:
             type: string
+      security:
+      - ApiKeyAuth: []
       summary: Delete one datasource
       tags:
       - datasources
@@ -147,6 +153,8 @@ paths:
           description: Error retrieving datasource from database
           schema:
             type: string
+      security:
+      - ApiKeyAuth: []
       summary: Get one datasource
       tags:
       - datasources
@@ -193,6 +201,8 @@ paths:
           description: Error retrieving datasource from database
           schema:
             type: string
+      security:
+      - ApiKeyAuth: []
       summary: Update one datasource
       tags:
       - datasources
@@ -214,6 +224,8 @@ paths:
           description: Error retrieving datasources from database
           schema:
             type: string
+      security:
+      - ApiKeyAuth: []
       summary: Get all datasources
       tags:
       - datasources
@@ -272,6 +284,8 @@ paths:
           description: Error retrieving sync statuses from database
           schema:
             type: string
+      security:
+      - ApiKeyAuth: []
       summary: Get all sync statuses of the last 24hrs
       tags:
       - syncstatus
@@ -293,6 +307,8 @@ paths:
           description: Error getting auth info
           schema:
             type: string
+      security:
+      - ApiKeyAuth: []
       summary: Get auth info
       tags:
       - user
@@ -318,7 +334,14 @@ paths:
           description: Error saving auth info
           schema:
             type: string
+      security:
+      - ApiKeyAuth: []
       summary: Save auth info
       tags:
       - user
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: DXC_SECURE_KEY
+    type: apiKey
 swagger: "2.0"

@@ -16,6 +16,11 @@
     "paths": {
         "/add-example-datasources": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Create example datasources",
                 "consumes": [
                     "application/json"
@@ -45,6 +50,11 @@
         },
         "/datasource": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Create datasource",
                 "consumes": [
                     "application/json"
@@ -85,6 +95,11 @@
         },
         "/datasource/{did}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Get one datasource given a did",
                 "produces": [
                     "application/json"
@@ -124,6 +139,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Modify one datasource (new name and/or host) given a did",
                 "tags": [
                     "datasources"
@@ -190,6 +210,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Delete one datasource given a did",
                 "tags": [
                     "datasources"
@@ -228,6 +253,11 @@
         },
         "/datasources": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Get all datasources",
                 "consumes": [
                     "application/json"
@@ -316,6 +346,11 @@
         },
         "/syncstatuses/last24h": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Get all sync statuses of the last 24hrs",
                 "consumes": [
                     "application/json"
@@ -348,6 +383,11 @@
         },
         "/user/authinfo": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Get address and api key for authentication with DXS",
                 "produces": [
                     "application/json"
@@ -378,6 +418,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Save address and api key for authentication with DXS",
                 "tags": [
                     "user"
@@ -484,6 +529,13 @@
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "DXC_SECURE_KEY",
+            "in": "header"
         }
     }
 }

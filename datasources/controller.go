@@ -42,7 +42,14 @@ type DatasourceReq struct {
 // @Success 201 {string} string "Success"
 // @Failure 400 {string} string "Error creating datasource"
 // @Router /datasource [post]
+// @Security ApiKeyAuth
 func AddOneDatasource(c echo.Context) error {
+
+	dxcSecureKey := c.Request().Header.Get("DXC_SECURE_KEY")
+	err := middlewares.CheckDXCSecureKey(dxcSecureKey)
+	if err != nil {
+		return c.String(http.StatusUnauthorized, err.Error())
+	}
 
 	datasource := new(database.Datasource)
 
@@ -84,7 +91,14 @@ func AddOneDatasource(c echo.Context) error {
 // @Success 201 {string} string "Success"
 // @Failure 400 {string} string "Error creating datasources"
 // @Router /add-example-datasources [post]
+// @Security ApiKeyAuth
 func AddExampleDatasources(c echo.Context) error {
+
+	dxcSecureKey := c.Request().Header.Get("DXC_SECURE_KEY")
+	err := middlewares.CheckDXCSecureKey(dxcSecureKey)
+	if err != nil {
+		return c.String(http.StatusUnauthorized, err.Error())
+	}
 
 	count := 0
 
@@ -161,11 +175,18 @@ func AddExampleDatasources(c echo.Context) error {
 // @Success 200 {array} database.Datasource true
 // @Failure 500 {string} string "Error retrieving datasources from database"
 // @Router /datasources [get]
+// @Security ApiKeyAuth
 func GetAllDatasources(c echo.Context) error {
+
+	dxcSecureKey := c.Request().Header.Get("DXC_SECURE_KEY")
+	err := middlewares.CheckDXCSecureKey(dxcSecureKey)
+	if err != nil {
+		return c.String(http.StatusUnauthorized, err.Error())
+	}
 
 	var datasources *[]database.Datasource
 
-	datasources, err := database.DBInstance.GetDatasources()
+	datasources, err = database.DBInstance.GetDatasources()
 
 	if err != nil {
 		return c.String(http.StatusInternalServerError, "Error retrieving item from database")
@@ -185,7 +206,15 @@ func GetAllDatasources(c echo.Context) error {
 // @Failure 400 {string} string "Bad request"
 // @Failure 500 {string} string "Error retrieving datasource from database"
 // @Router /datasource/{did} [get]
+// @Security ApiKeyAuth
 func GetOneDatasource(c echo.Context) error {
+
+	dxcSecureKey := c.Request().Header.Get("DXC_SECURE_KEY")
+	err := middlewares.CheckDXCSecureKey(dxcSecureKey)
+	if err != nil {
+		return c.String(http.StatusUnauthorized, err.Error())
+	}
+
 	did, err := url.QueryUnescape(c.Param("did"))
 	if err != nil {
 		return c.String(http.StatusInternalServerError, "Could not read the did")
@@ -220,7 +249,15 @@ func GetOneDatasource(c echo.Context) error {
 // @Failure 400 {string} string "Bad request"
 // @Failure 500 {string} string "Error retrieving datasource from database"
 // @Router /datasource/{did} [delete]
+// @Security ApiKeyAuth
 func DeleteDatasource(c echo.Context) error {
+
+	dxcSecureKey := c.Request().Header.Get("DXC_SECURE_KEY")
+	err := middlewares.CheckDXCSecureKey(dxcSecureKey)
+	if err != nil {
+		return c.String(http.StatusUnauthorized, err.Error())
+	}
+
 	did, err := url.QueryUnescape(c.Param("did"))
 	if err != nil {
 		return c.String(http.StatusInternalServerError, "Could not read the did")
@@ -254,7 +291,15 @@ func DeleteDatasource(c echo.Context) error {
 // @Failure 404 {string} string "Datasource not found"
 // @Failure 500 {string} string "Error retrieving datasource from database"
 // @Router /datasource/{did} [put]
+// @Security ApiKeyAuth
 func UpdateDatasource(c echo.Context) error {
+
+	dxcSecureKey := c.Request().Header.Get("DXC_SECURE_KEY")
+	err := middlewares.CheckDXCSecureKey(dxcSecureKey)
+	if err != nil {
+		return c.String(http.StatusUnauthorized, err.Error())
+	}
+
 	did, err := url.QueryUnescape(c.Param("did"))
 	if err != nil {
 		return c.String(http.StatusInternalServerError, "Could not read the did. err: "+err.Error())

@@ -3,6 +3,7 @@ package middlewares
 import (
 	"encoding/base64"
 	"encoding/json"
+	"os"
 
 	"github.com/databrokerglobal/dxc/utils"
 	"github.com/pkg/errors"
@@ -72,4 +73,19 @@ func CheckDXCProductKey(verificationDataB64 string) (did string, err error) {
 	// TODO: check address (take from public key -- use crypto utils) is allowed to use that did
 
 	return challengeDataObject.DID, nil
+}
+
+// CheckDXCSecureKey checks the DXC secure key, for access to most admin functions
+func CheckDXCSecureKey(dxcSecureKey string) (err error) {
+	envDXCSecureKey := os.Getenv("DXC_SECURE_KEY")
+	if envDXCSecureKey == "" {
+		return nil
+	}
+	if dxcSecureKey == "" {
+		return errors.New("DXC_SECURE_KEY not included in the headers")
+	}
+	if dxcSecureKey != envDXCSecureKey {
+		return errors.New("DXC_SECURE_KEY is incorrect")
+	}
+	return nil
 }
