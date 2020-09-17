@@ -2,6 +2,7 @@ import React from "react";
 import "./App.css";
 import { DatasourceForm, DatasourcesList } from "./Datasources";
 import { Authentication } from "./Authentication";
+import { DXCAuthentication } from "./DXCAuthentication";
 import { SyncStatusList } from "./SyncStatus";
 import { LOCAL_HOST } from "./fetchers";
 import {
@@ -64,7 +65,12 @@ function App() {
           </Grid> : null}
         {tabValue === "pane-AUTH" ?
           <Grid item xs={12}>
-            <Typography variant="h5">Authentication</Typography>
+            <Typography variant="h5">DXC authentication</Typography>
+            <Divider />
+            <Grid style={{ marginBottom: "40px", }} item xs={12}>
+              <DXCAuthentication />
+            </Grid>
+            <Typography variant="h5">Databroker authentication</Typography>
             <Divider />
             <Grid style={{ marginBottom: "40px", }} item xs={12}>
               <Authentication />

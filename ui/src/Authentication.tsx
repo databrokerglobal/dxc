@@ -53,7 +53,9 @@ export const Authentication = () => {
 
   const getData = async () => {
     axios
-      .get(`${LOCAL_HOST}/user/authinfo`)
+      .get(`${LOCAL_HOST}/user/authinfo`, {
+        headers: { 'DXC_SECURE_KEY': localStorage.getItem('DXC_SECURE_KEY') }
+      })
       .then(data => {
         setBody({
           address: data.data.address,
@@ -73,7 +75,9 @@ export const Authentication = () => {
 
   const handleSave = async () => {
     try {
-      await axios.post(`${LOCAL_HOST}/user/authinfo?address=${body.address}&apiKey=${body.apiKey}`);
+      await axios.post(`${LOCAL_HOST}/user/authinfo?address=${body.address}&apiKey=${body.apiKey}`, {
+        headers: { 'DXC_SECURE_KEY': localStorage.getItem('DXC_SECURE_KEY') }
+      });
       setResp(`Authentication data successfully saved.`);
       mutate('/syncstatuses/last24h')
     } catch (error) {

@@ -91,7 +91,9 @@ export const DatasourceForm = () => {
 
   const handleSubmit = async () => {
     try {
-      await axios.post(`${LOCAL_HOST}/datasource`, body);
+      await axios.post(`${LOCAL_HOST}/datasource`, body, {
+        headers: { 'DXC_SECURE_KEY': localStorage.getItem('DXC_SECURE_KEY')}
+      });
       setResp(`Success. Datasource created.`);
       mutate('/datasources')
     } catch (error) {
