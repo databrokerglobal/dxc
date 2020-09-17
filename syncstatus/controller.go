@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/databrokerglobal/dxc/database"
+	"github.com/databrokerglobal/dxc/middlewares"
 
 	"github.com/labstack/echo/v4"
 )
@@ -19,7 +20,14 @@ import (
 // @Success 200 {array} database.SyncStatus true
 // @Failure 500 {string} string "Error retrieving sync statuses from database"
 // @Router /syncstatuses/last24h [get]
+// @Security ApiKeyAuth
 func GetLatestSyncStatuses(c echo.Context) error {
+
+	dxcSecureKey := c.Request().Header.Get("DXC_SECURE_KEY")
+	err := middlewares.CheckDXCSecureKey(dxcSecureKey)
+	if err != nil {
+		return c.String(http.StatusUnauthorized, err.Error())
+	}
 
 	syncStatuses, err := database.DBInstance.GetMostRecentSyncStatuses(time.Now().Add(time.Duration(-24) * time.Hour))
 	if err != nil {
