@@ -395,6 +395,9 @@ func ProxyAPI(c echo.Context) error {
 			proxyReq.Header[index] = value
 		}
 	}
+	if datasource.HeaderAPIKeyName != "" {
+		proxyReq.Header[datasource.HeaderAPIKeyName] = []string{datasource.HeaderAPIKeyValue}
+	}
 
 	err = executeRequest(c, proxyReq)
 	return c.String(http.StatusAccepted, "")

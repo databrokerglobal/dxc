@@ -7,11 +7,13 @@ import (
 // Datasource struct
 type Datasource struct {
 	gorm.Model
-	Name      string `json:"name"`
-	Type      string `json:"type"`
-	Did       string `json:"did"`
-	Host      string `json:"host"`
-	Available bool   `json:"available"`
+	Name              string `json:"name"`
+	Type              string `json:"type"`
+	Did               string `json:"did"`
+	Host              string `json:"host"`
+	HeaderAPIKeyName  string `json:"headerAPIKeyName"`
+	HeaderAPIKeyValue string `json:"headerAPIKeyValue"`
+	Available         bool   `json:"available"`
 }
 
 // SyncStatus struct
