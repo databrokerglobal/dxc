@@ -153,7 +153,7 @@ export const DatasourceForm = () => {
           onChange={handleHost}
         />
       </Grid>
-      {body.type == "API" ?
+      {body.type === "API" ?
         <Grid item xs={2}>
           <TextField
             id="headerAPIKeyName"
@@ -164,7 +164,7 @@ export const DatasourceForm = () => {
           />
         </Grid> : null
       }
-      {body.type == "API" ?
+      {body.type === "API" ?
         <Grid item xs={2}>
           <TextField
             id="headerAPIKeyValue"
