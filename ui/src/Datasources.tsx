@@ -30,6 +30,8 @@ interface IDatasource {
   type: string;
   did?: string;
   host: string;
+  headerAPIKeyName: string;
+  headerAPIKeyValue: string;
 }
 
 export const DatasourceForm = () => {
@@ -37,6 +39,8 @@ export const DatasourceForm = () => {
     name: "datasource xxx",
     host: "http://example.com/myfile",
     type: "API",
+    headerAPIKeyName: "",
+    headerAPIKeyValue: "",
   };
   const [body, setBody] = React.useState<IDatasource>(exampleBody);
   const [resp, setResp] = React.useState<string>("");
@@ -75,6 +79,14 @@ export const DatasourceForm = () => {
 
   const handleHost = (event: any) => {
     setBody(R.assoc("host", event.target.value, body));
+  };
+
+  const handleHeaderAPIKeyName = (event: any) => {
+    setBody(R.assoc("headerAPIKeyName", event.target.value, body));
+  };
+
+  const handleHeaderAPIKeyValue = (event: any) => {
+    setBody(R.assoc("headerAPIKeyValue", event.target.value, body));
   };
 
   const handleSubmit = async () => {
@@ -141,6 +153,28 @@ export const DatasourceForm = () => {
           onChange={handleHost}
         />
       </Grid>
+      {body.type === "API" ?
+        <Grid item xs={2}>
+          <TextField
+            id="headerAPIKeyName"
+            label="API Key Name"
+            helperText="Optional key required in the headers"
+            value={body?.headerAPIKeyName}
+            onChange={handleHeaderAPIKeyName}
+          />
+        </Grid> : null
+      }
+      {body.type === "API" ?
+        <Grid item xs={2}>
+          <TextField
+            id="headerAPIKeyValue"
+            label="API Key Value"
+            helperText=""
+            value={body?.headerAPIKeyValue}
+            onChange={handleHeaderAPIKeyValue}
+          />
+        </Grid> : null
+      }
       <Grid item xs={12}>
         {R.isEmpty(err) && R.isEmpty(resp) && (
           <Button
@@ -197,6 +231,7 @@ export const DatasourcesList = () => {
                 <TableCell>Host</TableCell>
                 <TableCell>Added on</TableCell>
                 <TableCell>ID</TableCell>
+                <TableCell>Key in headers</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -208,6 +243,7 @@ export const DatasourcesList = () => {
                     <TableCell>{datasource.host}</TableCell>
                     <TableCell>{dayjs(datasource.CreatedAt).format('YYYY-MM-DD')}</TableCell>
                     <TableCell component="th" scope="row">{datasource.did}</TableCell>
+                    <TableCell style={{whiteSpace: "nowrap"}}>{datasource.headerAPIKeyName}{datasource.headerAPIKeyName !== undefined && datasource.headerAPIKeyName !== "" ? ":":""} {datasource.headerAPIKeyValue}</TableCell>
                   </TableRow> : null
               ))}
             </TableBody>
