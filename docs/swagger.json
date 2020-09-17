@@ -148,6 +148,18 @@
                         "description": "New host. Keep empty to keep existing host.",
                         "name": "newHost",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "New header API key name. Keep empty to keep existing header API key name.",
+                        "name": "newHeaderAPIKeyName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "New header API key value. Keep empty to keep existing header API key value.",
+                        "name": "newHeaderAPIKeyValue",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -412,6 +424,12 @@
                     "type": "boolean"
                 },
                 "did": {
+                    "type": "string"
+                },
+                "headerAPIKeyName": {
+                    "type": "string"
+                },
+                "headerAPIKeyValue": {
                     "type": "string"
                 },
                 "host": {

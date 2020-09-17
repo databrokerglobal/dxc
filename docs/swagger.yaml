@@ -5,6 +5,10 @@ definitions:
         type: boolean
       did:
         type: string
+      headerAPIKeyName:
+        type: string
+      headerAPIKeyValue:
+        type: string
       host:
         type: string
       name:
@@ -161,6 +165,16 @@ paths:
       - description: New host. Keep empty to keep existing host.
         in: query
         name: newHost
+        type: string
+      - description: New header API key name. Keep empty to keep existing header API
+          key name.
+        in: query
+        name: newHeaderAPIKeyName
+        type: string
+      - description: New header API key value. Keep empty to keep existing header
+          API key value.
+        in: query
+        name: newHeaderAPIKeyValue
         type: string
       responses:
         "200":

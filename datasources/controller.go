@@ -247,6 +247,8 @@ func DeleteDatasource(c echo.Context) error {
 // @Param did path string true "Digital identifier of the datasource"
 // @Param newName query string false "New name. Keep empty to keep existing name."
 // @Param newHost query string false "New host. Keep empty to keep existing host."
+// @Param newHeaderAPIKeyName query string false "New header API key name. Keep empty to keep existing header API key name."
+// @Param newHeaderAPIKeyValue query string false "New header API key value. Keep empty to keep existing header API key value."
 // @Success 200 {string} string "datasource successfully updated"
 // @Failure 400 {string} string "Bad request"
 // @Failure 404 {string} string "Datasource not found"
@@ -263,9 +265,11 @@ func UpdateDatasource(c echo.Context) error {
 
 	newName := c.QueryParam("newName")
 	newHost := c.QueryParam("newHost")
+	newHeaderAPIKeyName := c.QueryParam("newHeaderAPIKeyName")
+	newHeaderAPIKeyValue := c.QueryParam("newHeaderAPIKeyValue")
 
-	if newName == "" && newHost == "" {
-		return c.String(http.StatusBadRequest, "Bad request. newName and newHost cannot both be empty.")
+	if newName == "" && newHost == "" && newHeaderAPIKeyName == "" && newHeaderAPIKeyValue == "" {
+		return c.String(http.StatusBadRequest, "Bad request. all values cannot both be empty.")
 	}
 
 	if !RunningTest {
@@ -280,6 +284,14 @@ func UpdateDatasource(c echo.Context) error {
 
 		if newHost != "" {
 			datasource.Host = newHost
+		}
+
+		if newHeaderAPIKeyName != "" {
+			datasource.HeaderAPIKeyName = newHeaderAPIKeyName
+		}
+
+		if newHeaderAPIKeyValue != "" {
+			datasource.HeaderAPIKeyValue = newHeaderAPIKeyValue
 		}
 
 		err = database.DBInstance.UpdateDatasource(datasource)
