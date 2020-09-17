@@ -153,24 +153,28 @@ export const DatasourceForm = () => {
           onChange={handleHost}
         />
       </Grid>
-      <Grid item xs={2}>
-        <TextField
-          id="headerAPIKeyName"
-          label="Header API Key Name"
-          helperText="The optional key required in the header for API authorization"
-          value={body?.headerAPIKeyName}
-          onChange={handleHeaderAPIKeyName}
-        />
-      </Grid>
-      <Grid item xs={2}>
-        <TextField
-          id="headerAPIKeyValue"
-          label="Header API Key Value"
-          helperText=""
-          value={body?.headerAPIKeyValue}
-          onChange={handleHeaderAPIKeyValue}
-        />
-      </Grid>
+      {body.type == "API" ?
+        <Grid item xs={2}>
+          <TextField
+            id="headerAPIKeyName"
+            label="API Key Name"
+            helperText="Optional key required in the headers"
+            value={body?.headerAPIKeyName}
+            onChange={handleHeaderAPIKeyName}
+          />
+        </Grid> : null
+      }
+      {body.type == "API" ?
+        <Grid item xs={2}>
+          <TextField
+            id="headerAPIKeyValue"
+            label="API Key Value"
+            helperText=""
+            value={body?.headerAPIKeyValue}
+            onChange={handleHeaderAPIKeyValue}
+          />
+        </Grid> : null
+      }
       <Grid item xs={12}>
         {R.isEmpty(err) && R.isEmpty(resp) && (
           <Button
