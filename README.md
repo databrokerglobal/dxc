@@ -76,9 +76,14 @@ $ sudo apt install libc6-dev-armhf-cross
 $ sudo apt install gcc-multilib-arm-linux-gnueabihf
 ```
 
+### MacOS
+
+https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads
+
 #### Specifying the ARM platform env variables in build-script.sh
 
-Example for ARMv7:
+Replace CC with the name of the gcc compiler and then specify the platform you want to compile to.
+Enabling CGO is mandatory for the DXC for sqlite to work.
 
 ```
 # For the databroker signature package
