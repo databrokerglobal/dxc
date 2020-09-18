@@ -62,6 +62,36 @@ $ navigate to localhost:3000
 
 ## How to build
 
+### Cross-compilation for ARM platforms
+
+When using a host that is not ARM based a gcc cross compiler for ARM is required to compile to various ARM platforms.
+
+#### Ubuntu
+
+```
+# Optional recommended dependency
+$ sudo apt install libc6-dev-armhf-cross
+
+# Install the compiler
+$ sudo apt install gcc-multilib-arm-linux-gnueabihf
+```
+
+#### Specifying the ARM platform env variables in build-script.sh
+
+Example for ARMv7:
+
+```
+# For the databroker signature package
+env CC=arm-linux-gnueabihf-gcc GOOS=linux GOARCH=arm GOARM=7 go build -o databroker-signature
+
+# For the DXC
+env CC=arm-linux-gnueabihf-gcc CGO_ENABLED=1 GOOS=linux GOARCH=arm GOARM=7 go build -o ${BUILD_DIR}/dxc
+```
+
+List of all env variables:
+
+https://github.com/golang/go/wiki/GoArm
+
 ```
 $ ./build-script.sh
 $ cd dxc_build_dir
