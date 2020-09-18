@@ -142,3 +142,5 @@ $ ./run-tests.sh
 
 After running the test script an outfile is converted into a coverage.html file detailing the test coverage for each golang package in go project. This file is located in the test folder in the root of the project
 
+You can view a render of the results here: http://htmlpreview.github.io/?https://github.com/databrokerglobal/dxc/blob/master/test/coverage.html
+
