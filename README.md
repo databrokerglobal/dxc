@@ -92,6 +92,8 @@ List of all env variables:
 
 https://github.com/golang/go/wiki/GoArm
 
+# Build the DXC
+
 ```
 $ ./build-script.sh
 $ cd dxc_build_dir
