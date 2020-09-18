@@ -75,8 +75,13 @@ $ sudo apt install libc6-dev-armhf-cross
 # Install the compiler
 $ sudo apt install gcc-multilib-arm-linux-gnueabihf
 ```
+#### Arch linux
 
-### MacOS
+```
+$ sudo pacman -S arm-none-eabi-gcc
+```
+
+#### MacOS
 
 https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads
 
