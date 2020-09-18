@@ -85,6 +85,8 @@ https://developer.arm.com/tools-and-software/open-source-software/developer-tool
 Replace CC with the name of the gcc compiler and then specify the platform you want to compile to.
 Enabling CGO is mandatory for the DXC for sqlite to work.
 
+Example for Armv7:
+
 ```
 # For the databroker signature package
 env CC=arm-linux-gnueabihf-gcc GOOS=linux GOARCH=arm GOARM=7 go build -o databroker-signature
