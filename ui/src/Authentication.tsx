@@ -75,7 +75,7 @@ export const Authentication = () => {
 
   const handleSave = async () => {
     try {
-      await axios.post(`${LOCAL_HOST}/user/authinfo?address=${body.address}&apiKey=${body.apiKey}`, {
+      await axios.post(`${LOCAL_HOST}/user/authinfo?address=${body.address}&apiKey=${body.apiKey}`, null, {
         headers: { 'DXC_SECURE_KEY': localStorage.getItem('DXC_SECURE_KEY') }
       });
       setResp(`Authentication data successfully saved.`);
