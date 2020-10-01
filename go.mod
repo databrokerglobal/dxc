@@ -37,9 +37,11 @@ require (
 	github.com/urfave/cli v1.22.4 // indirect
 	golang.org/x/crypto v0.0.0-20200427165652-729f1e841bcc // indirect
 	golang.org/x/net v0.0.0-20200506145744-7e3656a0809f // indirect
+	golang.org/x/oauth2 v0.0.0-20190402181905-9f3314589c9a
 	golang.org/x/sys v0.0.0-20200501145240-bc7a7d42d5c3 // indirect
 	golang.org/x/tools v0.0.0-20200509030707-2212a7e161a5 // indirect
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0
+	gopkg.in/auth0.v3 v3.3.1
 	gopkg.in/ini.v1 v1.55.0 // indirect
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
 )

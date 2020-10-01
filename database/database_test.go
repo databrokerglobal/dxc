@@ -155,3 +155,39 @@ func (s *Suite) TestGetLatestInfuraID() {
 	require.NoError(s.T(), err)
 	require.Nil(s.T(), deep.Equal(infuraIDObject2.InfuraID, returnedInfuraID)) // check that the last one is returned (2) not the first one.
 }
+
+func (s *Suite) TestCreateSentiID() {
+
+	sentiIDObject := &SentiID{
+		SentiID: "eyJraWQiOiJzaCIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI3YTE3OGUxZS1jZDQwLTQzNTctODQxZC0xYzgxZWZmM2Y5MWYiLCJhdWQiOiJjYjQ1MzVmNy00YTE1LTRlNDAtODUzMy1lNDkxMzczNWNjMDEiLCJqdGkiOiJlODUxM2Q1YjUwYWJhYmZjNGFkYjlmZTJjZTNlZTU3YyIsImV4cCI6MTYwMTU1MDIyMiwibmFtZSI6IlZpbmNlbnQgQnVsdG90IiwiZW1haWwiOiJ2aW5jZW50QHNldHRsZW1pbnQuY29tIiwiZ2l2ZW5fbmFtZSI6IlZpbmNlbnQiLCJmYW1pbHlfbmFtZSI6IkJ1bHRvdCIsInNpZCI6IjA1N2Q2OGVlLTExYzYtNDQ4Zi1iNWY4LWY4YTg0ZTYwZDQyMyIsImRpZCI6MSwiZCI6eyIxIjp7InJhIjp7InJhZyI6MX0sInQiOjExMDAwfX19.VbULgNp6Jjs9IoHZRCcz20w2LKNR5WMuiiUe3NOqDR_jIShSTj7Ue5odH9nKYiXLEZr6CnuQ43VNJsyEpcSKLaIjTm9QjL78AntZCxpm4LEVaF2kCKpQeIOe9LdnEm_zMNXJnrqgTc_PSCTPF_qpKkLf0Sv88du7PxeWmoz57dzdRclrEPKPuyoz6psCIKYuLVdS0wtBDAFvjo8EjP_9axNIUW5U86_Xr38mRRZ3Ny-98VtHSW19sdwaRAFvHdnnbYrYBb9zmFMMMFeitTGIQxezK1-tgVRWQQiwfyYPibCwl69TUXb7s3lmJL2_a_UeX2vAtwqInbgRu8SbvEjjxw",
+	}
+
+	s.mock.ExpectBegin()
+	s.mock.ExpectExec(`INSERT INTO "senti_ids"`).WithArgs(AnyTime{}, AnyTime{}, nil, sentiIDObject.SentiID).WillReturnResult(sqlmock.NewResult(0, 1))
+	s.mock.ExpectCommit()
+
+	err := s.repository.CreateSentiID(sentiIDObject.SentiID)
+
+	require.NoError(s.T(), err)
+}
+
+func (s *Suite) TestGetLatestSentiID() {
+
+	sentiIDObject1 := &SentiID{
+		SentiID: "eyJraWQiOiJzaCIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI3YTE3OGUxZS1jZDQwLTQzNTctODQxZC0xYzgxZWZmM2Y5MWYiLCJhdWQiOiJjYjQ1MzVmNy00YTE1LTRlNDAtODUzMy1lNDkxMzczNWNjMDEiLCJqdGkiOiJlODUxM2Q1YjUwYWJhYmZjNGFkYjlmZTJjZTNlZTU3YyIsImV4cCI6MTYwMTU1MDIyMiwibmFtZSI6IlZpbmNlbnQgQnVsdG90IiwiZW1haWwiOiJ2aW5jZW50QHNldHRsZW1pbnQuY29tIiwiZ2l2ZW5fbmFtZSI6IlZpbmNlbnQiLCJmYW1pbHlfbmFtZSI6IkJ1bHRvdCIsInNpZCI6IjA1N2Q2OGVlLTExYzYtNDQ4Zi1iNWY4LWY4YTg0ZTYwZDQyMyIsImRpZCI6MSwiZCI6eyIxIjp7InJhIjp7InJhZyI6MX0sInQiOjExMDAwfX19.VbULgNp6Jjs9IoHZRCcz20w2LKNR5WMuiiUe3NOqDR_jIShSTj7Ue5odH9nKYiXLEZr6CnuQ43VNJsyEpcSKLaIjTm9QjL78AntZCxpm4LEVaF2kCKpQeIOe9LdnEm_zMNXJnrqgTc_PSCTPF_qpKkLf0Sv88du7PxeWmoz57dzdRclrEPKPuyoz6psCIKYuLVdS0wtBDAFvjo8EjP_9axNIUW5U86_Xr38mRRZ3Ny-98VtHSW19sdwaRAFvHdnnbYrYBb9zmFMMMFeitTGIQxezK1-tgVRWQQiwfyYPibCwl69TUXb7s3lmJL2_a_UeX2vAtwqInbgRu8SbvEjjxw",
+	}
+	sentiIDObject2 := &SentiID{
+		SentiID: "2345",
+	}
+
+	s.mock.ExpectQuery(
+		regexp.QuoteMeta(
+			`SELECT * FROM "senti_ids" WHERE "senti_ids"."deleted_at" IS NULL ORDER BY created_at desc,"senti_ids"."id" ASC LIMIT 1`,
+		),
+	).WillReturnRows(sqlmock.NewRows([]string{"senti_id"}).AddRow(sentiIDObject1.SentiID).AddRow(sentiIDObject2.SentiID))
+
+	returnedSentiID, err := s.repository.GetLatestSentiID()
+
+	require.NoError(s.T(), err)
+	require.Nil(s.T(), deep.Equal(sentiIDObject2.SentiID, returnedSentiID)) // check that the last one is returned (2) not the first one.
+}

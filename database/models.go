@@ -43,3 +43,9 @@ type InfuraID struct {
 	gorm.Model
 	InfuraID string `json:"infuraID"`
 }
+
+// SentiID struct to
+type SentiID struct {
+	gorm.Model
+	SentiID string `json:"access_token"`
+}
