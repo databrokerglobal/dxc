@@ -221,7 +221,7 @@ func ticker() {
 
 	fmt.Println("## Ticker initiating ")
 
-	ticker := time.NewTicker(1 * time.Minute)
+	ticker := time.NewTicker(30 * time.Minute)
 	done := make(chan bool)
 	go func() {
 		for {
