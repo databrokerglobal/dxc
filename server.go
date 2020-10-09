@@ -212,14 +212,14 @@ func getNewSentinelHUBAccessToken() {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Saved TOKEN = " + returnedSentiID)
+	fmt.Println("....................  Sentinel ## TOKEN = " + returnedSentiID)
 
 	//fmt.Println("*********")
 }
 
 func ticker() {
 
-	fmt.Println("## Ticker initiating ")
+	fmt.Println("....................  Sentinel ## Ticker initiating ")
 
 	ticker := time.NewTicker(30 * time.Minute)
 	done := make(chan bool)
@@ -229,7 +229,7 @@ func ticker() {
 			case <-done:
 				return
 			case t := <-ticker.C:
-				fmt.Println("Accessing new token at", t)
+				fmt.Println("....................  Sentinel ## Accessing new token at", t)
 				getNewSentinelHUBAccessToken()
 			}
 		}
@@ -240,6 +240,6 @@ func ticker() {
 	//done <- true
 	//fmt.Println("Ticker stopped")
 
-	fmt.Println("## Ticker running in-background ")
+	fmt.Println("....................  Sentinel ## Ticker running in-background ")
 
 }
