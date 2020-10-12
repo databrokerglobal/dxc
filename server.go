@@ -187,6 +187,7 @@ func getNewSentinelHUBAccessToken() {
 	resp, err := http.PostForm("https://services.sentinel-hub.com/oauth/token", data)
 
 	if err != nil {
+		fmt.Println("")
 		fmt.Println("## Inside main ERROR")
 		panic(err)
 	}
@@ -201,8 +202,8 @@ func getNewSentinelHUBAccessToken() {
 
 	str := fmt.Sprintf("%v", res["access_token"])
 
-	//fmt.Println("")
-	//fmt.Println(str)
+	fmt.Println("")
+	fmt.Println("....................  Sentinel ## NEW TOKEN obtained = " + str)
 
 	database.DBInstance.CreateSentiID(str)
 
@@ -212,16 +213,18 @@ func getNewSentinelHUBAccessToken() {
 		log.Fatal(err)
 	}
 
-	fmt.Println("....................  Sentinel ## TOKEN = " + returnedSentiID)
+	fmt.Println("")
+	fmt.Println("....................  Sentinel ## TOKEN saved in database = " + returnedSentiID)
 
 	//fmt.Println("*********")
 }
 
 func ticker() {
 
-	fmt.Println("....................  Sentinel ## Ticker initiating ")
+	fmt.Println("")
+	fmt.Println("....................  Sentinel ## Ticker initiating every ", 2*time.Minute)
 
-	ticker := time.NewTicker(30 * time.Minute)
+	ticker := time.NewTicker(2 * time.Minute)
 	done := make(chan bool)
 	go func() {
 		for {
@@ -229,6 +232,7 @@ func ticker() {
 			case <-done:
 				return
 			case t := <-ticker.C:
+				fmt.Println("")
 				fmt.Println("....................  Sentinel ## Accessing new token at", t)
 				getNewSentinelHUBAccessToken()
 			}

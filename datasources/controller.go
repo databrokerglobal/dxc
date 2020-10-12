@@ -465,7 +465,7 @@ func ProxyAPI(c echo.Context) error {
 	// Create a Bearer string by appending string access token
 	var bearer = "Bearer " + returnedSentiID
 	// add authorization header to the req
-	req.Header.Add("Authorization", bearer)
+	proxyReq.Header.Add("Authorization", bearer)
 	
 	//proxyReq.Header["access_token"] = []string{returnedSentiID}
 	
