@@ -222,9 +222,9 @@ func getNewSentinelHUBAccessToken() {
 func ticker() {
 
 	fmt.Println("")
-	fmt.Println("....................  Sentinel ## Ticker initiating every ", 2*time.Minute)
+	fmt.Println("....................  Sentinel ## Ticker initiating every ", 30*time.Minute)
 
-	ticker := time.NewTicker(2 * time.Minute)
+	ticker := time.NewTicker(30 * time.Minute)
 	done := make(chan bool)
 	go func() {
 		for {
