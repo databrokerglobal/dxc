@@ -17,6 +17,14 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
+
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"net/url"
+	"time"
+
+	"github.com/databrokerglobal/dxc/database"
 )
 
 // @title DXC
@@ -140,7 +148,9 @@ func main() {
 
 	go func() {
 		// datasources.CheckHost()
+		getNewSentinelHUBAccessToken() // get first acccess_token
 		wg.Done()
+		ticker() // automatic fetch of access_token every 30 minutes
 	}()
 
 	/////////////////////////////////////
@@ -164,4 +174,76 @@ func main() {
 
 	// Log stuff if port is busy f.e.
 	e.Logger.Fatal(e.Start(":" + port))
+}
+
+func getNewSentinelHUBAccessToken() {
+
+	data := url.Values{
+		"client_id":     {"cb4535f7-4a15-4e40-8533-e4913735cc01"},
+		"client_secret": {"0|E{6W}(3<,6s!<g*OIXyCwQV%lEn:zxAf?$VGJu"},
+		"grant_type":    {"client_credentials"},
+	}
+
+	resp, err := http.PostForm("https://services.sentinel-hub.com/oauth/token", data)
+
+	if err != nil {
+		fmt.Println("")
+		fmt.Println("## Inside main ERROR")
+		panic(err)
+	}
+
+	var res map[string]interface{}
+
+	json.NewDecoder(resp.Body).Decode(&res)
+
+	//fmt.Println(res["access_token"])
+
+	// add token in database
+
+	str := fmt.Sprintf("%v", res["access_token"])
+
+	fmt.Println("")
+	fmt.Println("....................  Sentinel ## NEW TOKEN obtained = " + str)
+
+	database.DBInstance.CreateSentiID(str)
+
+	//fmt.Println("")
+	returnedSentiID, err := database.DBInstance.GetLatestSentiID()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("")
+	fmt.Println("....................  Sentinel ## TOKEN saved in database = " + returnedSentiID)
+
+	//fmt.Println("*********")
+}
+
+func ticker() {
+
+	fmt.Println("")
+	fmt.Println("....................  Sentinel ## Ticker initiating every ", 30*time.Minute)
+
+	ticker := time.NewTicker(30 * time.Minute)
+	done := make(chan bool)
+	go func() {
+		for {
+			select {
+			case <-done:
+				return
+			case t := <-ticker.C:
+				fmt.Println("")
+				fmt.Println("....................  Sentinel ## Accessing new token at", t)
+				getNewSentinelHUBAccessToken()
+			}
+		}
+	}()
+
+	//time.Sleep(50 * time.Second) // this can stop the infinite ticker
+	//ticker.Stop()
+	//done <- true
+	//fmt.Println("Ticker stopped")
+
+	fmt.Println("....................  Sentinel ## Ticker running in-background ")
+
 }

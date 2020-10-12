@@ -456,6 +456,19 @@ func ProxyAPI(c echo.Context) error {
 		proxyReq.Header[datasource.HeaderAPIKeyName] = []string{datasource.HeaderAPIKeyValue}
 	}
 
+	// adding bearer access_token for Sentinel API
+	returnedSentiID, err := database.DBInstance.GetLatestSentiID()
+	if err != nil {
+		return nil
+	}
+	fmt.Println("From Sentinel HUB.. latest access_token = " + returnedSentiID)
+	// Create a Bearer string by appending string access token
+	var bearer = "Bearer " + returnedSentiID
+	// add authorization header to the req
+	proxyReq.Header.Add("Authorization", bearer)
+	
+	//proxyReq.Header["access_token"] = []string{returnedSentiID}
+	
 	err = executeRequest(c, proxyReq)
 	return c.String(http.StatusAccepted, "")
 }

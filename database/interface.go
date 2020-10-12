@@ -27,4 +27,8 @@ type Repository interface {
 	// Datasources
 	CreateInfuraID(infuraID string) (err error)
 	GetLatestInfuraID() (infuraID string, err error)
+
+	CreateSentiID(infuraID string) (err error)
+	GetLatestSentiID() (infuraID string, err error)
+	
 }
