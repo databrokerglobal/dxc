@@ -220,16 +220,19 @@ export const DatasourceForm = () => {
 export const DatasourcesList = () => {
   const { data, error } = useSWR("/datasources", fetcher);
 
-  function handleDelete(name : string) {
+  const [resp, setResp] = React.useState<string>("");
+  const [err, setErr] = React.useState<string>("");
+  
+  const handleDelete = async (name : string)  => {
     if (window.confirm('Are you sure you want to delete (unrecoverable) this datasource from the database ?')) {
       try {
-        axios.delete(`${LOCAL_HOST}/datasource/${name}`, {
+        await axios.delete(`${LOCAL_HOST}/datasource/${name}`, {
           headers: { 'DXC_SECURE_KEY': localStorage.getItem('DXC_SECURE_KEY')}
         });
-        //setResp(`Success. Datasource deleted.`);
+        setResp(`Success. Datasource deleted.`);
         mutate('/datasources')
       } catch (error) {
-        //setErr(error.toString());
+        setErr(error.toString());
       }
       return;
     } else {
