@@ -220,6 +220,23 @@ export const DatasourceForm = () => {
 export const DatasourcesList = () => {
   const { data, error } = useSWR("/datasources", fetcher);
 
+  function handleDelete(name : string) {
+    if (window.confirm('Are you sure you want to delete (unrecoverable) this datasource from the database ?')) {
+      try {
+        axios.delete(`${LOCAL_HOST}/datasource/${name}`, {
+          headers: { 'DXC_SECURE_KEY': localStorage.getItem('DXC_SECURE_KEY')}
+        });
+        //setResp(`Success. Datasource deleted.`);
+        mutate('/datasources')
+      } catch (error) {
+        //setErr(error.toString());
+      }
+      return;
+    } else {
+        return false;
+    }
+  }
+
   return (
     <Grid container spacing={2}>
       {!error &&
@@ -233,6 +250,7 @@ export const DatasourcesList = () => {
                 <TableCell>Host</TableCell>
                 <TableCell>Added on</TableCell>
                 <TableCell>ID</TableCell>
+                <TableCell>Action</TableCell>
                 <TableCell>Key in headers</TableCell>
               </TableRow>
             </TableHead>
@@ -245,6 +263,9 @@ export const DatasourcesList = () => {
                     <TableCell>{datasource.host}</TableCell>
                     <TableCell>{dayjs(datasource.CreatedAt).format('YYYY-MM-DD')}</TableCell>
                     <TableCell component="th" scope="row">{datasource.did}</TableCell>
+                    <TableCell>
+                      <Button variant="contained" onClick={e => handleDelete(datasource.did)}>Delete</Button>  
+                    </TableCell>
                     <TableCell style={{whiteSpace: "nowrap"}}>{datasource.headerAPIKeyName}{datasource.headerAPIKeyName !== undefined && datasource.headerAPIKeyName !== "" ? ":":""} {datasource.headerAPIKeyValue}</TableCell>
                   </TableRow> : null
               ))}
