@@ -219,7 +219,15 @@ export const DatasourceForm = () => {
 
 export const DatasourcesList = () => {
   const { data, error } = useSWR("/datasources", fetcher);
-
+  
+  const exampleBody = {
+    name: "datasource xxx",
+    host: "http://example.com/myfile",
+    type: "API",
+    headerAPIKeyName: "",
+    headerAPIKeyValue: "",
+  };
+  const [body, setBody] = React.useState<IDatasource>(exampleBody);
   const [resp, setResp] = React.useState<string>("");
   const [err, setErr] = React.useState<string>("");
   
@@ -233,6 +241,48 @@ export const DatasourcesList = () => {
         mutate('/datasources')
       } catch (error) {
         setErr(error.toString());
+      }
+      return;
+    } else {
+        return false;
+    }
+  }
+
+  const handleEdit = async (ds: any)  => {
+    if (window.confirm('Are you sure you want to edit this datasource ?')) {
+      var nameds = prompt("Please provide new NAME of the data source", ds.name);
+      if (nameds != null && nameds.trim()!="" ) {
+        var urlds = prompt("Please provide new HOST URL of the data source", ds.host);
+        if (urlds != null && urlds.trim()!="" ) {
+          // check if there is no edit 
+          if(nameds==ds.name && urlds==ds.host){
+            alert("Aborting as neither NAME or HOST URL was edited");
+          } else {
+            // set body 
+            body.name=nameds;
+            body.host=urlds;
+            body.type=ds.type;
+            body.headerAPIKeyName=ds.headerAPIKeyName;
+            body.headerAPIKeyValue=ds.headerAPIKeyValue;
+            try {
+              await axios.post(`${LOCAL_HOST}/datasource`, body, {
+                headers: { 'DXC_SECURE_KEY': localStorage.getItem('DXC_SECURE_KEY')}
+              });
+              // now delete previous
+              await axios.delete(`${LOCAL_HOST}/datasource/${ds.did}`, {
+                headers: { 'DXC_SECURE_KEY': localStorage.getItem('DXC_SECURE_KEY')}
+              });    
+              setResp(`Success. Datasource updated.`);
+              mutate('/datasources')
+            } catch (error) {
+              setErr(error.toString());
+            }
+          }
+        } else {
+          alert("Aborting as HOST URL not specified");
+        }
+      } else {
+        alert("Aborting as NAME not specified");
       }
       return;
     } else {
@@ -267,6 +317,7 @@ export const DatasourcesList = () => {
                     <TableCell>{dayjs(datasource.CreatedAt).format('YYYY-MM-DD')}</TableCell>
                     <TableCell component="th" scope="row">{datasource.did}</TableCell>
                     <TableCell>
+                      <Button variant="contained" onClick={e => handleEdit(datasource)}>Edit</Button>&nbsp;&nbsp;&nbsp;
                       <Button variant="contained" onClick={e => handleDelete(datasource.did)}>Delete</Button>  
                     </TableCell>
                     <TableCell style={{whiteSpace: "nowrap"}}>{datasource.headerAPIKeyName}{datasource.headerAPIKeyName !== undefined && datasource.headerAPIKeyName !== "" ? ":":""} {datasource.headerAPIKeyValue}</TableCell>
