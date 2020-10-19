@@ -42,4 +42,5 @@ require (
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0
 	gopkg.in/ini.v1 v1.55.0 // indirect
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
+	golang.org/genproto v0.0.0-20201013134114-7f9ee70cb474 
 )
