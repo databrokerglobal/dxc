@@ -314,8 +314,21 @@ export const DatasourcesList = () => {
                     <TableCell>{dayjs(datasource.CreatedAt).format('YYYY-MM-DD')}</TableCell>
                     <TableCell component="th" scope="row">{datasource.did}</TableCell>
                     <TableCell>
-                      <Button variant="contained" onClick={e => handleEdit(datasource)}>Edit</Button>&nbsp;&nbsp;&nbsp;
-                      <Button variant="contained" onClick={e => handleDelete(datasource.did)}>Delete</Button>  
+                      <Button 
+                        style={{
+                          backgroundColor: "#0044ff",
+                          color: "white"
+                        }} 
+                        variant="contained" 
+                        onClick={e => handleEdit(datasource)}>Edit</Button>
+                      <Button 
+                          style={{
+                            marginLeft: 10,
+                            backgroundColor: "#ff4400",
+                            color: "white"
+                          }} 
+                          variant="contained" 
+                          onClick={e => handleDelete(datasource.did)}>Delete</Button>  
                     </TableCell>
                     <TableCell style={{whiteSpace: "nowrap"}}>{datasource.headerAPIKeyName}{datasource.headerAPIKeyName !== undefined && datasource.headerAPIKeyName !== "" ? ":":""} {datasource.headerAPIKeyValue}</TableCell>
                   </TableRow> : null
