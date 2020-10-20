@@ -249,7 +249,7 @@ export const DatasourcesList = () => {
   }
 
   const handleEdit = async (ds: any)  => {
-    if (window.confirm('Are you sure you want to edit this datasource ?')) {
+    if (window.confirm('** Are you sure you want to edit this datasource ?')) {
       var nameds = prompt("Please provide new NAME of the data source", ds.name);
       if (nameds != null && nameds.trim()!="" ) {
         var urlds = prompt("Please provide new HOST URL of the data source", ds.host);
@@ -265,13 +265,10 @@ export const DatasourcesList = () => {
             body.headerAPIKeyName=ds.headerAPIKeyName;
             body.headerAPIKeyValue=ds.headerAPIKeyValue;
             try {
-              await axios.post(`${LOCAL_HOST}/datasource`, body, {
+              // now update previous
+              await axios.put(`${LOCAL_HOST}/datasource/${ds.did}`, body, {
                 headers: { 'DXC_SECURE_KEY': localStorage.getItem('DXC_SECURE_KEY')}
               });
-              // now delete previous
-              await axios.delete(`${LOCAL_HOST}/datasource/${ds.did}`, {
-                headers: { 'DXC_SECURE_KEY': localStorage.getItem('DXC_SECURE_KEY')}
-              });    
               setResp(`Success. Datasource updated.`);
               mutate('/datasources')
             } catch (error) {
