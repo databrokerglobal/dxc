@@ -2,6 +2,7 @@ import React from "react";
 import {
   TextField,
   Grid,
+  Button
 } from "@material-ui/core";
 import * as R from "ramda";
 
@@ -33,6 +34,10 @@ export const DXCAuthentication = () => {
     setBody(R.assoc("dxcSecureKey", event.target.value, body));
   };
 
+  function showKey(){
+    alert("DXC_SECURE_KEY\n____________________________\n\n" + body.dxcSecureKey);
+  }
+
   return (
     <Grid
       container
@@ -46,6 +51,7 @@ export const DXCAuthentication = () => {
     >
       <Grid item>
         <TextField
+          type="password"
           error={body?.dxcSecureKey?.length === 0}
           id="dxcSecureKey"
           label="DXC_SECURE_KEY"
@@ -54,6 +60,7 @@ export const DXCAuthentication = () => {
           value={body?.dxcSecureKey}
           onChange={handleDXCSecureKey}
         />
+        <Button onClick={e => showKey()}>Show</Button> 
       </Grid>
     </Grid>
   );
