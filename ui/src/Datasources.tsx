@@ -227,8 +227,11 @@ export const DatasourcesList = () => {
     headerAPIKeyName: "",
     headerAPIKeyValue: "",
   };
+  // eslint-disable-next-line
   const [body, setBody] = React.useState<IDatasource>(exampleBody);
+  // eslint-disable-next-line
   const [resp, setResp] = React.useState<string>("");
+  // eslint-disable-next-line
   const [err, setErr] = React.useState<string>("");
   
   const handleDelete = async (name : string)  => {
@@ -249,13 +252,13 @@ export const DatasourcesList = () => {
   }
 
   const handleEdit = async (ds: any)  => {
-    if (window.confirm('** Are you sure you want to edit this datasource ?')) {
+    if (window.confirm('Are you sure you want to edit this datasource ?')) {
       var nameds = prompt("Please provide new NAME of the data source", ds.name);
-      if (nameds != null && nameds.trim()!="" ) {
+      if (nameds !== null && nameds.trim()!=="" ) {
         var urlds = prompt("Please provide new HOST URL of the data source", ds.host);
-        if (urlds != null && urlds.trim()!="" ) {
+        if (urlds !== null && urlds.trim()!=="" ) {
           // check if there is no edit 
-          if(nameds==ds.name && urlds==ds.host){
+          if(nameds===ds.name && urlds===ds.host){
             alert("Aborting as neither NAME or HOST URL was edited");
           } else {
             // set body 
