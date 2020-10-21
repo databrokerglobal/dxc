@@ -239,7 +239,7 @@ export const DatasourcesList = () => {
             <TableBody>
               {(data.data as any).map((datasource: any) => (
                 datasource.did !== "" ?
-                  <TableRow key={datasource.did}>
+                  <TableRow key={datasource.did} className={datasource.available?"":"ds_inactive"}>
                     <TableCell>{datasource.name}</TableCell>
                     <TableCell>{datasource.type}</TableCell>
                     <TableCell>{datasource.host}</TableCell>
