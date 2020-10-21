@@ -113,7 +113,63 @@ func (s *Suite) TestDeleteDatasourceByDID() {
 	returnedDatasource2, err2 := s.repository.GetDatasourceByDID(datasource.Did)
 
 	require.NoError(s.T(), err2)
-	require.Nil(s.T(), deep.Equal("",returnedDatasource2.Did))
+	require.Nil(s.T(), deep.Equal("", returnedDatasource2.Did))
+}
+
+func (s *Suite) TestUpdateDatasourceByDID() {
+
+	datasource := &Datasource{
+		Name:      "Test",
+		Type:      "API",
+		Did:       "did",
+		Host:      "http://localhost:3453",
+		Available: true,
+	}
+
+	s.mock.ExpectQuery(
+		regexp.QuoteMeta(
+			`SELECT * FROM "datasources"  WHERE "datasources"."deleted_at" IS NULL AND (("datasources"."did" = ?)) ORDER BY "datasources"."id" ASC LIMIT 1`,
+		),
+	).WithArgs(datasource.Did).WillReturnRows(sqlmock.NewRows([]string{"name", "type", "did", "host", "available"}).AddRow(datasource.Name, datasource.Type, datasource.Did, datasource.Host, datasource.Available))
+
+	returnedDatasource, err := s.repository.GetDatasourceByDID(datasource.Did)
+	require.NoError(s.T(), err)
+	require.Nil(s.T(), deep.Equal(datasource, returnedDatasource))
+
+	newName := "NEW_NAME"
+	datasource.Name = newName
+
+	err0 := s.repository.UpdateDatasource(datasource)
+	require.NoError(s.T(), err0)
+
+	returnedDatasource2, err2 := s.repository.GetDatasourceByDID(datasource.Did)
+	require.NoError(s.T(), err2)
+	require.Nil(s.T(), deep.Equal(newName, returnedDatasource2.Name))
+}
+
+func (s *Suite) TestUpdateDatasourceByDID_check() {
+
+	datasource := &Datasource{
+		Name:      "Test",
+		Type:      "API",
+		Did:       "did",
+		Host:      "http://localhost:3453",
+		Available: true,
+	}
+
+	s.mock.ExpectQuery(
+		regexp.QuoteMeta(
+			`SELECT * FROM "datasources"  WHERE "datasources"."deleted_at" IS NULL AND (("datasources"."did" = ?)) ORDER BY "datasources"."id" ASC LIMIT 1`,
+		),
+	).WithArgs(datasource.Did).WillReturnRows(sqlmock.NewRows([]string{"name", "type", "did", "host", "available"}).AddRow(datasource.Name, datasource.Type, datasource.Did, datasource.Host, datasource.Available))
+
+	returnedDatasource, err := s.repository.GetDatasourceByDID(datasource.Did)
+	require.NoError(s.T(), err)
+	require.Nil(s.T(), deep.Equal(datasource, returnedDatasource))
+
+	returnedDatasource2, err2 := s.repository.GetDatasourceByDID(datasource.Did)
+	require.NoError(s.T(), err2)
+	require.Nil(s.T(), deep.Equal(datasource, returnedDatasource2))
 
 }
 
