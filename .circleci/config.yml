@@ -18,9 +18,6 @@ jobs: # basic units of work in a run
       # Normally, this step would be in a custom primary image;
       # we've added it here for the sake of explanation.
       - run:
-          name: Tidy go modules
-          command: go mod tidy -v
-      - run:
           name: Run unit tests
           # Store the results of our tests in the $TEST_RESULTS directory
           command: chmod +x ./run-tests.sh && ./run-tests.sh
