@@ -15,14 +15,15 @@ jobs: # basic units of work in a run
             - v2-pkg-cache
       # Normally, this step would be in a custom primary image;
       # we've added it here for the sake of explanation.
-      - run: go mod tidy
-      - run: go mod download
+      - run:
+          name: Tidy go modules
+          command: go mod tidy
       - run:
           name: Run unit tests
           # Store the results of our tests in the $TEST_RESULTS directory
           command: chmod +x ./run-tests.sh && ./run-tests.sh
       - save_cache: # Store cache in the /go/pkg directory
-          key: v1-pkg-cache
+          key: v2-pkg-cache
           paths:
             - "/go/pkg"
   build_and_test_truffle: # runs not using Workflows must have a `build` job as entry point
