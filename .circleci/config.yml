@@ -22,8 +22,7 @@ jobs: # basic units of work in a run
           # Store the results of our tests in the $TEST_RESULTS directory
           command: chmod +x ./run-tests.sh && ./run-tests.sh
       - save_cache: # Store cache in the /go/pkg directory
-          key:
-            - go-mod-v1-{{ checksum "go.sum" }}
+          key: go-mod-v1-{{ checksum "go.sum" }}
           paths:
             - "/go/pkig/mod"
   build_and_test_truffle: # runs not using Workflows must have a `build` job as entry point
