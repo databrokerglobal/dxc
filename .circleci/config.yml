@@ -12,7 +12,7 @@ jobs: # basic units of work in a run
       - restore_cache: # restores saved cache if no changes are detected since last run
           # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
           keys:
-            - v1-pkg-cache
+            - v2-pkg-cache
       # Normally, this step would be in a custom primary image;
       # we've added it here for the sake of explanation.
       - run: go mod download
