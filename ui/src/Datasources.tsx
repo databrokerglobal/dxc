@@ -319,16 +319,16 @@ export const DatasourcesList = () => {
                     <TableCell>
                       <Button 
                         style={{
-                          backgroundColor: "#0044ff",
-                          color: "white"
+                          backgroundColor: "#3dd890",
+                          color: "black"
                         }} 
                         variant="contained" 
                         onClick={e => handleEdit(datasource)}>Edit</Button>
                       <Button 
                           style={{
                             marginLeft: 10,
-                            backgroundColor: "#ff4400",
-                            color: "white"
+                            backgroundColor: "#ff6946",
+                            color: "black"
                           }} 
                           variant="contained" 
                           onClick={e => handleDelete(datasource.did)}>Delete</Button>  
