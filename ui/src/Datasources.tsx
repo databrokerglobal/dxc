@@ -294,8 +294,8 @@ export const DatasourcesList = () => {
     <Grid container spacing={2}>
       {!error &&
         data && (
-        <TableContainer>
-          <Table aria-label="simple table">
+        <TableContainer >
+          <Table aria-label="simple table" style={{ width:"2000px", marginTop: "15px", }}>
             <TableHead>
               <TableRow>
                 <TableCell>Name</TableCell>

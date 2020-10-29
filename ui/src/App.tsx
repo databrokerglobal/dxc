@@ -36,11 +36,12 @@ function App() {
   return (
     <Container>
       <CssBaseline />
-      <AppBar position="static" style={{ background: "#79E6D0" }}>
+      <AppBar position="static" style={{ background: "#A256FB" }}>
         <Toolbar>
-          <Typography variant="h6" style={{ color: "black" }}>
+          <Typography variant="h4" style={{ color: "white" }}>
             Databroker eXchange Controller
           </Typography>
+          <p style={{ margin: "20px", }}> <img src="logo.jpg" width="200"/> </p>
         </Toolbar>
       </AppBar>
       <Tabs value={tabValue} onChange={handleChangedTab} aria-label="simple tabs example">
