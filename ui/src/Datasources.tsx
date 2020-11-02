@@ -219,13 +219,83 @@ export const DatasourceForm = () => {
 
 export const DatasourcesList = () => {
   const { data, error } = useSWR("/datasources", fetcher);
+  
+  const exampleBody = {
+    name: "datasource xxx",
+    host: "http://example.com/myfile",
+    type: "API",
+    headerAPIKeyName: "",
+    headerAPIKeyValue: "",
+  };
+  // eslint-disable-next-line
+  const [body, setBody] = React.useState<IDatasource>(exampleBody);
+  // eslint-disable-next-line
+  const [resp, setResp] = React.useState<string>("");
+  // eslint-disable-next-line
+  const [err, setErr] = React.useState<string>("");
+  
+  const handleDelete = async (name : string)  => {
+    if (window.confirm('Are you sure you want to delete (unrecoverable) this datasource from the database ?')) {
+      try {
+        await axios.delete(`${LOCAL_HOST}/datasource/${name}`, {
+          headers: { 'DXC_SECURE_KEY': localStorage.getItem('DXC_SECURE_KEY')}
+        });
+        setResp(`Success. Datasource deleted.`);
+        mutate('/datasources')
+      } catch (error) {
+        setErr(error.toString());
+      }
+      return;
+    } else {
+        return false;
+    }
+  }
+
+  const handleEdit = async (ds: any)  => {
+    if (window.confirm('Are you sure you want to edit this datasource ?')) {
+      var nameds = prompt("Please provide new NAME of the data source", ds.name);
+      if (nameds !== null && nameds.trim()!=="" ) {
+        var urlds = prompt("Please provide new HOST URL of the data source", ds.host);
+        if (urlds !== null && urlds.trim()!=="" ) {
+          // check if there is no edit 
+          if(nameds===ds.name && urlds===ds.host){
+            alert("Aborting as neither NAME or HOST URL was edited");
+          } else {
+            // set body 
+            body.name=nameds;
+            body.host=urlds;
+            body.type=ds.type;
+            body.headerAPIKeyName=ds.headerAPIKeyName;
+            body.headerAPIKeyValue=ds.headerAPIKeyValue;
+            try {
+              // now update previous
+              await axios.put(`${LOCAL_HOST}/datasource/${ds.did}`, body, {
+                headers: { 'DXC_SECURE_KEY': localStorage.getItem('DXC_SECURE_KEY')}
+              });
+              setResp(`Success. Datasource updated.`);
+              mutate('/datasources')
+            } catch (error) {
+              setErr(error.toString());
+            }
+          }
+        } else {
+          alert("Aborting as HOST URL not specified");
+        }
+      } else {
+        alert("Aborting as NAME not specified");
+      }
+      return;
+    } else {
+        return false;
+    }
+  }
 
   return (
     <Grid container spacing={2}>
       {!error &&
         data && (
-        <TableContainer>
-          <Table aria-label="simple table">
+        <TableContainer >
+          <Table aria-label="simple table" style={{ width:"2000px", marginTop: "15px", }}>
             <TableHead>
               <TableRow>
                 <TableCell>Name</TableCell>
@@ -233,18 +303,36 @@ export const DatasourcesList = () => {
                 <TableCell>Host</TableCell>
                 <TableCell>Added on</TableCell>
                 <TableCell>ID</TableCell>
+                <TableCell>Action</TableCell>
                 <TableCell>Key in headers</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {(data.data as any).map((datasource: any) => (
                 datasource.did !== "" ?
-                  <TableRow key={datasource.did}>
+                  <TableRow key={datasource.did} className={datasource.available?"":"ds_inactive"}>
                     <TableCell>{datasource.name}</TableCell>
                     <TableCell>{datasource.type}</TableCell>
                     <TableCell>{datasource.host}</TableCell>
                     <TableCell>{dayjs(datasource.CreatedAt).format('YYYY-MM-DD')}</TableCell>
                     <TableCell component="th" scope="row">{datasource.did}</TableCell>
+                    <TableCell>
+                      <Button 
+                        style={{
+                          backgroundColor: "#3dd890",
+                          color: "black"
+                        }} 
+                        variant="contained" 
+                        onClick={e => handleEdit(datasource)}>Edit</Button>
+                      <Button 
+                          style={{
+                            marginLeft: 10,
+                            backgroundColor: "#ff6946",
+                            color: "black"
+                          }} 
+                          variant="contained" 
+                          onClick={e => handleDelete(datasource.did)}>Delete</Button>  
+                    </TableCell>
                     <TableCell style={{whiteSpace: "nowrap"}}>{datasource.headerAPIKeyName}{datasource.headerAPIKeyName !== undefined && datasource.headerAPIKeyName !== "" ? ":":""} {datasource.headerAPIKeyValue}</TableCell>
                   </TableRow> : null
               ))}

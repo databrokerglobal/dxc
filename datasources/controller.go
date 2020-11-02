@@ -308,14 +308,21 @@ func UpdateDatasource(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "Bad request. did cannot be empty.")
 	}
 
-	newName := c.QueryParam("newName")
-	newHost := c.QueryParam("newHost")
+	u := new(DatasourceReq)
+	if err = c.Bind(u); err != nil {
+		return c.String(http.StatusBadRequest, "Bad request. Either name or host must be present.")
+	}
+
+	newName := u.Name
+	newHost := u.Host
 	newHeaderAPIKeyName := c.QueryParam("newHeaderAPIKeyName")
 	newHeaderAPIKeyValue := c.QueryParam("newHeaderAPIKeyValue")
 
 	if newName == "" && newHost == "" && newHeaderAPIKeyName == "" && newHeaderAPIKeyValue == "" {
 		return c.String(http.StatusBadRequest, "Bad request. all values cannot both be empty.")
 	}
+
+	fmt.Println("HERE  ### @ ")
 
 	if !RunningTest {
 		datasource, err := database.DBInstance.GetDatasourceByDID(did)
@@ -388,7 +395,13 @@ func GetFile(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "datasource is not of type FILE")
 	}
 
-	filename := path.Base(datasource.Host)
+	oldfilename := path.Base(datasource.Host)
+	filename := ""
+	if idx := strings.IndexByte(oldfilename, '?'); idx >= 0 {
+		filename = oldfilename[:strings.IndexByte(oldfilename, '?')]
+	} else {
+		filename = oldfilename
+	}
 	rand, _ := utils.GenerateRandomStringURLSafe(10)
 	pathToFile := "tempFiles/" + rand + "/" + filename
 	err = downloadFile(pathToFile, datasource.Host)
