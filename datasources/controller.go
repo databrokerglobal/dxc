@@ -402,14 +402,20 @@ func GetFile(c echo.Context) error {
 	} else {
 		filename = oldfilename
 	}
-	rand, _ := utils.GenerateRandomStringURLSafe(10)
-	pathToFile := "tempFiles/" + rand + "/" + filename
-	err = downloadFile(pathToFile, datasource.Host)
-	if err != nil {
-		return c.String(http.StatusInternalServerError, "could not download file. error: "+err.Error())
-	}
-	defer os.RemoveAll(filepath.Dir(pathToFile))
 
+	// check if host URL is actually a URL
+	if strings.Contains(strings.ToLower(datasource.Host), "http") {
+		rand, _ := utils.GenerateRandomStringURLSafe(10)
+		pathToFile := "tempFiles/" + rand + "/" + filename
+		err = downloadFile(pathToFile, datasource.Host)
+		if err != nil {
+			return c.String(http.StatusInternalServerError, "could not download file. error: "+err.Error())
+		}
+		defer os.RemoveAll(filepath.Dir(pathToFile))
+		return c.Attachment(pathToFile, filename)
+	}
+	// in case host url is local file
+	pathToFile := datasource.Host
 	return c.Attachment(pathToFile, filename)
 }
 
