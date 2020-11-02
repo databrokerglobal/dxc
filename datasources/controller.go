@@ -402,15 +402,20 @@ func GetFile(c echo.Context) error {
 	} else {
 		filename = oldfilename
 	}
-	rand, _ := utils.GenerateRandomStringURLSafe(10)
-	pathToFile := "tempFiles/" + rand + "/" + filename
-	err = downloadFile(pathToFile, datasource.Host)
-	if err != nil {
-		return c.String(http.StatusInternalServerError, "could not download file. error: "+err.Error())
-	}
-	defer os.RemoveAll(filepath.Dir(pathToFile))
 
-	return c.Attachment(pathToFile, filename)
+	// check if URL is not local file
+	if strings.Contains(strings.ToLower(datasource.Host), "http") {
+		rand, _ := utils.GenerateRandomStringURLSafe(10)
+		pathToFile := "tempFiles/" + rand + "/" + filename
+		err = downloadFile(pathToFile, datasource.Host)
+		if err != nil {
+			return c.String(http.StatusInternalServerError, "could not download file. error: "+err.Error())
+		}
+		defer os.RemoveAll(filepath.Dir(pathToFile))
+		return c.Attachment(pathToFile, filename)
+	}
+	pathToFile := datasource.Host
+	return c.Inline(pathToFile, filename)
 }
 
 // ProxyAPI redirects api
