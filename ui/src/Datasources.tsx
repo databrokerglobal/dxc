@@ -295,7 +295,7 @@ export const DatasourcesList = () => {
       {!error &&
         data && (
         <TableContainer>
-          <Table aria-label="simple table">
+          <Table aria-label="simple table" style={{ width:"2000px", marginTop: "15px", }}>
             <TableHead>
               <TableRow>
                 <TableCell>Name</TableCell>

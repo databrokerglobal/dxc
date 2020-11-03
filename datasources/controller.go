@@ -402,7 +402,13 @@ func GetFile(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "datasource is not of type FILE")
 	}
 
-	filename := path.Base(datasource.Host)
+	oldfilename := path.Base(datasource.Host)
+	filename := ""
+	if idx := strings.IndexByte(oldfilename, '?'); idx >= 0 {
+		filename = oldfilename[:strings.IndexByte(oldfilename, '?')]
+	} else {
+		filename = oldfilename
+	}
 	rand, _ := utils.GenerateRandomStringURLSafe(10)
 	pathToFile := "tempFiles/" + rand + "/" + filename
 	err = downloadFile(pathToFile, datasource.Host)
