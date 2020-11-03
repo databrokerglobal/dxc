@@ -20,7 +20,7 @@ var (
 	_ = big.NewInt
 	_ = strings.NewReader
 	_ = ethereum.NotFound
-	_ = abi.U256
+	_ = abi.MaxUint256
 	_ = bind.Bind
 	_ = common.Big1
 	_ = types.BloomLookup
@@ -155,7 +155,9 @@ func bindEthereum(address common.Address, caller bind.ContractCaller, transactor
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
 func (_Ethereum *EthereumRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
-	return _Ethereum.Contract.EthereumCaller.contract.Call(opts, result, method, params...)
+	resultArray := make([]interface{}, 1)
+	resultArray[0] = result
+	return _Ethereum.Contract.EthereumCaller.contract.Call(opts, &resultArray, method, params...)
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
@@ -174,7 +176,9 @@ func (_Ethereum *EthereumRaw) Transact(opts *bind.TransactOpts, method string, p
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
 func (_Ethereum *EthereumCallerRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
-	return _Ethereum.Contract.contract.Call(opts, result, method, params...)
+	resultArray := make([]interface{}, 1)
+	resultArray[0] = result
+	return _Ethereum.Contract.contract.Call(opts, &resultArray, method, params...)
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
@@ -196,7 +200,11 @@ func (_Ethereum *EthereumCaller) AllDeals(opts *bind.CallOpts) ([]Struct0, error
 		ret0 = new([]Struct0)
 	)
 	out := ret0
-	err := _Ethereum.contract.Call(opts, out, "allDeals")
+	var v interface{}
+	v = out
+	resultArray := make([]interface{}, 1)
+	resultArray[0] = v
+	err := _Ethereum.contract.Call(opts, &resultArray, "allDeals")
 	return *ret0, err
 }
 
@@ -222,7 +230,11 @@ func (_Ethereum *EthereumCaller) DealsForAddress(opts *bind.CallOpts, user commo
 		ret0 = new([]Struct0)
 	)
 	out := ret0
-	err := _Ethereum.contract.Call(opts, out, "dealsForAddress", user)
+	var v interface{}
+	v = out
+	resultArray := make([]interface{}, 1)
+	resultArray[0] = v
+	err := _Ethereum.contract.Call(opts, &resultArray, "dealsForAddress", user)
 	return *ret0, err
 }
 
@@ -248,7 +260,11 @@ func (_Ethereum *EthereumCaller) DealsForDID(opts *bind.CallOpts, did string) ([
 		ret0 = new([]Struct0)
 	)
 	out := ret0
-	err := _Ethereum.contract.Call(opts, out, "dealsForDID", did)
+	var v interface{}
+	v = out
+	resultArray := make([]interface{}, 1)
+	resultArray[0] = v
+	err := _Ethereum.contract.Call(opts, &resultArray, "dealsForDID", did)
 	return *ret0, err
 }
 
@@ -298,7 +314,11 @@ func (_Ethereum *EthereumCaller) DidToDeals(opts *bind.CallOpts, arg0 string, ar
 		ValidUntil            *big.Int
 	})
 	out := ret
-	err := _Ethereum.contract.Call(opts, out, "didToDeals", arg0, arg1)
+	var v interface{}
+	v = out
+	resultArray := make([]interface{}, 1)
+	resultArray[0] = v
+	err := _Ethereum.contract.Call(opts, &resultArray, "didToDeals", arg0, arg1)
 	return *ret, err
 }
 
@@ -350,7 +370,11 @@ func (_Ethereum *EthereumCaller) GetCurrentIndex(opts *bind.CallOpts) (*big.Int,
 		ret0 = new(*big.Int)
 	)
 	out := ret0
-	err := _Ethereum.contract.Call(opts, out, "getCurrentIndex")
+	var v interface{}
+	v = out
+	resultArray := make([]interface{}, 1)
+	resultArray[0] = v
+	err := _Ethereum.contract.Call(opts, &resultArray, "getCurrentIndex")
 	return *ret0, err
 }
 
@@ -376,7 +400,11 @@ func (_Ethereum *EthereumCaller) GetDealByIndex(opts *bind.CallOpts, index *big.
 		ret0 = new(Struct0)
 	)
 	out := ret0
-	err := _Ethereum.contract.Call(opts, out, "getDealByIndex", index)
+	var v interface{}
+	v = out
+	resultArray := make([]interface{}, 1)
+	resultArray[0] = v
+	err := _Ethereum.contract.Call(opts, &resultArray, "getDealByIndex", index)
 	return *ret0, err
 }
 
@@ -402,7 +430,11 @@ func (_Ethereum *EthereumCaller) HasAccessToDeal(opts *bind.CallOpts, index *big
 		ret0 = new(bool)
 	)
 	out := ret0
-	err := _Ethereum.contract.Call(opts, out, "hasAccessToDeal", index, user)
+	var v interface{}
+	v = out
+	resultArray := make([]interface{}, 1)
+	resultArray[0] = v
+	err := _Ethereum.contract.Call(opts, &resultArray, "hasAccessToDeal", index, user)
 	return *ret0, err
 }
 
@@ -428,7 +460,11 @@ func (_Ethereum *EthereumCaller) Owner(opts *bind.CallOpts) (common.Address, err
 		ret0 = new(common.Address)
 	)
 	out := ret0
-	err := _Ethereum.contract.Call(opts, out, "owner")
+	var v interface{}
+	v = out
+	resultArray := make([]interface{}, 1)
+	resultArray[0] = v
+	err := _Ethereum.contract.Call(opts, &resultArray, "owner")
 	return *ret0, err
 }
 
@@ -454,7 +490,11 @@ func (_Ethereum *EthereumCaller) Paused(opts *bind.CallOpts) (bool, error) {
 		ret0 = new(bool)
 	)
 	out := ret0
-	err := _Ethereum.contract.Call(opts, out, "paused")
+	var v interface{}
+	v = out
+	resultArray := make([]interface{}, 1)
+	resultArray[0] = v
+	err := _Ethereum.contract.Call(opts, &resultArray, "paused")
 	return *ret0, err
 }
 
@@ -504,7 +544,11 @@ func (_Ethereum *EthereumCaller) UserToDeals(opts *bind.CallOpts, arg0 common.Ad
 		ValidUntil            *big.Int
 	})
 	out := ret
-	err := _Ethereum.contract.Call(opts, out, "userToDeals", arg0, arg1)
+	var v interface{}
+	v = out
+	resultArray := make([]interface{}, 1)
+	resultArray[0] = v
+	err := _Ethereum.contract.Call(opts, &resultArray, "userToDeals", arg0, arg1)
 	return *ret, err
 }
 
