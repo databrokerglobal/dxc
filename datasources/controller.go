@@ -26,9 +26,11 @@ var RunningTest = false
 
 // DatasourceReq safe type for the controller
 type DatasourceReq struct {
-	Name string `json:"name"`
-	Type string `json:"type"`
-	Host string `json:"host"`
+	Name        string `json:"name"`
+	Type        string `json:"type"`
+	Host        string `json:"host"`
+	APIKeyName  string `json:"headerAPIKeyName"`
+	APIKeyValue string `json:"headerAPIKeyValue"`
 }
 
 // AddOneDatasource datasource
@@ -308,13 +310,25 @@ func UpdateDatasource(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "Bad request. did cannot be empty.")
 	}
 
-	newName := c.QueryParam("newName")
-	newHost := c.QueryParam("newHost")
-	newHeaderAPIKeyName := c.QueryParam("newHeaderAPIKeyName")
-	newHeaderAPIKeyValue := c.QueryParam("newHeaderAPIKeyValue")
+	u := new(DatasourceReq)
+	if err = c.Bind(u); err != nil {
+		return c.String(http.StatusBadRequest, "Bad request. Either name or host must be present.")
+	}
+
+	newName := u.Name
+	newHost := u.Host
+	newHeaderAPIKeyName := u.APIKeyName
+	newHeaderAPIKeyValue := u.APIKeyValue
 
 	if newName == "" && newHost == "" && newHeaderAPIKeyName == "" && newHeaderAPIKeyValue == "" {
-		return c.String(http.StatusBadRequest, "Bad request. all values cannot both be empty.")
+		// may be in query params
+		newName = c.QueryParam("newName")
+		newHost = c.QueryParam("newHost")
+		newHeaderAPIKeyName = c.QueryParam("newHeaderAPIKeyName")
+		newHeaderAPIKeyValue = c.QueryParam("newHeaderAPIKeyValue")
+		if newName == "" && newHost == "" && newHeaderAPIKeyName == "" && newHeaderAPIKeyValue == "" {
+			return c.String(http.StatusBadRequest, "Bad request. all values cannot both be empty.")
+		}
 	}
 
 	if !RunningTest {
@@ -388,7 +402,13 @@ func GetFile(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "datasource is not of type FILE")
 	}
 
-	filename := path.Base(datasource.Host)
+	oldfilename := path.Base(datasource.Host)
+	filename := ""
+	if idx := strings.IndexByte(oldfilename, '?'); idx >= 0 {
+		filename = oldfilename[:strings.IndexByte(oldfilename, '?')]
+	} else {
+		filename = oldfilename
+	}
 	rand, _ := utils.GenerateRandomStringURLSafe(10)
 	pathToFile := "tempFiles/" + rand + "/" + filename
 	err = downloadFile(pathToFile, datasource.Host)

@@ -56,7 +56,7 @@ func (s *Suite) TestCreateDatasource() {
 	}
 
 	s.mock.ExpectBegin()
-	s.mock.ExpectExec(`INSERT INTO "datasources"`).WithArgs(AnyTime{}, AnyTime{}, nil, datasource.Name, datasource.Type, datasource.Did, datasource.Host, datasource.Available).WillReturnResult(sqlmock.NewResult(0, 1))
+	s.mock.ExpectExec(`INSERT INTO "datasources"`).WithArgs(AnyTime{}, AnyTime{}, nil, datasource.Name, datasource.Type, datasource.Did, datasource.Host, datasource.HeaderAPIKeyName, datasource.HeaderAPIKeyValue, datasource.Available).WillReturnResult(sqlmock.NewResult(0, 1))
 	s.mock.ExpectCommit()
 
 	err := s.repository.CreateDatasource(datasource)
@@ -84,6 +84,36 @@ func (s *Suite) TestGetDatasourceByDID() {
 
 	require.NoError(s.T(), err)
 	require.Nil(s.T(), deep.Equal(datasource, returnedDatasource))
+}
+
+func (s *Suite) TestDeleteDatasourceByDID() {
+
+	datasource := &Datasource{
+		Name:      "Test",
+		Type:      "API",
+		Did:       "did",
+		Host:      "http://localhost:3453",
+		Available: true,
+	}
+
+	s.mock.ExpectQuery(
+		regexp.QuoteMeta(
+			`SELECT * FROM "datasources"  WHERE "datasources"."deleted_at" IS NULL AND (("datasources"."did" = ?)) ORDER BY "datasources"."id" ASC LIMIT 1`,
+		),
+	).WithArgs(datasource.Did).WillReturnRows(sqlmock.NewRows([]string{"name", "type", "did", "host", "available"}).AddRow(datasource.Name, datasource.Type, datasource.Did, datasource.Host, datasource.Available))
+
+	returnedDatasource, err := s.repository.GetDatasourceByDID(datasource.Did)
+
+	require.NoError(s.T(), err)
+	require.Nil(s.T(), deep.Equal(datasource, returnedDatasource))
+
+	err0 := s.repository.DeleteDatasource(datasource.Did)
+	require.NoError(s.T(), err0)
+
+	returnedDatasource2, err2 := s.repository.GetDatasourceByDID(datasource.Did)
+
+	require.NoError(s.T(), err2)
+	require.Nil(s.T(), deep.Equal("", returnedDatasource2.Did))
 }
 
 func (s *Suite) TestCreateSyncStatus() {

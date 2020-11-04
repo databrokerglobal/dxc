@@ -3,7 +3,7 @@ jobs: # basic units of work in a run
   build_and_test_go: # runs not using Workflows must have a `build` job as entry point
     docker: # run the steps with Docker
       # CircleCI Go images available at: https://hub.docker.com/r/circleci/golang/
-      - image: circleci/golang:1.13
+      - image: circleci/golang:1.15
         environment:
           GO111MODULE: "on"
     environment: # environment variables for the build itself
@@ -28,7 +28,7 @@ jobs: # basic units of work in a run
   build_and_test_truffle: # runs not using Workflows must have a `build` job as entry point
     working_directory: ~/dxc/truffle
     docker: # run the steps with Docker
-      - image: circleci/node:12.16.1 # ...with this image as the primary container; this is where all `steps` will ru
+      - image: circleci/node:12.18.2 # ...with this image as the primary container; this is where all `steps` will ru
     steps: # a collection of executable commands
       - checkout:
           path: ~/dxc
