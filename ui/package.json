@@ -12,7 +12,7 @@
     "@types/react-select": "^3.0.12",
     "@types/yup": "^0.28.0",
     "axios": "^0.19.2",
-    "dayjs": "^1.8.25",
+    "dayjs": "^1.9.6",
     "formik": "^2.1.4",
     "ramda": "^0.27.0",
     "react": "^16.13.1",
