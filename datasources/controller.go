@@ -19,6 +19,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
+
+	"github.com/jlaffaye/ftp"
 )
 
 // RunningTest is true when we are running tests
@@ -72,6 +74,13 @@ func AddOneDatasource(c echo.Context) error {
 	}
 
 	datasource.Available = true
+
+	if datasource.Ftpusername == "" {
+		datasource.Ftpusername = "anonymous"
+	}
+	if datasource.Ftppassword == "" {
+		datasource.Ftppassword = "anonymous"
+	}
 
 	if !RunningTest {
 		if err := database.DBInstance.CreateDatasource(datasource); err != nil {
@@ -409,14 +418,25 @@ func GetFile(c echo.Context) error {
 	} else {
 		filename = oldfilename
 	}
+	// check if protocol is local file
+	if datasource.Protocol == "LOCAL" {
+		// direct download of local file
+		pathToFile := datasource.Host
+		path := strings.Replace(pathToFile, "file://", "", -1)
+		return c.Inline(path, filename)
+	}
+	//if strings.Contains(strings.ToLower(datasource.Host), "http") || strings.Contains(strings.ToLower(datasource.Host), "ftp") {
 	rand, _ := utils.GenerateRandomStringURLSafe(10)
 	pathToFile := "tempFiles/" + rand + "/" + filename
-	err = downloadFile(pathToFile, datasource.Host)
+	if strings.Contains(strings.ToLower(datasource.Host), "http") {
+		err = downloadFileHTTP(pathToFile, datasource.Host)
+	} else {
+		err = downloadFileFTP(filename, pathToFile, datasource.Host, datasource.Ftpusername, datasource.Ftppassword)
+	}
 	if err != nil {
 		return c.String(http.StatusInternalServerError, "could not download file. error: "+err.Error())
 	}
 	defer os.RemoveAll(filepath.Dir(pathToFile))
-
 	return c.Attachment(pathToFile, filename)
 }
 
@@ -590,7 +610,7 @@ func executeRequest(c echo.Context, r *http.Request) error {
 	return c.Blob(resp.StatusCode, resp.Header.Get("Content-Type"), stream)
 }
 
-func downloadFile(pathToFile string, url string) error {
+func downloadFileHTTP(pathToFile string, url string) error {
 
 	// Get the data
 	resp, err := http.Get(url)
@@ -612,4 +632,57 @@ func downloadFile(pathToFile string, url string) error {
 	// Write the body to file
 	_, err = io.Copy(out, resp.Body)
 	return err
+}
+
+func downloadFileFTP(filename string, pathToFile string, url string, ftpusername string, ftppassword string) error {
+
+	//url := ftp://ftp.gnu.org/gnu/Licenses/fdl-1.1.txt
+	//filename := "f.pdf"
+
+	url2 := strings.Replace(url, "ftp://", "", 1) // remove ftp://
+	index := strings.Index(url2, "/")             // get index of /
+	ftpserver := url2[:index]                     // extracted ftpserver
+	if strings.Index(ftpserver, ":") < 0 {
+		ftpserver = ftpserver + ":21" // add default ftp port
+	}
+	path := url2[index:]
+	path = strings.Replace(path, filename, "", -1)
+
+	client, err := ftp.Dial(ftpserver) // sample ftp servers "ftp.gnu.org:21" "speedtest.tele2.net:21")
+	if err != nil {
+		return err
+	}
+	if err := client.Login(ftpusername, ftppassword); err != nil {
+		return err
+	}
+
+	client.ChangeDir(path) // change directory to path
+
+	entries, _ := client.List(filename) // get file entry
+
+	if len(entries) < 0 {
+		return errors.New("No file found")
+	}
+
+	for _, entry := range entries {
+		name := entry.Name
+		reader, err := client.Retr(name)
+		if err != nil {
+			panic(err)
+		}
+		//client.Delete(name) // this can delete file from server
+		// Write the body to file
+		// Create the file
+		if err = os.MkdirAll(filepath.Dir(pathToFile), 0770); err != nil {
+			return err
+		}
+		out, err := os.Create(pathToFile)
+		if err != nil {
+			return err
+		}
+		defer out.Close()
+		_, err = io.Copy(out, reader)
+		return err
+	}
+	return nil
 }

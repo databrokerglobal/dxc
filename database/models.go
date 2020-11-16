@@ -14,6 +14,9 @@ type Datasource struct {
 	HeaderAPIKeyName  string `json:"headerAPIKeyName"`
 	HeaderAPIKeyValue string `json:"headerAPIKeyValue"`
 	Available         bool   `json:"available"`
+	Protocol          string `json:"protocol"`
+	Ftpusername       string `json:"ftpusername"`
+	Ftppassword       string `json:"ftppassword"`
 }
 
 // SyncStatus struct

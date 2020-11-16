@@ -54,9 +54,9 @@ export const DXCAuthentication = () => {
           type="password"
           error={body?.dxcSecureKey?.length === 0}
           id="dxcSecureKey"
-          label="DXC_SECURE_KEY"
+          label="DXC_PASSWORD"
           fullWidth={true}
-          helperText="The DXC_SECURE_KEY is set when setting up your DXC."
+          helperText="The password is set when setting up your DXC."
           value={body?.dxcSecureKey}
           onChange={handleDXCSecureKey}
         />

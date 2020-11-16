@@ -32,15 +32,21 @@ interface IDatasource {
   host: string;
   headerAPIKeyName: string;
   headerAPIKeyValue: string;
+  protocol: string;
+  ftpusername: string;
+  ftppassword: string;
 }
 
 export const DatasourceForm = () => {
   const exampleBody = {
-    name: "datasource xxx",
+    name: "",
     host: "http://example.com/myfile",
     type: "API",
     headerAPIKeyName: "",
     headerAPIKeyValue: "",
+    protocol: "HTTP",
+    ftpusername: "anonymous",
+    ftppassword: "anonymous",
   };
   const [body, setBody] = React.useState<IDatasource>(exampleBody);
   const [resp, setResp] = React.useState<string>("");
@@ -89,7 +95,38 @@ export const DatasourceForm = () => {
     setBody(R.assoc("headerAPIKeyValue", event.target.value, body));
   };
 
+  const handleProtocol = (event: any) => {
+    setBody(R.assoc("protocol", event.target.value, body));
+  };
+
+  const handleFtpusername = (event: any) => {
+    setBody(R.assoc("ftpusername", event.target.value, body));
+  };
+
+  const handleFtppassword = (event: any) => {
+    setBody(R.assoc("ftppassword", event.target.value, body));
+  };
+
   const handleSubmit = async () => {
+    // premlims checking
+    if(body.type=="FILE"){
+      if (String(body.protocol).match("HTTP")){
+        if ( !( body.host.toLowerCase().startsWith("http://")||body.host.toLowerCase().startsWith("https://")) ) {
+          alert("Wrong PROTOCOL. HTTP URL must start with http:// or https://")
+          return
+        }
+      } else if (String(body.protocol).match("FTP")){
+        if ( !( body.host.toLowerCase().startsWith("ftp://")||body.host.toLowerCase().startsWith("ftps://")) ) {
+          alert("Wrong PROTOCOL. FTP URL must start with ftp:// or ftps://")
+          return
+        }
+      } else {
+        if ( !( body.host.toLowerCase().startsWith("file://")||body.host.toLowerCase().startsWith("/")) ) {
+          alert("Wrong PROTOCOL. Local file URI must start with file:// or /")
+          return
+        }
+      } 
+    } 
     try {
       await axios.post(`${LOCAL_HOST}/datasource`, body, {
         headers: { 'DXC_SECURE_KEY': localStorage.getItem('DXC_SECURE_KEY')}
@@ -129,7 +166,7 @@ export const DatasourceForm = () => {
           id="type"
           select
           label="Type"
-          helperText="The name of data source"
+          helperText="The type of data source"
           value={body?.type}
           onChange={handleType}
         >
@@ -144,7 +181,29 @@ export const DatasourceForm = () => {
           ))}
         </TextField>
       </Grid>
+      {body.type === "FILE" ?
       <Grid item>
+        <TextField
+          id="protocol"
+          select
+          label="Protocol"
+          helperText="Access protocol for file"
+          value={body?.protocol}
+          onChange={handleProtocol}
+        >
+          {[
+            { value: "HTTP", label: "http/https" },
+            { value: "FTP", label: "ftp/ftps" },
+            { value: "LOCAL", label: "Local file" },
+          ].map((o: any, i: number) => (
+            <MenuItem key={i.toString()} value={o.value}>
+              {o.label}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Grid>: null
+      }
+      <Grid item xs={2}>
         <TextField
           required
           error={body?.host?.length === 0}
@@ -155,12 +214,34 @@ export const DatasourceForm = () => {
           onChange={handleHost}
         />
       </Grid>
+      {body.protocol === "FTP" ?
+        <Grid item xs={2}>
+          <TextField
+            id="ftpusername"
+            label="Username"
+            helperText="Username of FTP server"
+            value={body?.ftpusername}
+            onChange={handleFtpusername}
+          />
+        </Grid> : null
+      }
+      {body.protocol === "FTP" ?
+        <Grid item xs={2}>
+          <TextField
+            id="ftppassword"
+            label="Password"
+            helperText="Password of FTP server"
+            value={body?.ftppassword}
+            onChange={handleFtppassword}
+          />
+        </Grid> : null
+      }
       {body.type === "API" ?
         <Grid item xs={2}>
           <TextField
             id="headerAPIKeyName"
             label="API Key Name"
-            helperText="Optional key required in the headers"
+            helperText="Optional key in the header"
             value={body?.headerAPIKeyName}
             onChange={handleHeaderAPIKeyName}
           />
@@ -171,7 +252,7 @@ export const DatasourceForm = () => {
           <TextField
             id="headerAPIKeyValue"
             label="API Key Value"
-            helperText=""
+            helperText="The value of key"
             value={body?.headerAPIKeyValue}
             onChange={handleHeaderAPIKeyValue}
           />
@@ -226,6 +307,9 @@ export const DatasourcesList = () => {
     type: "API",
     headerAPIKeyName: "",
     headerAPIKeyValue: "",
+    protocol: "",
+    ftpusername: "",
+    ftppassword: "",
   };
   // eslint-disable-next-line
   const [body, setBody] = React.useState<IDatasource>(exampleBody);
@@ -298,11 +382,12 @@ export const DatasourcesList = () => {
           <Table aria-label="simple table" style={{ width:"2000px", marginTop: "15px", }}>
             <TableHead>
               <TableRow>
+                <TableCell>ID</TableCell>
                 <TableCell>Name</TableCell>
                 <TableCell>Type</TableCell>
+                <TableCell>Protocol</TableCell>
                 <TableCell>Host</TableCell>
                 <TableCell>Added on</TableCell>
-                <TableCell>ID</TableCell>
                 <TableCell>Action</TableCell>
                 <TableCell>Key in headers</TableCell>
               </TableRow>
@@ -310,16 +395,17 @@ export const DatasourcesList = () => {
             <TableBody>
               {(data.data as any).map((datasource: any) => (
                 datasource.did !== "" ?
-                  <TableRow key={datasource.did} className={datasource.available?"":"ds_inactive"}>
+                  <TableRow key={datasource.did}>
+                    <TableCell component="th" scope="row">{datasource.did}</TableCell>
                     <TableCell>{datasource.name}</TableCell>
                     <TableCell>{datasource.type}</TableCell>
+                    <TableCell>{datasource.protocol} {datasource.protocol=="FTP" ? ("["+datasource.ftpusername+"/"+datasource.ftppassword+"]"): ("")} </TableCell>
                     <TableCell>{datasource.host}</TableCell>
                     <TableCell>{dayjs(datasource.CreatedAt).format('YYYY-MM-DD')}</TableCell>
-                    <TableCell component="th" scope="row">{datasource.did}</TableCell>
                     <TableCell>
                       <Button 
                         style={{
-                          backgroundColor: "#3dd890",
+                          backgroundColor: "#0044ff",
                           color: "white"
                         }} 
                         variant="contained" 
@@ -327,7 +413,7 @@ export const DatasourcesList = () => {
                       <Button 
                           style={{
                             marginLeft: 10,
-                            backgroundColor: "#ff6946",
+                            backgroundColor: "#ff4400",
                             color: "white"
                           }} 
                           variant="contained" 
