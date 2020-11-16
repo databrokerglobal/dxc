@@ -93,6 +93,10 @@ export const Authentication = () => {
     setBody(R.assoc("apiKey", event.target.value, body));
   };
 
+  function showKey(){
+    alert("DXC_KEY\n____________________________\n\n" + body.apiKey);
+  }
+
   return (
     <Grid
       container
@@ -118,6 +122,7 @@ export const Authentication = () => {
       </Grid>
       <Grid item>
         <TextField
+          type="password"
           error={body?.apiKey?.length === 0}
           required
           id="apiKey"
@@ -127,6 +132,7 @@ export const Authentication = () => {
           value={body?.apiKey}
           onChange={handleApiKey}
         />
+        <Button onClick={e => showKey()}>Show</Button>
       </Grid>
       <Grid item xs={12}>
         {R.isEmpty(err) && R.isEmpty(resp) && (

@@ -310,7 +310,7 @@ export const DatasourcesList = () => {
             <TableBody>
               {(data.data as any).map((datasource: any) => (
                 datasource.did !== "" ?
-                  <TableRow key={datasource.did}>
+                  <TableRow key={datasource.did} className={datasource.available?"":"ds_inactive"}>
                     <TableCell>{datasource.name}</TableCell>
                     <TableCell>{datasource.type}</TableCell>
                     <TableCell>{datasource.host}</TableCell>
@@ -319,7 +319,7 @@ export const DatasourcesList = () => {
                     <TableCell>
                       <Button 
                         style={{
-                          backgroundColor: "#0044ff",
+                          backgroundColor: "#3dd890",
                           color: "white"
                         }} 
                         variant="contained" 
@@ -327,7 +327,7 @@ export const DatasourcesList = () => {
                       <Button 
                           style={{
                             marginLeft: 10,
-                            backgroundColor: "#ff4400",
+                            backgroundColor: "#ff6946",
                             color: "white"
                           }} 
                           variant="contained" 
