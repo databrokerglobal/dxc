@@ -185,3 +185,64 @@ func (s *Suite) TestGetLatestInfuraID() {
 	require.NoError(s.T(), err)
 	require.Nil(s.T(), deep.Equal(infuraIDObject2.InfuraID, returnedInfuraID)) // check that the last one is returned (2) not the first one.
 }
+
+func (s *Suite) TestUpdateDatasourceByDID() {
+
+	// The objective is to test update datasource.
+
+	datasource := &Datasource{
+		Name:      "Test",
+		Type:      "API",
+		Did:       "did",
+		Host:      "http://localhost:3453",
+		Available: true,
+	}
+
+	s.mock.ExpectQuery(
+		regexp.QuoteMeta(
+			`SELECT * FROM "datasources"  WHERE "datasources"."deleted_at" IS NULL AND (("datasources"."did" = ?)) ORDER BY "datasources"."id" ASC LIMIT 1`,
+		),
+	).WithArgs(datasource.Did).WillReturnRows(sqlmock.NewRows([]string{"name", "type", "did", "host", "available"}).AddRow(datasource.Name, datasource.Type, datasource.Did, datasource.Host, datasource.Available))
+
+	returnedDatasource, err := s.repository.GetDatasourceByDID(datasource.Did)
+	require.NoError(s.T(), err)
+	require.Nil(s.T(), deep.Equal(datasource, returnedDatasource))
+
+	newName := "NEW_NAME"
+	datasource.Name = newName
+
+	err0 := s.repository.UpdateDatasource(datasource)
+	require.NoError(s.T(), err0)
+
+	returnedDatasource2, err2 := s.repository.GetDatasourceByDID(datasource.Did)
+	require.NoError(s.T(), err2)
+	require.Nil(s.T(), deep.Equal(newName, returnedDatasource2.Name))
+}
+
+func (s *Suite) TestUpdateDatasourceByDID_check() {
+
+	// The objective is to retrieve the same datasource again, however, it is coming with null values
+
+	datasource := &Datasource{
+		Name:      "Test",
+		Type:      "API",
+		Did:       "did",
+		Host:      "http://localhost:3453",
+		Available: true,
+	}
+
+	s.mock.ExpectQuery(
+		regexp.QuoteMeta(
+			`SELECT * FROM "datasources"  WHERE "datasources"."deleted_at" IS NULL AND (("datasources"."did" = ?)) ORDER BY "datasources"."id" ASC LIMIT 1`,
+		),
+	).WithArgs(datasource.Did).WillReturnRows(sqlmock.NewRows([]string{"name", "type", "did", "host", "available"}).AddRow(datasource.Name, datasource.Type, datasource.Did, datasource.Host, datasource.Available))
+
+	returnedDatasource, err := s.repository.GetDatasourceByDID(datasource.Did)
+	require.NoError(s.T(), err)
+	require.Nil(s.T(), deep.Equal(datasource, returnedDatasource))
+
+	returnedDatasource2, err2 := s.repository.GetDatasourceByDID(datasource.Did)
+	require.NoError(s.T(), err2)
+	require.Nil(s.T(), deep.Equal(datasource, returnedDatasource2))
+
+}
