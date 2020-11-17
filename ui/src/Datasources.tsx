@@ -109,24 +109,55 @@ export const DatasourceForm = () => {
 
   const handleSubmit = async () => {
     // premlims checking
-    if(body.type=="FILE"){
-      if (String(body.protocol).match("HTTP")){
-        if ( !( body.host.toLowerCase().startsWith("http://")||body.host.toLowerCase().startsWith("https://")) ) {
-          alert("Wrong PROTOCOL. HTTP URL must start with http:// or https://")
+    if(body.type==="FILE"){
+      if(body.protocol==="HTTP"){
+        if(body.host.toLowerCase().startsWith("http://")){
+          //alert("Correct HTTP host");
+        } else{
+          alert("Wrong PROTOCOL and HOST URL\n\n HTTP URL must start with http:// ")
           return
         }
-      } else if (String(body.protocol).match("FTP")){
-        if ( !( body.host.toLowerCase().startsWith("ftp://")||body.host.toLowerCase().startsWith("ftps://")) ) {
-          alert("Wrong PROTOCOL. FTP URL must start with ftp:// or ftps://")
+      } else if(body.protocol==="HTTPS"){
+        if(body.host.toLowerCase().startsWith("https://")){
+          //alert("Correct HTTPS host");
+        } else{
+          alert("Wrong PROTOCOL and HOST URL\n\n HTTPS URL must start with https:// ")
+          return
+        }
+      } else if(body.protocol==="FTP"){
+        if(body.host.toLowerCase().startsWith("ftp://")){
+          //alert("Correct FTP host");
+        } else{
+          alert("Wrong PROTOCOL and HOST URL\n\n FTP URL must start with ftp:// ")
+          return
+        }
+      } else if(body.protocol==="FTPS"){
+        if(body.host.toLowerCase().startsWith("ftps://")){
+          //alert("Correct FTPS host");
+        } else{
+          alert("Wrong PROTOCOL and HOST URL\n\n FTPS URL must start with ftps:// ")
+          return
+        }
+      } else if(body.protocol==="SFTP"){
+        if(body.host.toLowerCase().startsWith("sftp://")){
+          //alert("Correct SFTP host");
+        } else{
+          alert("Wrong PROTOCOL and HOST URL\n\n SFTP URL must start with sftp:// ")
+          return
+        }
+      } else if(body.protocol==="LOCAL"){
+        if(body.host.toLowerCase().startsWith("file://")||body.host.toLowerCase().startsWith("/")){
+          //alert("Correct LOCAL file host");
+        } else{
+          alert("Wrong PROTOCOL and HOST URL\n\n Local file URI must start with file:// or /")
           return
         }
       } else {
-        if ( !( body.host.toLowerCase().startsWith("file://")||body.host.toLowerCase().startsWith("/")) ) {
-          alert("Wrong PROTOCOL. Local file URI must start with file:// or /")
-          return
-        }
-      } 
-    } 
+        alert("Wrong PROTOCOL and HOST URL.")
+        return
+      }
+    }
+        
     try {
       await axios.post(`${LOCAL_HOST}/datasource`, body, {
         headers: { 'DXC_SECURE_KEY': localStorage.getItem('DXC_SECURE_KEY')}
@@ -192,9 +223,12 @@ export const DatasourceForm = () => {
           onChange={handleProtocol}
         >
           {[
-            { value: "HTTP", label: "http/https" },
-            { value: "FTP", label: "ftp/ftps" },
-            { value: "LOCAL", label: "Local file" },
+            { value: "HTTP",  label: "http" },
+            { value: "HTTPS", label: "https" },
+            { value: "FTP",   label: "ftp" },
+            { value: "FTPS",  label: "ftps" },
+            { value: "SFTP",  label: "sftp" },
+            { value: "LOCAL", label: "Local" },
           ].map((o: any, i: number) => (
             <MenuItem key={i.toString()} value={o.value}>
               {o.label}
@@ -214,7 +248,7 @@ export const DatasourceForm = () => {
           onChange={handleHost}
         />
       </Grid>
-      {body.protocol === "FTP" ?
+      {body.protocol === "FTP" || body.protocol === "FTPS" || body.protocol === "SFTP" ?
         <Grid item xs={2}>
           <TextField
             id="ftpusername"
@@ -225,7 +259,7 @@ export const DatasourceForm = () => {
           />
         </Grid> : null
       }
-      {body.protocol === "FTP" ?
+      {body.protocol === "FTP" || body.protocol === "FTPS" || body.protocol === "SFTP" ?
         <Grid item xs={2}>
           <TextField
             id="ftppassword"
@@ -390,6 +424,7 @@ export const DatasourcesList = () => {
                 <TableCell>Added on</TableCell>
                 <TableCell>Action</TableCell>
                 <TableCell>Key in headers</TableCell>
+                <TableCell>Credentials</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -399,7 +434,7 @@ export const DatasourcesList = () => {
                     <TableCell component="th" scope="row">{datasource.did}</TableCell>
                     <TableCell>{datasource.name}</TableCell>
                     <TableCell>{datasource.type}</TableCell>
-                    <TableCell>{datasource.protocol} {datasource.protocol=="FTP" ? ("["+datasource.ftpusername+"/"+datasource.ftppassword+"]"): ("")} </TableCell>
+                    <TableCell>{datasource.protocol}</TableCell>
                     <TableCell>{datasource.host}</TableCell>
                     <TableCell>{dayjs(datasource.CreatedAt).format('YYYY-MM-DD')}</TableCell>
                     <TableCell>
@@ -420,6 +455,7 @@ export const DatasourcesList = () => {
                           onClick={e => handleDelete(datasource.did)}>Delete</Button>  
                     </TableCell>
                     <TableCell style={{whiteSpace: "nowrap"}}>{datasource.headerAPIKeyName}{datasource.headerAPIKeyName !== undefined && datasource.headerAPIKeyName !== "" ? ":":""} {datasource.headerAPIKeyValue}</TableCell>
+                    <TableCell>{ ( datasource.protocol==="FTPS" || datasource.protocol==="FTP" || datasource.protocol==="SFTP" )  ? (datasource.ftpusername+"/"+datasource.ftppassword): ("")} </TableCell>      
                   </TableRow> : null
               ))}
             </TableBody>

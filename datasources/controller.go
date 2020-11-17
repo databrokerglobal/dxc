@@ -114,10 +114,11 @@ func AddExampleDatasources(c echo.Context) error {
 	count := 0
 
 	datasource := new(database.Datasource)
-	datasource.Name = "file 1"
+	datasource.Name = "Local file 1"
 	datasource.Available = true
 	datasource.Type = "FILE"
-	datasource.Host = utils.TrimLastSlash("https://file-examples.com/wp-content/uploads/2017/02/file_example_XLS_10.xls")
+	datasource.Protocol = "LOCAL"
+	datasource.Host = utils.TrimLastSlash("file:///etc/hosts")
 	rand, _ := utils.GenerateRandomStringURLSafe(10)
 	datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
 	if !RunningTest {
@@ -128,9 +129,40 @@ func AddExampleDatasources(c echo.Context) error {
 	count++
 
 	datasource = new(database.Datasource)
-	datasource.Name = "file 2"
+	datasource.Name = "Local file 2"
 	datasource.Available = true
 	datasource.Type = "FILE"
+	datasource.Protocol = "LOCAL"
+	datasource.Host = utils.TrimLastSlash("/etc/hosts")
+	rand, _ = utils.GenerateRandomStringURLSafe(10)
+	datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
+	if !RunningTest {
+		if err := database.DBInstance.CreateDatasource(datasource); err != nil {
+			return err
+		}
+	}
+	count++
+
+	datasource = new(database.Datasource)
+	datasource.Name = "File 1"
+	datasource.Available = true
+	datasource.Type = "FILE"
+	datasource.Protocol = "HTTPS"
+	datasource.Host = utils.TrimLastSlash("https://file-examples.com/wp-content/uploads/2017/02/file_example_XLS_10.xls")
+	rand, _ = utils.GenerateRandomStringURLSafe(10)
+	datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
+	if !RunningTest {
+		if err := database.DBInstance.CreateDatasource(datasource); err != nil {
+			return err
+		}
+	}
+	count++
+
+	datasource = new(database.Datasource)
+	datasource.Name = "File 2"
+	datasource.Available = true
+	datasource.Type = "FILE"
+	datasource.Protocol = "HTTPS"
 	datasource.Host = utils.TrimLastSlash("https://file-examples.com/wp-content/uploads/2017/02/file_example_XLSX_10.xlsx")
 	rand, _ = utils.GenerateRandomStringURLSafe(10)
 	datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
@@ -142,10 +174,11 @@ func AddExampleDatasources(c echo.Context) error {
 	count++
 
 	datasource = new(database.Datasource)
-	datasource.Name = "file 3 (ftp)"
+	datasource.Name = "File 3"
 	datasource.Available = true
 	datasource.Type = "FILE"
-	datasource.Host = utils.TrimLastSlash("ftp://speedtest.tele2.net/100KB.zip")
+	datasource.Protocol = "HTTP"
+	datasource.Host = utils.TrimLastSlash("http://www.africau.edu/images/default/sample.pdf")
 	rand, _ = utils.GenerateRandomStringURLSafe(10)
 	datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
 	if !RunningTest {
@@ -156,7 +189,41 @@ func AddExampleDatasources(c echo.Context) error {
 	count++
 
 	datasource = new(database.Datasource)
-	datasource.Name = "api 1"
+	datasource.Name = "File 4"
+	datasource.Available = true
+	datasource.Type = "FILE"
+	datasource.Protocol = "FTP"
+	datasource.Ftpusername = "anonymous"
+	datasource.Ftppassword = "anonymous"
+	datasource.Host = utils.TrimLastSlash("ftp://ftp.gnu.org/gnu/Licenses/fdl-1.1.txt")
+	rand, _ = utils.GenerateRandomStringURLSafe(10)
+	datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
+	if !RunningTest {
+		if err := database.DBInstance.CreateDatasource(datasource); err != nil {
+			return err
+		}
+	}
+	count++
+
+	datasource = new(database.Datasource)
+	datasource.Name = "File 5"
+	datasource.Available = true
+	datasource.Type = "FILE"
+	datasource.Protocol = "FTP"
+	datasource.Ftpusername = "demo"
+	datasource.Ftppassword = "demo"
+	datasource.Host = utils.TrimLastSlash("ftp://demo.wftpserver.com/download/Spring.jpg")
+	rand, _ = utils.GenerateRandomStringURLSafe(10)
+	datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
+	if !RunningTest {
+		if err := database.DBInstance.CreateDatasource(datasource); err != nil {
+			return err
+		}
+	}
+	count++
+
+	datasource = new(database.Datasource)
+	datasource.Name = "API 1"
 	datasource.Available = true
 	datasource.Type = "API"
 	datasource.Host = utils.TrimLastSlash("https://jsonplaceholder.typicode.com")
@@ -425,13 +492,13 @@ func GetFile(c echo.Context) error {
 		path := strings.Replace(pathToFile, "file://", "", -1)
 		return c.Inline(path, filename)
 	}
-	//if strings.Contains(strings.ToLower(datasource.Host), "http") || strings.Contains(strings.ToLower(datasource.Host), "ftp") {
+	// generate temporary file
 	rand, _ := utils.GenerateRandomStringURLSafe(10)
 	pathToFile := "tempFiles/" + rand + "/" + filename
-	if strings.Contains(strings.ToLower(datasource.Host), "http") {
+	if datasource.Protocol == "HTTP" || datasource.Protocol == "HTTPS" {
 		err = downloadFileHTTP(pathToFile, datasource.Host)
 	} else {
-		err = downloadFileFTP(filename, pathToFile, datasource.Host, datasource.Ftpusername, datasource.Ftppassword)
+		err = downloadFileFTP(datasource.Protocol, datasource.Host, datasource.Ftpusername, datasource.Ftppassword, pathToFile, filename)
 	}
 	if err != nil {
 		return c.String(http.StatusInternalServerError, "could not download file. error: "+err.Error())
@@ -634,34 +701,28 @@ func downloadFileHTTP(pathToFile string, url string) error {
 	return err
 }
 
-func downloadFileFTP(filename string, pathToFile string, url string, ftpusername string, ftppassword string) error {
-
-	//url := ftp://ftp.gnu.org/gnu/Licenses/fdl-1.1.txt
-	//filename := "f.pdf"
-
-	url2 := strings.Replace(url, "ftp://", "", 1) // remove ftp://
-	index := strings.Index(url2, "/")             // get index of /
-	ftpserver := url2[:index]                     // extracted ftpserver
-	if strings.Index(ftpserver, ":") < 0 {
-		ftpserver = ftpserver + ":21" // add default ftp port
-	}
-	path := url2[index:]
-	path = strings.Replace(path, filename, "", -1)
-
-	client, err := ftp.Dial(ftpserver) // sample ftp servers "ftp.gnu.org:21" "speedtest.tele2.net:21")
+func downloadFileFTP(protocol string, url string, ftpusername string, ftppassword string, pathToFile string, filename string) error {
+	// get server address and path of file
+	server, path, err := getFtpServer(protocol, url, filename)
 	if err != nil {
 		return err
 	}
+	// get client of ftp server
+	client, err := ftp.Dial(server)
+	if err != nil {
+		return err
+	}
+	// now connect to server
 	if err := client.Login(ftpusername, ftppassword); err != nil {
 		return err
 	}
-
-	client.ChangeDir(path) // change directory to path
-
-	entries, _ := client.List(filename) // get file entry
-
-	if len(entries) < 0 {
-		return errors.New("No file found")
+	//entries, _ := client.List("*")
+	// change directory to path
+	client.ChangeDir(path)
+	// get file entry
+	entries, _ := client.List(filename)
+	if len(entries) <= 0 {
+		return errors.New("No file found. Please check filename or path")
 	}
 
 	for _, entry := range entries {
@@ -670,8 +731,6 @@ func downloadFileFTP(filename string, pathToFile string, url string, ftpusername
 		if err != nil {
 			panic(err)
 		}
-		//client.Delete(name) // this can delete file from server
-		// Write the body to file
 		// Create the file
 		if err = os.MkdirAll(filepath.Dir(pathToFile), 0770); err != nil {
 			return err
@@ -681,8 +740,30 @@ func downloadFileFTP(filename string, pathToFile string, url string, ftpusername
 			return err
 		}
 		defer out.Close()
+		// Write the body to file
 		_, err = io.Copy(out, reader)
 		return err
 	}
 	return nil
+}
+
+func getFtpServer(protocol string, url string, filename string) (string, string, error) {
+	url2 := url
+	if protocol == "FTP" {
+		url2 = strings.Replace(url, "ftp://", "", 1) // remove ftp://
+	} else if protocol == "FTPS" {
+		url2 = strings.Replace(url, "ftps://", "", 1) // remove ftp://
+	} else if protocol == "SFTP" {
+		url2 = strings.Replace(url, "sftp://", "", 1) // remove ftp://
+	} else {
+		return "", "", errors.New("No file found")
+	}
+	index := strings.Index(url2, "/") // get index of /
+	ftpserver := url2[:index]         // extracted ftpserver
+	if strings.Index(ftpserver, ":") < 0 {
+		ftpserver = ftpserver + ":21" // add default ftp port
+	}
+	path := url2[index:]
+	path = strings.Replace(path, filename, "", -1)
+	return ftpserver, path, nil
 }

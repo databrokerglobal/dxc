@@ -28,7 +28,7 @@ func (m *Manager) GetDatasourceByDID(did string) (d *Datasource, err error) {
 // GetDatasources Get all Datasources query
 func (m *Manager) GetDatasources() (ds *[]Datasource, err error) {
 	datasources := []Datasource{}
-	m.DB.Table("Datasources").Find(&datasources)
+	m.DB.Order("Type, Protocol").Table("Datasources").Find(&datasources)
 	return &datasources, nil
 }
 
