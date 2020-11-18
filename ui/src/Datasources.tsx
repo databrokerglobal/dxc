@@ -39,7 +39,7 @@ interface IDatasource {
 
 export const DatasourceForm = () => {
   const exampleBody = {
-    name: "",
+    name: "datasource example",
     host: "http://example.com/myfile",
     type: "API",
     headerAPIKeyName: "",
@@ -158,6 +158,7 @@ export const DatasourceForm = () => {
       }
     }
         
+    if (window.confirm('Are you sure you want to ADD a new datasource ?')) {
     try {
       await axios.post(`${LOCAL_HOST}/datasource`, body, {
         headers: { 'DXC_SECURE_KEY': localStorage.getItem('DXC_SECURE_KEY')}
@@ -166,6 +167,7 @@ export const DatasourceForm = () => {
       mutate('/datasources')
     } catch (error) {
       setErr(error.toString());
+    }
     }
   };
 
@@ -248,25 +250,15 @@ export const DatasourceForm = () => {
           onChange={handleHost}
         />
       </Grid>
-      {body.protocol === "FTP" || body.protocol === "FTPS" || body.protocol === "SFTP" ?
+      
+      {body.type === "API" ?
         <Grid item xs={2}>
           <TextField
-            id="ftpusername"
-            label="Username"
-            helperText="Username of FTP server"
-            value={body?.ftpusername}
-            onChange={handleFtpusername}
-          />
-        </Grid> : null
-      }
-      {body.protocol === "FTP" || body.protocol === "FTPS" || body.protocol === "SFTP" ?
-        <Grid item xs={2}>
-          <TextField
-            id="ftppassword"
-            label="Password"
-            helperText="Password of FTP server"
-            value={body?.ftppassword}
-            onChange={handleFtppassword}
+            id="headerAPIKeyValue"
+            label="API Key Value"
+            helperText="The value of key"
+            value={body?.headerAPIKeyValue}
+            onChange={handleHeaderAPIKeyValue}
           />
         </Grid> : null
       }
@@ -281,17 +273,29 @@ export const DatasourceForm = () => {
           />
         </Grid> : null
       }
-      {body.type === "API" ?
+      { body.type === "FILE" && (body.protocol === "FTP" || body.protocol === "FTPS" || body.protocol === "SFTP") ?
         <Grid item xs={2}>
           <TextField
-            id="headerAPIKeyValue"
-            label="API Key Value"
-            helperText="The value of key"
-            value={body?.headerAPIKeyValue}
-            onChange={handleHeaderAPIKeyValue}
+            id="ftpusername"
+            label="Username"
+            helperText="Username of FTP server"
+            value={body?.ftpusername}
+            onChange={handleFtpusername}
           />
         </Grid> : null
       }
+      { body.type === "FILE" && (body.protocol === "FTP" || body.protocol === "FTPS" || body.protocol === "SFTP") ?
+        <Grid item xs={2}>
+          <TextField
+            id="ftppassword"
+            label="Password"
+            helperText="Password of FTP server"
+            value={body?.ftppassword}
+            onChange={handleFtppassword}
+          />
+        </Grid> : null
+      }
+
       <Grid item xs={12}>
         {R.isEmpty(err) && R.isEmpty(resp) && (
           <Button
@@ -478,3 +482,4 @@ export const DatasourcesList = () => {
     </Grid>
   );
 };
+
