@@ -18,6 +18,8 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Switch,
+  FormControlLabel,
 } from "@material-ui/core";
 import { isEmptyArray } from "formik";
 import { useWindowSize } from "./WindowSizeHook";
@@ -35,6 +37,11 @@ interface IDatasource {
   protocol: string;
   ftpusername: string;
   ftppassword: string;
+  client_id: string;
+  client_secret: string;
+  grant_type: string;
+  token_url: string;
+  time_to_live: number;
 }
 
 export const DatasourceForm = () => {
@@ -45,8 +52,13 @@ export const DatasourceForm = () => {
     headerAPIKeyName: "",
     headerAPIKeyValue: "",
     protocol: "HTTP",
-    ftpusername: "anonymous",
-    ftppassword: "anonymous",
+    ftpusername: "",
+    ftppassword: "",
+    client_id: "",
+    client_secret: "",
+    grant_type: "client_credentials", 
+    token_url: "",
+    time_to_live: 1,
   };
   const [body, setBody] = React.useState<IDatasource>(exampleBody);
   const [resp, setResp] = React.useState<string>("");
@@ -107,12 +119,25 @@ export const DatasourceForm = () => {
     setBody(R.assoc("ftppassword", event.target.value, body));
   };
 
+  const [state, setState] = React.useState({
+    oauth2: false,
+  });
+
+  const handleOauthChange = (event: any) => {
+    setState({ ...state, [event.target.name]: event.target.checked });
+    /*if(event.target.checked){
+      alert("Activated")
+    } else {
+      alert("Deactivated") 
+    }*/
+  };
+
   const handleSubmit = async () => {
     // premlims checking
     if(body.type==="FILE"){
       if(body.protocol==="HTTP"){
         if(body.host.toLowerCase().startsWith("http://")){
-          //alert("Correct HTTP host");
+          alert("Correct HTTP host");
         } else{
           alert("Wrong PROTOCOL and HOST URL\n\n HTTP URL must start with http:// ")
           return
@@ -295,6 +320,82 @@ export const DatasourceForm = () => {
           />
         </Grid> : null
       }
+      
+      {body.type === "API" ?
+      <FormControlLabel
+        label="Oauth2"
+        control={
+          <Switch
+            checked={state.oauth2}
+            onChange={handleOauthChange}
+            name="oauth2"
+            color="primary"
+          />
+        }/> : null 
+      }
+
+      {body.type === "API" && state.oauth2 ?
+        <Grid item xs={2}>
+          <div style={{ marginTop: 10 }}></div>
+          <TextField
+            id="headerAPIKeyName"
+            label="client_id"
+            helperText="Value of client_id for Oauth"
+            value={body?.client_id}
+            onChange={handleHeaderAPIKeyName}
+          />
+          </Grid> : null
+      }
+      
+      {body.type === "API" && state.oauth2 ?  
+        <Grid item xs={2}>
+          <div style={{ marginTop: 10 }}></div>
+          <TextField
+            id="headerAPIKeyName"
+            label="client_secret"
+            helperText="Value of client_secret for Oauth"
+            value={body?.client_secret}
+            onChange={handleHeaderAPIKeyName}
+          />
+          </Grid> : null
+        }
+        {body.type === "API" && state.oauth2 ?
+          <Grid item xs={2}>
+            <div style={{ marginTop: 10 }}></div>
+            <TextField
+              id="headerAPIKeyName"
+              label="grant_type"
+              helperText="Value of grant_type for Oauth"
+              value={body?.grant_type}
+              onChange={handleHeaderAPIKeyName}
+            />
+          </Grid> : null
+        }
+        {body.type === "API" && state.oauth2 ?
+          <Grid item xs={2}>
+            <div style={{ marginTop: 10 }}></div>
+            <TextField
+              id="headerAPIKeyName"
+              label="token_url"
+              helperText="The URL for accessing token"
+              value={body?.token_url}
+              onChange={handleHeaderAPIKeyName}
+            />
+          </Grid> : null
+        }
+        {body.type === "API" && state.oauth2 ?
+          <Grid item xs={2}>
+            <div style={{ marginTop: 10 }}></div>
+            <TextField
+              id="headerAPIKeyName"
+              label="time_to_live"
+              helperText="Validity duration of token"
+              value={body?.token_url}
+              onChange={handleHeaderAPIKeyName}
+            />
+          </Grid> : null
+        }
+        
 
       <Grid item xs={12}>
         {R.isEmpty(err) && R.isEmpty(resp) && (
@@ -348,6 +449,11 @@ export const DatasourcesList = () => {
     protocol: "",
     ftpusername: "",
     ftppassword: "",
+    client_id: "",
+    client_secret: "",
+    grant_type: "client_credentials", 
+    token_url: "",
+    time_to_live: 1,
   };
   // eslint-disable-next-line
   const [body, setBody] = React.useState<IDatasource>(exampleBody);
