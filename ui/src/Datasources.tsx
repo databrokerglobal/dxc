@@ -270,7 +270,7 @@ export const DatasourceForm = () => {
 
               <br/><br/>{" FTP/FTPS/SFTP --> protocol://host/path/filename or protocol://username:password@host/path/filename"}
               <br/><em>{"Instead of providing credentials in URL you can provide those in provided input fields"}</em>
-              <br/><em>{" for example ftp://ftp.gnu.org/gnu/Licenses/fdl-1.1.txt or ftp://demo:demo@demo.wftpserver.com/upload/sample.pdf"}</em>
+              <br/><em>{" for example ftp://XXX/gnu/Licenses/fdl-1.1.txt (where XXX=ftp.gnu.org) or ftp://ZZZ/download/Spring.jpg  (where ZZZ=demo:demo@demo.wftpserver.com) "}</em>
               
               <br/><br/>{" Local file --> file://path/file_name or /path/file_name (UNIX and Mac OS) or drive:\\path\file_name (Windows)"}
               <br/><em>{" for example file:///etc/hosts or /etc/hosts "}</em>
