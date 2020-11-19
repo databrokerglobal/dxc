@@ -18,11 +18,14 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Tooltip,
+  Typography,
 } from "@material-ui/core";
 import { isEmptyArray } from "formik";
 import { useWindowSize } from "./WindowSizeHook";
 import * as Yup from "yup";
 import * as R from "ramda";
+import { makeStyles } from '@material-ui/core/styles';
 
 interface IDatasource {
   ID?: string;
@@ -106,6 +109,16 @@ export const DatasourceForm = () => {
   const handleFtppassword = (event: any) => {
     setBody(R.assoc("ftppassword", event.target.value, body));
   };
+
+  const useStyles = makeStyles((theme) => ({
+    customWidth: {
+      backgroundColor: "#F7F6D0",
+      color: "#000",
+      maxWidth: 1000,
+      fontSize: 13,
+      padding: 20,
+    },
+  }));
 
   const handleSubmit = async () => {
     // premlims checking
@@ -240,6 +253,32 @@ export const DatasourceForm = () => {
       </Grid>: null
       }
       <Grid item xs={2}>
+        <Tooltip
+          interactive
+          placement="bottom"
+          classes={{ tooltip: useStyles().customWidth }}
+          title={
+            <React.Fragment>
+              <Typography color="inherit">Instructions</Typography>
+              <br/>{"For API datasource, you can specify HOST URL in format: http://host/path or https://host/path"}
+              <br/><em>{" for example http://example.com/myfile"}</em> 
+              <br/><em>{"Optionally you can also provide API key-value"}</em>
+              <hr/>
+              {"For FILE datasource, it depends on type of PROTOCOL. URL format for "} 
+              <br/><br/>{" HTTP/HTTPS --> protocol://host/path/filename "}
+              <br/><em>{" for example http://example.com/myfile"}</em>
+
+              <br/><br/>{" FTP/FTPS/SFTP --> protocol://host/path/filename or protocol://username:password@host/path/filename"}
+              <br/><em>{"Instead of providing credentials in URL you can provide those in provided input fields"}</em>
+              <br/><em>{" for example ftp://ftp.gnu.org/gnu/Licenses/fdl-1.1.txt or ftp://demo:demo@demo.wftpserver.com/upload/sample.pdf"}</em>
+              
+              <br/><br/>{" Local file --> file://path/file_name or /path/file_name (UNIX and Mac OS) or drive:\\path\file_name (Windows)"}
+              <br/><em>{" for example file:///etc/hosts or /etc/hosts "}</em>
+              <hr/>
+              {"For STREAM datasource, you can specify HOST URL in format: http://host/path or https://host/path"}
+            </React.Fragment>
+          }
+        >
         <TextField
           required
           error={body?.host?.length === 0}
@@ -249,6 +288,7 @@ export const DatasourceForm = () => {
           value={body?.host}
           onChange={handleHost}
         />
+        </Tooltip>
       </Grid>
       
       {body.type === "API" ?
