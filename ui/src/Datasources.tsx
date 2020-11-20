@@ -26,6 +26,7 @@ import { useWindowSize } from "./WindowSizeHook";
 import * as Yup from "yup";
 import * as R from "ramda";
 import { makeStyles } from '@material-ui/core/styles';
+import HelpOutlineSharpIcon from '@material-ui/icons/HelpOutlineSharp';
 
 interface IDatasource {
   ID?: string;
@@ -114,11 +115,13 @@ export const DatasourceForm = () => {
     customWidth: {
       backgroundColor: "#F7F6D0",
       color: "#000",
-      maxWidth: 1000,
+      maxWidth: 650,
       fontSize: 13,
       padding: 20,
     },
   }));
+
+  const classes = useStyles();
 
   const handleSubmit = async () => {
     // premlims checking
@@ -204,6 +207,7 @@ export const DatasourceForm = () => {
           helperText="The name of the data source"
           value={body?.name}
           onChange={handleName}
+          fullWidth
         />
       </Grid>
       <Grid item>
@@ -215,6 +219,7 @@ export const DatasourceForm = () => {
           helperText="The type of data source"
           value={body?.type}
           onChange={handleType}
+          fullWidth
         >
           {[
             { value: "API", label: "API" },
@@ -226,6 +231,24 @@ export const DatasourceForm = () => {
             </MenuItem>
           ))}
         </TextField>
+        <Tooltip
+          arrow
+          interactive
+          placement="bottom"
+          classes={{ tooltip: classes.customWidth }}
+          title={
+            <React.Fragment>
+              <Typography color="inherit">Datasource Type</Typography>
+              <br/>{"The datasource can be an API or FILE or STREAM. "}
+              <br/><br/>{"For API datasource, you need to provide HOST URL. Optionally key-value pair."} 
+              <br/>{"For FILE datasource, you need to provide protocol and URL to access it."}
+              <br/>{"For STREAM datasource, you need to provide API and accesstoken URLs"}
+              <br/><br/>{"For more info visit "}<a target="_blank" rel="noopener noreferrer" href="https://dev.databroker.global/manual">{"manual"}</a>
+            </React.Fragment>
+          }
+        >
+          <HelpOutlineSharpIcon/>  
+        </Tooltip>
       </Grid>
       {body.type === "FILE" ?
       <Grid item>
@@ -236,6 +259,7 @@ export const DatasourceForm = () => {
           helperText="Access protocol for file"
           value={body?.protocol}
           onChange={handleProtocol}
+          fullWidth
         >
           {[
             { value: "HTTP",  label: "http" },
@@ -250,35 +274,24 @@ export const DatasourceForm = () => {
             </MenuItem>
           ))}
         </TextField>
-      </Grid>: null
-      }
-      <Grid item xs={2}>
         <Tooltip
           interactive
           placement="bottom"
-          classes={{ tooltip: useStyles().customWidth }}
+          classes={{ tooltip: classes.customWidth }}
           title={
             <React.Fragment>
-              <Typography color="inherit">Instructions</Typography>
-              <br/>{"For API datasource, you can specify HOST URL in format: http://host/path or https://host/path"}
-              <br/><em>{" for example http://example.com/myfile"}</em> 
-              <br/><em>{"Optionally you can also provide API key-value"}</em>
-              <hr/>
-              {"For FILE datasource, it depends on type of PROTOCOL. URL format for "} 
-              <br/><br/>{" HTTP/HTTPS --> protocol://host/path/filename "}
-              <br/><em>{" for example http://example.com/myfile"}</em>
-
-              <br/><br/>{" FTP/FTPS/SFTP --> protocol://host/path/filename or protocol://username:password@host/path/filename"}
-              <br/><em>{"Instead of providing credentials in URL you can provide those in provided input fields"}</em>
-              <br/><em>{" for example ftp://XXX/gnu/Licenses/fdl-1.1.txt (where XXX=ftp.gnu.org) or ftp://ZZZ/download/Spring.jpg  (where ZZZ=demo:demo@demo.wftpserver.com) "}</em>
-              
-              <br/><br/>{" Local file --> file://path/file_name or /path/file_name (UNIX and Mac OS) or drive:\\path\file_name (Windows)"}
-              <br/><em>{" for example file:///etc/hosts or /etc/hosts "}</em>
-              <hr/>
-              {"For STREAM datasource, you can specify HOST URL in format: http://host/path or https://host/path"}
+              <Typography color="inherit">Protocol</Typography>
+              <br/>{"The FILE datasource can be a local file or any file available on network (web server or ftp server)."} 
+              <br/>{"You need to provide protocol to use to access it. URL/URI of the file must adhere to the protocol."}
+              <br/><br/>{"For more info visit "}<a target="_blank" rel="noopener noreferrer" href="https://dev.databroker.global/manual">{"manual"}</a>
             </React.Fragment>
           }
         >
+          <HelpOutlineSharpIcon/>  
+        </Tooltip>
+      </Grid>: null
+      }
+      <Grid item xs={2}>
         <TextField
           required
           error={body?.host?.length === 0}
@@ -287,7 +300,22 @@ export const DatasourceForm = () => {
           helperText="The host (url) of the data source"
           value={body?.host}
           onChange={handleHost}
+          fullWidth
         />
+        <Tooltip
+          interactive
+          placement="bottom"
+          classes={{ tooltip: classes.customWidth }}
+          title={
+            <React.Fragment>
+              <Typography color="inherit">HOST URL</Typography>
+              <br/>{"A Uniform Resource Locator (URL) is a reference to a web resource that specifies its location on a computer network and a mechanism for retrieving it."} 
+              <br/>{"A typical URL could have the form http://www.example.com/index.html, which indicates a protocol (http), a hostname (www.example.com), and a file name (index.html)."}
+              <br/><br/>{"For more info visit "}<a target="_blank" rel="noopener noreferrer" href="https://dev.databroker.global/manual">{"manual"}</a>
+            </React.Fragment>
+          }
+        >
+          <HelpOutlineSharpIcon/>  
         </Tooltip>
       </Grid>
       
