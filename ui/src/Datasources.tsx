@@ -243,7 +243,7 @@ export const DatasourceForm = () => {
               <br/><br/>{"For API datasource, you need to provide HOST URL. Optionally key-value pair."} 
               <br/>{"For FILE datasource, you need to provide protocol and URL to access it."}
               <br/>{"For STREAM datasource, you need to provide API and accesstoken URLs"}
-              <br/><br/>{"For more info visit "}<a target="_blank" rel="noopener noreferrer" href="https://dev.databroker.global/manual">{"manual"}</a>
+              <br/><br/>{"For more info visit "}<a target="_blank" rel="noopener noreferrer" href="https://www.databroker.global/help">{"manual"}</a>
             </React.Fragment>
           }
         >
@@ -283,7 +283,7 @@ export const DatasourceForm = () => {
               <Typography color="inherit">Protocol</Typography>
               <br/>{"The FILE datasource can be a local file or any file available on network (web server or ftp server)."} 
               <br/>{"You need to provide protocol to use to access it. URL/URI of the file must adhere to the protocol."}
-              <br/><br/>{"For more info visit "}<a target="_blank" rel="noopener noreferrer" href="https://dev.databroker.global/manual">{"manual"}</a>
+              <br/><br/>{"For more info visit "}<a target="_blank" rel="noopener noreferrer" href="https://www.databroker.global/help">{"manual"}</a>
             </React.Fragment>
           }
         >
@@ -311,7 +311,7 @@ export const DatasourceForm = () => {
               <Typography color="inherit">HOST URL</Typography>
               <br/>{"A Uniform Resource Locator (URL) is a reference to a web resource that specifies its location on a computer network and a mechanism for retrieving it."} 
               <br/>{"A typical URL could have the form http://www.example.com/index.html, which indicates a protocol (http), a hostname (www.example.com), and a file name (index.html)."}
-              <br/><br/>{"For more info visit "}<a target="_blank" rel="noopener noreferrer" href="https://dev.databroker.global/manual">{"manual"}</a>
+              <br/><br/>{"For more info visit "}<a target="_blank" rel="noopener noreferrer" href="https://www.databroker.global/help">{"manual"}</a>
             </React.Fragment>
           }
         >
