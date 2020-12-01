@@ -2,11 +2,8 @@ import React from "react";
 import axios from "axios";
 import dayjs from "dayjs";
 import { LOCAL_HOST, fetcher } from "./fetchers";
-import useSWR, {mutate} from "swr";
-import {
-  Error,
-  Check,
-} from "@material-ui/icons";
+import useSWR, { mutate } from "swr";
+import { Error, Check } from "@material-ui/icons";
 import {
   TextField,
   MenuItem,
@@ -25,8 +22,8 @@ import { isEmptyArray } from "formik";
 import { useWindowSize } from "./WindowSizeHook";
 import * as Yup from "yup";
 import * as R from "ramda";
-import { makeStyles } from '@material-ui/core/styles';
-import HelpOutlineSharpIcon from '@material-ui/icons/HelpOutlineSharp';
+import { makeStyles } from "@material-ui/core/styles";
+import HelpOutlineSharpIcon from "@material-ui/icons/HelpOutlineSharp";
 
 interface IDatasource {
   ID?: string;
@@ -125,65 +122,80 @@ export const DatasourceForm = () => {
 
   const handleSubmit = async () => {
     // premlims checking
-    if(body.type==="FILE"){
-      if(body.protocol==="HTTP"){
-        if(body.host.toLowerCase().startsWith("http://")){
+    if (body.type === "FILE") {
+      if (body.protocol === "HTTP") {
+        if (body.host.toLowerCase().startsWith("http://")) {
           //alert("Correct HTTP host");
-        } else{
-          alert("Wrong PROTOCOL and HOST URL\n\n HTTP URL must start with http:// ")
-          return
+        } else {
+          alert(
+            "Wrong PROTOCOL and HOST URL\n\n HTTP URL must start with http:// "
+          );
+          return;
         }
-      } else if(body.protocol==="HTTPS"){
-        if(body.host.toLowerCase().startsWith("https://")){
+      } else if (body.protocol === "HTTPS") {
+        if (body.host.toLowerCase().startsWith("https://")) {
           //alert("Correct HTTPS host");
-        } else{
-          alert("Wrong PROTOCOL and HOST URL\n\n HTTPS URL must start with https:// ")
-          return
+        } else {
+          alert(
+            "Wrong PROTOCOL and HOST URL\n\n HTTPS URL must start with https:// "
+          );
+          return;
         }
-      } else if(body.protocol==="FTP"){
-        if(body.host.toLowerCase().startsWith("ftp://")){
+      } else if (body.protocol === "FTP") {
+        if (body.host.toLowerCase().startsWith("ftp://")) {
           //alert("Correct FTP host");
-        } else{
-          alert("Wrong PROTOCOL and HOST URL\n\n FTP URL must start with ftp:// ")
-          return
+        } else {
+          alert(
+            "Wrong PROTOCOL and HOST URL\n\n FTP URL must start with ftp:// "
+          );
+          return;
         }
-      } else if(body.protocol==="FTPS"){
-        if(body.host.toLowerCase().startsWith("ftps://")){
+      } else if (body.protocol === "FTPS") {
+        if (body.host.toLowerCase().startsWith("ftps://")) {
           //alert("Correct FTPS host");
-        } else{
-          alert("Wrong PROTOCOL and HOST URL\n\n FTPS URL must start with ftps:// ")
-          return
+        } else {
+          alert(
+            "Wrong PROTOCOL and HOST URL\n\n FTPS URL must start with ftps:// "
+          );
+          return;
         }
-      } else if(body.protocol==="SFTP"){
-        if(body.host.toLowerCase().startsWith("sftp://")){
+      } else if (body.protocol === "SFTP") {
+        if (body.host.toLowerCase().startsWith("sftp://")) {
           //alert("Correct SFTP host");
-        } else{
-          alert("Wrong PROTOCOL and HOST URL\n\n SFTP URL must start with sftp:// ")
-          return
+        } else {
+          alert(
+            "Wrong PROTOCOL and HOST URL\n\n SFTP URL must start with sftp:// "
+          );
+          return;
         }
-      } else if(body.protocol==="LOCAL"){
-        if(body.host.toLowerCase().startsWith("file://")||body.host.toLowerCase().startsWith("/")){
+      } else if (body.protocol === "LOCAL") {
+        if (
+          body.host.toLowerCase().startsWith("file://") ||
+          body.host.toLowerCase().startsWith("/")
+        ) {
           //alert("Correct LOCAL file host");
-        } else{
-          alert("Wrong PROTOCOL and HOST URL\n\n Local file URI must start with file:// or /")
-          return
+        } else {
+          alert(
+            "Wrong PROTOCOL and HOST URL\n\n Local file URI must start with file:// or /"
+          );
+          return;
         }
       } else {
-        alert("Wrong PROTOCOL and HOST URL.")
-        return
+        alert("Wrong PROTOCOL and HOST URL.");
+        return;
       }
     }
-        
-    if (window.confirm('Are you sure you want to ADD a new datasource ?')) {
-    try {
-      await axios.post(`${LOCAL_HOST}/datasource`, body, {
-        headers: { 'DXC_SECURE_KEY': localStorage.getItem('DXC_SECURE_KEY')}
-      });
-      setResp(`Success. Datasource created.`);
-      mutate('/datasources')
-    } catch (error) {
-      setErr(error.toString());
-    }
+
+    if (window.confirm("Are you sure you want to ADD a new datasource ?")) {
+      try {
+        await axios.post(`${LOCAL_HOST}/datasource`, body, {
+          headers: { DXC_SECURE_KEY: localStorage.getItem("DXC_SECURE_KEY") },
+        });
+        setResp(`Success. Datasource created.`);
+        mutate("/datasources");
+      } catch (error) {
+        setErr(error.toString());
+      }
     }
   };
 
@@ -239,58 +251,93 @@ export const DatasourceForm = () => {
           title={
             <React.Fragment>
               <Typography color="inherit">Datasource Type</Typography>
-              <br/>{"The datasource can be an API or FILE or STREAM. "}
-              <br/><br/>{"For API datasource, you need to provide HOST URL. Optionally key-value pair."} 
-              <br/>{"For FILE datasource, you need to provide protocol and URL to access it."}
-              <br/>{"For STREAM datasource, you need to provide API and accesstoken URLs"}
-              <br/><br/>{"For more info visit "}<a target="_blank" rel="noopener noreferrer" href="https://www.databroker.global/help">{"manual"}</a>
+              <br />
+              {"The datasource can be an API or FILE or STREAM. "}
+              <br />
+              <br />
+              {
+                "For API datasource, you need to provide HOST URL. Optionally key-value pair."
+              }
+              <br />
+              {
+                "For FILE datasource, you need to provide protocol and URL to access it."
+              }
+              <br />
+              {
+                "For STREAM datasource, you need to provide API and accesstoken URLs"
+              }
+              <br />
+              <br />
+              {"For more info visit "}
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://www.databroker.global/help"
+              >
+                {"manual"}
+              </a>
             </React.Fragment>
           }
         >
-          <HelpOutlineSharpIcon/>  
+          <HelpOutlineSharpIcon />
         </Tooltip>
       </Grid>
-      {body.type === "FILE" ?
-      <Grid item>
-        <TextField
-          id="protocol"
-          select
-          label="Protocol"
-          helperText="Access protocol for file"
-          value={body?.protocol}
-          onChange={handleProtocol}
-          fullWidth
-        >
-          {[
-            { value: "HTTP",  label: "http" },
-            { value: "HTTPS", label: "https" },
-            { value: "FTP",   label: "ftp" },
-            { value: "FTPS",  label: "ftps" },
-            { value: "SFTP",  label: "sftp" },
-            { value: "LOCAL", label: "Local" },
-          ].map((o: any, i: number) => (
-            <MenuItem key={i.toString()} value={o.value}>
-              {o.label}
-            </MenuItem>
-          ))}
-        </TextField>
-        <Tooltip
-          interactive
-          placement="bottom"
-          classes={{ tooltip: classes.customWidth }}
-          title={
-            <React.Fragment>
-              <Typography color="inherit">Protocol</Typography>
-              <br/>{"The FILE datasource can be a local file or any file available on network (web server or ftp server)."} 
-              <br/>{"You need to provide protocol to use to access it. URL/URI of the file must adhere to the protocol."}
-              <br/><br/>{"For more info visit "}<a target="_blank" rel="noopener noreferrer" href="https://www.databroker.global/help">{"manual"}</a>
-            </React.Fragment>
-          }
-        >
-          <HelpOutlineSharpIcon/>  
-        </Tooltip>
-      </Grid>: null
-      }
+      {body.type === "FILE" ? (
+        <Grid item>
+          <TextField
+            id="protocol"
+            select
+            label="Protocol"
+            helperText="Access protocol for file"
+            value={body?.protocol}
+            onChange={handleProtocol}
+            fullWidth
+          >
+            {[
+              { value: "HTTP", label: "http" },
+              { value: "HTTPS", label: "https" },
+              { value: "FTP", label: "ftp" },
+              { value: "FTPS", label: "ftps" },
+              { value: "SFTP", label: "sftp" },
+              { value: "LOCAL", label: "Local" },
+            ].map((o: any, i: number) => (
+              <MenuItem key={i.toString()} value={o.value}>
+                {o.label}
+              </MenuItem>
+            ))}
+          </TextField>
+          <Tooltip
+            interactive
+            placement="bottom"
+            classes={{ tooltip: classes.customWidth }}
+            title={
+              <React.Fragment>
+                <Typography color="inherit">Protocol</Typography>
+                <br />
+                {
+                  "The FILE datasource can be a local file or any file available on network (web server or ftp server)."
+                }
+                <br />
+                {
+                  "You need to provide protocol to use to access it. URL/URI of the file must adhere to the protocol."
+                }
+                <br />
+                <br />
+                {"For more info visit "}
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://www.databroker.global/help"
+                >
+                  {"manual"}
+                </a>
+              </React.Fragment>
+            }
+          >
+            <HelpOutlineSharpIcon />
+          </Tooltip>
+        </Grid>
+      ) : null}
       <Grid item xs={2}>
         <TextField
           required
@@ -309,17 +356,32 @@ export const DatasourceForm = () => {
           title={
             <React.Fragment>
               <Typography color="inherit">HOST URL</Typography>
-              <br/>{"A Uniform Resource Locator (URL) is a reference to a web resource that specifies its location on a computer network and a mechanism for retrieving it."} 
-              <br/>{"A typical URL could have the form http://www.example.com/index.html, which indicates a protocol (http), a hostname (www.example.com), and a file name (index.html)."}
-              <br/><br/>{"For more info visit "}<a target="_blank" rel="noopener noreferrer" href="https://www.databroker.global/help">{"manual"}</a>
+              <br />
+              {
+                "A Uniform Resource Locator (URL) is a reference to a web resource that specifies its location on a computer network and a mechanism for retrieving it."
+              }
+              <br />
+              {
+                "A typical URL could have the form http://www.example.com/index.html, which indicates a protocol (http), a hostname (www.example.com), and a file name (index.html)."
+              }
+              <br />
+              <br />
+              {"For more info visit "}
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://www.databroker.global/help"
+              >
+                {"manual"}
+              </a>
             </React.Fragment>
           }
         >
-          <HelpOutlineSharpIcon/>  
+          <HelpOutlineSharpIcon />
         </Tooltip>
       </Grid>
-      
-      {body.type === "API" ?
+
+      {body.type === "API" ? (
         <Grid item xs={2}>
           <TextField
             id="headerAPIKeyValue"
@@ -328,9 +390,9 @@ export const DatasourceForm = () => {
             value={body?.headerAPIKeyValue}
             onChange={handleHeaderAPIKeyValue}
           />
-        </Grid> : null
-      }
-      {body.type === "API" ?
+        </Grid>
+      ) : null}
+      {body.type === "API" ? (
         <Grid item xs={2}>
           <TextField
             id="headerAPIKeyName"
@@ -339,9 +401,12 @@ export const DatasourceForm = () => {
             value={body?.headerAPIKeyName}
             onChange={handleHeaderAPIKeyName}
           />
-        </Grid> : null
-      }
-      { body.type === "FILE" && (body.protocol === "FTP" || body.protocol === "FTPS" || body.protocol === "SFTP") ?
+        </Grid>
+      ) : null}
+      {body.type === "FILE" &&
+      (body.protocol === "FTP" ||
+        body.protocol === "FTPS" ||
+        body.protocol === "SFTP") ? (
         <Grid item xs={2}>
           <TextField
             id="ftpusername"
@@ -350,9 +415,12 @@ export const DatasourceForm = () => {
             value={body?.ftpusername}
             onChange={handleFtpusername}
           />
-        </Grid> : null
-      }
-      { body.type === "FILE" && (body.protocol === "FTP" || body.protocol === "FTPS" || body.protocol === "SFTP") ?
+        </Grid>
+      ) : null}
+      {body.type === "FILE" &&
+      (body.protocol === "FTP" ||
+        body.protocol === "FTPS" ||
+        body.protocol === "SFTP") ? (
         <Grid item xs={2}>
           <TextField
             id="ftppassword"
@@ -361,8 +429,8 @@ export const DatasourceForm = () => {
             value={body?.ftppassword}
             onChange={handleFtppassword}
           />
-        </Grid> : null
-      }
+        </Grid>
+      ) : null}
 
       <Grid item xs={12}>
         {R.isEmpty(err) && R.isEmpty(resp) && (
@@ -406,7 +474,7 @@ export const DatasourceForm = () => {
 
 export const DatasourcesList = () => {
   const { data, error } = useSWR("/datasources", fetcher);
-  
+
   const exampleBody = {
     name: "datasource xxx",
     host: "http://example.com/myfile",
@@ -423,47 +491,59 @@ export const DatasourcesList = () => {
   const [resp, setResp] = React.useState<string>("");
   // eslint-disable-next-line
   const [err, setErr] = React.useState<string>("");
-  
-  const handleDelete = async (name : string)  => {
-    if (window.confirm('Are you sure you want to delete (unrecoverable) this datasource from the database ?')) {
+
+  const handleDelete = async (name: string) => {
+    if (
+      window.confirm(
+        "Are you sure you want to delete (unrecoverable) this datasource from the database ?"
+      )
+    ) {
       try {
         await axios.delete(`${LOCAL_HOST}/datasource/${name}`, {
-          headers: { 'DXC_SECURE_KEY': localStorage.getItem('DXC_SECURE_KEY')}
+          headers: { DXC_SECURE_KEY: localStorage.getItem("DXC_SECURE_KEY") },
         });
         setResp(`Success. Datasource deleted.`);
-        mutate('/datasources')
+        mutate("/datasources");
       } catch (error) {
         setErr(error.toString());
       }
       return;
     } else {
-        return false;
+      return false;
     }
-  }
+  };
 
-  const handleEdit = async (ds: any)  => {
-    if (window.confirm('Are you sure you want to edit this datasource ?')) {
-      var nameds = prompt("Please provide new NAME of the data source", ds.name);
-      if (nameds !== null && nameds.trim()!=="" ) {
-        var urlds = prompt("Please provide new HOST URL of the data source", ds.host);
-        if (urlds !== null && urlds.trim()!=="" ) {
-          // check if there is no edit 
-          if(nameds===ds.name && urlds===ds.host){
+  const handleEdit = async (ds: any) => {
+    if (window.confirm("Are you sure you want to edit this datasource ?")) {
+      var nameds = prompt(
+        "Please provide new NAME of the data source",
+        ds.name
+      );
+      if (nameds !== null && nameds.trim() !== "") {
+        var urlds = prompt(
+          "Please provide new HOST URL of the data source",
+          ds.host
+        );
+        if (urlds !== null && urlds.trim() !== "") {
+          // check if there is no edit
+          if (nameds === ds.name && urlds === ds.host) {
             alert("Aborting as neither NAME or HOST URL was edited");
           } else {
-            // set body 
-            body.name=nameds;
-            body.host=urlds;
-            body.type=ds.type;
-            body.headerAPIKeyName=ds.headerAPIKeyName;
-            body.headerAPIKeyValue=ds.headerAPIKeyValue;
+            // set body
+            body.name = nameds;
+            body.host = urlds;
+            body.type = ds.type;
+            body.headerAPIKeyName = ds.headerAPIKeyName;
+            body.headerAPIKeyValue = ds.headerAPIKeyValue;
             try {
               // now update previous
               await axios.put(`${LOCAL_HOST}/datasource/${ds.did}`, body, {
-                headers: { 'DXC_SECURE_KEY': localStorage.getItem('DXC_SECURE_KEY')}
+                headers: {
+                  DXC_SECURE_KEY: localStorage.getItem("DXC_SECURE_KEY"),
+                },
               });
               setResp(`Success. Datasource updated.`);
-              mutate('/datasources')
+              mutate("/datasources");
             } catch (error) {
               setErr(error.toString());
             }
@@ -476,16 +556,18 @@ export const DatasourcesList = () => {
       }
       return;
     } else {
-        return false;
+      return false;
     }
-  }
+  };
 
   return (
     <Grid container spacing={2}>
-      {!error &&
-        data && (
+      {!error && data && (
         <TableContainer>
-          <Table aria-label="simple table" style={{ width:"2000px", marginTop: "15px", }}>
+          <Table
+            aria-label="simple table"
+            style={{ width: "2000px", marginTop: "15px" }}
+          >
             <TableHead>
               <TableRow>
                 <TableCell>ID</TableCell>
@@ -500,40 +582,67 @@ export const DatasourcesList = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {(data.data as any).map((datasource: any) => (
-                datasource.did !== "" ?
-                  <TableRow key={datasource.did} className={datasource.available?"":"ds_inactive"}>
-                    <TableCell component="th" scope="row">{datasource.did}</TableCell>
+              {(data.data as any).map((datasource: any) =>
+                datasource.did !== "" ? (
+                  <TableRow
+                    key={datasource.did}
+                    className={datasource.available ? "" : "ds_inactive"}
+                  >
+                    <TableCell component="th" scope="row">
+                      {datasource.did}
+                    </TableCell>
                     <TableCell>{datasource.name}</TableCell>
                     <TableCell>{datasource.type}</TableCell>
                     <TableCell>{datasource.protocol}</TableCell>
                     <TableCell>{datasource.host}</TableCell>
-                    <TableCell>{dayjs(datasource.CreatedAt).format('YYYY-MM-DD')}</TableCell>
                     <TableCell>
-                      <Button 
+                      {dayjs(datasource.CreatedAt).format("YYYY-MM-DD")}
+                    </TableCell>
+                    <TableCell>
+                      <Button
                         style={{
                           backgroundColor: "#3dd890",
-                          color: "white"
-                        }} 
-                        variant="contained" 
-                        onClick={e => handleEdit(datasource)}>Edit</Button>
-                      <Button 
-                          style={{
-                            marginLeft: 10,
-                            backgroundColor: "#ff6946",
-                            color: "white"
-                          }} 
-                          variant="contained" 
-                          onClick={e => handleDelete(datasource.did)}>Delete</Button>  
+                          color: "white",
+                        }}
+                        variant="contained"
+                        onClick={(e) => handleEdit(datasource)}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        style={{
+                          marginLeft: 10,
+                          backgroundColor: "#ff6946",
+                          color: "white",
+                        }}
+                        variant="contained"
+                        onClick={(e) => handleDelete(datasource.did)}
+                      >
+                        Delete
+                      </Button>
                     </TableCell>
-                    <TableCell style={{whiteSpace: "nowrap"}}>{datasource.headerAPIKeyName}{datasource.headerAPIKeyName !== undefined && datasource.headerAPIKeyName !== "" ? ":":""} {datasource.headerAPIKeyValue}</TableCell>
-                    <TableCell>{ ( datasource.protocol==="FTPS" || datasource.protocol==="FTP" || datasource.protocol==="SFTP" )  ? (datasource.ftpusername+"/"+datasource.ftppassword): ("")} </TableCell>      
-                  </TableRow> : null
-              ))}
+                    <TableCell style={{ whiteSpace: "nowrap" }}>
+                      {datasource.headerAPIKeyName}
+                      {datasource.headerAPIKeyName !== undefined &&
+                      datasource.headerAPIKeyName !== ""
+                        ? ":"
+                        : ""}{" "}
+                      {datasource.headerAPIKeyValue}
+                    </TableCell>
+                    <TableCell>
+                      {datasource.protocol === "FTPS" ||
+                      datasource.protocol === "FTP" ||
+                      datasource.protocol === "SFTP"
+                        ? datasource.ftpusername + "/" + datasource.ftppassword
+                        : ""}{" "}
+                    </TableCell>
+                  </TableRow>
+                ) : null
+              )}
             </TableBody>
           </Table>
         </TableContainer>
-        )}
+      )}
       {!error && data && isEmptyArray(data.data) && (
         <p>No data source created yet</p>
       )}
@@ -550,4 +659,3 @@ export const DatasourcesList = () => {
     </Grid>
   );
 };
-
