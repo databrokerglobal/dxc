@@ -139,7 +139,7 @@ func main() {
 	//////////////////////////
 
 	go func() {
-		datasources.CheckHost()
+		// datasources.CheckHost()
 		wg.Done()
 	}()
 

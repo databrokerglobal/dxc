@@ -21,6 +21,8 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/jlaffaye/ftp"
+	"github.com/pkg/sftp"
+	"golang.org/x/crypto/ssh"
 )
 
 // RunningTest is true when we are running tests
@@ -114,7 +116,7 @@ func AddExampleDatasources(c echo.Context) error {
 	count := 0
 
 	datasource := new(database.Datasource)
-	datasource.Name = "Local file 1"
+	datasource.Name = "File 1"
 	datasource.Available = true
 	datasource.Type = "FILE"
 	datasource.Protocol = "LOCAL"
@@ -129,7 +131,7 @@ func AddExampleDatasources(c echo.Context) error {
 	count++
 
 	datasource = new(database.Datasource)
-	datasource.Name = "Local file 2"
+	datasource.Name = "File 2"
 	datasource.Available = true
 	datasource.Type = "FILE"
 	datasource.Protocol = "LOCAL"
@@ -144,7 +146,7 @@ func AddExampleDatasources(c echo.Context) error {
 	count++
 
 	datasource = new(database.Datasource)
-	datasource.Name = "File 1"
+	datasource.Name = "File 3"
 	datasource.Available = true
 	datasource.Type = "FILE"
 	datasource.Protocol = "HTTPS"
@@ -159,7 +161,7 @@ func AddExampleDatasources(c echo.Context) error {
 	count++
 
 	datasource = new(database.Datasource)
-	datasource.Name = "File 2"
+	datasource.Name = "File 4"
 	datasource.Available = true
 	datasource.Type = "FILE"
 	datasource.Protocol = "HTTPS"
@@ -174,7 +176,7 @@ func AddExampleDatasources(c echo.Context) error {
 	count++
 
 	datasource = new(database.Datasource)
-	datasource.Name = "File 3"
+	datasource.Name = "File 5"
 	datasource.Available = true
 	datasource.Type = "FILE"
 	datasource.Protocol = "HTTP"
@@ -189,7 +191,7 @@ func AddExampleDatasources(c echo.Context) error {
 	count++
 
 	datasource = new(database.Datasource)
-	datasource.Name = "File 4"
+	datasource.Name = "File 6"
 	datasource.Available = true
 	datasource.Type = "FILE"
 	datasource.Protocol = "FTP"
@@ -206,13 +208,47 @@ func AddExampleDatasources(c echo.Context) error {
 	count++
 
 	datasource = new(database.Datasource)
-	datasource.Name = "File 5"
+	datasource.Name = "File 7"
 	datasource.Available = true
 	datasource.Type = "FILE"
 	datasource.Protocol = "FTP"
 	datasource.Ftpusername = "demo"
 	datasource.Ftppassword = "demo"
 	datasource.Host = utils.TrimLastSlash("ftp://demo.wftpserver.com/download/Spring.jpg")
+	rand, _ = utils.GenerateRandomStringURLSafe(10)
+	datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
+	if !RunningTest {
+		if err := database.DBInstance.CreateDatasource(datasource); err != nil {
+			return err
+		}
+	}
+	count++
+
+	datasource = new(database.Datasource)
+	datasource.Name = "File 8"
+	datasource.Available = true
+	datasource.Type = "FILE"
+	datasource.Protocol = "FTPS"
+	datasource.Ftpusername = "demo"
+	datasource.Ftppassword = "password"
+	datasource.Host = utils.TrimLastSlash("ftps://test.rebex.net//pub/example/KeyGenerator.png")
+	rand, _ = utils.GenerateRandomStringURLSafe(10)
+	datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
+	if !RunningTest {
+		if err := database.DBInstance.CreateDatasource(datasource); err != nil {
+			return err
+		}
+	}
+	count++
+
+	datasource = new(database.Datasource)
+	datasource.Name = "File 9"
+	datasource.Available = true
+	datasource.Type = "FILE"
+	datasource.Protocol = "SFTP"
+	datasource.Ftpusername = "demo"
+	datasource.Ftppassword = "password"
+	datasource.Host = utils.TrimLastSlash("sftp://test.rebex.net:22/pub/example/KeyGenerator.png")
 	rand, _ = utils.GenerateRandomStringURLSafe(10)
 	datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
 	if !RunningTest {
@@ -497,7 +533,10 @@ func GetFile(c echo.Context) error {
 	pathToFile := "tempFiles/" + rand + "/" + filename
 	if datasource.Protocol == "HTTP" || datasource.Protocol == "HTTPS" {
 		err = downloadFileHTTP(pathToFile, datasource.Host)
+	} else if datasource.Protocol == "SFTP" {
+		err = downloadFileSFTP(datasource.Protocol, datasource.Host, datasource.Ftpusername, datasource.Ftppassword, pathToFile, filename)
 	} else {
+		// if file protocol is FTP or FTPS
 		err = downloadFileFTP(datasource.Protocol, datasource.Host, datasource.Ftpusername, datasource.Ftppassword, pathToFile, filename)
 	}
 	if err != nil {
@@ -724,6 +763,8 @@ func downloadFileFTP(protocol string, url string, ftpusername string, ftppasswor
 	if len(entries) <= 0 {
 		return errors.New("No file found. Please check filename or path")
 	}
+	// close connection
+	defer client.Quit()
 
 	for _, entry := range entries {
 		name := entry.Name
@@ -743,6 +784,52 @@ func downloadFileFTP(protocol string, url string, ftpusername string, ftppasswor
 		// Write the body to file
 		_, err = io.Copy(out, reader)
 		return err
+	}
+	return nil
+}
+
+func downloadFileSFTP(protocol string, url string, ftpusername string, ftppassword string, pathToFile string, filename string) error {
+	// get server address and path of file
+	server, path, err := getFtpServer(protocol, url, filename)
+	if err != nil {
+		return err
+	}
+	// get client of sftp server
+	config := &ssh.ClientConfig{
+		User: ftpusername,
+		Auth: []ssh.AuthMethod{
+			ssh.Password(ftppassword),
+		},
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		//Ciphers: []string{"3des-cbc", "aes256-cbc", "aes192-cbc", "aes128-cbc"},
+	}
+	conn, err := ssh.Dial("tcp", server, config)
+	if err == nil {
+		client, err := sftp.NewClient(conn)
+		// Close connection
+		defer client.Close()
+		defer conn.Close()
+		if err == nil {
+			// cwd, err := client.ReadDir(path) //if contains(cwd, filename) {
+			// skipping checking of file exists as thread processing this task periodically
+			reader, err := client.Open(path + "/" + filename)
+			if err != nil {
+				panic(err)
+			}
+			// Create the file
+			if err = os.MkdirAll(filepath.Dir(pathToFile), 0770); err != nil {
+				return err
+			}
+			out, err := os.Create(pathToFile)
+			if err != nil {
+				return err
+			}
+			defer out.Close()
+			// Write the body to file
+			_, err = io.Copy(out, reader)
+			return err
+		}
+		return errors.New("Internal error in connection or login to server")
 	}
 	return nil
 }

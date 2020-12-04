@@ -17,6 +17,7 @@ import {
   TableRow,
   Tooltip,
   Typography,
+  Box,
 } from "@material-ui/core";
 import { isEmptyArray } from "formik";
 import { useWindowSize } from "./WindowSizeHook";
@@ -299,7 +300,7 @@ export const DatasourceForm = () => {
               { value: "FTP", label: "ftp" },
               { value: "FTPS", label: "ftps" },
               { value: "SFTP", label: "sftp" },
-              { value: "LOCAL", label: "Local" },
+              { value: "LOCAL", label: "local" },
             ].map((o: any, i: number) => (
               <MenuItem key={i.toString()} value={o.value}>
                 {o.label}
@@ -656,6 +657,7 @@ export const DatasourcesList = () => {
           </p>
         </div>
       )}
+      <Box m={10} /> 
     </Grid>
   );
 };
