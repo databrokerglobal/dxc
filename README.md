@@ -47,7 +47,7 @@ DXC_SERVER_HOST=http://xx.xx.xx.xx:xxxx
 
 ### Dependencies
 
-- golang >= 1.11 (1.14 recommended)
+- golang >= 1.13 (1.15 recommended)
 - node 12.6.1 LTS or higher
 
 ### Run locally
