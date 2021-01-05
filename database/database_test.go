@@ -56,7 +56,7 @@ func (s *Suite) TestCreateDatasource() {
 	}
 
 	s.mock.ExpectBegin()
-	s.mock.ExpectExec(`INSERT INTO "datasources"`).WithArgs(AnyTime{}, AnyTime{}, nil, datasource.Name, datasource.Type, datasource.Did, datasource.Host, datasource.HeaderAPIKeyName, datasource.HeaderAPIKeyValue, datasource.Available).WillReturnResult(sqlmock.NewResult(0, 1))
+	s.mock.ExpectExec(`INSERT INTO "datasources"`).WithArgs(AnyTime{}, AnyTime{}, nil, datasource.Name, datasource.Type, datasource.Did, datasource.Host, datasource.HeaderAPIKeyName, datasource.HeaderAPIKeyValue, datasource.Available, datasource.Protocol, datasource.Ftpusername, datasource.Ftppassword).WillReturnResult(sqlmock.NewResult(0, 1))
 	s.mock.ExpectCommit()
 
 	err := s.repository.CreateDatasource(datasource)
