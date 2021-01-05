@@ -31,7 +31,7 @@ require (
 	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/golang/snappy v0.0.2 // indirect
 	github.com/google/gofuzz v1.1.1-0.20200604201612-c04b05f3adfa // indirect
-	github.com/google/uuid v1.1.2
+	github.com/google/uuid v1.1.4
 	github.com/hashicorp/go.net v0.0.1
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/holiman/uint256 v1.1.1 // indirect
