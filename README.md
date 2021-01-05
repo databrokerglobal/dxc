@@ -85,6 +85,14 @@ $ sudo pacman -S arm-none-eabi-gcc
 
 https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads
 
+or even easier: 
+
+`brew cask install gcc-arm-embedded`
+
+Just be sure that `arm-none-eabi-gcc` is in your path
+
+More details on the latest way to install the GNU embedded toolchain for macos in this gist here: https://gist.github.com/joegoggins/7763637
+
 #### Specifying the ARM platform env variables in build-script.sh
 
 Replace CC with the name of the gcc compiler and then specify the platform you want to compile to.
