@@ -24,7 +24,7 @@
     "@types/ethereumjs-abi": "^0.6.3",
     "axios": "^0.19.2",
     "bn.js": "^5.1.1",
-    "dayjs": "^1.8.26",
+    "dayjs": "^1.10.3",
     "dotenv": "^8.2.0",
     "ethereumjs-abi": "^0.6.8",
     "ethers": "^4.0.47",
