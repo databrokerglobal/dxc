@@ -275,7 +275,7 @@ export const DatasourceForm = () => {
                 rel="noopener noreferrer"
                 href="https://www.databroker.global/help"
               >
-                {"manual"}
+                {"support"}
               </a>
             </React.Fragment>
           }
@@ -330,7 +330,7 @@ export const DatasourceForm = () => {
                   rel="noopener noreferrer"
                   href="https://www.databroker.global/help"
                 >
-                  {"manual"}
+                  {"support"}
                 </a>
               </React.Fragment>
             }
@@ -373,7 +373,7 @@ export const DatasourceForm = () => {
                 rel="noopener noreferrer"
                 href="https://www.databroker.global/help"
               >
-                {"manual"}
+                {"support"}
               </a>
             </React.Fragment>
           }
