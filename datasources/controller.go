@@ -848,7 +848,11 @@ func getFtpServer(protocol string, url string, filename string) (string, string,
 	index := strings.Index(url2, "/") // get index of /
 	ftpserver := url2[:index]         // extracted ftpserver
 	if strings.Index(ftpserver, ":") < 0 {
-		ftpserver = ftpserver + ":21" // add default ftp port
+		if protocol == "SFTP" {
+			ftpserver = ftpserver + ":22" // add default sftp port
+		} else {
+			ftpserver = ftpserver + ":21" // add default ftp & ftps port
+		}
 	}
 	path := url2[index:]
 	path = strings.Replace(path, filename, "", -1)
