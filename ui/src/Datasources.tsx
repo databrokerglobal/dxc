@@ -275,7 +275,7 @@ export const DatasourceForm = () => {
                 rel="noopener noreferrer"
                 href="https://www.databroker.global/help"
               >
-                {"manual"}
+                {"support"}
               </a>
             </React.Fragment>
           }
@@ -330,7 +330,7 @@ export const DatasourceForm = () => {
                   rel="noopener noreferrer"
                   href="https://www.databroker.global/help"
                 >
-                  {"manual"}
+                  {"support"}
                 </a>
               </React.Fragment>
             }
@@ -373,7 +373,7 @@ export const DatasourceForm = () => {
                 rel="noopener noreferrer"
                 href="https://www.databroker.global/help"
               >
-                {"manual"}
+                {"support"}
               </a>
             </React.Fragment>
           }
@@ -385,22 +385,22 @@ export const DatasourceForm = () => {
       {body.type === "API" ? (
         <Grid item xs={2}>
           <TextField
-            id="headerAPIKeyValue"
-            label="API Key Value"
-            helperText="The value of key"
-            value={body?.headerAPIKeyValue}
-            onChange={handleHeaderAPIKeyValue}
+            id="headerAPIKeyName"
+            label="API Key Name"
+            helperText="Optional key in the header"
+            value={body?.headerAPIKeyName}
+            onChange={handleHeaderAPIKeyName}
           />
         </Grid>
       ) : null}
       {body.type === "API" ? (
         <Grid item xs={2}>
           <TextField
-            id="headerAPIKeyName"
-            label="API Key Name"
-            helperText="Optional key in the header"
-            value={body?.headerAPIKeyName}
-            onChange={handleHeaderAPIKeyName}
+            id="headerAPIKeyValue"
+            label="API Key Value"
+            helperText="The value of key"
+            value={body?.headerAPIKeyValue}
+            onChange={handleHeaderAPIKeyValue}
           />
         </Grid>
       ) : null}
