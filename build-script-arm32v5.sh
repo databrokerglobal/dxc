@@ -4,7 +4,7 @@ rm -rf dxc_build_*
 
 set -e
 
-BUILD_DIR=dxc_build_$(date +%Y%m%d)
+BUILD_DIR=DXC_ARM32v5_Build_$(date +%Y%m%d)
 
 mkdir ${BUILD_DIR}
 env CC=arm-none-eabi-gcc CGO_ENABLED=1 GOOS=linux GOARCH=arm GOARM=5
