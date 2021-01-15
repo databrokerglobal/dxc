@@ -1,6 +1,6 @@
 #! /bin/bash
 
-rm -rf dxc_build_*
+rm -rf DXC_ARM64_Build_*
 
 set -e
 
