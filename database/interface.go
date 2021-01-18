@@ -12,6 +12,11 @@ type Repository interface {
 	SaveNewUserAuth(address string, apiKey string) (err error)
 	GetLatestUserAuth() (u *UserAuth, err error)
 
+	// VersionInfo
+	SaveInstalledVersionInfo(version string, checked string, upgrade bool) (err error)
+	GetInstalledVersionInfo() (u *VersionInfo, err error)
+	DeleteInstalledVersionInfo(version string) (err error)
+
 	// Datasources
 	CreateDatasource(datasource *Datasource) (err error)
 	GetDatasourceByDID(did string) (d *Datasource, err error)

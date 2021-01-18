@@ -17,6 +17,7 @@ import {
   Link,
 } from "@material-ui/core";
 import CssBaseline from "@material-ui/core/CssBaseline";
+import { DXCVersion } from "./DXCVersion";
 
 declare global {
   interface Window {
@@ -46,6 +47,7 @@ function App() {
       <Tabs value={tabValue} onChange={handleChangedTab} aria-label="simple tabs example">
         <Tab value="pane-DS" label="Data sources" />
         <Tab value="pane-AUTH" label="Configuration" />
+        <Tab value="pane-VER" label="Version Info" />
       </Tabs>
       <Grid
         container
@@ -63,14 +65,22 @@ function App() {
               <DatasourcesList />
             </Grid>
           </Grid> : null}
+          {tabValue === "pane-VER" ?
+          <Grid item xs={12}>
+            <Typography variant="h5">DXC Version</Typography>
+            <Divider />
+            <Grid style={{ marginTop: "15px", }} item xs={12}>
+              <DXCVersion />
+            </Grid>
+          </Grid> : null}
         {tabValue === "pane-AUTH" ?
           <Grid item xs={12}>
-            <Typography variant="h5">DXC authentication</Typography>
+            <Typography variant="h5">DXC Authentication</Typography>
             <Divider />
             <Grid style={{ marginBottom: "40px", }} item xs={12}>
               <DXCAuthentication />
             </Grid>
-            <Typography variant="h5">Databroker authentication</Typography>
+            <Typography variant="h5">Databroker Authentication</Typography>
             <Divider />
             <Grid style={{ marginBottom: "40px", }} item xs={12}>
               <Authentication />
