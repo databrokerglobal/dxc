@@ -37,6 +37,9 @@
   }
 }
 
-.ds_inactive{
-  background-color: #e6f0f0;
+.ds_unavailable{
+  background-color: #ffebeb;
+}
+.ds_available{
+  background-color: #ebfdf9;
 }

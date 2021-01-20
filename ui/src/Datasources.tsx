@@ -17,6 +17,7 @@ import {
   TableRow,
   Tooltip,
   Typography,
+  Divider,
   Box,
 } from "@material-ui/core";
 import { isEmptyArray } from "formik";
@@ -25,6 +26,7 @@ import * as Yup from "yup";
 import * as R from "ramda";
 import { makeStyles } from "@material-ui/core/styles";
 import HelpOutlineSharpIcon from "@material-ui/icons/HelpOutlineSharp";
+import LensIcon from '@material-ui/icons/Lens';
 
 interface IDatasource {
   ID?: string;
@@ -565,12 +567,18 @@ export const DatasourcesList = () => {
     <Grid container spacing={2}>
       {!error && data && (
         <TableContainer>
+          <Typography variant="subtitle1" color="textSecondary" align="right">
+            Total {data.data.length} datasources, scroll to view more columns --&gt;
+          </Typography>
+          <Divider/>
           <Table
+            stickyHeader
             aria-label="simple table"
-            style={{ width: "2000px", marginTop: "15px" }}
+            style={{ width: "2000px" }}
           >
             <TableHead>
               <TableRow>
+                <TableCell></TableCell>
                 <TableCell>ID</TableCell>
                 <TableCell>Name</TableCell>
                 <TableCell>Type</TableCell>
@@ -582,13 +590,16 @@ export const DatasourcesList = () => {
                 <TableCell>Credentials</TableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
+            <TableBody> 
               {(data.data as any).map((datasource: any) =>
                 datasource.did !== "" ? (
                   <TableRow
                     key={datasource.did}
-                    className={datasource.available ? "" : "ds_inactive"}
+                    className={datasource.available ? "ds_available" : "ds_unavailable"}
                   >
+                    <TableCell>
+                      {datasource.available ? <LensIcon style={{ color: '#3DEFC5' }} /> : <LensIcon style={{ color: '#FF3B3B' }} /> }
+                    </TableCell>
                     <TableCell component="th" scope="row">
                       {datasource.did}
                     </TableCell>
