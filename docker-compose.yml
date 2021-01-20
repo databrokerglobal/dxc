@@ -2,7 +2,7 @@ version: "3"
 
 services:
   dxc-server:
-    image: databrokerdao/dxc-server:0.1.3
+    image: databrokerdao/dxc-server:latest
     volumes:
       - ./db-data:/go/db-data
     ports:
@@ -10,7 +10,7 @@ services:
     env_file:
       - .env
   dxc-ui:
-    image: databrokerdao/dxc-ui:0.1.3
+    image: databrokerdao/dxc-ui:latest
     ports:
       - "1337:80"
     env_file:

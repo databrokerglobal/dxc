@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	"github.com/fatih/color"
 	"github.com/labstack/echo/v4"
@@ -95,6 +96,59 @@ func GetUserAuth(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, userAuth)
+}
+
+// GetVersionInfo to get the address and api key
+// Create godoc
+// @Summary Get version info
+// @Description Get version and last check on date of DXC
+// @Tags user
+// @Produce json
+// @Success 200 {object} database.VersionInfo true
+// @Failure 404 {string} string "Not data found"
+// @Failure 500 {string} string "Error getting version info"
+// @Router /user/versioninfo [get]
+// @Security ApiKeyAuth
+func GetVersionInfo(c echo.Context) error {
+	installedVersionInfo, err := database.DBInstance.GetInstalledVersionInfo()
+	if err != nil || installedVersionInfo == nil {
+		return c.String(http.StatusInternalServerError, errors.Wrap(err, "error getting installed Version Info ").Error())
+	}
+	// check if upgrade is required
+	latestVersion := getLatestVersionFromPortal()
+	if latestVersion != "" {
+		if latestVersion != installedVersionInfo.Version {
+			installedVersionInfo.Upgrade = true
+			err := database.DBInstance.SaveInstalledVersionInfo(installedVersionInfo.Version, installedVersionInfo.Checked, true)
+			if err != nil {
+				return c.String(http.StatusInternalServerError, errors.Wrap(err, "error saving installed version info upgrade ").Error())
+			}
+		}
+	}
+	return c.JSON(http.StatusOK, installedVersionInfo)
+}
+
+func getLatestVersionFromPortal() string {
+	url := "https://www.databroker.global/get_latest_dxc_version"
+	httpClient := http.Client{
+		Timeout: time.Second * 5, // Timeout after 5 seconds
+	}
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err == nil {
+		res, getErr := httpClient.Do(req)
+		if getErr == nil {
+			if res.Body != nil {
+				defer res.Body.Close()
+			}
+			body, readErr := ioutil.ReadAll(res.Body)
+			if readErr == nil {
+				latestVersion := string(body)
+				// TODO: check if it is in valid format major.minor.patch like 1.0.0
+				return latestVersion
+			}
+		}
+	}
+	return ""
 }
 
 func getInfuraIDAndServeContract(address string, apiKey string) {

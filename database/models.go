@@ -41,6 +41,14 @@ type UserAuth struct {
 	APIKey  string `json:"api_key"`
 }
 
+// VersionInfo struct to
+type VersionInfo struct {
+	gorm.Model
+	Version string `json:"version"`
+	Checked string `json:"checked"`
+	Upgrade bool   `json:"upgrade"`
+}
+
 // InfuraID struct to
 type InfuraID struct {
 	gorm.Model

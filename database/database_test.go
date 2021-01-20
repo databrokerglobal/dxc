@@ -150,6 +150,23 @@ func (s *Suite) TestSaveNewUserAuth() {
 	require.NoError(s.T(), err)
 }
 
+func (s *Suite) TestSaveInstalledVersionInfo() {
+
+	versionInfo := &VersionInfo{
+		Version: "0.1.0",
+		Checked: "09/01/2021",
+		Upgrade: false,
+	}
+
+	s.mock.ExpectBegin()
+	s.mock.ExpectExec(`INSERT INTO "version_infos"`).WithArgs(AnyTime{}, AnyTime{}, nil, versionInfo.Version, versionInfo.Checked, versionInfo.Upgrade).WillReturnResult(sqlmock.NewResult(0, 1))
+	s.mock.ExpectCommit()
+
+	err := s.repository.SaveInstalledVersionInfo(versionInfo.Version, versionInfo.Checked, versionInfo.Upgrade)
+
+	require.NoError(s.T(), err)
+}
+
 func (s *Suite) TestCreateInfuraID() {
 
 	infuraIDObject := &InfuraID{

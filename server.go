@@ -1,13 +1,16 @@
 package main
 
 import (
+	"io/ioutil"
 	"log"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/fatih/color"
 	"github.com/joho/godotenv"
 
+	"github.com/databrokerglobal/dxc/database"
 	"github.com/databrokerglobal/dxc/datasources"
 	_ "github.com/databrokerglobal/dxc/docs"
 	"github.com/databrokerglobal/dxc/ethereum"
@@ -18,6 +21,8 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
+
+var versionFile = ".version"
 
 // @title DXC
 // @version 1.0
@@ -109,6 +114,10 @@ func main() {
 	e.POST("/user/authinfo", usermanager.SaveUserAuth)
 	e.GET("/user/authinfo", usermanager.GetUserAuth)
 
+	// VERSION INFO
+	e.GET("/user/versioninfo", usermanager.GetVersionInfo)
+	saveVersionInfoInDatabase()
+
 	////
 	// routes accessible by users
 	////
@@ -164,4 +173,60 @@ func main() {
 
 	// Log stuff if port is busy f.e.
 	e.Logger.Fatal(e.Start(":" + port))
+}
+
+func saveVersionInfoInDatabase() {
+	installedVersionInfo, err := database.DBInstance.GetInstalledVersionInfo()
+	if err != nil {
+		log.Fatalf("DXC_VERSION not set : " + err.Error())
+	}
+	if installedVersionInfo != nil {
+		if installedVersionInfo.Upgrade {
+			if _, err := os.Stat(versionFile); os.IsNotExist(err) {
+				// versionFile does not exist
+				color.Red(" ")
+				color.Red("UPGRADE REQUIRED")
+				color.Red(" ")
+				color.Blue("Note: Check .version file exists in new upgrade with latest version number")
+				color.Red(" ")
+				log.Fatalf("New DXC VERSION avaiable, please upgrade !!!!!!!!!!!!!!!!!!!!!!!!!!!!! ")
+			} else {
+				color.Green(" ")
+				color.Green("---------------------------- UPGRADE INSTALLATION ----------------------------  ")
+				color.Green(" ")
+			}
+		} else {
+			color.Green("DXC VERSION " + installedVersionInfo.Version)
+			color.Green("Installed On " + installedVersionInfo.Checked)
+			return
+		}
+	} else {
+		color.Green(" ")
+		color.Green("---------------------------- FRESH INSTALLATION ----------------------------  ")
+		color.Green(" ")
+	}
+	// installing DXC for the first time so read from .version file and store in database
+	installedVersion := getVersionFromFile()
+	currentTime := time.Now()
+	installedDate := currentTime.Format("02-January-2006 15:04:05 Monday")
+	err = database.DBInstance.SaveInstalledVersionInfo(installedVersion, installedDate, false)
+	if err != nil {
+		log.Fatalf("DXC_VERSION not set in database : " + err.Error())
+	}
+	color.Green("DXC VERSION " + installedVersion)
+	color.Green("Installed On " + installedDate)
+}
+
+func getVersionFromFile() string {
+	dat, err := ioutil.ReadFile(versionFile)
+	if err != nil {
+		log.Fatalf("DXC_VERSION not set, error reading file : " + err.Error())
+	}
+	currentVersion := string(dat)
+	// Removing file so that
+	e := os.Remove(versionFile)
+	if e != nil {
+		log.Fatal("ERROR removing file " + e.Error())
+	}
+	return currentVersion
 }
