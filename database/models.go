@@ -47,6 +47,7 @@ type VersionInfo struct {
 	Version string `json:"version"`
 	Checked string `json:"checked"`
 	Upgrade bool   `json:"upgrade"`
+	Latest  string `json:"latest"`
 }
 
 // InfuraID struct to

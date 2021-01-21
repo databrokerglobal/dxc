@@ -5,13 +5,16 @@ import {
   Grid,
   Typography,
 } from "@material-ui/core";
-import * as R from "ramda";
+import {
+  Error,
+} from "@material-ui/icons";
 
 interface IAuth {
   ID?: string;
   version: string;
   checked: string;
   upgrade: boolean;
+  latest: string;
   alreadyRequestedData: boolean;
 }
 
@@ -21,26 +24,11 @@ export const DXCVersion = () => {
     version: "N/A",
     checked: "N/A",
     upgrade: false,
+    latest: "N/A",
     alreadyRequestedData: false,
   });
 
-  const [resp, setResp] = React.useState<string>("");
   const [err, setErr] = React.useState<string>("");
-
-  // reset error or response + form
-  React.useEffect(() => {
-    if (!R.isEmpty(err)) {
-      setTimeout(() => {
-        setErr("");
-      }, 2000);
-    }
-    if (!R.isEmpty(resp)) {
-      setTimeout(() => {
-        setResp("");
-      }, 2000);
-    }
-  });
-
 
   const getData = async () => {
     axios
@@ -52,12 +40,12 @@ export const DXCVersion = () => {
           version: data.data.version,
           checked: data.data.checked,
           upgrade: data.data.upgrade,
+          latest: data.data.latest,
           alreadyRequestedData: true,
         });
       })
-      .catch(err => {
-        console.log(err);
-        return null;
+      .catch(error => {
+        setErr("Network Error")
       });
   };
 
@@ -65,6 +53,18 @@ export const DXCVersion = () => {
     getData();
   }
 
+  if(err !== ""){
+    return (
+      <Grid container>
+      <div style={{ display: "flex", alignContent: "row", alignItems: "center", width: "100%" }}>
+          <Error color="error"/>
+          <p style={{ marginLeft: "1%", color: "red" }}>
+            Unable to fetch data. Please check if server is running [<b> {err} </b>]
+          </p>
+        </div>
+      </Grid>
+    )
+  }
   return (
     <Grid
       container
@@ -83,9 +83,15 @@ export const DXCVersion = () => {
         <Typography variant="subtitle1" component="h2" color="textSecondary">
           Installed on : {body?.checked}
         </Typography>
+        {body?.upgrade?
         <Typography variant="h6" component="h2" color="secondary">
-          {body?.upgrade?"New version available. Please upgrade the software.":""}
+          New version {body?.latest} available. Please upgrade and restart the DXC. 
         </Typography>
+        :
+        <Typography variant="h6" component="h2" color="primary">
+          Latest version 
+        </Typography>
+        }
       </Grid>
     </Grid>
   );

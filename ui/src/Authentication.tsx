@@ -150,10 +150,13 @@ export const Authentication = () => {
               display: "flex",
               alignContent: "row",
               alignItems: "center",
+              width: "100%"
             }}
           >
-            <Error />
-            <p style={{ marginLeft: "1%", color: "red" }}>{err}</p>
+            <Error color="error"/>
+            <p style={{ marginLeft: "1%", color: "red" }}>
+              Unable to save data. Please check if server is running [<b> {err.toString().replace("Error: ", "")} </b>]
+            </p>
           </div>
         )}
         {R.isEmpty(err) && !R.isEmpty(resp) && (
