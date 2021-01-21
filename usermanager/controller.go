@@ -119,7 +119,7 @@ func GetVersionInfo(c echo.Context) error {
 	if latestVersion != "" {
 		if latestVersion != installedVersionInfo.Version {
 			installedVersionInfo.Upgrade = true
-			err := database.DBInstance.SaveInstalledVersionInfo(installedVersionInfo.Version, installedVersionInfo.Checked, true)
+			err := database.DBInstance.SaveInstalledVersionInfo(installedVersionInfo.Version, installedVersionInfo.Checked, true, latestVersion)
 			if err != nil {
 				return c.String(http.StatusInternalServerError, errors.Wrap(err, "error saving installed version info upgrade ").Error())
 			}

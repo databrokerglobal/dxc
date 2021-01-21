@@ -1,8 +1,8 @@
 package main
 
 import (
-	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"sync"
 	"time"
@@ -21,8 +21,6 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
-
-var versionFile = ".version"
 
 // @title DXC
 // @version 1.0
@@ -134,6 +132,13 @@ func main() {
 	if dxcHost == "" {
 		log.Fatalf("DXC_HOST env variable is not set!")
 	}
+	halt := os.Getenv("HALT_ON_NO_INTERNET")
+	if !checkInternet() && (halt == "1" || halt == "true") {
+		color.Red("Set HALT_ON_NO_INTERNET to 0 in .env file to ignore this checking and continue installing/restarting DXC server")
+		color.Red("If this check is skipped then note that 'Network error' will be displayed in multiple components of UI")
+		color.Red("")
+		log.Fatalf("Internet is required to access datasources availibity")
+	}
 
 	/////////////////
 	// GO ROUTINES //
@@ -176,26 +181,33 @@ func main() {
 }
 
 func saveVersionInfoInDatabase() {
+	// NOTE: This version number must be updated on every PR
+	var version = "1.0.2"
+
 	installedVersionInfo, err := database.DBInstance.GetInstalledVersionInfo()
 	if err != nil {
 		log.Fatalf("DXC_VERSION not set : " + err.Error())
 	}
 	if installedVersionInfo != nil {
 		if installedVersionInfo.Upgrade {
-			if _, err := os.Stat(versionFile); os.IsNotExist(err) {
-				// versionFile does not exist
-				color.Red(" ")
-				color.Red("UPGRADE REQUIRED")
-				color.Red(" ")
-				color.Blue("Note: Check .version file exists in new upgrade with latest version number")
-				color.Red(" ")
-				log.Fatalf("New DXC VERSION avaiable, please upgrade !!!!!!!!!!!!!!!!!!!!!!!!!!!!! ")
-			} else {
+			if installedVersionInfo.Latest == version {
 				color.Green(" ")
 				color.Green("---------------------------- UPGRADE INSTALLATION ----------------------------  ")
 				color.Green(" ")
+			} else {
+				haltOnUpgrade := os.Getenv("HALT_ON_UPGRADE_AVAILABLE")
+				if haltOnUpgrade == "1" || haltOnUpgrade == "true" {
+					color.Red(" ")
+					color.Red("UPGRADE REQUIRED")
+					color.Red(" ")
+					color.Red("Current version is NOT the latest version available")
+					color.Red("Set HALT_ON_UPGRADE_AVAILABLE to 0 in .env file to ignore this and continue with current version.")
+					color.Red(" ")
+					log.Fatalf("New DXC VERSION avaiable, please upgrade !!!!!!!!!!!!!!!!!!!!!!!!!!!!! ")
+				}
 			}
 		} else {
+			color.Green("---------------------------- RESTART ----------------------------  ")
 			color.Green("DXC VERSION " + installedVersionInfo.Version)
 			color.Green("Installed On " + installedVersionInfo.Checked)
 			return
@@ -205,11 +217,11 @@ func saveVersionInfoInDatabase() {
 		color.Green("---------------------------- FRESH INSTALLATION ----------------------------  ")
 		color.Green(" ")
 	}
-	// installing DXC for the first time so read from .version file and store in database
-	installedVersion := getVersionFromFile()
+	// installing DXC for the first time so read from hardocded value set on TOP and store in database
+	installedVersion := version
 	currentTime := time.Now()
 	installedDate := currentTime.Format("02-January-2006 15:04:05 Monday")
-	err = database.DBInstance.SaveInstalledVersionInfo(installedVersion, installedDate, false)
+	err = database.DBInstance.SaveInstalledVersionInfo(installedVersion, installedDate, false, "")
 	if err != nil {
 		log.Fatalf("DXC_VERSION not set in database : " + err.Error())
 	}
@@ -217,16 +229,14 @@ func saveVersionInfoInDatabase() {
 	color.Green("Installed On " + installedDate)
 }
 
-func getVersionFromFile() string {
-	dat, err := ioutil.ReadFile(versionFile)
-	if err != nil {
-		log.Fatalf("DXC_VERSION not set, error reading file : " + err.Error())
+func checkInternet() bool {
+	_, netErrors := http.Get("https://www.google.com")
+	if netErrors != nil {
+		color.Red("")
+		color.Red("!!!!!!!!! INTERNET NOT AVAILABLE")
+		color.Red("")
+		return false
+	} else {
+		return true
 	}
-	currentVersion := string(dat)
-	// Removing file so that
-	e := os.Remove(versionFile)
-	if e != nil {
-		log.Fatal("ERROR removing file " + e.Error())
-	}
-	return currentVersion
 }

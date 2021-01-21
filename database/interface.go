@@ -13,7 +13,7 @@ type Repository interface {
 	GetLatestUserAuth() (u *UserAuth, err error)
 
 	// VersionInfo
-	SaveInstalledVersionInfo(version string, checked string, upgrade bool) (err error)
+	SaveInstalledVersionInfo(version string, checked string, upgrade bool, latest string) (err error)
 	GetInstalledVersionInfo() (u *VersionInfo, err error)
 	DeleteInstalledVersionInfo(version string) (err error)
 

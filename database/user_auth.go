@@ -35,11 +35,12 @@ func (m *Manager) GetLatestUserAuth() (u *UserAuth, err error) {
 }
 
 // SaveInstalledVersionInfo create a new item
-func (m *Manager) SaveInstalledVersionInfo(version string, checked string, upgrade bool) (err error) {
+func (m *Manager) SaveInstalledVersionInfo(version string, checked string, upgrade bool, latest string) (err error) {
 	versionInfo := VersionInfo{}
 	versionInfo.Version = version
 	versionInfo.Checked = checked
 	versionInfo.Upgrade = upgrade
+	versionInfo.Latest = latest
 
 	// Generate new one
 	m.DB.Create(&versionInfo)

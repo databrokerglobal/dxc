@@ -15,6 +15,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Typography,
 } from "@material-ui/core";
 import { isEmptyArray } from "formik";
 
@@ -26,6 +27,14 @@ export const SyncStatusList = () => {
 
   const statusColor = (success: boolean): string => {
     return success ? "green" : "red";
+  };
+
+  if (!error && data && isEmptyArray(data.data)){ 
+    return (
+      <Typography variant="subtitle1" color="textSecondary" align="left">
+        <p>No data source created yet</p>
+      </Typography>
+    )
   };
 
   return (
@@ -55,16 +64,13 @@ export const SyncStatusList = () => {
           </Table>
         </TableContainer>
         )}
-      {!error && data && isEmptyArray(data.data) && (
-        <p>No data source created yet</p>
-      )}
       {error && error.toString().length > 0 && (
         <div
-          style={{ display: "flex", alignContent: "row", alignItems: "center" }}
+          style={{ display: "flex", alignContent: "row", alignItems: "center", width: "100%" }}
         >
-          <Error />
+          <Error color="error"/>
           <p style={{ marginLeft: "1%", color: "red" }}>
-            {error.toString().replace("Error: ", "")}
+            Unable to fetch data. Please check if server is running [<b> {error.toString().replace("Error: ", "")} </b>]
           </p>
         </div>
       )}

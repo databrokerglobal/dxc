@@ -563,12 +563,20 @@ export const DatasourcesList = () => {
     }
   };
 
+  if (!error && data && isEmptyArray(data.data)){ 
+    return (
+      <Typography variant="subtitle1" color="textSecondary" align="left">
+        <p>No data source created yet</p>
+      </Typography>
+    )
+  };
+
   return (
     <Grid container spacing={2}>
       {!error && data && (
         <TableContainer>
           <Typography variant="subtitle1" color="textSecondary" align="right">
-            Total {data.data.length} datasources, scroll to view more columns --&gt;
+            Total {data.data.length} datasources, scroll for further details --&gt;
           </Typography>
           <Divider/>
           <Table
@@ -579,13 +587,13 @@ export const DatasourcesList = () => {
             <TableHead>
               <TableRow>
                 <TableCell></TableCell>
-                <TableCell>ID</TableCell>
                 <TableCell>Name</TableCell>
+                <TableCell>Host</TableCell>
                 <TableCell>Type</TableCell>
                 <TableCell>Protocol</TableCell>
-                <TableCell>Host</TableCell>
+                <TableCell>Actions</TableCell>
+                <TableCell>DID</TableCell>
                 <TableCell>Added on</TableCell>
-                <TableCell>Action</TableCell>
                 <TableCell>Key in headers</TableCell>
                 <TableCell>Credentials</TableCell>
               </TableRow>
@@ -600,21 +608,15 @@ export const DatasourcesList = () => {
                     <TableCell>
                       {datasource.available ? <LensIcon style={{ color: '#3DEFC5' }} /> : <LensIcon style={{ color: '#FF3B3B' }} /> }
                     </TableCell>
-                    <TableCell component="th" scope="row">
-                      {datasource.did}
-                    </TableCell>
                     <TableCell>{datasource.name}</TableCell>
+                    <TableCell>{datasource.host}</TableCell>
                     <TableCell>{datasource.type}</TableCell>
                     <TableCell>{datasource.protocol}</TableCell>
-                    <TableCell>{datasource.host}</TableCell>
-                    <TableCell>
-                      {dayjs(datasource.CreatedAt).format("YYYY-MM-DD")}
-                    </TableCell>
                     <TableCell>
                       <Button
                         style={{
-                          backgroundColor: "#3dd890",
-                          color: "white",
+                          backgroundColor: "#3DEFC5",
+                          color: "black",
                         }}
                         variant="contained"
                         onClick={(e) => handleEdit(datasource)}
@@ -624,7 +626,7 @@ export const DatasourcesList = () => {
                       <Button
                         style={{
                           marginLeft: 10,
-                          backgroundColor: "#ff6946",
+                          backgroundColor: "#FF3B3B",
                           color: "white",
                         }}
                         variant="contained"
@@ -632,6 +634,10 @@ export const DatasourcesList = () => {
                       >
                         Delete
                       </Button>
+                    </TableCell>
+                    <TableCell component="th" scope="row">{datasource.did}</TableCell>
+                    <TableCell>
+                      {dayjs(datasource.CreatedAt).format("YYYY-MM-DD")}
                     </TableCell>
                     <TableCell style={{ whiteSpace: "nowrap" }}>
                       {datasource.headerAPIKeyName}
@@ -655,16 +661,13 @@ export const DatasourcesList = () => {
           </Table>
         </TableContainer>
       )}
-      {!error && data && isEmptyArray(data.data) && (
-        <p>No data source created yet</p>
-      )}
       {error && error.toString().length > 0 && (
         <div
-          style={{ display: "flex", alignContent: "row", alignItems: "center" }}
+          style={{ display: "flex", alignContent: "row", alignItems: "center", width: "100%" }}
         >
-          <Error />
+          <Error color="error"/>
           <p style={{ marginLeft: "1%", color: "red" }}>
-            {error.toString().replace("Error: ", "")}
+            Unable to fetch data. Please check if server is running [<b> {error.toString().replace("Error: ", "")} </b>]
           </p>
         </div>
       )}
