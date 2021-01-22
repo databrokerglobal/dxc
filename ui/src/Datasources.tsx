@@ -15,7 +15,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Tooltip,
   Typography,
   Divider,
   Box,
@@ -24,8 +23,6 @@ import { isEmptyArray } from "formik";
 import { useWindowSize } from "./WindowSizeHook";
 import * as Yup from "yup";
 import * as R from "ramda";
-import { makeStyles } from "@material-ui/core/styles";
-import HelpOutlineSharpIcon from "@material-ui/icons/HelpOutlineSharp";
 import LensIcon from '@material-ui/icons/Lens';
 
 interface IDatasource {
@@ -110,18 +107,6 @@ export const DatasourceForm = () => {
   const handleFtppassword = (event: any) => {
     setBody(R.assoc("ftppassword", event.target.value, body));
   };
-
-  const useStyles = makeStyles((theme) => ({
-    customWidth: {
-      backgroundColor: "#F7F6D0",
-      color: "#000",
-      maxWidth: 650,
-      fontSize: 13,
-      padding: 20,
-    },
-  }));
-
-  const classes = useStyles();
 
   const handleSubmit = async () => {
     // premlims checking
@@ -246,44 +231,6 @@ export const DatasourceForm = () => {
             </MenuItem>
           ))}
         </TextField>
-        <Tooltip
-          arrow
-          interactive
-          placement="bottom"
-          classes={{ tooltip: classes.customWidth }}
-          title={
-            <React.Fragment>
-              <Typography color="inherit">Datasource Type</Typography>
-              <br />
-              {"The datasource can be an API or FILE or STREAM. "}
-              <br />
-              <br />
-              {
-                "For API datasource, you need to provide HOST URL. Optionally key-value pair."
-              }
-              <br />
-              {
-                "For FILE datasource, you need to provide protocol and URL to access it."
-              }
-              <br />
-              {
-                "For STREAM datasource, you need to provide API and accesstoken URLs"
-              }
-              <br />
-              <br />
-              {"For more info visit "}
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                href="https://www.databroker.global/help"
-              >
-                {"support"}
-              </a>
-            </React.Fragment>
-          }
-        >
-          <HelpOutlineSharpIcon />
-        </Tooltip>
       </Grid>
       {body.type === "FILE" ? (
         <Grid item>
@@ -309,36 +256,6 @@ export const DatasourceForm = () => {
               </MenuItem>
             ))}
           </TextField>
-          <Tooltip
-            interactive
-            placement="bottom"
-            classes={{ tooltip: classes.customWidth }}
-            title={
-              <React.Fragment>
-                <Typography color="inherit">Protocol</Typography>
-                <br />
-                {
-                  "The FILE datasource can be a local file or any file available on network (web server or ftp server)."
-                }
-                <br />
-                {
-                  "You need to provide protocol to use to access it. URL/URI of the file must adhere to the protocol."
-                }
-                <br />
-                <br />
-                {"For more info visit "}
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="https://www.databroker.global/help"
-                >
-                  {"support"}
-                </a>
-              </React.Fragment>
-            }
-          >
-            <HelpOutlineSharpIcon />
-          </Tooltip>
         </Grid>
       ) : null}
       <Grid item xs={2}>
@@ -352,36 +269,6 @@ export const DatasourceForm = () => {
           onChange={handleHost}
           fullWidth
         />
-        <Tooltip
-          interactive
-          placement="bottom"
-          classes={{ tooltip: classes.customWidth }}
-          title={
-            <React.Fragment>
-              <Typography color="inherit">HOST URL</Typography>
-              <br />
-              {
-                "A Uniform Resource Locator (URL) is a reference to a web resource that specifies its location on a computer network and a mechanism for retrieving it."
-              }
-              <br />
-              {
-                "A typical URL could have the form http://www.example.com/index.html, which indicates a protocol (http), a hostname (www.example.com), and a file name (index.html)."
-              }
-              <br />
-              <br />
-              {"For more info visit "}
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                href="https://www.databroker.global/help"
-              >
-                {"support"}
-              </a>
-            </React.Fragment>
-          }
-        >
-          <HelpOutlineSharpIcon />
-        </Tooltip>
       </Grid>
 
       {body.type === "API" ? (

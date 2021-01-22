@@ -18,6 +18,7 @@ import {
 } from "@material-ui/core";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { DXCVersion } from "./DXCVersion";
+import { DXCHelpSupport } from "./DXCHelpSupport";
 
 declare global {
   interface Window {
@@ -48,6 +49,7 @@ function App() {
         <Tab value="pane-DS" label="Data sources" />
         <Tab value="pane-AUTH" label="Configuration" />
         <Tab value="pane-VER" label="Version Info" />
+        <Tab value="pane-UM" label="Help &amp; Support" />
       </Tabs>
       <Grid
         container
@@ -73,7 +75,14 @@ function App() {
               <DXCVersion />
             </Grid>
           </Grid> : null}
-        {tabValue === "pane-AUTH" ?
+          {tabValue === "pane-UM" ?
+          <Grid item xs={12}>
+            <Divider />
+            <Grid style={{ marginTop: "15px", }} item xs={12}>
+              <DXCHelpSupport />
+            </Grid>
+          </Grid> : null}
+          {tabValue === "pane-AUTH" ?
           <Grid item xs={12}>
             <Typography variant="h5">DXC Authentication</Typography>
             <Divider />
