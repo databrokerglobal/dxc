@@ -114,6 +114,9 @@ func main() {
 
 	// VERSION INFO
 	e.GET("/user/versioninfo", usermanager.GetVersionInfo)
+	e.GET("/user/versionhistory", usermanager.GetVersionHistory)
+	e.DELETE("/user/versionhistory", usermanager.DeleteVersionHistory)
+
 	saveVersionInfoInDatabase()
 
 	////
@@ -153,7 +156,7 @@ func main() {
 	//////////////////////////
 
 	go func() {
-		// datasources.CheckHost()
+		datasources.CheckHost() // checks on server start
 		wg.Done()
 	}()
 
@@ -182,12 +185,21 @@ func main() {
 
 func saveVersionInfoInDatabase() {
 	// NOTE: This version number must be updated on every PR
-	var version = "1.0.3"
+	var version = "1.0.5"
 
 	installedVersionInfo, err := database.DBInstance.GetInstalledVersionInfo()
 	if err != nil {
 		log.Fatalf("DXC_VERSION not set : " + err.Error())
 	}
+
+	forceUpgrade := os.Getenv("FORCE_UPGRADE")
+	if installedVersionInfo != nil && (forceUpgrade == "1" || forceUpgrade == "true") {
+		color.Green(" ")
+		color.Green("---------------------------- FORCED UPGRADE ----------------------------  ")
+		color.Green(" ")
+		installedVersionInfo = nil
+	}
+
 	if installedVersionInfo != nil {
 		if installedVersionInfo.Upgrade {
 			if installedVersionInfo.Latest == version {
@@ -221,7 +233,11 @@ func saveVersionInfoInDatabase() {
 	installedVersion := version
 	currentTime := time.Now()
 	installedDate := currentTime.Format("02-January-2006 15:04:05 Monday")
-	err = database.DBInstance.SaveInstalledVersionInfo(installedVersion, installedDate, false, "")
+	if forceUpgrade == "1" || forceUpgrade == "true" {
+		err = database.DBInstance.SaveInstalledVersionInfo(installedVersion, installedDate, true, "FORCED")
+	} else {
+		err = database.DBInstance.SaveInstalledVersionInfo(installedVersion, installedDate, false, "LATEST")
+	}
 	if err != nil {
 		log.Fatalf("DXC_VERSION not set in database : " + err.Error())
 	}
@@ -236,7 +252,6 @@ func checkInternet() bool {
 		color.Red("!!!!!!!!! INTERNET NOT AVAILABLE")
 		color.Red("")
 		return false
-	} else {
-		return true
 	}
+	return true
 }

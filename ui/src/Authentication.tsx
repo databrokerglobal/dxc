@@ -154,7 +154,7 @@ export const Authentication = () => {
             }}
           >
             <Error color="error"/>
-            <p style={{ marginLeft: "1%", color: "red" }}>
+            <p style={{ marginLeft: "1%", color: "#FF3B3B" }}>
               Unable to save data. Please check if server is running [<b> {err.toString().replace("Error: ", "")} </b>]
             </p>
           </div>

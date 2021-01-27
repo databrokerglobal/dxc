@@ -38,9 +38,9 @@ function App() {
   return (
     <Container>
       <CssBaseline />
-      <AppBar position="static" style={{ background: "#79E6D0" }}>
+      <AppBar position="static" style={{ background: "#3DEFC5" }}>
         <Toolbar>
-          <Typography variant="h6" style={{ color: "black" }}>
+          <Typography variant="h5" component="h5" style={{ color: "black" }}>
             Databroker eXchange Controller
           </Typography>
         </Toolbar>

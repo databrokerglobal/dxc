@@ -26,7 +26,7 @@ export const SyncStatusList = () => {
   dayjs.extend(relativeTime);
 
   const statusColor = (success: boolean): string => {
-    return success ? "green" : "red";
+    return success ? "#3DEFC5" : "#FF3B3B";
   };
 
   if (!error && data && isEmptyArray(data.data)){ 
@@ -69,7 +69,7 @@ export const SyncStatusList = () => {
           style={{ display: "flex", alignContent: "row", alignItems: "center", width: "100%" }}
         >
           <Error color="error"/>
-          <p style={{ marginLeft: "1%", color: "red" }}>
+          <p style={{ marginLeft: "1%", color: "#FF3B3B" }}>
             Unable to fetch data. Please check if server is running [<b> {error.toString().replace("Error: ", "")} </b>]
           </p>
         </div>
