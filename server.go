@@ -252,7 +252,6 @@ func checkInternet() bool {
 		color.Red("!!!!!!!!! INTERNET NOT AVAILABLE")
 		color.Red("")
 		return false
-	} else {
-		return true
 	}
+	return true
 }
