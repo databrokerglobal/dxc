@@ -16,6 +16,8 @@ type Repository interface {
 	SaveInstalledVersionInfo(version string, checked string, upgrade bool, latest string) (err error)
 	GetInstalledVersionInfo() (u *VersionInfo, err error)
 	DeleteInstalledVersionInfo(version string) (err error)
+	GetVersionHistory() (u []VersionInfo, err error)
+	DeleteVersionHistory() (err error)
 
 	// Datasources
 	CreateDatasource(datasource *Datasource) (err error)

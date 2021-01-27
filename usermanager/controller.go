@@ -98,8 +98,8 @@ func GetUserAuth(c echo.Context) error {
 	return c.JSON(http.StatusOK, userAuth)
 }
 
-// GetVersionInfo to get the address and api key
-// Create godoc
+// GetVersionInfo to get the version info
+// GetVersionInfo godoc
 // @Summary Get version info
 // @Description Get version and last check on date of DXC
 // @Tags user
@@ -117,7 +117,7 @@ func GetVersionInfo(c echo.Context) error {
 	// check if upgrade is required
 	latestVersion := getLatestVersionFromPortal()
 	if latestVersion != "" {
-		if latestVersion != installedVersionInfo.Version {
+		if latestVersion != installedVersionInfo.Version && !installedVersionInfo.Upgrade {
 			installedVersionInfo.Upgrade = true
 			err := database.DBInstance.SaveInstalledVersionInfo(installedVersionInfo.Version, installedVersionInfo.Checked, true, latestVersion)
 			if err != nil {
@@ -126,6 +126,44 @@ func GetVersionInfo(c echo.Context) error {
 		}
 	}
 	return c.JSON(http.StatusOK, installedVersionInfo)
+}
+
+// DeleteVersionHistory to delete the version History
+// DeleteDatasource godoc
+// @Summary Delete version History
+// @Description Delete all versions and last check on dates of DXC
+// @Tags user
+// @Produce json
+// @Success 200 {object} version history successfully deleted
+// @Failure 404 {string} string "Bad request"
+// @Failure 500 {string} string "Error getting version History"
+// @Router /user/versionHistory [delete]
+// @Security ApiKeyAuth
+func DeleteVersionHistory(c echo.Context) error {
+	err := database.DBInstance.DeleteVersionHistory()
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Error retrieving version history from database")
+	}
+	return c.JSON(http.StatusOK, "version history successfully deleted")
+}
+
+// GetVersionHistory to get the version History
+// Create godoc
+// @Summary Get version History
+// @Description Get all versions and last check on dates of DXC
+// @Tags user
+// @Produce json
+// @Success 200 {object} database.VersionHistory true
+// @Failure 404 {string} string "Not data found"
+// @Failure 500 {string} string "Error getting version History"
+// @Router /user/versionHistory [get]
+// @Security ApiKeyAuth
+func GetVersionHistory(c echo.Context) error {
+	versionHistory, err := database.DBInstance.GetVersionHistory()
+	if err != nil || versionHistory == nil {
+		return c.String(http.StatusInternalServerError, errors.Wrap(err, "error getting installed Version History ").Error())
+	}
+	return c.JSON(http.StatusOK, versionHistory)
 }
 
 func getLatestVersionFromPortal() string {

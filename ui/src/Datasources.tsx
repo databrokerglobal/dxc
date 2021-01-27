@@ -341,7 +341,7 @@ export const DatasourceForm = () => {
             }}
           >
             <Error />
-            <p style={{ marginLeft: "1%", color: "red" }}>{err}</p>
+            <p style={{ marginLeft: "1%", color: "#FF3B3B" }}>{err}</p>
           </div>
         )}
         {R.isEmpty(err) && !R.isEmpty(resp) && (
@@ -553,7 +553,7 @@ export const DatasourcesList = () => {
           style={{ display: "flex", alignContent: "row", alignItems: "center", width: "100%" }}
         >
           <Error color="error"/>
-          <p style={{ marginLeft: "1%", color: "red" }}>
+          <p style={{ marginLeft: "1%", color: "#FF3B3B" }}>
             Unable to fetch data. Please check if server is running [<b> {error.toString().replace("Error: ", "")} </b>]
           </p>
         </div>

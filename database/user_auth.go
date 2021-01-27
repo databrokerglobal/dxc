@@ -75,3 +75,25 @@ func (m *Manager) DeleteInstalledVersionInfo(version string) (err error) {
 	}
 	return
 }
+
+// GetVersionHistory to get the previous history of DXC version info item saved
+func (m *Manager) GetVersionHistory() (u []VersionInfo, err error) {
+	var results []VersionInfo
+	m.DB.Table("version_infos").Find(&results)
+	if errs := m.DB.GetErrors(); len(errs) > 0 {
+		return nil, errors.Wrap(errs[0], "error getting installed VersionInfo item")
+	}
+	return results, nil
+}
+
+// DeleteVersionHistory delete allversion history except current
+func (m *Manager) DeleteVersionHistory() (err error) {
+	versionInfo := VersionInfo{}
+	m.DB.Last(&versionInfo)
+	m.DB.Where("checked != ? ", versionInfo.Checked).Delete(VersionInfo{})
+	if errs := m.DB.GetErrors(); len(errs) > 0 {
+		err = errs[0]
+		return
+	}
+	return
+}
