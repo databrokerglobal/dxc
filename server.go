@@ -189,7 +189,7 @@ func main() {
 
 func saveVersionInfoInDatabase() {
 	// NOTE: This version number must be updated on every PR
-	var version = "1.0.5"
+	var version = "1.0.7"
 
 	installedVersionInfo, err := database.DBInstance.GetInstalledVersionInfo()
 	if err != nil {
