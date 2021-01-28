@@ -16,7 +16,7 @@ import (
 )
 
 // CheckHost check for a host resp
-func CheckHost() {
+func CheckHost(did string) {
 
 	color.Cyan("Verifying API/Stream status...")
 
@@ -27,6 +27,10 @@ func CheckHost() {
 
 	if len(*datasources) > 0 {
 		for _, datasource := range *datasources {
+			if did != "" && did != datasource.Did {
+				// need to check availibity of only newly added datasource so skip all other datasources
+				continue
+			}
 			notfounderror := errors.New("No file found. Please check filename or path")
 			if datasource.Host != "" && datasource.Host != "N/A" && datasource.Name != "" {
 				if datasource.Protocol == "LOCAL" {
