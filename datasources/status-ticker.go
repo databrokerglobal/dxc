@@ -68,7 +68,7 @@ func doChecks() {
 	wg.Add(1)
 
 	go func() {
-		CheckHost("")
+		CheckHost("", "")
 		wg.Done()
 	}()
 

@@ -42,3 +42,4 @@ outfile
 
 # dxc build file is created when running `go build`
 ./dxc
+__debug_bin

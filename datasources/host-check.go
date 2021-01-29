@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/databrokerglobal/dxc/database"
+	"github.com/databrokerglobal/dxc/utils"
 	"github.com/fatih/color"
 	"github.com/jlaffaye/ftp"
 	"github.com/pkg/errors"
@@ -16,7 +17,7 @@ import (
 )
 
 // CheckHost check for a host resp
-func CheckHost(did string) {
+func CheckHost(did string, name string) {
 
 	color.Cyan("Verifying API/Stream status...")
 
@@ -25,10 +26,16 @@ func CheckHost(did string) {
 		log.Fatal(err)
 	}
 
+	nameExtension := ""
+
 	if len(*datasources) > 0 {
 		for _, datasource := range *datasources {
 			if did != "" && did != datasource.Did {
 				// need to check availibity of only newly added datasource so skip all other datasources
+				// also check for unique name, if found, then add random string to current datasource name
+				if datasource.Name == name {
+					nameExtension, _ = utils.GenerateRandomString(5)
+				}
 				continue
 			}
 			notfounderror := errors.New("No file found. Please check filename or path")
@@ -93,6 +100,9 @@ func CheckHost(did string) {
 					// future implementation dataosurce with streams or other protocols
 				}
 				datasource.Available = notfounderror == nil
+				if nameExtension != "" {
+					datasource.Name = datasource.Name + " " + nameExtension
+				}
 				database.DBInstance.UpdateDatasource(&datasource)
 			}
 		}

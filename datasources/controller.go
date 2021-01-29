@@ -88,7 +88,7 @@ func AddOneDatasource(c echo.Context) error {
 		if err := database.DBInstance.CreateDatasource(datasource); err != nil {
 			return err
 		}
-		CheckHost(datasource.Did)
+		CheckHost(datasource.Did, datasource.Name)
 		SendStatus()
 	}
 

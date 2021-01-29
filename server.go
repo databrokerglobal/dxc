@@ -159,7 +159,7 @@ func main() {
 	go func() {
 		goenv := os.Getenv("GO_ENV")
 		if strings.EqualFold(goenv, "local") {
-			datasources.CheckHost("") // checks on server start in dev environment
+			datasources.CheckHost("", "") // checks on server start in dev environment
 		}
 		wg.Done()
 	}()
