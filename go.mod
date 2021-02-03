@@ -11,7 +11,7 @@ require (
 	github.com/cespare/cp v1.1.1 // indirect
 	github.com/deckarep/golang-set v1.7.1 // indirect
 	github.com/edsrzf/mmap-go v1.0.0 // indirect
-	github.com/ethereum/go-ethereum v1.9.23
+	github.com/ethereum/go-ethereum v1.9.25
 	github.com/fatih/color v1.9.0
 	github.com/fjl/memsize v0.0.0-20180929194037-2a09253e352a // indirect
 	github.com/gballet/go-libpcsclite v0.0.0-20191108122812-4678299bea08 // indirect
@@ -20,7 +20,6 @@ require (
 	github.com/go-openapi/swag v0.19.11 // indirect
 	github.com/go-test/deep v1.0.6
 	github.com/golang/protobuf v1.4.3 // indirect
-	github.com/golang/snappy v0.0.2 // indirect
 	github.com/google/uuid v1.1.2 // indirect
 	github.com/jackpal/go-nat-pmp v1.0.2 // indirect
 	github.com/jinzhu/gorm v1.9.16
