@@ -15,10 +15,10 @@ require (
 	github.com/fatih/color v1.9.0
 	github.com/fjl/memsize v0.0.0-20180929194037-2a09253e352a // indirect
 	github.com/gballet/go-libpcsclite v0.0.0-20191108122812-4678299bea08 // indirect
+	github.com/gin-gonic/gin v1.6.3 // indirect
 	github.com/go-ole/go-ole v1.2.4 // indirect
-	github.com/go-openapi/spec v0.19.11 // indirect
-	github.com/go-openapi/swag v0.19.11 // indirect
 	github.com/go-test/deep v1.0.6
+	github.com/gofrs/uuid v3.3.0+incompatible // indirect
 	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/golang/snappy v0.0.2 // indirect
 	github.com/google/uuid v1.1.2 // indirect
@@ -52,14 +52,13 @@ require (
 	github.com/spf13/viper v1.7.1
 	github.com/status-im/keycard-go v0.0.0-20200402102358-957c09536969 // indirect
 	github.com/stretchr/testify v1.6.1
-	github.com/swaggo/echo-swagger v1.0.0
-	github.com/swaggo/swag v1.6.9
+	github.com/swaggo/echo-swagger v1.1.0
+	github.com/swaggo/gin-swagger v1.2.0 // indirect
+	github.com/swaggo/swag v1.7.0
 	github.com/tyler-smith/go-bip39 v1.0.2 // indirect
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897
-	golang.org/x/net v0.0.0-20201027133719-8eef5233e2a1 // indirect
 	golang.org/x/sys v0.0.0-20201027140754-0fcbb8f4928c // indirect
 	golang.org/x/text v0.3.4 // indirect
-	golang.org/x/tools v0.0.0-20201028025901-8cd080b735b3 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0
 	gopkg.in/ini.v1 v1.62.0 // indirect
