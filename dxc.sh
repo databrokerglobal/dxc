@@ -1,13 +1,28 @@
 #!/bin/bash
 set -e
 IFS=
-
+# set global variables
+package=DXC
+scriptname=./dxc.sh
+FILE=.env #docker-compose.yml is dependent on .env only
 # default values
 HOST_IP="localhost"
 HOST_PORT=1111
 LOCAL_FOLDER="/tmp"
 PASSWORD=""
 IMAGE_TAG="latest"
+
+function checkDocker(){
+    if [ -x "$(command -v docker)" ]; then
+        #echo "docker and docker-compose are installed"
+        echo " "
+    else
+        echo ""
+        echo "#### Aborting as DOCKER not installed ..."
+        echo ""
+        exit 1
+    fi
+}
 
 function createEnv() {
 
@@ -38,7 +53,7 @@ function createEnv() {
     FORCE_UPGRADE=0
 
     ## key to secure your DXC server. Choose whatever key you want, you will have to enter it to use the DXC api or the DXC ui. Comment or leave empty to not use a secure key. Choose a long key for maximum security.
-    #DXC_SECURE_KEY='${PASSWORD}'
+    DXC_SECURE_KEY='${PASSWORD}'
 
     # ------------------------------------
     # DO NOT EDIT ANY VARIBALE AFTER THIS 
@@ -83,21 +98,14 @@ services:
     echo ">>>>>>    created docker-compose.yml  "
 }
 
-FILE=.env #docker-compose.yml is dependent on .env only
-    
-echo ""
-echo "##########################   DXC  Setup  ##########################"
-echo ""
-echo "Press RETURN to install OR any other key to just restart"
-read -s -n 1 VAR
-if [ "$VAR" = "" ]; 
-then
-    echo "Installation ..."
+function installationProcess(){
+    echo "Installation process starting ..."
+    echo " "
     if test -f "$FILE"; 
     then
         #echo "$FILE exists."
         echo "** Previous installation found **"
-        echo "Press RETURN to remove previous and setup new OR press any other key to abort"
+        echo "Press RETURN to remove previous and setup new dxc OR press any other key to abort"
         read -s -n 1 VAR
         if [ "$VAR" = "" ]; 
         then
@@ -113,7 +121,6 @@ then
             exit 1
         fi
     fi
-
     # get IP  
     echo -n "Please provide IP : "
     read TEMP_VAR
@@ -145,7 +152,11 @@ then
     # create setup files .env and docker-compose.yml
     createEnv
     createDockerCompose
-else
+}
+
+function restartProcess(){
+    echo "Restarting DXC ..."
+    echo " "
     if test -f "$FILE";
     then  
         echo "Press RETURN to pull latest image OR press any other key to further provide new image tag to pull from docker"
@@ -178,7 +189,55 @@ else
         echo ""
         exit 1
     fi    
+}
+
+if test $# -eq 0; then
+  echo ""
+  echo "No arguments supplied. For brief info execute with -h or --help"   
+  echo ""
+  exit 0
 fi
+
+# check if docker and docker-compose in installed or not
+checkDocker
+
+
+while test $# -gt 0; do
+  case "$1" in
+    -h|--help)
+      echo "$package - Databroker eXchange Controller - Installation Script v1.0 "
+      echo " "
+      echo "$scriptname [options] [arguments]"
+      echo " "
+      echo "options:"
+      echo "-h, --help      show brief help"
+      echo "-i              install new dxc, if already installed then it will be removed on approval"
+      echo "-r              restart dxc, option to change image tag to pull"
+      exit 0
+      ;;
+    -i)
+      installationProcess
+      break;  
+      ;;
+    -I)
+      installationProcess
+      break;  
+      ;;
+    -r)
+      restartProcess
+      break;
+      ;;
+    -R)
+      restartProcess
+      break;
+      ;;
+    *)
+      echo "Wrong arguments supplied. For brief info execute with -h or --help"   
+      echo ""
+      exit 0
+      ;;  
+  esac
+done
 
 echo "docker-compose down"
 docker-compose down 
@@ -186,7 +245,5 @@ echo "docker-compose pull"
 docker-compose pull
 echo "docker-compose up -d"
 docker-compose up -d
-echo ""
+echo " "
 echo "Completed !!!!"
-    
-
