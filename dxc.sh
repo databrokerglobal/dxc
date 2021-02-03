@@ -7,7 +7,9 @@ scriptname=./dxc.sh
 FILE=.env #docker-compose.yml is dependent on .env only
 # default values
 HOST_IP="localhost"
-HOST_PORT=1111
+HOST_PORT_DEFAULT=3000
+HOST_PORT=3000
+SERVER_PORT=3001
 LOCAL_FOLDER="/tmp"
 PASSWORD=""
 IMAGE_TAG="latest"
@@ -60,10 +62,10 @@ function createEnv() {
     # ------------------------------------
 
     ## DXC IP/URL for access from outside. include http/https and port. no trailing slash
-    DXC_HOST=http://${URL_IP}:${PORT}2
+    DXC_HOST=http://${URL_IP}:'${SERVER_PORT}'
 
     ## DXC IP for access from ui to server. localhost does not work if you use docker. include http/https and port (that you set in docker-compose).
-    DXC_SERVER_HOST=http://${URL_IP}:${PORT}2
+    DXC_SERVER_HOST=http://${URL_IP}:'${SERVER_PORT}'
 
     ## if use mqtt:
     #MQTT_BROKER_HOST=broker.emqx.io
@@ -83,19 +85,58 @@ services:
             - ./db-data:/go/db-data
             - ${LOCAL_FILES_DIR}:${LOCAL_FILES_DIR}
         ports:
-            - "${PORT}2:8080"
+            - "'${SERVER_PORT}':8080"
         env_file:
             - .env
     dxc-ui:
         image: databrokerdao/dxc-ui:'${IMAGE_TAG}'
         ports:
-            - "${PORT}:80"
+            - "'${HOST_PORT}':80"
         env_file:
             - .env
     
     '  > docker-compose.yml
 
     echo ">>>>>>    created docker-compose.yml  "
+}
+
+function checkPorts(){
+    # 1023 - 65535 are legit TCP ports
+    if test $HOST_PORT -lt 1023; then
+        echo ""
+        echo "Aborting as PORT ${HOST_PORT} cannot be lower than 1023"   
+        echo ""
+        exit 0
+    fi
+    if test $HOST_PORT -gt 65535; then
+        echo ""
+        echo "Aborting as PORT ${HOST_PORT} cannot be greater than 65535"   
+        echo ""
+        exit 0
+    fi
+    
+    let "SERVER_PORT=HOST_PORT+1"
+
+    # Connection to localhost 1111 port [tcp/*] succeeded!
+    # nc: connect to localhost port 1114 (tcp) failed: Connection refused
+        
+    if ( nc -zv $HOST_IP ${HOST_PORT} 2>&1 >/dev/null ); then
+        echo ""
+        echo "Aborting as PORT ${HOST_PORT} already in use"   
+        echo ""
+        exit 0
+    else
+        echo "PORT ${HOST_PORT} available"
+    fi
+
+    if ( nc -zv $HOST_IP ${SERVER_PORT} 2>&1 >/dev/null ); then
+        echo ""
+        echo "Aborting as PORT ${SERVER_PORT} already in use"   
+        echo ""
+        exit 0
+    else
+        echo "PORT ${SERVER_PORT} available"
+    fi
 }
 
 function installationProcess(){
@@ -142,6 +183,9 @@ function installationProcess(){
     read TEMP_VAR
     if [ "$TEMP_VAR" != "" ]; then
         HOST_PORT=$TEMP_VAR
+        checkPorts
+    else
+        HOST_PORT=$HOST_PORT_DEFAULT    
     fi
 
     # get PORT
@@ -256,3 +300,4 @@ echo "docker-compose up -d"
 docker-compose up -d
 echo " "
 echo "Completed !!!!"
+
