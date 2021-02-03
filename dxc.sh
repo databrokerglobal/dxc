@@ -127,7 +127,16 @@ function installationProcess(){
     if [ "$TEMP_VAR" != "" ]; then
         HOST_IP=$TEMP_VAR
     fi
-        
+
+    echo -n "Do you want to check provided IP reachable via ping (Y/N) : "
+    read TEMP_VAR
+    if [ "$TEMP_VAR" == "y" ] || [ "$TEMP_VAR" == "Y" ] ; then
+        echo "Checking whether provided IP is available via ping"
+        ping -c 1 $HOST_IP; echo "Ping check result : " $? 
+    else
+        echo "Checking of IP is skipped !! Make sure the IP is reachable"
+    fi
+    
     # get PORT
     echo -n "Please provide PORT : "
     read TEMP_VAR
