@@ -51,7 +51,7 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/viper v1.7.1
 	github.com/status-im/keycard-go v0.0.0-20200402102358-957c09536969 // indirect
-	github.com/stretchr/testify v1.6.1
+	github.com/stretchr/testify v1.7.0
 	github.com/swaggo/echo-swagger v1.0.0
 	github.com/swaggo/swag v1.6.9
 	github.com/tyler-smith/go-bip39 v1.0.2 // indirect
