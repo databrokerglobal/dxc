@@ -29,6 +29,7 @@
     "ethereumjs-abi": "^0.6.8",
     "ethers": "^4.0.47",
     "faker": "^4.1.0",
+    "node": "^12.18.2",
     "truffle-hdwallet-provider": "^1.0.17"
   },
   "devDependencies": {

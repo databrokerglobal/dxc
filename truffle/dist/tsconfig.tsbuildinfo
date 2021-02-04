@@ -422,72 +422,72 @@
         "signature": "bc6dd50ac2fc9a7ca6488811b116bd0ddd606338db0bb97852c8fcf757e2d7f5"
       },
       "../node_modules/web3/node_modules/web3-bzz/types/index.d.ts": {
-        "version": "522e8bee3f43924c0183263f00d4334b1bae3aedbd1447247bed939e35a92e49",
-        "signature": "522e8bee3f43924c0183263f00d4334b1bae3aedbd1447247bed939e35a92e49"
+        "version": "864d3573f14f138134b33f9589fb2bfb68a63cb63801a23d17a247f5f3bfa375",
+        "signature": "864d3573f14f138134b33f9589fb2bfb68a63cb63801a23d17a247f5f3bfa375"
       },
       "../node_modules/web3/node_modules/web3-core-helpers/types/index.d.ts": {
-        "version": "a78be6e7b7d9963984cda317063bd68c423230f33d5ff86342f546a4869badfa",
-        "signature": "a78be6e7b7d9963984cda317063bd68c423230f33d5ff86342f546a4869badfa"
+        "version": "f78e420fe5405af9516eac9220cfe11a8ef3deae16c371b3ca26993d1cdf91e1",
+        "signature": "f78e420fe5405af9516eac9220cfe11a8ef3deae16c371b3ca26993d1cdf91e1"
       },
       "../node_modules/web3/node_modules/web3-core-method/types/index.d.ts": {
-        "version": "5406b4329334693645bcdaa36e570a9c4457022012803dfb65e9f152d99e420e",
-        "signature": "5406b4329334693645bcdaa36e570a9c4457022012803dfb65e9f152d99e420e"
+        "version": "3170c0416dd2064d848fe1f06a2e1e53ed55030e93cb91ca451ad56b06354ff8",
+        "signature": "3170c0416dd2064d848fe1f06a2e1e53ed55030e93cb91ca451ad56b06354ff8"
       },
       "../node_modules/web3/node_modules/bignumber.js/bignumber.d.ts": {
-        "version": "3da2d5afe14d3088426231c88a901fc2d82bb2f0f2b7ff1287397ac3413ef4a5",
-        "signature": "3da2d5afe14d3088426231c88a901fc2d82bb2f0f2b7ff1287397ac3413ef4a5"
+        "version": "1d7d9e42cb2cc36dfc7ce35755ce67d5ff0f4a2ef72d3019f4c461bfd22123da",
+        "signature": "1d7d9e42cb2cc36dfc7ce35755ce67d5ff0f4a2ef72d3019f4c461bfd22123da"
       },
       "../node_modules/web3/node_modules/web3-core/types/index.d.ts": {
-        "version": "5c8a5d68c170e5ee064faa6f81ac56db1df46d68076300117d5b8b1f94f8f034",
-        "signature": "5c8a5d68c170e5ee064faa6f81ac56db1df46d68076300117d5b8b1f94f8f034"
+        "version": "e79645dd4b76e29bb923b5b380cacdb3b083960064be069b573e206bfd34cba1",
+        "signature": "e79645dd4b76e29bb923b5b380cacdb3b083960064be069b573e206bfd34cba1"
       },
       "../node_modules/web3/node_modules/web3-core-subscriptions/types/index.d.ts": {
-        "version": "eca4bc678f7d80467294310bfe193c79f9e0273a984b149cad4d574670c36140",
-        "signature": "eca4bc678f7d80467294310bfe193c79f9e0273a984b149cad4d574670c36140"
+        "version": "5666d8fa634bec348d8e96cc49a620bb48f9420af778cd3acd1610e9ab03e236",
+        "signature": "5666d8fa634bec348d8e96cc49a620bb48f9420af778cd3acd1610e9ab03e236"
       },
       "../node_modules/web3/node_modules/web3-utils/types/index.d.ts": {
-        "version": "59a9fb883504b769e188ce9626872538906854ec44d643c59a8cce0d4d231dd4",
-        "signature": "59a9fb883504b769e188ce9626872538906854ec44d643c59a8cce0d4d231dd4"
+        "version": "4a066fc9352105f1e8a62b43fd920cccd711fbbee6e7faa6f24a9b9cec196a42",
+        "signature": "4a066fc9352105f1e8a62b43fd920cccd711fbbee6e7faa6f24a9b9cec196a42"
       },
       "../node_modules/web3/node_modules/web3-eth-abi/types/index.d.ts": {
-        "version": "f5ccf8b3d40ee249074eb3658ff446fea6a00717bf9d6152e3b8a039d17c9755",
-        "signature": "f5ccf8b3d40ee249074eb3658ff446fea6a00717bf9d6152e3b8a039d17c9755"
+        "version": "30f5cdb7ec6ef9e132e43285e4d3cf9bc83abb561cc1ea332f6de59866659d11",
+        "signature": "30f5cdb7ec6ef9e132e43285e4d3cf9bc83abb561cc1ea332f6de59866659d11"
       },
       "../node_modules/web3/node_modules/web3-eth-accounts/types/index.d.ts": {
-        "version": "5d5b4333bee1c2f45285ad919bd84b8e390ae3df74f4a5a8897b23a99d883cd2",
-        "signature": "5d5b4333bee1c2f45285ad919bd84b8e390ae3df74f4a5a8897b23a99d883cd2"
+        "version": "9e47cea2039dc59f4d9a33cc1da282a487a71c724efb2e888046417777d85313",
+        "signature": "9e47cea2039dc59f4d9a33cc1da282a487a71c724efb2e888046417777d85313"
       },
       "../node_modules/web3/node_modules/web3-eth-contract/types/index.d.ts": {
-        "version": "6928a48034dc8baeb0f76fd289e3fc147f85ad1a4cd16e83caa3a09319228aaf",
-        "signature": "6928a48034dc8baeb0f76fd289e3fc147f85ad1a4cd16e83caa3a09319228aaf"
+        "version": "0b4f5a7488b65127f98969219088c6814868b17f9c659740369fa33dc689ca85",
+        "signature": "0b4f5a7488b65127f98969219088c6814868b17f9c659740369fa33dc689ca85"
       },
       "../node_modules/web3/node_modules/web3-eth-ens/types/index.d.ts": {
-        "version": "f20f8e2f17f1a2a5ea4f8da29d950c935e8d02eedcc0361e83a6bc48d014fced",
-        "signature": "f20f8e2f17f1a2a5ea4f8da29d950c935e8d02eedcc0361e83a6bc48d014fced"
+        "version": "e082f4e967527c06203e5a3d9624f71a5b5102a38f66710325d51777cf4d5377",
+        "signature": "e082f4e967527c06203e5a3d9624f71a5b5102a38f66710325d51777cf4d5377"
       },
       "../node_modules/web3/node_modules/web3-eth-iban/types/index.d.ts": {
-        "version": "0fb95f12fc884fe598482a93253c62fe1e16f9bc3688e3a0ba43653f63cec11e",
-        "signature": "0fb95f12fc884fe598482a93253c62fe1e16f9bc3688e3a0ba43653f63cec11e"
+        "version": "1e13aa4f2ff194e7b753650d271c814a93419bf3dd6085ab6dcce0990e43bc68",
+        "signature": "1e13aa4f2ff194e7b753650d271c814a93419bf3dd6085ab6dcce0990e43bc68"
       },
       "../node_modules/web3/node_modules/web3-eth-personal/types/index.d.ts": {
-        "version": "5ab73f039129eff66b0b9a2d4a3276ca8a19e8e2dce31b0e3a9801470c9cedfc",
-        "signature": "5ab73f039129eff66b0b9a2d4a3276ca8a19e8e2dce31b0e3a9801470c9cedfc"
+        "version": "068b7d8771cc226375d8fc8a79fa03d0b2398f915a463b72faac8216c68d0d31",
+        "signature": "068b7d8771cc226375d8fc8a79fa03d0b2398f915a463b72faac8216c68d0d31"
       },
       "../node_modules/web3/node_modules/web3-net/types/index.d.ts": {
-        "version": "e04855b52e6a2408dae2d00b65cf5f1b97a621578760e819ed93442f8e0e8e7a",
-        "signature": "e04855b52e6a2408dae2d00b65cf5f1b97a621578760e819ed93442f8e0e8e7a"
+        "version": "2f208677a8d0b0ec9ae1fd09e8276dd455e6eef200c680078e40dc106cb21f0e",
+        "signature": "2f208677a8d0b0ec9ae1fd09e8276dd455e6eef200c680078e40dc106cb21f0e"
       },
       "../node_modules/web3/node_modules/web3-eth/types/index.d.ts": {
-        "version": "0a735a2bfce08f3e34b0c0460eb0ecc0bff7c45e4ae09921b86f2b02d6d71095",
-        "signature": "0a735a2bfce08f3e34b0c0460eb0ecc0bff7c45e4ae09921b86f2b02d6d71095"
+        "version": "a099f6dc79facda20519b252539a3a839bf902d70159f29866230a843922aca7",
+        "signature": "a099f6dc79facda20519b252539a3a839bf902d70159f29866230a843922aca7"
       },
       "../node_modules/web3/node_modules/web3-shh/types/index.d.ts": {
-        "version": "04f05d488173df868faa41b9604ad1861fd379c6bcf172caa1bab3bc5fb1b771",
-        "signature": "04f05d488173df868faa41b9604ad1861fd379c6bcf172caa1bab3bc5fb1b771"
+        "version": "1a86456517579a769ea206f9039a7d11e80c065bbd02b4ac8aafe2cf6ad008ca",
+        "signature": "1a86456517579a769ea206f9039a7d11e80c065bbd02b4ac8aafe2cf6ad008ca"
       },
       "../node_modules/web3/types/index.d.ts": {
-        "version": "fd578eeca4c0e44c2dc87c1c1f01f62cf8544edaefa0d07d5803a075cefd7ba9",
-        "signature": "fd578eeca4c0e44c2dc87c1c1f01f62cf8544edaefa0d07d5803a075cefd7ba9"
+        "version": "089e611f488f1de8aeb1c32c396d376b5c6e04f7b41684d334fe30139ae1dc02",
+        "signature": "089e611f488f1de8aeb1c32c396d376b5c6e04f7b41684d334fe30139ae1dc02"
       },
       "../node_modules/truffle-typings/index.d.ts": {
         "version": "7185c75f0b599a5636b0559967d0c70053828c24307bfbea24dbeb9cbb5d7e1f",
@@ -661,6 +661,10 @@
         "version": "6396a7a06f3ef0fc31a7c89330e015146b78a2256b030c698b6d404594c37b8f",
         "signature": "6396a7a06f3ef0fc31a7c89330e015146b78a2256b030c698b6d404594c37b8f"
       },
+      "../node_modules/@types/pbkdf2/index.d.ts": {
+        "version": "a73a445c1e0a6d0f8b48e8eb22dc9d647896783a7f8991cbbc31c0d94bf1f5a2",
+        "signature": "a73a445c1e0a6d0f8b48e8eb22dc9d647896783a7f8991cbbc31c0d94bf1f5a2"
+      },
       "../node_modules/@types/prettier/index.d.ts": {
         "version": "49d2008788e2158df8230fb361412c04cdfe0fb0f586f57d456a878789a3539d",
         "signature": "49d2008788e2158df8230fb361412c04cdfe0fb0f586f57d456a878789a3539d"
@@ -668,6 +672,10 @@
       "../node_modules/@types/resolve/index.d.ts": {
         "version": "2880728492d6a6baa55411d14cc42fa55714a24b1d1d27ff9a8a610abd47c761",
         "signature": "2880728492d6a6baa55411d14cc42fa55714a24b1d1d27ff9a8a610abd47c761"
+      },
+      "../node_modules/@types/secp256k1/index.d.ts": {
+        "version": "26edf4435648f73b2b5ccc07f3159fea08b46b20e5230f95e57f6b62e388d2b2",
+        "signature": "26edf4435648f73b2b5ccc07f3159fea08b46b20e5230f95e57f6b62e388d2b2"
       }
     },
     "options": {
@@ -1577,7 +1585,6 @@
       "../node_modules/web3/node_modules/web3-eth/types/index.d.ts": [
         "../node_modules/@types/node/net.d.ts",
         "../node_modules/web3/node_modules/web3-core/types/index.d.ts",
-        "../node_modules/web3/node_modules/web3-core-helpers/types/index.d.ts",
         "../node_modules/web3/node_modules/web3-core-subscriptions/types/index.d.ts",
         "../node_modules/web3/node_modules/web3-eth-abi/types/index.d.ts",
         "../node_modules/web3/node_modules/web3-eth-accounts/types/index.d.ts",
@@ -1950,6 +1957,13 @@
         "../node_modules/@types/node/util.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts"
       ],
+      "../node_modules/@types/pbkdf2/index.d.ts": [
+        "../node_modules/@types/node/ts3.2/index.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
       "../node_modules/@types/prettier/index.d.ts": [
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
@@ -1957,6 +1971,13 @@
         "../node_modules/@types/node/ts3.2/util.d.ts"
       ],
       "../node_modules/@types/resolve/index.d.ts": [
+        "../node_modules/@types/node/ts3.2/index.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/@types/secp256k1/index.d.ts": [
         "../node_modules/@types/node/ts3.2/index.d.ts",
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
@@ -2798,7 +2819,6 @@
       "../node_modules/web3/node_modules/web3-eth/types/index.d.ts": [
         "../node_modules/@types/node/net.d.ts",
         "../node_modules/web3/node_modules/web3-core/types/index.d.ts",
-        "../node_modules/web3/node_modules/web3-core-helpers/types/index.d.ts",
         "../node_modules/web3/node_modules/web3-core-subscriptions/types/index.d.ts",
         "../node_modules/web3/node_modules/web3-eth-abi/types/index.d.ts",
         "../node_modules/web3/node_modules/web3-eth-accounts/types/index.d.ts",
@@ -3117,6 +3137,20 @@
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/util.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/@types/pbkdf2/index.d.ts": [
+        "../node_modules/@types/node/ts3.2/index.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/@types/secp256k1/index.d.ts": [
+        "../node_modules/@types/node/ts3.2/index.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
       ]
     },
     "semanticDiagnosticsPerFile": [
@@ -3226,24 +3260,6 @@
       "../node_modules/@nomiclabs/buidler-truffle5/src/type-extensions.d.ts",
       "../node_modules/@nomiclabs/buidler-web3/src/type-extensions.d.ts",
       "../node_modules/@types/bn.js/index.d.ts",
-      "../node_modules/web3/node_modules/web3-bzz/types/index.d.ts",
-      "../node_modules/web3/node_modules/web3-core-helpers/types/index.d.ts",
-      "../node_modules/web3/node_modules/web3-core-method/types/index.d.ts",
-      "../node_modules/web3/node_modules/bignumber.js/bignumber.d.ts",
-      "../node_modules/web3/node_modules/web3-core/types/index.d.ts",
-      "../node_modules/web3/node_modules/web3-core-subscriptions/types/index.d.ts",
-      "../node_modules/web3/node_modules/web3-utils/types/index.d.ts",
-      "../node_modules/web3/node_modules/web3-eth-abi/types/index.d.ts",
-      "../node_modules/web3/node_modules/web3-eth-accounts/types/index.d.ts",
-      "../node_modules/web3/node_modules/web3-eth-contract/types/index.d.ts",
-      "../node_modules/web3/node_modules/web3-eth-ens/types/index.d.ts",
-      "../node_modules/web3/node_modules/web3-eth-iban/types/index.d.ts",
-      "../node_modules/web3/node_modules/web3-eth-personal/types/index.d.ts",
-      "../node_modules/web3/node_modules/web3-net/types/index.d.ts",
-      "../node_modules/web3/node_modules/web3-eth/types/index.d.ts",
-      "../node_modules/web3/node_modules/web3-shh/types/index.d.ts",
-      "../node_modules/web3/types/index.d.ts",
-      "../node_modules/truffle-typings/index.d.ts",
       "../node_modules/axios/index.d.ts",
       "../test/utils/getlatestquote.ts",
       "../node_modules/@types/ethereumjs-abi/index.d.ts",
@@ -3280,6 +3296,26 @@
       "../node_modules/@types/mkdirp/index.d.ts",
       "../node_modules/@types/prettier/index.d.ts",
       "../node_modules/@types/resolve/index.d.ts",
+      "../node_modules/web3/node_modules/web3-bzz/types/index.d.ts",
+      "../node_modules/web3/node_modules/web3-core-helpers/types/index.d.ts",
+      "../node_modules/web3/node_modules/web3-core-method/types/index.d.ts",
+      "../node_modules/web3/node_modules/bignumber.js/bignumber.d.ts",
+      "../node_modules/web3/node_modules/web3-core/types/index.d.ts",
+      "../node_modules/web3/node_modules/web3-core-subscriptions/types/index.d.ts",
+      "../node_modules/web3/node_modules/web3-utils/types/index.d.ts",
+      "../node_modules/web3/node_modules/web3-eth-abi/types/index.d.ts",
+      "../node_modules/web3/node_modules/web3-eth-accounts/types/index.d.ts",
+      "../node_modules/web3/node_modules/web3-eth-contract/types/index.d.ts",
+      "../node_modules/web3/node_modules/web3-eth-iban/types/index.d.ts",
+      "../node_modules/web3/node_modules/web3-eth-personal/types/index.d.ts",
+      "../node_modules/web3/node_modules/web3-net/types/index.d.ts",
+      "../node_modules/web3/node_modules/web3-eth/types/index.d.ts",
+      "../node_modules/web3/node_modules/web3-shh/types/index.d.ts",
+      "../node_modules/web3/types/index.d.ts",
+      "../node_modules/@types/pbkdf2/index.d.ts",
+      "../node_modules/@types/secp256k1/index.d.ts",
+      "../node_modules/web3/node_modules/web3-eth-ens/types/index.d.ts",
+      "../node_modules/truffle-typings/index.d.ts",
       "../types/truffle-contracts/index.d.ts",
       "../test/dxc.ts",
       "../test/migrations.ts",
