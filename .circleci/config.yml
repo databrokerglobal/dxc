@@ -39,9 +39,6 @@ jobs: # basic units of work in a run
           # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
           key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:
-          name: remove stuff
-          command: rm package-lock.json
-      - run:
           name: install-npm-packages
           command: npm install
       - save_cache: # special step to save the dependency cache
