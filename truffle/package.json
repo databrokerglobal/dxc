@@ -27,7 +27,7 @@
     "dayjs": "^1.8.26",
     "dotenv": "^8.2.0",
     "ethereumjs-abi": "^0.6.8",
-    "ethers": "^4.0.47",
+    "ethers": "^5.0.31",
     "faker": "^4.1.0",
     "truffle-hdwallet-provider": "^1.0.17"
   },
