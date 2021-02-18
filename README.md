@@ -130,6 +130,8 @@ List of all env variables:
 
 https://github.com/golang/go/wiki/GoArm
 
+For compiling DXC ARM build on linux, toolchain should be env CC=arm-linux-gnueabihf-gcc instead of arm-none-eabi-gcc
+
 # Build the DXC
 
 ```
