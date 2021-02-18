@@ -7,7 +7,7 @@ set -e
 BUILD_DIR=DXC_ARM32v7_Build_$(date +%Y%m%d)
 
 mkdir ${BUILD_DIR}
-env CC=arm-none-eabi-gcc CGO_ENABLED=1 GOOS=linux GOARCH=arm GOARM=7
+env CC=arm-linux-gnueabihf-gcc CGO_ENABLED=1 GOOS=linux GOARCH=arm GOARM=7
 go build -o ${BUILD_DIR}/dxc
 cd databroker-signature
 env CC=arm-linux-gnueabihf-gcc GOOS=linux GOARCH=arm GOARM=7
