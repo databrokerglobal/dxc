@@ -16,8 +16,14 @@ IMAGE_TAG="latest"
 
 function checkDocker(){
     if [ -x "$(command -v docker)" ]; then
-        #echo "docker and docker-compose are installed"
-        echo " "
+        if [ -x "$(command -v docker-compose)" ]; then
+            echo "#### Good to go, DOCKER and DOCKER-COMPOSE are installed !!!"
+        else
+            echo ""
+            echo "#### Aborting as DOCKER-COMPOSE is not installed ..."
+            echo ""
+            exit 1
+        fi
     else
         echo ""
         echo "#### Aborting as DOCKER not installed ..."
@@ -80,7 +86,7 @@ echo 'version: "3"
 
 services:
     dxc-server:
-        image: databrokerdao/dxc-server:'${IMAGE_TAG}'
+        image: databrokerdao/dxc-server:'$IMAGE_TAG'
         volumes:
             - ./db-data:/go/db-data
             - ${LOCAL_FILES_DIR}:${LOCAL_FILES_DIR}
@@ -89,7 +95,7 @@ services:
         env_file:
             - .env
     dxc-ui:
-        image: databrokerdao/dxc-ui:'${IMAGE_TAG}'
+        image: databrokerdao/dxc-ui:'$IMAGE_TAG'
         ports:
             - "'${HOST_PORT}':80"
         env_file:
@@ -139,9 +145,30 @@ function checkPorts(){
     fi
 }
 
+function getImageTagToPull(){
+    # get IMAGE TAG
+    echo ""
+    echo -n "Please provide image tag to pull : "
+    read TEMP_VAR
+    if [ "$TEMP_VAR" != "" ]; then
+        IMAGE_TAG=$TEMP_VAR
+        if test -f "docker-compose.yml"; 
+        then
+            rm docker-compose.yml
+        fi    
+        echo "Removed previous docker-compose.yml "
+    else
+        IMAGE_TAG="latest"    
+    fi
+    echo "OK. Pulling '$IMAGE_TAG' image tag "
+}
+
 function installationProcess(){
-    echo "Installation process starting ..."
+    echo "Installation process starting ... $1"
     echo " "
+    if [ "$1" == "1" ]; then
+        getImageTagToPull
+    fi
     if test -f "$FILE"; 
     then
         #echo "$FILE exists."
@@ -150,7 +177,10 @@ function installationProcess(){
         read -s -n 1 VAR
         if [ "$VAR" = "" ]; 
         then
-            rm .env
+            if test -f ".env"; 
+            then
+                rm .env
+            fi    
             if test -f "docker-compose.yml"; 
             then
                 rm docker-compose.yml
@@ -218,22 +248,9 @@ function restartProcess(){
         then
             echo "Pull latest image ..."
         else
-            # get IMAGE TAG
-            echo ""
-            echo -n "Please provide image tag to pull : "
-            read TEMP_VAR
-            if [ "$TEMP_VAR" != "" ]; then
-                IMAGE_TAG=$TEMP_VAR
-                if test -f "docker-compose.yml"; 
-                then
-                    rm docker-compose.yml
-                fi    
-                echo "Removed previous docker-compose.yml "
-            else
-                echo "Pulling 'latest' image tag as no new tag specified"    
-            fi
+            getImageTagToPull
         fi
-        createDockerCompose
+        createDockerCompose 
         echo ""
         echo "Restarting ..."    
     else
@@ -264,16 +281,25 @@ while test $# -gt 0; do
       echo " "
       echo "options:"
       echo "-h, --help      show brief help"
-      echo "-i              install new dxc, if already installed then it will be removed on approval"
+      echo "-i              install new dxc with 'latest' tag, if already installed then it will be removed on approval"
+      echo "-t              install new dxc with TAG as specified by user, if already installed then it will be removed on approval"
       echo "-r              restart dxc, option to change image tag to pull"
       exit 0
       ;;
     -i)
-      installationProcess
+      installationProcess 0
       break;  
       ;;
     -I)
-      installationProcess
+      installationProcess 0
+      break;  
+      ;;
+    -t)
+      installationProcess 1
+      break;  
+      ;;
+    -T)
+      installationProcess 1
       break;  
       ;;
     -r)
