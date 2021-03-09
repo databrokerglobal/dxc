@@ -27,7 +27,7 @@ require (
 	github.com/jlaffaye/ftp v0.0.0-20201021201046-0de5c29d4555
 	github.com/joho/godotenv v1.3.0
 	github.com/karalabe/usb v0.0.0-20191104083709-911d15fe12a9 // indirect
-	github.com/labstack/echo/v4 v4.1.17
+	github.com/labstack/echo/v4 v4.2.1
 	github.com/magiconair/properties v1.8.4 // indirect
 	github.com/mailru/easyjson v0.7.6 // indirect
 	github.com/mattn/go-colorable v0.1.8 // indirect
