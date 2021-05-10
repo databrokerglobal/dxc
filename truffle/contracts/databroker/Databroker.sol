@@ -249,11 +249,14 @@ contract Databoker is Ownable, Uniswap {
 
 
                     if (staking) {
-                        //staking imported functions
+                        // If staking == true, we send the platform's percentage to the Staking program
+                        // A wallet from which the staking program will operate
+                        // PS: The platform's percentage should be a value easily changeable
                     }
                 }
             else {
-                //What to do when balanceQuote is negative?
+                // We fetch the difference in quote at the end of the proposal and we reimburse the client
+                // From our wallet's funds
             }
 
         } else {
@@ -278,11 +281,14 @@ contract Databoker is Ownable, Uniswap {
                     transferFrom(_buyer.buyerAddress, platformAddress, (_buyer.balanceQuote)); 
                     
                     if (staking) {
-                        //staking imported functions
+                        // If staking == true, we send the platform's percentage to the Staking program (in DTX)
+                        // A wallet from which the staking program will operate
+                        // PS: The platform's percentage should be a value easily changeable
                     }
                 }
             else {
-                //What to do when balanceQuote is negative?
+                // We fetch the difference in quote at the end of the proposal and we reimburse the client
+                // From our wallet's funds
             }
         }
     }
