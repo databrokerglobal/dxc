@@ -16,10 +16,10 @@ contract Databoker is Ownable, Uniswap {
     // This will trigger from the Wyre service side a transaction to receive ETH
     // Those ETH will be send to the buyer address
     // From there we need to interact with Uniswap
- 
+
     address public tokenAddress = 0x765f0C16D1Ddc279295c1a7C24B0883F62d33F75;
 
-    
+
     struct Buyer {
         address buyerAddress;
         uint256 balanceBase;
@@ -27,7 +27,7 @@ contract Databoker is Ownable, Uniswap {
     }
 
     Buyer[] internal buyersList;
-    
+
 
     struct Seller {
         address sellerAddress;
@@ -53,8 +53,8 @@ contract Databoker is Ownable, Uniswap {
         uint256 ethAmount, 
         bool marketplace, 
         address addressMarketplace) public {
-        
-        
+
+
         // In the case that the marketplace is not us but a third party
         address platformAddress = 0xfc6b0e0C50837f8A5785A3D03d4323D4cF7d1118; 
         uint256 platformPercentage = 10;
@@ -62,7 +62,7 @@ contract Databoker is Ownable, Uniswap {
             platformAddress = addressMarketplace;
         }
 
-        
+
         // Call to uniswap to swap ETH to token and deposit on specific address
         swapEthForTokenWithUniswap(ethAmount, tokenAddress, buyerAddress);
         uint256 price = getTokenPrice(0x55A42989BC1D4f8F3ADAB9E77593b81cCbb50a3d);
@@ -249,15 +249,18 @@ contract Databoker is Ownable, Uniswap {
 
 
                     if (staking) {
-                        //staking imported functions
+                        // If staking == true, we send the platform's percentage to the Staking program
+                        // A wallet from which the staking program will operate
+                        // PS: The platform's percentage should be a value easily changeable
                     }
                 }
             else {
-                //What to do when balanceQuote is negative?
+                // We fetch the difference in quote at the end of the proposal and we reimburse the client
+                // From our wallet's funds
             }
 
         } else {
-                
+
             // Call uniswap to swap DTX for ETH on the right account
             swapTokenForETHWithUniswap(dealAmount, tokenAddress, buyerAddress);
             uint256 price = getTokenPrice(0x55A42989BC1D4f8F3ADAB9E77593b81cCbb50a3d);
@@ -276,14 +279,17 @@ contract Databoker is Ownable, Uniswap {
                 {       
                    // transfer of additional balances between the different accounts
                     transferFrom(_buyer.buyerAddress, platformAddress, (_buyer.balanceQuote)); 
-                    
+
                     if (staking) {
-                        //staking imported functions
+                        // If staking == true, we send the platform's percentage to the Staking program (in DTX)
+                        // A wallet from which the staking program will operate
+                        // PS: The platform's percentage should be a value easily changeable
                     }
                 }
             else {
-                //What to do when balanceQuote is negative?
+                // We fetch the difference in quote at the end of the proposal and we reimburse the client
+                // From our wallet's funds
             }
         }
     }
-}
+} 
