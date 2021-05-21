@@ -32,7 +32,6 @@ contract DTXStaking is ERC20, Ownable {
            public payable ERC20("DTXStaking", "DTXS")
        {
            _mint(address(this), _supply);
-           _mint(msg.sender, _supply);
            dtxToken = IERC20(_dtxToken);
        }
        
