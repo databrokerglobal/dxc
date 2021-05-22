@@ -3,6 +3,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>database: Go Coverage Report</title>
 		<style>
 			body {
 				background: black;
@@ -58,15 +59,15 @@
 				
 				<option value="file1">github.com/databrokerglobal/dxc/database/challenge.go (0.0%)</option>
 				
-				<option value="file2">github.com/databrokerglobal/dxc/database/datasource.go (28.0%)</option>
+				<option value="file2">github.com/databrokerglobal/dxc/database/datasource.go (40.0%)</option>
 				
 				<option value="file3">github.com/databrokerglobal/dxc/database/infuraID.go (72.7%)</option>
 				
-				<option value="file4">github.com/databrokerglobal/dxc/database/manager.go (23.5%)</option>
+				<option value="file4">github.com/databrokerglobal/dxc/database/manager.go (22.2%)</option>
 				
 				<option value="file5">github.com/databrokerglobal/dxc/database/syncStatus.go (57.1%)</option>
 				
-				<option value="file6">github.com/databrokerglobal/dxc/database/user_auth.go (37.5%)</option>
+				<option value="file6">github.com/databrokerglobal/dxc/database/user_auth.go (27.5%)</option>
 				
 				<option value="file7">github.com/databrokerglobal/dxc/databroker-signature/cmd/getAddress.go (81.8%)</option>
 				
@@ -76,15 +77,15 @@
 				
 				<option value="file10">github.com/databrokerglobal/dxc/databroker-signature/cmd/verify.go (88.0%)</option>
 				
-				<option value="file11">github.com/databrokerglobal/dxc/datasources/controller.go (35.7%)</option>
+				<option value="file11">github.com/databrokerglobal/dxc/datasources/controller.go (41.4%)</option>
 				
 				<option value="file12">github.com/databrokerglobal/dxc/datasources/host-check.go (0.0%)</option>
 				
 				<option value="file13">github.com/databrokerglobal/dxc/datasources/status-ticker.go (0.0%)</option>
 				
-				<option value="file14">github.com/databrokerglobal/dxc/middlewares/middlewares.go (87.0%)</option>
+				<option value="file14">github.com/databrokerglobal/dxc/middlewares/middlewares.go (64.5%)</option>
 				
-				<option value="file15">github.com/databrokerglobal/dxc/usermanager/controller.go (43.2%)</option>
+				<option value="file15">github.com/databrokerglobal/dxc/usermanager/controller.go (24.7%)</option>
 				
 				<option value="file16">github.com/databrokerglobal/dxc/utils/crypto.go (89.8%)</option>
 				
@@ -177,18 +178,18 @@ func (m *Manager) GetDatasourceByDID(did string) (d *Datasource, err error) <spa
 // GetDatasources Get all Datasources query
 func (m *Manager) GetDatasources() (ds *[]Datasource, err error) <span class="cov0" title="0">{
         datasources := []Datasource{}
-        m.DB.Table("Datasources").Find(&amp;datasources)
+        m.DB.Order("Type, Protocol").Table("Datasources").Find(&amp;datasources)
         return &amp;datasources, nil
 }</span>
 
 // DeleteDatasource delete a Datasource
-func (m *Manager) DeleteDatasource(did string) (err error) <span class="cov0" title="0">{
+func (m *Manager) DeleteDatasource(did string) (err error) <span class="cov8" title="1">{
         m.DB.Delete(Datasource{}, "Did LIKE ?", did)
         if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
                 err = errs[0]
                 return
         }</span>
-        <span class="cov0" title="0">return</span>
+        <span class="cov8" title="1">return</span>
 }
 
 // UpdateDatasource update a datasource entry
@@ -278,6 +279,7 @@ func init() <span class="cov8" title="1">{
         DBInstance.DB.AutoMigrate(&amp;SyncStatus{})
         DBInstance.DB.AutoMigrate(&amp;Challenge{})
         DBInstance.DB.AutoMigrate(&amp;UserAuth{})
+        DBInstance.DB.AutoMigrate(&amp;VersionInfo{})
         DBInstance.DB.AutoMigrate(&amp;InfuraID{})</span>
 }
 </pre>
@@ -349,6 +351,70 @@ func (m *Manager) GetLatestUserAuth() (u *UserAuth, err error) <span class="cov0
                 return nil, errors.Wrap(errs[0], "error getting latest UserAuth iem")
         }</span>
         <span class="cov0" title="0">return &amp;userAuth, nil</span>
+}
+
+// SaveInstalledVersionInfo create a new item
+func (m *Manager) SaveInstalledVersionInfo(version string, checked string, upgrade bool, latest string) (err error) <span class="cov8" title="1">{
+        versionInfo := VersionInfo{}
+        versionInfo.Version = version
+        versionInfo.Checked = checked
+        versionInfo.Upgrade = upgrade
+        versionInfo.Latest = latest
+
+        // Generate new one
+        m.DB.Create(&amp;versionInfo)
+        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
+                err = errs[0]
+        }</span>
+
+        <span class="cov8" title="1">return</span>
+}
+
+// GetInstalledVersionInfo to get the installed DXC version info item saved
+func (m *Manager) GetInstalledVersionInfo() (u *VersionInfo, err error) <span class="cov0" title="0">{
+        versionInfo := VersionInfo{}
+        var n int
+        m.DB.Table("version_infos").Count(&amp;n)
+        if n == 0 </span><span class="cov0" title="0">{
+                return nil, nil
+        }</span>
+        <span class="cov0" title="0">m.DB.Last(&amp;versionInfo)
+        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
+                return nil, errors.Wrap(errs[0], "error getting installed VersionInfo item")
+        }</span>
+        <span class="cov0" title="0">return &amp;versionInfo, nil</span>
+}
+
+// DeleteInstalledVersionInfo delete a Datasource
+func (m *Manager) DeleteInstalledVersionInfo(version string) (err error) <span class="cov0" title="0">{
+        m.DB.Delete(VersionInfo{}, "Did LIKE ?", version)
+        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
+                err = errs[0]
+                return
+        }</span>
+        <span class="cov0" title="0">return</span>
+}
+
+// GetVersionHistory to get the previous history of DXC version info item saved
+func (m *Manager) GetVersionHistory() (u []VersionInfo, err error) <span class="cov0" title="0">{
+        var results []VersionInfo
+        m.DB.Table("version_infos").Find(&amp;results)
+        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
+                return nil, errors.Wrap(errs[0], "error getting installed VersionInfo item")
+        }</span>
+        <span class="cov0" title="0">return results, nil</span>
+}
+
+// DeleteVersionHistory delete allversion history except current
+func (m *Manager) DeleteVersionHistory() (err error) <span class="cov0" title="0">{
+        versionInfo := VersionInfo{}
+        m.DB.Last(&amp;versionInfo)
+        m.DB.Where("checked != ? ", versionInfo.Checked).Delete(VersionInfo{})
+        if errs := m.DB.GetErrors(); len(errs) &gt; 0 </span><span class="cov0" title="0">{
+                err = errs[0]
+                return
+        }</span>
+        <span class="cov0" title="0">return</span>
 }
 </pre>
 		
@@ -651,6 +717,10 @@ import (
 
         "github.com/labstack/echo/v4"
         "github.com/pkg/errors"
+
+        "github.com/jlaffaye/ftp"
+        "github.com/pkg/sftp"
+        "golang.org/x/crypto/ssh"
 )
 
 // RunningTest is true when we are running tests
@@ -658,9 +728,11 @@ var RunningTest = false
 
 // DatasourceReq safe type for the controller
 type DatasourceReq struct {
-        Name string `json:"name"`
-        Type string `json:"type"`
-        Host string `json:"host"`
+        Name        string `json:"name"`
+        Type        string `json:"type"`
+        Host        string `json:"host"`
+        APIKeyName  string `json:"headerAPIKeyName"`
+        APIKeyValue string `json:"headerAPIKeyValue"`
 }
 
 // AddOneDatasource datasource
@@ -674,9 +746,16 @@ type DatasourceReq struct {
 // @Success 201 {string} string "Success"
 // @Failure 400 {string} string "Error creating datasource"
 // @Router /datasource [post]
+// @Security ApiKeyAuth
 func AddOneDatasource(c echo.Context) error <span class="cov8" title="1">{
 
-        datasource := new(database.Datasource)
+        dxcSecureKey := c.Request().Header.Get("DXC_SECURE_KEY")
+        err := middlewares.CheckDXCSecureKey(dxcSecureKey)
+        if err != nil </span><span class="cov0" title="0">{
+                return c.String(http.StatusUnauthorized, err.Error())
+        }</span>
+
+        <span class="cov8" title="1">datasource := new(database.Datasource)
 
         if err := c.Bind(datasource); err != nil </span><span class="cov0" title="0">{
                 return err
@@ -696,11 +775,19 @@ func AddOneDatasource(c echo.Context) error <span class="cov8" title="1">{
 
         <span class="cov8" title="1">datasource.Available = true
 
-        if !RunningTest </span><span class="cov0" title="0">{
+        if datasource.Ftpusername == "" </span><span class="cov8" title="1">{
+                datasource.Ftpusername = "anonymous"
+        }</span>
+        <span class="cov8" title="1">if datasource.Ftppassword == "" </span><span class="cov8" title="1">{
+                datasource.Ftppassword = "anonymous"
+        }</span>
+
+        <span class="cov8" title="1">if !RunningTest </span><span class="cov0" title="0">{
                 if err := database.DBInstance.CreateDatasource(datasource); err != nil </span><span class="cov0" title="0">{
                         return err
                 }</span>
-                <span class="cov0" title="0">SendStatus()</span>
+                <span class="cov0" title="0">CheckHost(datasource.Did, datasource.Name)
+                SendStatus()</span>
         }
 
         <span class="cov8" title="1">return c.JSON(http.StatusCreated, datasource.Did)</span>
@@ -716,15 +803,23 @@ func AddOneDatasource(c echo.Context) error <span class="cov8" title="1">{
 // @Success 201 {string} string "Success"
 // @Failure 400 {string} string "Error creating datasources"
 // @Router /add-example-datasources [post]
+// @Security ApiKeyAuth
 func AddExampleDatasources(c echo.Context) error <span class="cov8" title="1">{
 
-        count := 0
+        dxcSecureKey := c.Request().Header.Get("DXC_SECURE_KEY")
+        err := middlewares.CheckDXCSecureKey(dxcSecureKey)
+        if err != nil </span><span class="cov0" title="0">{
+                return c.String(http.StatusUnauthorized, err.Error())
+        }</span>
+
+        <span class="cov8" title="1">count := 0
 
         datasource := new(database.Datasource)
-        datasource.Name = "file 1"
+        datasource.Name = "File 1"
         datasource.Available = true
         datasource.Type = "FILE"
-        datasource.Host = utils.TrimLastSlash("https://file-examples.com/wp-content/uploads/2017/02/file_example_XLS_10.xls")
+        datasource.Protocol = "LOCAL"
+        datasource.Host = utils.TrimLastSlash("file:///etc/hosts")
         rand, _ := utils.GenerateRandomStringURLSafe(10)
         datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
         if !RunningTest </span><span class="cov0" title="0">{
@@ -735,9 +830,40 @@ func AddExampleDatasources(c echo.Context) error <span class="cov8" title="1">{
         <span class="cov8" title="1">count++
 
         datasource = new(database.Datasource)
-        datasource.Name = "file 2"
+        datasource.Name = "File 2"
         datasource.Available = true
         datasource.Type = "FILE"
+        datasource.Protocol = "LOCAL"
+        datasource.Host = utils.TrimLastSlash("/etc/hosts")
+        rand, _ = utils.GenerateRandomStringURLSafe(10)
+        datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
+        if !RunningTest </span><span class="cov0" title="0">{
+                if err := database.DBInstance.CreateDatasource(datasource); err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+        }
+        <span class="cov8" title="1">count++
+
+        datasource = new(database.Datasource)
+        datasource.Name = "File 3"
+        datasource.Available = true
+        datasource.Type = "FILE"
+        datasource.Protocol = "HTTPS"
+        datasource.Host = utils.TrimLastSlash("https://file-examples.com/wp-content/uploads/2017/02/file_example_XLS_10.xls")
+        rand, _ = utils.GenerateRandomStringURLSafe(10)
+        datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
+        if !RunningTest </span><span class="cov0" title="0">{
+                if err := database.DBInstance.CreateDatasource(datasource); err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+        }
+        <span class="cov8" title="1">count++
+
+        datasource = new(database.Datasource)
+        datasource.Name = "File 4"
+        datasource.Available = true
+        datasource.Type = "FILE"
+        datasource.Protocol = "HTTPS"
         datasource.Host = utils.TrimLastSlash("https://file-examples.com/wp-content/uploads/2017/02/file_example_XLSX_10.xlsx")
         rand, _ = utils.GenerateRandomStringURLSafe(10)
         datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
@@ -749,10 +875,11 @@ func AddExampleDatasources(c echo.Context) error <span class="cov8" title="1">{
         <span class="cov8" title="1">count++
 
         datasource = new(database.Datasource)
-        datasource.Name = "file 3 (ftp)"
+        datasource.Name = "File 5"
         datasource.Available = true
         datasource.Type = "FILE"
-        datasource.Host = utils.TrimLastSlash("ftp://speedtest.tele2.net/100KB.zip")
+        datasource.Protocol = "HTTP"
+        datasource.Host = utils.TrimLastSlash("http://www.africau.edu/images/default/sample.pdf")
         rand, _ = utils.GenerateRandomStringURLSafe(10)
         datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
         if !RunningTest </span><span class="cov0" title="0">{
@@ -763,7 +890,75 @@ func AddExampleDatasources(c echo.Context) error <span class="cov8" title="1">{
         <span class="cov8" title="1">count++
 
         datasource = new(database.Datasource)
-        datasource.Name = "api 1"
+        datasource.Name = "File 6"
+        datasource.Available = true
+        datasource.Type = "FILE"
+        datasource.Protocol = "FTP"
+        datasource.Ftpusername = "anonymous"
+        datasource.Ftppassword = "anonymous"
+        datasource.Host = utils.TrimLastSlash("ftp://ftp.gnu.org/gnu/Licenses/fdl-1.1.txt")
+        rand, _ = utils.GenerateRandomStringURLSafe(10)
+        datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
+        if !RunningTest </span><span class="cov0" title="0">{
+                if err := database.DBInstance.CreateDatasource(datasource); err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+        }
+        <span class="cov8" title="1">count++
+
+        datasource = new(database.Datasource)
+        datasource.Name = "File 7"
+        datasource.Available = true
+        datasource.Type = "FILE"
+        datasource.Protocol = "FTP"
+        datasource.Ftpusername = "demo"
+        datasource.Ftppassword = "demo"
+        datasource.Host = utils.TrimLastSlash("ftp://demo.wftpserver.com/download/Spring.jpg")
+        rand, _ = utils.GenerateRandomStringURLSafe(10)
+        datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
+        if !RunningTest </span><span class="cov0" title="0">{
+                if err := database.DBInstance.CreateDatasource(datasource); err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+        }
+        <span class="cov8" title="1">count++
+
+        datasource = new(database.Datasource)
+        datasource.Name = "File 8"
+        datasource.Available = true
+        datasource.Type = "FILE"
+        datasource.Protocol = "FTPS"
+        datasource.Ftpusername = "demo"
+        datasource.Ftppassword = "password"
+        datasource.Host = utils.TrimLastSlash("ftps://test.rebex.net//pub/example/KeyGenerator.png")
+        rand, _ = utils.GenerateRandomStringURLSafe(10)
+        datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
+        if !RunningTest </span><span class="cov0" title="0">{
+                if err := database.DBInstance.CreateDatasource(datasource); err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+        }
+        <span class="cov8" title="1">count++
+
+        datasource = new(database.Datasource)
+        datasource.Name = "File 9"
+        datasource.Available = true
+        datasource.Type = "FILE"
+        datasource.Protocol = "SFTP"
+        datasource.Ftpusername = "demo"
+        datasource.Ftppassword = "password"
+        datasource.Host = utils.TrimLastSlash("sftp://test.rebex.net:22/pub/example/KeyGenerator.png")
+        rand, _ = utils.GenerateRandomStringURLSafe(10)
+        datasource.Did = fmt.Sprintf("did:databroker:%s:%s:%s", strings.Replace(datasource.Name, " ", "", -1), datasource.Type, rand)
+        if !RunningTest </span><span class="cov0" title="0">{
+                if err := database.DBInstance.CreateDatasource(datasource); err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+        }
+        <span class="cov8" title="1">count++
+
+        datasource = new(database.Datasource)
+        datasource.Name = "API 1"
         datasource.Available = true
         datasource.Type = "API"
         datasource.Host = utils.TrimLastSlash("https://jsonplaceholder.typicode.com")
@@ -793,11 +988,18 @@ func AddExampleDatasources(c echo.Context) error <span class="cov8" title="1">{
 // @Success 200 {array} database.Datasource true
 // @Failure 500 {string} string "Error retrieving datasources from database"
 // @Router /datasources [get]
+// @Security ApiKeyAuth
 func GetAllDatasources(c echo.Context) error <span class="cov0" title="0">{
 
-        var datasources *[]database.Datasource
+        dxcSecureKey := c.Request().Header.Get("DXC_SECURE_KEY")
+        err := middlewares.CheckDXCSecureKey(dxcSecureKey)
+        if err != nil </span><span class="cov0" title="0">{
+                return c.String(http.StatusUnauthorized, err.Error())
+        }</span>
 
-        datasources, err := database.DBInstance.GetDatasources()
+        <span class="cov0" title="0">var datasources *[]database.Datasource
+
+        datasources, err = database.DBInstance.GetDatasources()
 
         if err != nil </span><span class="cov0" title="0">{
                 return c.String(http.StatusInternalServerError, "Error retrieving item from database")
@@ -817,8 +1019,16 @@ func GetAllDatasources(c echo.Context) error <span class="cov0" title="0">{
 // @Failure 400 {string} string "Bad request"
 // @Failure 500 {string} string "Error retrieving datasource from database"
 // @Router /datasource/{did} [get]
+// @Security ApiKeyAuth
 func GetOneDatasource(c echo.Context) error <span class="cov8" title="1">{
-        did, err := url.QueryUnescape(c.Param("did"))
+
+        dxcSecureKey := c.Request().Header.Get("DXC_SECURE_KEY")
+        err := middlewares.CheckDXCSecureKey(dxcSecureKey)
+        if err != nil </span><span class="cov0" title="0">{
+                return c.String(http.StatusUnauthorized, err.Error())
+        }</span>
+
+        <span class="cov8" title="1">did, err := url.QueryUnescape(c.Param("did"))
         if err != nil </span><span class="cov0" title="0">{
                 return c.String(http.StatusInternalServerError, "Could not read the did")
         }</span>
@@ -852,8 +1062,16 @@ func GetOneDatasource(c echo.Context) error <span class="cov8" title="1">{
 // @Failure 400 {string} string "Bad request"
 // @Failure 500 {string} string "Error retrieving datasource from database"
 // @Router /datasource/{did} [delete]
+// @Security ApiKeyAuth
 func DeleteDatasource(c echo.Context) error <span class="cov8" title="1">{
-        did, err := url.QueryUnescape(c.Param("did"))
+
+        dxcSecureKey := c.Request().Header.Get("DXC_SECURE_KEY")
+        err := middlewares.CheckDXCSecureKey(dxcSecureKey)
+        if err != nil </span><span class="cov0" title="0">{
+                return c.String(http.StatusUnauthorized, err.Error())
+        }</span>
+
+        <span class="cov8" title="1">did, err := url.QueryUnescape(c.Param("did"))
         if err != nil </span><span class="cov0" title="0">{
                 return c.String(http.StatusInternalServerError, "Could not read the did")
         }</span>
@@ -879,13 +1097,23 @@ func DeleteDatasource(c echo.Context) error <span class="cov8" title="1">{
 // @Param did path string true "Digital identifier of the datasource"
 // @Param newName query string false "New name. Keep empty to keep existing name."
 // @Param newHost query string false "New host. Keep empty to keep existing host."
+// @Param newHeaderAPIKeyName query string false "New header API key name. Keep empty to keep existing header API key name."
+// @Param newHeaderAPIKeyValue query string false "New header API key value. Keep empty to keep existing header API key value."
 // @Success 200 {string} string "datasource successfully updated"
 // @Failure 400 {string} string "Bad request"
 // @Failure 404 {string} string "Datasource not found"
 // @Failure 500 {string} string "Error retrieving datasource from database"
 // @Router /datasource/{did} [put]
+// @Security ApiKeyAuth
 func UpdateDatasource(c echo.Context) error <span class="cov8" title="1">{
-        did, err := url.QueryUnescape(c.Param("did"))
+
+        dxcSecureKey := c.Request().Header.Get("DXC_SECURE_KEY")
+        err := middlewares.CheckDXCSecureKey(dxcSecureKey)
+        if err != nil </span><span class="cov0" title="0">{
+                return c.String(http.StatusUnauthorized, err.Error())
+        }</span>
+
+        <span class="cov8" title="1">did, err := url.QueryUnescape(c.Param("did"))
         if err != nil </span><span class="cov0" title="0">{
                 return c.String(http.StatusInternalServerError, "Could not read the did. err: "+err.Error())
         }</span>
@@ -893,12 +1121,26 @@ func UpdateDatasource(c echo.Context) error <span class="cov8" title="1">{
                 return c.String(http.StatusBadRequest, "Bad request. did cannot be empty.")
         }</span>
 
-        <span class="cov8" title="1">newName := c.QueryParam("newName")
-        newHost := c.QueryParam("newHost")
-
-        if newName == "" &amp;&amp; newHost == "" </span><span class="cov8" title="1">{
-                return c.String(http.StatusBadRequest, "Bad request. newName and newHost cannot both be empty.")
+        <span class="cov8" title="1">u := new(DatasourceReq)
+        if err = c.Bind(u); err != nil </span><span class="cov0" title="0">{
+                return c.String(http.StatusBadRequest, "Bad request. Either name or host must be present.")
         }</span>
+
+        <span class="cov8" title="1">newName := u.Name
+        newHost := u.Host
+        newHeaderAPIKeyName := u.APIKeyName
+        newHeaderAPIKeyValue := u.APIKeyValue
+
+        if newName == "" &amp;&amp; newHost == "" &amp;&amp; newHeaderAPIKeyName == "" &amp;&amp; newHeaderAPIKeyValue == "" </span><span class="cov8" title="1">{
+                // may be in query params
+                newName = c.QueryParam("newName")
+                newHost = c.QueryParam("newHost")
+                newHeaderAPIKeyName = c.QueryParam("newHeaderAPIKeyName")
+                newHeaderAPIKeyValue = c.QueryParam("newHeaderAPIKeyValue")
+                if newName == "" &amp;&amp; newHost == "" &amp;&amp; newHeaderAPIKeyName == "" &amp;&amp; newHeaderAPIKeyValue == "" </span><span class="cov8" title="1">{
+                        return c.String(http.StatusBadRequest, "Bad request. all values cannot both be empty.")
+                }</span>
+        }
 
         <span class="cov8" title="1">if !RunningTest </span><span class="cov0" title="0">{
                 datasource, err := database.DBInstance.GetDatasourceByDID(did)
@@ -912,6 +1154,14 @@ func UpdateDatasource(c echo.Context) error <span class="cov8" title="1">{
 
                 <span class="cov0" title="0">if newHost != "" </span><span class="cov0" title="0">{
                         datasource.Host = newHost
+                }</span>
+
+                <span class="cov0" title="0">if newHeaderAPIKeyName != "" </span><span class="cov0" title="0">{
+                        datasource.HeaderAPIKeyName = newHeaderAPIKeyName
+                }</span>
+
+                <span class="cov0" title="0">if newHeaderAPIKeyValue != "" </span><span class="cov0" title="0">{
+                        datasource.HeaderAPIKeyValue = newHeaderAPIKeyValue
                 }</span>
 
                 <span class="cov0" title="0">err = database.DBInstance.UpdateDatasource(datasource)
@@ -963,15 +1213,35 @@ func GetFile(c echo.Context) error <span class="cov0" title="0">{
                 return c.String(http.StatusBadRequest, "datasource is not of type FILE")
         }</span>
 
-        <span class="cov0" title="0">filename := path.Base(datasource.Host)
-        rand, _ := utils.GenerateRandomStringURLSafe(10)
+        <span class="cov0" title="0">oldfilename := path.Base(datasource.Host)
+        filename := ""
+        if idx := strings.IndexByte(oldfilename, '?'); idx &gt;= 0 </span><span class="cov0" title="0">{
+                filename = oldfilename[:strings.IndexByte(oldfilename, '?')]
+        }</span> else<span class="cov0" title="0"> {
+                filename = oldfilename
+        }</span>
+        // check if protocol is local file
+        <span class="cov0" title="0">if datasource.Protocol == "LOCAL" </span><span class="cov0" title="0">{
+                // direct download of local file
+                pathToFile := datasource.Host
+                path := strings.Replace(pathToFile, "file://", "", -1)
+                return c.Inline(path, filename)
+        }</span>
+        // generate temporary file
+        <span class="cov0" title="0">rand, _ := utils.GenerateRandomStringURLSafe(10)
         pathToFile := "tempFiles/" + rand + "/" + filename
-        err = downloadFile(pathToFile, datasource.Host)
-        if err != nil </span><span class="cov0" title="0">{
+        if datasource.Protocol == "HTTP" || datasource.Protocol == "HTTPS" </span><span class="cov0" title="0">{
+                err = downloadFileHTTP(pathToFile, datasource.Host)
+        }</span> else<span class="cov0" title="0"> if datasource.Protocol == "SFTP" </span><span class="cov0" title="0">{
+                err = downloadFileSFTP(datasource.Protocol, datasource.Host, datasource.Ftpusername, datasource.Ftppassword, pathToFile, filename)
+        }</span> else<span class="cov0" title="0"> {
+                // if file protocol is FTP or FTPS
+                err = downloadFileFTP(datasource.Protocol, datasource.Host, datasource.Ftpusername, datasource.Ftppassword, pathToFile, filename)
+        }</span>
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
                 return c.String(http.StatusInternalServerError, "could not download file. error: "+err.Error())
         }</span>
         <span class="cov0" title="0">defer os.RemoveAll(filepath.Dir(pathToFile))
-
         return c.Attachment(pathToFile, filename)</span>
 }
 
@@ -1027,6 +1297,9 @@ func ProxyAPI(c echo.Context) error <span class="cov0" title="0">{
                         proxyReq.Header[index] = value
                 }</span>
         }
+        <span class="cov0" title="0">if datasource.HeaderAPIKeyName != "" </span><span class="cov0" title="0">{
+                proxyReq.Header[datasource.HeaderAPIKeyName] = []string{datasource.HeaderAPIKeyValue}
+        }</span>
 
         <span class="cov0" title="0">err = executeRequest(c, proxyReq)
         return c.String(http.StatusAccepted, "")</span>
@@ -1142,7 +1415,7 @@ func executeRequest(c echo.Context, r *http.Request) error <span class="cov0" ti
         return c.Blob(resp.StatusCode, resp.Header.Get("Content-Type"), stream)</span>
 }
 
-func downloadFile(pathToFile string, url string) error <span class="cov0" title="0">{
+func downloadFileHTTP(pathToFile string, url string) error <span class="cov0" title="0">{
 
         // Get the data
         resp, err := http.Get(url)
@@ -1165,6 +1438,125 @@ func downloadFile(pathToFile string, url string) error <span class="cov0" title=
         _, err = io.Copy(out, resp.Body)
         return err</span>
 }
+
+func downloadFileFTP(protocol string, url string, ftpusername string, ftppassword string, pathToFile string, filename string) error <span class="cov0" title="0">{
+        // get server address and path of file
+        server, path, err := getFtpServer(protocol, url, filename)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        // get client of ftp server
+        <span class="cov0" title="0">client, err := ftp.Dial(server)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        // now connect to server
+        <span class="cov0" title="0">if err := client.Login(ftpusername, ftppassword); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        //entries, _ := client.List("*")
+        // change directory to path
+        <span class="cov0" title="0">client.ChangeDir(path)
+        // get file entry
+        entries, _ := client.List(filename)
+        if len(entries) &lt;= 0 </span><span class="cov0" title="0">{
+                return errors.New("No file found. Please check filename or path")
+        }</span>
+        // close connection
+        <span class="cov0" title="0">defer client.Quit()
+
+        for _, entry := range entries </span><span class="cov0" title="0">{
+                name := entry.Name
+                reader, err := client.Retr(name)
+                if err != nil </span><span class="cov0" title="0">{
+                        panic(err)</span>
+                }
+                // Create the file
+                <span class="cov0" title="0">if err = os.MkdirAll(filepath.Dir(pathToFile), 0770); err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov0" title="0">out, err := os.Create(pathToFile)
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov0" title="0">defer out.Close()
+                // Write the body to file
+                _, err = io.Copy(out, reader)
+                return err</span>
+        }
+        <span class="cov0" title="0">return nil</span>
+}
+
+func downloadFileSFTP(protocol string, url string, ftpusername string, ftppassword string, pathToFile string, filename string) error <span class="cov0" title="0">{
+        // get server address and path of file
+        server, path, err := getFtpServer(protocol, url, filename)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        // get client of sftp server
+        <span class="cov0" title="0">config := &amp;ssh.ClientConfig{
+                User: ftpusername,
+                Auth: []ssh.AuthMethod{
+                        ssh.Password(ftppassword),
+                },
+                HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+                //Ciphers: []string{"3des-cbc", "aes256-cbc", "aes192-cbc", "aes128-cbc"},
+        }
+        conn, err := ssh.Dial("tcp", server, config)
+        if err == nil </span><span class="cov0" title="0">{
+                client, err := sftp.NewClient(conn)
+                // Close connection
+                defer client.Close()
+                defer conn.Close()
+                if err == nil </span><span class="cov0" title="0">{
+                        // cwd, err := client.ReadDir(path) //if contains(cwd, filename) {
+                        // skipping checking of file exists as thread processing this task periodically
+                        reader, err := client.Open(path + "/" + filename)
+                        if err != nil </span><span class="cov0" title="0">{
+                                panic(err)</span>
+                        }
+                        // Create the file
+                        <span class="cov0" title="0">if err = os.MkdirAll(filepath.Dir(pathToFile), 0770); err != nil </span><span class="cov0" title="0">{
+                                return err
+                        }</span>
+                        <span class="cov0" title="0">out, err := os.Create(pathToFile)
+                        if err != nil </span><span class="cov0" title="0">{
+                                return err
+                        }</span>
+                        <span class="cov0" title="0">defer out.Close()
+                        // Write the body to file
+                        _, err = io.Copy(out, reader)
+                        return err</span>
+                }
+                <span class="cov0" title="0">return errors.New("Internal error in connection or login to server")</span>
+        }
+        <span class="cov0" title="0">return nil</span>
+}
+
+func getFtpServer(protocol string, url string, filename string) (string, string, error) <span class="cov0" title="0">{
+        url2 := url
+        if protocol == "FTP" </span><span class="cov0" title="0">{
+                url2 = strings.Replace(url, "ftp://", "", 1) // remove ftp://
+        }</span> else<span class="cov0" title="0"> if protocol == "FTPS" </span><span class="cov0" title="0">{
+                url2 = strings.Replace(url, "ftps://", "", 1) // remove ftp://
+        }</span> else<span class="cov0" title="0"> if protocol == "SFTP" </span><span class="cov0" title="0">{
+                url2 = strings.Replace(url, "sftp://", "", 1) // remove ftp://
+        }</span> else<span class="cov0" title="0"> {
+                return "", "", errors.New("No file found")
+        }</span>
+        <span class="cov0" title="0">index := strings.Index(url2, "/") // get index of /
+        ftpserver := url2[:index]         // extracted ftpserver
+        if strings.Index(ftpserver, ":") &lt; 0 </span><span class="cov0" title="0">{
+                if protocol == "SFTP" </span><span class="cov0" title="0">{
+                        ftpserver = ftpserver + ":22" // add default sftp port
+                }</span> else<span class="cov0" title="0"> {
+                        ftpserver = ftpserver + ":21" // add default ftp &amp; ftps port
+                }</span>
+        }
+        <span class="cov0" title="0">path := url2[index:]
+        path = strings.Replace(path, filename, "", -1)
+        return ftpserver, path, nil</span>
+}
 </pre>
 		
 		<pre class="file" id="file12" style="display: none">package datasources
@@ -1172,13 +1564,21 @@ func downloadFile(pathToFile string, url string) error <span class="cov0" title=
 import (
         "log"
         "net/http"
+        "os"
+        "path"
+        "strings"
 
         "github.com/databrokerglobal/dxc/database"
+        "github.com/databrokerglobal/dxc/utils"
         "github.com/fatih/color"
+        "github.com/jlaffaye/ftp"
+        "github.com/pkg/errors"
+        "github.com/pkg/sftp"
+        "golang.org/x/crypto/ssh"
 )
 
 // CheckHost check for a host resp
-func CheckHost() <span class="cov0" title="0">{
+func CheckHost(did string, name string) <span class="cov0" title="0">{
 
         color.Cyan("Verifying API/Stream status...")
 
@@ -1187,19 +1587,100 @@ func CheckHost() <span class="cov0" title="0">{
                 log.Fatal(err)
         }</span>
 
-        <span class="cov0" title="0">if len(*datasources) &gt; 0 </span><span class="cov0" title="0">{
+        <span class="cov0" title="0">nameExtension := ""
+
+        if len(*datasources) &gt; 0 </span><span class="cov0" title="0">{
                 for _, datasource := range *datasources </span><span class="cov0" title="0">{
+                        if did != "" &amp;&amp; did != datasource.Did </span><span class="cov0" title="0">{
+                                // need to check availibity of only newly added datasource so skip all other datasources
+                                // also check for unique name, if found, then add random string to current datasource name
+                                if datasource.Name == name </span><span class="cov0" title="0">{
+                                        nameExtension, _ = utils.GenerateRandomString(5)
+                                }</span>
+                                <span class="cov0" title="0">continue</span>
+                        }
+                        <span class="cov0" title="0">notfounderror := errors.New("No file found. Please check filename or path")
                         if datasource.Host != "" &amp;&amp; datasource.Host != "N/A" &amp;&amp; datasource.Name != "" </span><span class="cov0" title="0">{
-                                _, err = http.Get(datasource.Host)
-                                datasource.Available = err == nil
-                                database.DBInstance.UpdateDatasource(&amp;datasource)
-                        }</span>
+                                if datasource.Protocol == "LOCAL" </span><span class="cov0" title="0">{
+                                        path := strings.Replace(datasource.Host, "file://", "", -1)
+                                        _, notfounderror = os.Stat(path)
+                                }</span> else<span class="cov0" title="0"> if datasource.Type == "API" || datasource.Protocol == "HTTP" || datasource.Protocol == "HTTPS" </span><span class="cov0" title="0">{
+                                        // note we are checking API HOST also as protocol used is HTTP/HTTPS for those datasources
+                                        _, notfounderror = http.Get(datasource.Host)
+                                }</span> else<span class="cov0" title="0"> if datasource.Protocol == "FTP" || datasource.Protocol == "FTPS" </span><span class="cov0" title="0">{
+                                        filename := path.Base(datasource.Host)
+                                        // get server address and path of file
+                                        server, path, err := getFtpServer(datasource.Protocol, datasource.Host, filename)
+                                        // get client of ftp server
+                                        client, err := ftp.Dial(server)
+                                        if err == nil </span><span class="cov0" title="0">{
+                                                // now connect to server
+                                                err := client.Login(datasource.Ftpusername, datasource.Ftppassword)
+                                                // Close connection
+                                                defer client.Quit()
+                                                if err == nil </span><span class="cov0" title="0">{
+                                                        // change directory to path
+                                                        client.ChangeDir(path)
+                                                        // get file entry
+                                                        entries, _ := client.List(filename)
+                                                        if len(entries) &gt; 0 </span><span class="cov0" title="0">{
+                                                                notfounderror = nil
+                                                        }</span>
+                                                }
+                                        }
+                                } else<span class="cov0" title="0"> if datasource.Protocol == "SFTP" </span><span class="cov0" title="0">{
+                                        filename := path.Base(datasource.Host)
+                                        // get server address and path of file
+                                        server, path, err := getFtpServer(datasource.Protocol, datasource.Host, filename)
+                                        // get client of ftp server
+                                        config := &amp;ssh.ClientConfig{
+                                                User: datasource.Ftpusername,
+                                                Auth: []ssh.AuthMethod{
+                                                        ssh.Password(datasource.Ftppassword),
+                                                },
+                                                HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+                                                //Ciphers: []string{"3des-cbc", "aes256-cbc", "aes192-cbc", "aes128-cbc"},
+                                        }
+                                        conn, err := ssh.Dial("tcp", server, config)
+                                        if err == nil </span><span class="cov0" title="0">{
+                                                client, err := sftp.NewClient(conn)
+                                                // Close connection
+                                                defer client.Close()
+                                                defer conn.Close()
+                                                if err == nil </span><span class="cov0" title="0">{
+                                                        // change directory to path
+                                                        cwd, err := client.ReadDir(path) // []os.FileInfo
+                                                        if err == nil </span><span class="cov0" title="0">{
+                                                                if contains(cwd, filename) </span><span class="cov0" title="0">{
+                                                                        notfounderror = nil
+                                                                }</span>
+                                                        }
+                                                }
+                                        }
+                                } else <span class="cov0" title="0">{
+                                        // future implementation dataosurce with streams or other protocols
+                                }</span>
+                                <span class="cov0" title="0">datasource.Available = notfounderror == nil
+                                if nameExtension != "" </span><span class="cov0" title="0">{
+                                        datasource.Name = datasource.Name + " " + nameExtension
+                                }</span>
+                                <span class="cov0" title="0">database.DBInstance.UpdateDatasource(&amp;datasource)</span>
+                        }
                 }
         }
 
         <span class="cov0" title="0">green := color.New(color.FgHiGreen).SprintFunc()
 
         defer color.White("Finished checking datasource liveness %s", green("\nCurrent datasource count: ", len(*datasources)))</span>
+}
+
+func contains(arr []os.FileInfo, str string) bool <span class="cov0" title="0">{
+        for _, a := range arr </span><span class="cov0" title="0">{
+                if a.Name() == str </span><span class="cov0" title="0">{
+                        return true
+                }</span>
+        }
+        <span class="cov0" title="0">return false</span>
 }
 </pre>
 		
@@ -1273,7 +1754,7 @@ func doChecks() <span class="cov0" title="0">{
         wg.Add(1)
 
         go func() </span><span class="cov0" title="0">{
-                CheckHost()
+                CheckHost("", "")
                 wg.Done()
         }</span>()
 
@@ -1392,6 +1873,7 @@ func SendStatus() <span class="cov0" title="0">{
 import (
         "encoding/base64"
         "encoding/json"
+        "os"
 
         "github.com/databrokerglobal/dxc/utils"
         "github.com/pkg/errors"
@@ -1462,6 +1944,21 @@ func CheckDXCProductKey(verificationDataB64 string) (did string, err error) <spa
 
         <span class="cov8" title="1">return challengeDataObject.DID, nil</span>
 }
+
+// CheckDXCSecureKey checks the DXC secure key, for access to most admin functions
+func CheckDXCSecureKey(dxcSecureKey string) (err error) <span class="cov0" title="0">{
+        envDXCSecureKey := os.Getenv("DXC_SECURE_KEY")
+        if envDXCSecureKey == "" </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov0" title="0">if dxcSecureKey == "" </span><span class="cov0" title="0">{
+                return errors.New("DXC_SECURE_KEY not included in the headers")
+        }</span>
+        <span class="cov0" title="0">if dxcSecureKey != envDXCSecureKey </span><span class="cov0" title="0">{
+                return errors.New("DXC_SECURE_KEY is incorrect")
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
 </pre>
 		
 		<pre class="file" id="file15" style="display: none">package usermanager
@@ -1472,6 +1969,7 @@ import (
         "fmt"
         "io/ioutil"
         "net/http"
+        "time"
 
         "github.com/fatih/color"
         "github.com/labstack/echo/v4"
@@ -1480,6 +1978,7 @@ import (
         "github.com/databrokerglobal/dxc/database"
         "github.com/databrokerglobal/dxc/datasources"
         "github.com/databrokerglobal/dxc/ethereum"
+        "github.com/databrokerglobal/dxc/middlewares"
         "github.com/databrokerglobal/dxc/utils"
 )
 
@@ -1502,9 +2001,16 @@ type DXSAPIKey struct {
 // @Success 200 {string} string true
 // @Failure 500 {string} string "Error saving auth info"
 // @Router /user/authinfo [post]
+// @Security ApiKeyAuth
 func SaveUserAuth(c echo.Context) error <span class="cov8" title="1">{
 
-        address := c.QueryParam("address")
+        dxcSecureKey := c.Request().Header.Get("DXC_SECURE_KEY")
+        err := middlewares.CheckDXCSecureKey(dxcSecureKey)
+        if err != nil </span><span class="cov0" title="0">{
+                return c.String(http.StatusUnauthorized, err.Error())
+        }</span>
+
+        <span class="cov8" title="1">address := c.QueryParam("address")
         apiKey := c.QueryParam("apiKey")
 
         if address == "" || apiKey == "" </span><span class="cov8" title="1">{
@@ -1535,9 +2041,16 @@ func SaveUserAuth(c echo.Context) error <span class="cov8" title="1">{
 // @Failure 404 {string} string "Not data found"
 // @Failure 500 {string} string "Error getting auth info"
 // @Router /user/authinfo [get]
+// @Security ApiKeyAuth
 func GetUserAuth(c echo.Context) error <span class="cov0" title="0">{
 
-        userAuth, err := database.DBInstance.GetLatestUserAuth()
+        dxcSecureKey := c.Request().Header.Get("DXC_SECURE_KEY")
+        err := middlewares.CheckDXCSecureKey(dxcSecureKey)
+        if err != nil </span><span class="cov0" title="0">{
+                return c.String(http.StatusUnauthorized, err.Error())
+        }</span>
+
+        <span class="cov0" title="0">userAuth, err := database.DBInstance.GetLatestUserAuth()
         if err != nil </span><span class="cov0" title="0">{
                 return c.String(http.StatusInternalServerError, errors.Wrap(err, "error getting user auth").Error())
         }</span>
@@ -1546,6 +2059,97 @@ func GetUserAuth(c echo.Context) error <span class="cov0" title="0">{
         }</span>
 
         <span class="cov0" title="0">return c.JSON(http.StatusOK, userAuth)</span>
+}
+
+// GetVersionInfo to get the version info
+// GetVersionInfo godoc
+// @Summary Get version info
+// @Description Get version and last check on date of DXC
+// @Tags user
+// @Produce json
+// @Success 200 {object} database.VersionInfo true
+// @Failure 404 {string} string "Not data found"
+// @Failure 500 {string} string "Error getting version info"
+// @Router /user/versioninfo [get]
+// @Security ApiKeyAuth
+func GetVersionInfo(c echo.Context) error <span class="cov0" title="0">{
+        installedVersionInfo, err := database.DBInstance.GetInstalledVersionInfo()
+        if err != nil || installedVersionInfo == nil </span><span class="cov0" title="0">{
+                return c.String(http.StatusInternalServerError, errors.Wrap(err, "error getting installed Version Info ").Error())
+        }</span>
+        // check if upgrade is required
+        <span class="cov0" title="0">latestVersion := getLatestVersionFromPortal()
+        if latestVersion != "" </span><span class="cov0" title="0">{
+                if latestVersion != installedVersionInfo.Version &amp;&amp; !installedVersionInfo.Upgrade </span><span class="cov0" title="0">{
+                        installedVersionInfo.Upgrade = true
+                        err := database.DBInstance.SaveInstalledVersionInfo(installedVersionInfo.Version, installedVersionInfo.Checked, true, latestVersion)
+                        if err != nil </span><span class="cov0" title="0">{
+                                return c.String(http.StatusInternalServerError, errors.Wrap(err, "error saving installed version info upgrade ").Error())
+                        }</span>
+                }
+        }
+        <span class="cov0" title="0">return c.JSON(http.StatusOK, installedVersionInfo)</span>
+}
+
+// DeleteVersionHistory to delete the version History
+// DeleteDatasource godoc
+// @Summary Delete version History
+// @Description Delete all versions and last check on dates of DXC
+// @Tags user
+// @Produce json
+// @Success 200 {object} version history successfully deleted
+// @Failure 404 {string} string "Bad request"
+// @Failure 500 {string} string "Error getting version History"
+// @Router /user/versionHistory [delete]
+// @Security ApiKeyAuth
+func DeleteVersionHistory(c echo.Context) error <span class="cov0" title="0">{
+        err := database.DBInstance.DeleteVersionHistory()
+        if err != nil </span><span class="cov0" title="0">{
+                return c.String(http.StatusInternalServerError, "Error retrieving version history from database")
+        }</span>
+        <span class="cov0" title="0">return c.JSON(http.StatusOK, "version history successfully deleted")</span>
+}
+
+// GetVersionHistory to get the version History
+// Create godoc
+// @Summary Get version History
+// @Description Get all versions and last check on dates of DXC
+// @Tags user
+// @Produce json
+// @Success 200 {object} database.VersionHistory true
+// @Failure 404 {string} string "Not data found"
+// @Failure 500 {string} string "Error getting version History"
+// @Router /user/versionHistory [get]
+// @Security ApiKeyAuth
+func GetVersionHistory(c echo.Context) error <span class="cov0" title="0">{
+        versionHistory, err := database.DBInstance.GetVersionHistory()
+        if err != nil || versionHistory == nil </span><span class="cov0" title="0">{
+                return c.String(http.StatusInternalServerError, errors.Wrap(err, "error getting installed Version History ").Error())
+        }</span>
+        <span class="cov0" title="0">return c.JSON(http.StatusOK, versionHistory)</span>
+}
+
+func getLatestVersionFromPortal() string <span class="cov0" title="0">{
+        url := "https://www.databroker.global/get_latest_dxc_version"
+        httpClient := http.Client{
+                Timeout: time.Second * 5, // Timeout after 5 seconds
+        }
+        req, err := http.NewRequest(http.MethodGet, url, nil)
+        if err == nil </span><span class="cov0" title="0">{
+                res, getErr := httpClient.Do(req)
+                if getErr == nil </span><span class="cov0" title="0">{
+                        if res.Body != nil </span><span class="cov0" title="0">{
+                                defer res.Body.Close()
+                        }</span>
+                        <span class="cov0" title="0">body, readErr := ioutil.ReadAll(res.Body)
+                        if readErr == nil </span><span class="cov0" title="0">{
+                                latestVersion := string(body)
+                                // TODO: check if it is in valid format major.minor.patch like 1.0.0
+                                return latestVersion
+                        }</span>
+                }
+        }
+        <span class="cov0" title="0">return ""</span>
 }
 
 func getInfuraIDAndServeContract(address string, apiKey string) <span class="cov8" title="1">{
