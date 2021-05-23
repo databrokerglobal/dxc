@@ -1,0 +1,179 @@
+{
+  "manifestVersion": "3.2",
+  "admin": {
+    "address": "0x2659411C865578cEc1f1673DeBAa75599d6bdc47",
+    "txHash": "0x6ce6ea1bab3f7ba34a7e4db7e5cfd266feef58ac6977a08e5c2e68c059afe3c4"
+  },
+  "proxies": [
+    {
+      "address": "0xA7388B224a51005BfeFFA2A23d72daC8D3949Caf",
+      "txHash": "0xf23b2d33c1346ae9ca9bbddc8be99316e79f4a21b7f5eae2bbb304a4cc64de96",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xc99F9b81B3E31D563E6F3dE3cE6b4EC1E1587605",
+      "txHash": "0xc61657416b3c976615e8db59bec046d171b7be2041881d588f0a814aadf38e8a",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x98A134A4fB3Cb76f9553c9D07ac11558b38b2b30",
+      "txHash": "0xe002535df2642ad87cccef77db4ee397f1bf5a36abca625f371cc2276eb337c7",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x433f87ad120aD6F6fC97D712701f218D909C670F",
+      "txHash": "0x8936bc6985445963f821bbcd8bf578f3058313027e386eccd8df58a397785cd4",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x3B9b24c15A52FB5D140143B830f8E758221Fb5A5",
+      "txHash": "0xe1f62c9e0322881629019ae77a6146bdbf93eafd8eab9068ef5d18a94eb8a347",
+      "kind": "transparent"
+    }
+  ],
+  "impls": {
+    "94160caceb1e1a260841028af8bac85d76d7fbf88aec79ef5c33664a7f0ae9c8": {
+      "address": "0x32135471CDF642DfDA9685908de6c9eb06C25bb7",
+      "txHash": "0x5513097b1bc61a14d50c6f279aa778b3f1371b240ecd6848c24f3b302787e7d7",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Ownable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "access/Ownable.sol:19"
+          },
+          {
+            "contract": "Ownable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "access/Ownable.sol:20"
+          },
+          {
+            "contract": "DXCDeals",
+            "label": "_dealIndex",
+            "type": "t_struct(Counter)608_storage",
+            "src": "dxc/DXCDeals.sol:11"
+          },
+          {
+            "contract": "DXCDeals",
+            "label": "_lockPeriod",
+            "type": "t_uint256",
+            "src": "dxc/DXCDeals.sol:12"
+          },
+          {
+            "contract": "DXCDeals",
+            "label": "_platformPercentage",
+            "type": "t_uint256",
+            "src": "dxc/DXCDeals.sol:13"
+          },
+          {
+            "contract": "DXCDeals",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "dxc/DXCDeals.sol:14"
+          },
+          {
+            "contract": "DXCDeals",
+            "label": "_dealsRegistry",
+            "type": "t_array(t_struct(Deal)200_storage)dyn_storage",
+            "src": "dxc/DXCDeals.sol:29"
+          },
+          {
+            "contract": "DXCDeals",
+            "label": "_didToDeals",
+            "type": "t_mapping(t_string_memory_ptr,t_array(t_struct(Deal)200_storage)dyn_storage)",
+            "src": "dxc/DXCDeals.sol:30"
+          },
+          {
+            "contract": "DXCDeals",
+            "label": "_dealIndexToDeal",
+            "type": "t_mapping(t_uint256,t_struct(Deal)200_storage)",
+            "src": "dxc/DXCDeals.sol:31"
+          }
+        ],
+        "types": {
+          "t_struct(Counter)608_storage": {
+            "label": "struct Counters.Counter",
+            "members": [
+              {
+                "label": "_value",
+                "type": "t_uint256"
+              }
+            ]
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_array(t_struct(Deal)200_storage)dyn_storage": {
+            "label": "struct DXCDeals.Deal[]"
+          },
+          "t_struct(Deal)200_storage": {
+            "label": "struct DXCDeals.Deal",
+            "members": [
+              {
+                "label": "did",
+                "type": "t_string_storage"
+              },
+              {
+                "label": "dealIndex",
+                "type": "t_uint256"
+              },
+              {
+                "label": "buyerId",
+                "type": "t_string_storage"
+              },
+              {
+                "label": "sellerId",
+                "type": "t_string_storage"
+              },
+              {
+                "label": "platformAddress",
+                "type": "t_address"
+              },
+              {
+                "label": "amountInDTX",
+                "type": "t_uint256"
+              },
+              {
+                "label": "amountInUSDT",
+                "type": "t_uint256"
+              },
+              {
+                "label": "validFrom",
+                "type": "t_uint256"
+              },
+              {
+                "label": "validUntil",
+                "type": "t_uint256"
+              },
+              {
+                "label": "accepted",
+                "type": "t_bool"
+              },
+              {
+                "label": "payoutCompleted",
+                "type": "t_bool"
+              }
+            ]
+          },
+          "t_string_storage": {
+            "label": "string"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_mapping(t_string_memory_ptr,t_array(t_struct(Deal)200_storage)dyn_storage)": {
+            "label": "mapping(string => struct DXCDeals.Deal[])"
+          },
+          "t_mapping(t_uint256,t_struct(Deal)200_storage)": {
+            "label": "mapping(uint256 => struct DXCDeals.Deal)"
+          }
+        }
+      }
+    }
+  }
+}
