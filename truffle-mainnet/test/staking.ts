@@ -127,5 +127,41 @@ contract('Staking', async accounts => {
             web3.utils.toWei(rewardOf).toString()
             ).to.be.equal('0');
     });
+
+    it('Full user workflow', async () => {
+      // To enable accounts[1] to trnasfer DTX
+      await dtxInstance.increaseAllowance(
+        accounts[1],
+        web3.utils.toWei('1000'), {from: accounts[0]}
+      );
+
+      await stk.increaseAllowance(
+        accounts[1],
+        web3.utils.toWei('1000')
+      );
+      
+      // To enable transferFrom from the staking contract
+      await dtxInstance.increaseAllowance(
+          stk.address,
+          web3.utils.toWei('1000')
+        );
+
+      // To create a monthly reward
+      await dtxInstance.transferFrom(accounts[0],
+          stk.address, web3.utils.toWei('1000'));
+
+      // So that accounts[1] has funds
+      await dtxInstance.transferFrom(accounts[0],
+        accounts[1], web3.utils.toWei('1000'));
+
+      await stk.createStake(web3.utils.toWei('1000'), web3.utils.toWei('20'), {from: accounts[1]});
+      await stk.distributeRewards(web3.utils.toWei('30'), {from: accounts[0]} );  
+      await stk.withdrawAllReward({from: accounts[0]});
+      const rewardOf = await stk.rewardOf(accounts[1].toString()); 
+
+      expect(
+          web3.utils.toWei(rewardOf).toString()
+          ).to.be.equal('0');
+  });
   });
 });

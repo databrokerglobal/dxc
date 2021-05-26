@@ -566,11 +566,11 @@
         "signature": "7185c75f0b599a5636b0559967d0c70053828c24307bfbea24dbeb9cbb5d7e1f"
       },
       "../types/truffle-contracts/index.d.ts": {
-        "version": "a8f49145e0cb38c2dc7d31899c60441fe915ca62770bee498b769f12eca0faef",
-        "signature": "a8f49145e0cb38c2dc7d31899c60441fe915ca62770bee498b769f12eca0faef"
+        "version": "c3f3a31af390e5dd1fbdd388c9cd0f1ca86a178eacc6920d9c46315c6111e4bc",
+        "signature": "c3f3a31af390e5dd1fbdd388c9cd0f1ca86a178eacc6920d9c46315c6111e4bc"
       },
       "../test/staking.ts": {
-        "version": "137237d1b0b36e326347edfe34bbb82a5421c25277a1ad90f1c9ea1e7b1c6c0b",
+        "version": "87892f8f20802a4c4fef39eb5d007bf78c41418adab8d67d8518e8eca9a2f3ef",
         "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
       },
       "../migrations/1_initial_migration.ts": {
