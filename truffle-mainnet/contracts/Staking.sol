@@ -128,9 +128,10 @@ contract Staking is ERC20, Ownable {
   /**
     * @notice A method for a stakeholder to create a stake.
     * @param _stake The size of the stake to be created.
+    * 
     * MUST revert if not enough token to stake
     */
-   function createStake(uint256 _stake)
+   function createStake(uint256 _stake, uint256 _time)
        public
    {
        // DTX staking
@@ -143,20 +144,11 @@ contract Staking is ERC20, Ownable {
        stakes[msg.sender] = stakes[msg.sender].add(_stake);
 
        if(time[msg.sender] == 0) {
-          time[msg.sender] = time[msg.sender].add(block.timestamp);
+          time[msg.sender] = time[msg.sender].add(_time);
        } else {
-           time[msg.sender] = (time[msg.sender] + block.timestamp).div(2);
+           time[msg.sender] = (time[msg.sender] + _time).div(2);
        }
    }
-    /**
-    * @notice A method for the owner to modify a staking timestamp
-    * @param _timestamp the new timestamp
-    * @param _stakeholder the address of the stakeholder
-    * MUST revert if not enough token to stake
-    */
-    function changeTimeStake(uint256 _timestamp, address _stakeholder) public onlyOwner{
-        time[_stakeholder] = _timestamp;
-    }
 
    /**
     * @notice A method for a stakeholder to remove a stake.
@@ -220,26 +212,6 @@ contract Staking is ERC20, Ownable {
             return monthlyReward;
     }
 
-    /**
-    * @notice A method to get the staking time of one stakeholder.
-    * @return uint256 the related timestamp in unix.
-    */
-
-    function getStakeTime(address _stakeholder) public view returns(uint256){
-            uint256 stakeTime = getDay(time[_stakeholder]);
-            return stakeTime;
-    }
-
-    /**
-    * @notice A method to get the current block timestamp
-    * @return uint256 the latest block timestamp in unix format.
-    */
-    
-    function getBlockTimestamp() public view returns(uint256){
-        uint256 timestamp = getDay(block.timestamp);
-        return timestamp;
-    }
-
 
    /**
     * @notice A simple method that calculates the rewards for each stakeholder. This method will be called at the
@@ -247,7 +219,7 @@ contract Staking is ERC20, Ownable {
     * But also based on the length that a trader kept his token in the staking program over that month.
     * @param _stakeholder The stakeholder to calculate rewards for.
     */
-   function calculateReward(address _stakeholder)
+   function calculateReward(address _stakeholder, uint256 _time)
        public
        view
        returns(uint256)
@@ -256,21 +228,21 @@ contract Staking is ERC20, Ownable {
                             .sub(totalStakes())) *
                          ((stakeOf(_stakeholder).mul(100))
                             .div(totalStakes())) *
-                         (((getDay(block.timestamp).sub(getDay(time[_stakeholder]))).mul(100))
-                            .div(getDay(block.timestamp)))).div(10000);
+                         ((((_time).sub(time[_stakeholder])).mul(100))
+                            .div(_time))).div(10000);
        return reward;
    }
 
    /**
     * @notice A method to distribute rewards to all stakeholders. Should be called at the end of the month.
     */
-   function distributeRewards()
+   function distributeRewards(uint256 time)
        public
        onlyOwner
    {
        for (uint256 s = 0; s < stakeholders.length; s += 1){
            address stakeholder = stakeholders[s];
-           uint256 reward = calculateReward(stakeholder);
+           uint256 reward = calculateReward(stakeholder, time);
            rewards[stakeholder] = rewards[stakeholder].add(reward);
        }
     }
@@ -307,38 +279,6 @@ contract Staking is ERC20, Ownable {
        dtxToken.transfer(msg.sender, reward);
        _mint(address(this), reward);
    }
-
-    uint constant SECONDS_PER_DAY = 24 * 60 * 60;
-    uint constant SECONDS_PER_HOUR = 60 * 60;
-    uint constant SECONDS_PER_MINUTE = 60;
-    int constant OFFSET19700101 = 2440588;
-
-    function getDay(uint timestamp) public view returns (uint day) {
-        (,,day) = _daysToDate(timestamp / SECONDS_PER_DAY);
-    }
-
-    /**
-    * @notice Methods to enable to compute the number of days from a block.timestamp
-    */
-
-    function _daysToDate(uint _days) public view returns (uint year, uint month, uint day) {
-        int __days = int(_days);
-
-        int L = __days + 68569 + OFFSET19700101;
-        int N = 4 * L / 146097;
-        L = L - (146097 * N + 3) / 4;
-        int _year = 4000 * (L + 1) / 1461001;
-        L = L - 1461 * _year / 4 + 31;
-        int _month = 80 * L / 2447;
-        int _day = L - 2447 * _month / 80;
-        L = _month / 11;
-        _month = _month + 2 - 12 * L;
-        _year = 100 * (N - 49) + _year + L;
-
-        year = uint(_year);
-        month = uint(_month);
-        day = uint(_day);
-    }
 }
 
 
