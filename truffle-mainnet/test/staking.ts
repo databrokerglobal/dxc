@@ -70,7 +70,7 @@ contract('Staking', async accounts => {
         // Ratio time staking remained on the program: 
         // - Staking time: 10
         // PandL = 1000 * (2000/2000) * (30-20/30) 
-        // Attention I have a decimal issue that's why the BN
+        // Attention: I have a decimal issue that's why the BN
 
         await stk.createStake(web3.utils.toWei('1000'), web3.utils.toWei('20'));
         expect(
@@ -90,42 +90,42 @@ contract('Staking', async accounts => {
 
     it('Withraw all rewards check', async () => {
 
-      await stk.distributeRewards(web3.utils.toWei('30'));  
-      await stk.withdrawAllReward();  
-      const rewardOf = await stk.rewardOf(accounts[0].toString());      
-      expect(
-          web3.utils.toWei(rewardOf).toString()
-          ).to.be.equal('0');
+        await stk.distributeRewards(web3.utils.toWei('30'));  
+        await stk.withdrawAllReward();  
+        const rewardOf = await stk.rewardOf(accounts[0].toString());      
+        expect(
+            web3.utils.toWei(rewardOf).toString()
+            ).to.be.equal('0');
     });
 
     it('Full user workflow', async () => {
-      // To enable accounts[1] to trnasfer DTX
-      await dtxInstance.increaseAllowance(
-        accounts[1],
-        web3.utils.toWei('1000')
-      );
-      
-      // To enable transferFrom from the staking contract
-      await dtxInstance.increaseAllowance(
-          stk.address,
+        // To enable accounts[1] to trnasfer DTX
+        await dtxInstance.increaseAllowance(
+          accounts[1],
           web3.utils.toWei('1000')
         );
+        
+        // To enable transferFrom from the staking contract
+        await dtxInstance.increaseAllowance(
+            stk.address,
+            web3.utils.toWei('1000')
+          );
 
-      // To create a monthly reward
-      await dtxInstance.transferFrom(accounts[0],
-          stk.address, web3.utils.toWei('1000'));
-      // So that accounts[1] has funds
-      await dtxInstance.transferFrom(accounts[0],
-        accounts[1], web3.utils.toWei('1000'));
+        // To create a monthly reward
+        await dtxInstance.transferFrom(accounts[0],
+            stk.address, web3.utils.toWei('1000'));
+        // So that accounts[1] has funds
+        await dtxInstance.transferFrom(accounts[0],
+          accounts[1], web3.utils.toWei('1000'));
 
-      await stk.createStake(web3.utils.toWei('1000'), web3.utils.toWei('20'));
-      await stk.distributeRewards(web3.utils.toWei('30'));  
-      await stk.withdrawReward();
-      const rewardOf = await stk.rewardOf(accounts[1].toString()); 
+        await stk.createStake(web3.utils.toWei('1000'), web3.utils.toWei('20'));
+        await stk.distributeRewards(web3.utils.toWei('30'));  
+        await stk.withdrawReward();
+        const rewardOf = await stk.rewardOf(accounts[1].toString()); 
 
-      expect(
-          web3.utils.toWei(rewardOf).toString()
-          ).to.be.equal('0');
+        expect(
+            web3.utils.toWei(rewardOf).toString()
+            ).to.be.equal('0');
     });
   });
 });
