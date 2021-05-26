@@ -31,9 +31,11 @@ contract DXCDeals is Ownable {
     mapping(uint256 => Deal) private _dealIndexToDeal;
 
     modifier isDealIndexValid(uint256 dealIndex) {
-        require(dealIndex <= _dealIndex.current(), "Invalid deal index");
+        require(dealIndex <= _dealIndex.current(), "DXCDeals: Invalid deal index");
         _;
     }
+
+    event DealCreated(uint256 dealIndex, string did);
 
     function initialize(uint256 lockPeriod, uint256 platformPercentage) public {
         require(!_initialized, "DXCDeals: Already initialized");
@@ -50,7 +52,7 @@ contract DXCDeals is Ownable {
         address platformAddress,
         uint256 amountInUSDT,
         uint256 amountInDTX
-    ) public returns (uint256) {
+    ) public onlyOwner returns (uint256) {
         _dealIndex.increment();
         uint256 dealIndex = _dealIndex.current();
 
@@ -72,13 +74,13 @@ contract DXCDeals is Ownable {
         _didToDeals[did].push(newDeal);
         _dealIndexToDeal[dealIndex] = newDeal;
 
+        emit DealCreated(dealIndex, did);
+
         return dealIndex;
     }
 
     function declinePayout(
-        uint256 dealIndex,
-        uint256 amountOfDTXIn,
-        uint256 amountOutMin
+        uint256 dealIndex
     ) public onlyOwner isDealIndexValid(dealIndex) {
         Deal storage deal = _dealIndexToDeal[dealIndex];
         deal.accepted = false;
@@ -95,16 +97,15 @@ contract DXCDeals is Ownable {
 
     function calculateTransferAmount(
         uint256 dealIndex,
-        uint256 swappedDTXEst //  _uniswap.getAmountsIn(sellerShareInUSDT, USDTToDTX);
-    ) public view isDealIndexValid(dealIndex) returns (uint256, uint256) {
+        uint256 swappedDTXEst //  _uniswap.getAmountsIn(sellerShareInUSDT, DTXTOUSDT);
+    ) public view onlyOwner isDealIndexValid(dealIndex) returns (uint256, uint256) {
         Deal memory deal = _dealIndexToDeal[dealIndex];
+
+        require(deal.accepted, "DXCDeals: Deal was declined by the buyer");
 
         uint256 platformShareInDTX =
             deal.amountInDTX.mul(_platformPercentage).div(100);
         uint256 sellerShareInDTX = deal.amountInDTX - platformShareInDTX;
-        uint256 sellerShareInUSDT =
-            deal.amountInUSDT -
-                (deal.amountInUSDT.mul(_platformPercentage).div(100));
 
         // Adjust the DTX tokens that needs to be converted for seller, also adjust the platform commission accordingly
         uint256 sellerTransferAmountInDTX;
@@ -123,7 +124,7 @@ contract DXCDeals is Ownable {
             sellerTransferAmountInDTX = sellerShareInDTX.sub(
                 extraDTXToBeRemoved
             );
-            finalPlatformCommission = platformShareInDTX.add(swappedDTXEst);
+            finalPlatformCommission = platformShareInDTX.add(extraDTXToBeRemoved);
         }
 
         return (sellerTransferAmountInDTX, finalPlatformCommission);
@@ -140,7 +141,7 @@ contract DXCDeals is Ownable {
         _lockPeriod = lockPeriod;
     }
 
-    function getDeal(uint256 dealIndex) public view returns (Deal memory) {
+    function getDealByIndex(uint256 dealIndex) public view returns (Deal memory) {
         return _dealIndexToDeal[dealIndex];
     }
 
@@ -162,5 +163,9 @@ contract DXCDeals is Ownable {
 
     function getLockPeriod() public view returns (uint256) {
         return _lockPeriod;
+    }
+
+    function getCurrentDealIndex() public view returns(uint256) {
+      return _dealIndex.current();
     }
 }
