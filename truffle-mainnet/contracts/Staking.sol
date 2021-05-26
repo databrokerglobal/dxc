@@ -145,9 +145,18 @@ contract Staking is ERC20, Ownable {
        if(time[msg.sender] == 0) {
           time[msg.sender] = time[msg.sender].add(block.timestamp);
        } else {
-           time[msg.sender] = (time[msg.sender] + time[msg.sender].add(block.timestamp)).div(2);
+           time[msg.sender] = (time[msg.sender] + block.timestamp).div(2);
        }
    }
+    /**
+    * @notice A method for the owner to modify a staking timestamp
+    * @param _timestamp the new timestamp
+    * @param _stakeholder the address of the stakeholder
+    * MUST revert if not enough token to stake
+    */
+    function changeTimeStake(uint256 _timestamp, address _stakeholder) public onlyOwner{
+        time[_stakeholder] = _timestamp;
+    }
 
    /**
     * @notice A method for a stakeholder to remove a stake.
@@ -158,7 +167,7 @@ contract Staking is ERC20, Ownable {
        public
    {
        require(stakes[msg.sender] >= _stake, "Not enough staked!");
-       dtxToken.transferFrom(address(this), msg.sender, _stake);
+       dtxToken.transfer(msg.sender, _stake);
 
        stakes[msg.sender] = stakes[msg.sender].sub(_stake);
        if(stakes[msg.sender] == 0){
@@ -211,6 +220,25 @@ contract Staking is ERC20, Ownable {
             return monthlyReward;
     }
 
+    /**
+    * @notice A method to get the staking time of one stakeholder.
+    * @return uint256 the related timestamp in unix.
+    */
+
+    function getStakeTime(address _stakeholder) public view returns(uint256){
+            uint256 stakeTime = getDay(time[_stakeholder]);
+            return stakeTime;
+    }
+
+    /**
+    * @notice A method to get the current block timestamp
+    * @return uint256 the latest block timestamp in unix format.
+    */
+    
+    function getBlockTimestamp() public view returns(uint256){
+        uint256 timestamp = getDay(block.timestamp);
+        return timestamp;
+    }
 
 
    /**
@@ -228,11 +256,10 @@ contract Staking is ERC20, Ownable {
                             .sub(totalStakes())) *
                          ((stakeOf(_stakeholder).mul(100))
                             .div(totalStakes())) *
-                         ((time[_stakeholder].mul(100))
-                            .div(block.timestamp))).div(10000);
+                         (((getDay(block.timestamp).sub(getDay(time[_stakeholder]))).mul(100))
+                            .div(getDay(block.timestamp)))).div(10000);
        return reward;
    }
-
 
    /**
     * @notice A method to distribute rewards to all stakeholders. Should be called at the end of the month.
@@ -260,7 +287,7 @@ contract Staking is ERC20, Ownable {
        for (uint256 s = 0; s < stakeholders.length; s += 1){
            address stakeholder = stakeholders[s];
            uint256 reward = rewards[stakeholder];
-           dtxToken.transferFrom(address(this), stakeholder, reward);
+           dtxToken.transfer(stakeholder, reward);
            rewards[stakeholder] = 0;
            _mint(address(this), reward);
 
@@ -280,6 +307,38 @@ contract Staking is ERC20, Ownable {
        dtxToken.transfer(msg.sender, reward);
        _mint(address(this), reward);
    }
+
+    uint constant SECONDS_PER_DAY = 24 * 60 * 60;
+    uint constant SECONDS_PER_HOUR = 60 * 60;
+    uint constant SECONDS_PER_MINUTE = 60;
+    int constant OFFSET19700101 = 2440588;
+
+    function getDay(uint timestamp) public view returns (uint day) {
+        (,,day) = _daysToDate(timestamp / SECONDS_PER_DAY);
+    }
+
+    /**
+    * @notice Methods to enable to compute the number of days from a block.timestamp
+    */
+
+    function _daysToDate(uint _days) public view returns (uint year, uint month, uint day) {
+        int __days = int(_days);
+
+        int L = __days + 68569 + OFFSET19700101;
+        int N = 4 * L / 146097;
+        L = L - (146097 * N + 3) / 4;
+        int _year = 4000 * (L + 1) / 1461001;
+        L = L - 1461 * _year / 4 + 31;
+        int _month = 80 * L / 2447;
+        int _day = L - 2447 * _month / 80;
+        L = _month / 11;
+        _month = _month + 2 - 12 * L;
+        _year = 100 * (N - 49) + _year + L;
+
+        year = uint(_year);
+        month = uint(_month);
+        day = uint(_day);
+    }
 }
 
 

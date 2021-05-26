@@ -566,15 +566,19 @@
         "signature": "7185c75f0b599a5636b0559967d0c70053828c24307bfbea24dbeb9cbb5d7e1f"
       },
       "../types/truffle-contracts/index.d.ts": {
-        "version": "816bb7f76537d32ac7b7aac84e1073ab54da52fd44e8a2a57571d3c3651e463a",
-        "signature": "816bb7f76537d32ac7b7aac84e1073ab54da52fd44e8a2a57571d3c3651e463a"
+        "version": "a8f49145e0cb38c2dc7d31899c60441fe915ca62770bee498b769f12eca0faef",
+        "signature": "a8f49145e0cb38c2dc7d31899c60441fe915ca62770bee498b769f12eca0faef"
+      },
+      "../test/staking.ts": {
+        "version": "137237d1b0b36e326347edfe34bbb82a5421c25277a1ad90f1c9ea1e7b1c6c0b",
+        "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
       },
       "../migrations/1_initial_migration.ts": {
         "version": "b86f0433ff224a4e45506e85516f239144e8d89636b702962e9196f457aec6b3",
         "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
       },
-      "../migrations/2_staking_migrations.ts": {
-        "version": "382fa9af54275ba680af24380fe61a3a0cc91ad613e164265cc03aeb8c48ad40",
+      "../migrations/2_databroker_migration.ts": {
+        "version": "792f3a14442c10848e4ff6e82e7351c948830ec69c645678820daf1044f8bca5",
         "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
       },
       "../node_modules/@types/accepts/index.d.ts": {
@@ -1904,6 +1908,13 @@
         "../node_modules/@types/node/util.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts"
       ],
+      "../test/staking.ts": [
+        "../types/truffle-contracts/index.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
       "../migrations/1_initial_migration.ts": [
         "../types/truffle-contracts/index.d.ts",
         "../node_modules/@types/node/fs.d.ts",
@@ -1911,7 +1922,7 @@
         "../node_modules/@types/node/util.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts"
       ],
-      "../migrations/2_staking_migrations.ts": [
+      "../migrations/2_databroker_migration.ts": [
         "../types/truffle-contracts/index.d.ts",
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
@@ -2794,6 +2805,26 @@
         "../node_modules/@types/node/util.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts"
       ],
+      "../node_modules/querystring/decode.d.ts": [
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/querystring/encode.d.ts": [
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/querystring/index.d.ts": [
+        "../node_modules/querystring/decode.d.ts",
+        "../node_modules/querystring/encode.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
       "../node_modules/@types/node/url.d.ts": [
         "../node_modules/@types/node/querystring.d.ts",
         "../node_modules/@types/node/fs.d.ts",
@@ -2940,6 +2971,118 @@
         "../node_modules/@types/node/ts3.2/util.d.ts"
       ],
       "../node_modules/@types/bn.js/index.d.ts": [
+        "../node_modules/@types/node/ts3.2/index.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/@nomiclabs/ethereumjs-vm/dist/exceptions.d.ts": [
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/ethereumjs-util/node_modules/@types/bn.js/index.d.ts": [
+        "../node_modules/@types/node/ts3.2/index.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/rlp/dist/types.d.ts": [
+        "../node_modules/@types/bn.js/index.d.ts",
+        "../node_modules/@types/node/ts3.2/index.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/rlp/dist/index.d.ts": [
+        "../node_modules/rlp/dist/types.d.ts",
+        "../node_modules/@types/node/ts3.2/index.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/ethereumjs-util/dist/constants.d.ts": [
+        "../node_modules/@types/bn.js/index.d.ts",
+        "../node_modules/@types/node/ts3.2/index.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/ethereumjs-util/dist/account.d.ts": [
+        "../node_modules/@types/node/ts3.2/index.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/ethereumjs-util/dist/hash.d.ts": [
+        "../node_modules/rlp/dist/index.d.ts",
+        "../node_modules/@types/node/ts3.2/index.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/ethereumjs-util/dist/signature.d.ts": [
+        "../node_modules/@types/node/ts3.2/index.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/ethereumjs-util/dist/bytes.d.ts": [
+        "../node_modules/@types/bn.js/index.d.ts",
+        "../node_modules/@types/node/ts3.2/index.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/ethereumjs-util/dist/object.d.ts": [
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/ethereumjs-util/dist/index.d.ts": [
+        "../node_modules/@types/bn.js/index.d.ts",
+        "../node_modules/rlp/dist/index.d.ts",
+        "../node_modules/ethereumjs-util/dist/constants.d.ts",
+        "../node_modules/ethereumjs-util/dist/account.d.ts",
+        "../node_modules/ethereumjs-util/dist/hash.d.ts",
+        "../node_modules/ethereumjs-util/dist/signature.d.ts",
+        "../node_modules/ethereumjs-util/dist/bytes.d.ts",
+        "../node_modules/ethereumjs-util/dist/object.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/@nomiclabs/buidler/internal/buidler-evm/stack-traces/opcodes.d.ts": [
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/@nomiclabs/buidler/internal/buidler-evm/stack-traces/model.d.ts": [
+        "../node_modules/@nomiclabs/buidler/internal/buidler-evm/stack-traces/opcodes.d.ts",
+        "../node_modules/@types/node/ts3.2/index.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/@nomiclabs/buidler/internal/buidler-evm/stack-traces/message-trace.d.ts": [
+        "../node_modules/@nomiclabs/ethereumjs-vm/dist/exceptions.d.ts",
+        "../node_modules/ethereumjs-util/dist/index.d.ts",
+        "../node_modules/@nomiclabs/buidler/internal/buidler-evm/stack-traces/model.d.ts",
+        "../node_modules/@types/bn.js/index.d.ts",
         "../node_modules/@types/node/ts3.2/index.d.ts",
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
@@ -3118,7 +3261,7 @@
         "../node_modules/@types/node/net.d.ts",
         "../node_modules/web3/node_modules/web3-core-helpers/types/index.d.ts",
         "../node_modules/web3/node_modules/web3-core-method/types/index.d.ts",
-        "../node_modules/web3/node_modules/@types/bn.js/index.d.ts",
+        "../node_modules/@types/bn.js/index.d.ts",
         "../node_modules/web3/node_modules/bignumber.js/bignumber.d.ts",
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
@@ -3132,7 +3275,7 @@
         "../node_modules/@types/node/ts3.2/util.d.ts"
       ],
       "../node_modules/web3/node_modules/web3-utils/types/index.d.ts": [
-        "../node_modules/web3/node_modules/@types/bn.js/index.d.ts",
+        "../node_modules/@types/bn.js/index.d.ts",
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/util.d.ts",
@@ -3153,7 +3296,7 @@
         "../node_modules/@types/node/ts3.2/util.d.ts"
       ],
       "../node_modules/web3/node_modules/web3-eth-contract/types/index.d.ts": [
-        "../node_modules/web3/node_modules/@types/bn.js/index.d.ts",
+        "../node_modules/@types/bn.js/index.d.ts",
         "../node_modules/web3/node_modules/web3-core/types/index.d.ts",
         "../node_modules/web3/node_modules/web3-utils/types/index.d.ts",
         "../node_modules/@types/node/fs.d.ts",
@@ -3205,7 +3348,7 @@
         "../node_modules/web3/node_modules/web3-net/types/index.d.ts",
         "../node_modules/web3/node_modules/web3-utils/types/index.d.ts",
         "../node_modules/web3/node_modules/bignumber.js/bignumber.d.ts",
-        "../node_modules/web3/node_modules/@types/bn.js/index.d.ts",
+        "../node_modules/@types/bn.js/index.d.ts",
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/util.d.ts",
@@ -3247,191 +3390,6 @@
       "../types/truffle-contracts/index.d.ts": [
         "../node_modules/@types/bn.js/index.d.ts",
         "../node_modules/truffle-typings/index.d.ts",
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/@types/ethereumjs-abi/index.d.ts": [
-        "../node_modules/@types/node/ts3.2/index.d.ts",
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/@types/faker/index.d.ts": [
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/@types/lru-cache/index.d.ts": [
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/@types/mkdirp/index.d.ts": [
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/index.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/@types/pbkdf2/index.d.ts": [
-        "../node_modules/@types/node/ts3.2/index.d.ts",
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/@types/prettier/index.d.ts": [
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/@types/resolve/index.d.ts": [
-        "../node_modules/@types/node/ts3.2/index.d.ts",
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/@types/secp256k1/index.d.ts": [
-        "../node_modules/@types/node/ts3.2/index.d.ts",
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/querystring/decode.d.ts": [
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/querystring/encode.d.ts": [
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/querystring/index.d.ts": [
-        "../node_modules/querystring/decode.d.ts",
-        "../node_modules/querystring/encode.d.ts",
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/@nomiclabs/ethereumjs-vm/dist/exceptions.d.ts": [
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/ethereumjs-util/node_modules/@types/bn.js/index.d.ts": [
-        "../node_modules/@types/node/ts3.2/index.d.ts",
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/rlp/dist/types.d.ts": [
-        "../node_modules/@types/bn.js/index.d.ts",
-        "../node_modules/@types/node/ts3.2/index.d.ts",
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/rlp/dist/index.d.ts": [
-        "../node_modules/rlp/dist/types.d.ts",
-        "../node_modules/@types/node/ts3.2/index.d.ts",
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/ethereumjs-util/dist/constants.d.ts": [
-        "../node_modules/@types/bn.js/index.d.ts",
-        "../node_modules/@types/node/ts3.2/index.d.ts",
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/ethereumjs-util/dist/account.d.ts": [
-        "../node_modules/@types/node/ts3.2/index.d.ts",
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/ethereumjs-util/dist/hash.d.ts": [
-        "../node_modules/rlp/dist/index.d.ts",
-        "../node_modules/@types/node/ts3.2/index.d.ts",
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/ethereumjs-util/dist/signature.d.ts": [
-        "../node_modules/@types/node/ts3.2/index.d.ts",
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/ethereumjs-util/dist/bytes.d.ts": [
-        "../node_modules/@types/bn.js/index.d.ts",
-        "../node_modules/@types/node/ts3.2/index.d.ts",
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/ethereumjs-util/dist/object.d.ts": [
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/ethereumjs-util/dist/index.d.ts": [
-        "../node_modules/@types/bn.js/index.d.ts",
-        "../node_modules/rlp/dist/index.d.ts",
-        "../node_modules/ethereumjs-util/dist/constants.d.ts",
-        "../node_modules/ethereumjs-util/dist/account.d.ts",
-        "../node_modules/ethereumjs-util/dist/hash.d.ts",
-        "../node_modules/ethereumjs-util/dist/signature.d.ts",
-        "../node_modules/ethereumjs-util/dist/bytes.d.ts",
-        "../node_modules/ethereumjs-util/dist/object.d.ts",
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/@nomiclabs/buidler/internal/buidler-evm/stack-traces/opcodes.d.ts": [
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/@nomiclabs/buidler/internal/buidler-evm/stack-traces/model.d.ts": [
-        "../node_modules/@nomiclabs/buidler/internal/buidler-evm/stack-traces/opcodes.d.ts",
-        "../node_modules/@types/node/ts3.2/index.d.ts",
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts"
-      ],
-      "../node_modules/@nomiclabs/buidler/internal/buidler-evm/stack-traces/message-trace.d.ts": [
-        "../node_modules/@nomiclabs/ethereumjs-vm/dist/exceptions.d.ts",
-        "../node_modules/ethereumjs-util/dist/index.d.ts",
-        "../node_modules/@nomiclabs/buidler/internal/buidler-evm/stack-traces/model.d.ts",
-        "../node_modules/@types/bn.js/index.d.ts",
-        "../node_modules/@types/node/ts3.2/index.d.ts",
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/util.d.ts",
@@ -3553,6 +3511,19 @@
         "../node_modules/@types/node/util.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts"
       ],
+      "../node_modules/@types/ethereumjs-abi/index.d.ts": [
+        "../node_modules/@types/node/ts3.2/index.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/@types/faker/index.d.ts": [
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
       "../node_modules/@types/fs-capacitor/index.d.ts": [
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/index.d.ts",
@@ -3617,6 +3588,19 @@
         "../node_modules/@types/node/util.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts"
       ],
+      "../node_modules/@types/lru-cache/index.d.ts": [
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/@types/mkdirp/index.d.ts": [
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/index.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
       "../node_modules/@types/node-fetch/node_modules/form-data/index.d.ts": [
         "../node_modules/@types/node/stream.d.ts",
         "../node_modules/@types/node/http.d.ts",
@@ -3637,6 +3621,33 @@
         "../node_modules/@types/node/http.d.ts",
         "../node_modules/@types/node/url.d.ts",
         "../node_modules/@types/node-fetch/externals.d.ts",
+        "../node_modules/@types/node/ts3.2/index.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/@types/pbkdf2/index.d.ts": [
+        "../node_modules/@types/node/ts3.2/index.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/@types/prettier/index.d.ts": [
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/@types/resolve/index.d.ts": [
+        "../node_modules/@types/node/ts3.2/index.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../node_modules/@types/secp256k1/index.d.ts": [
         "../node_modules/@types/node/ts3.2/index.d.ts",
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
@@ -3850,44 +3861,6 @@
       "../node_modules/typescript/lib/lib.es2020.bigint.d.ts",
       "../node_modules/typescript/lib/lib.esnext.intl.d.ts",
       "../node_modules/typescript/lib/lib.es2018.full.d.ts",
-      "../node_modules/querystring/decode.d.ts",
-      "../node_modules/querystring/encode.d.ts",
-      "../node_modules/querystring/index.d.ts",
-      "../node_modules/@types/bn.js/index.d.ts",
-      "../node_modules/@nomiclabs/ethereumjs-vm/dist/exceptions.d.ts",
-      "../node_modules/ethereumjs-util/node_modules/@types/bn.js/index.d.ts",
-      "../node_modules/rlp/dist/types.d.ts",
-      "../node_modules/rlp/dist/index.d.ts",
-      "../node_modules/ethereumjs-util/dist/constants.d.ts",
-      "../node_modules/ethereumjs-util/dist/account.d.ts",
-      "../node_modules/ethereumjs-util/dist/hash.d.ts",
-      "../node_modules/ethereumjs-util/dist/signature.d.ts",
-      "../node_modules/ethereumjs-util/dist/bytes.d.ts",
-      "../node_modules/ethereumjs-util/dist/object.d.ts",
-      "../node_modules/ethereumjs-util/dist/index.d.ts",
-      "../node_modules/@nomiclabs/buidler/internal/buidler-evm/stack-traces/opcodes.d.ts",
-      "../node_modules/@nomiclabs/buidler/internal/buidler-evm/stack-traces/model.d.ts",
-      "../node_modules/@nomiclabs/buidler/internal/buidler-evm/stack-traces/message-trace.d.ts",
-      "../node_modules/@nomiclabs/buidler/types.d.ts",
-      "../node_modules/@nomiclabs/buidler/internal/core/config/config-env.d.ts",
-      "../node_modules/@nomiclabs/buidler/internal/core/errors-list.d.ts",
-      "../node_modules/@nomiclabs/buidler/internal/core/errors.d.ts",
-      "../node_modules/@nomiclabs/buidler/internal/context.d.ts",
-      "../node_modules/@nomiclabs/buidler/internal/constants.d.ts",
-      "../node_modules/@nomiclabs/buidler/plugins.d.ts",
-      "../node_modules/web3/node_modules/web3-core/types/index.d.ts",
-      "../node_modules/web3/node_modules/web3-utils/types/index.d.ts",
-      "../node_modules/web3/node_modules/web3-eth-contract/types/index.d.ts",
-      "../node_modules/web3/node_modules/web3-eth/types/index.d.ts",
-      "../types/truffle-contracts/index.d.ts",
-      "../node_modules/@types/accepts/index.d.ts",
-      "../node_modules/@types/connect/index.d.ts",
-      "../node_modules/@types/body-parser/index.d.ts",
-      "../node_modules/@types/content-disposition/index.d.ts",
-      "../node_modules/@types/keygrip/index.d.ts",
-      "../node_modules/@types/range-parser/index.d.ts",
-      "../node_modules/@types/qs/index.d.ts",
-      "../node_modules/@types/express-serve-static-core/index.d.ts",
       "../node_modules/@types/mocha/index.d.ts",
       "../node_modules/@types/node/globals.d.ts",
       "../node_modules/@types/node/async_hooks.d.ts",
@@ -3922,6 +3895,9 @@
       "../node_modules/@types/node/tls.d.ts",
       "../node_modules/@types/node/trace_events.d.ts",
       "../node_modules/@types/node/tty.d.ts",
+      "../node_modules/querystring/decode.d.ts",
+      "../node_modules/querystring/encode.d.ts",
+      "../node_modules/querystring/index.d.ts",
       "../node_modules/@types/node/url.d.ts",
       "../node_modules/@types/node/util.d.ts",
       "../node_modules/@types/node/v8.d.ts",
@@ -3938,16 +3914,38 @@
       "../node_modules/ts-essentials/dist/types.d.ts",
       "../node_modules/ts-essentials/dist/functions.d.ts",
       "../node_modules/ts-essentials/dist/index.d.ts",
+      "../node_modules/@types/bn.js/index.d.ts",
+      "../node_modules/@nomiclabs/ethereumjs-vm/dist/exceptions.d.ts",
+      "../node_modules/ethereumjs-util/node_modules/@types/bn.js/index.d.ts",
+      "../node_modules/rlp/dist/types.d.ts",
+      "../node_modules/rlp/dist/index.d.ts",
+      "../node_modules/ethereumjs-util/dist/constants.d.ts",
+      "../node_modules/ethereumjs-util/dist/account.d.ts",
+      "../node_modules/ethereumjs-util/dist/hash.d.ts",
+      "../node_modules/ethereumjs-util/dist/signature.d.ts",
+      "../node_modules/ethereumjs-util/dist/bytes.d.ts",
+      "../node_modules/ethereumjs-util/dist/object.d.ts",
+      "../node_modules/ethereumjs-util/dist/index.d.ts",
+      "../node_modules/@nomiclabs/buidler/internal/buidler-evm/stack-traces/opcodes.d.ts",
+      "../node_modules/@nomiclabs/buidler/internal/buidler-evm/stack-traces/model.d.ts",
+      "../node_modules/@nomiclabs/buidler/internal/buidler-evm/stack-traces/message-trace.d.ts",
       "../node_modules/@nomiclabs/buidler/internal/core/params/argumenttypes.d.ts",
+      "../node_modules/@nomiclabs/buidler/types.d.ts",
+      "../node_modules/@nomiclabs/buidler/internal/core/config/config-env.d.ts",
       "../node_modules/@nomiclabs/buidler/config.d.ts",
       "../solcconfig.json",
       "../buidler.config.ts",
       "../node_modules/@types/chai/index.d.ts",
+      "../node_modules/@nomiclabs/buidler/internal/core/errors-list.d.ts",
+      "../node_modules/@nomiclabs/buidler/internal/core/errors.d.ts",
       "../node_modules/@nomiclabs/buidler/internal/artifacts.d.ts",
       "../node_modules/@nomiclabs/buidler/internal/util/lazy.d.ts",
       "../node_modules/@nomiclabs/buidler/internal/core/config/extenders.d.ts",
       "../node_modules/@nomiclabs/buidler/internal/core/tasks/dsl.d.ts",
+      "../node_modules/@nomiclabs/buidler/internal/context.d.ts",
       "../node_modules/@nomiclabs/buidler/internal/core/plugins.d.ts",
+      "../node_modules/@nomiclabs/buidler/internal/constants.d.ts",
+      "../node_modules/@nomiclabs/buidler/plugins.d.ts",
       "../node_modules/@nomiclabs/buidler-truffle5/src/constants.ts",
       "../node_modules/@nomiclabs/buidler-truffle5/src/types.ts",
       "../node_modules/@nomiclabs/buidler-truffle5/src/provisioner.ts",
@@ -3959,18 +3957,31 @@
       "../node_modules/web3/node_modules/web3-core-method/types/index.d.ts",
       "../node_modules/web3/node_modules/@types/bn.js/index.d.ts",
       "../node_modules/web3/node_modules/bignumber.js/bignumber.d.ts",
+      "../node_modules/web3/node_modules/web3-core/types/index.d.ts",
       "../node_modules/web3/node_modules/web3-core-subscriptions/types/index.d.ts",
+      "../node_modules/web3/node_modules/web3-utils/types/index.d.ts",
       "../node_modules/web3/node_modules/web3-eth-abi/types/index.d.ts",
       "../node_modules/web3/node_modules/web3-eth-accounts/types/index.d.ts",
+      "../node_modules/web3/node_modules/web3-eth-contract/types/index.d.ts",
       "../node_modules/web3/node_modules/web3-eth-ens/types/index.d.ts",
       "../node_modules/web3/node_modules/web3-eth-iban/types/index.d.ts",
       "../node_modules/web3/node_modules/web3-eth-personal/types/index.d.ts",
       "../node_modules/web3/node_modules/web3-net/types/index.d.ts",
+      "../node_modules/web3/node_modules/web3-eth/types/index.d.ts",
       "../node_modules/web3/node_modules/web3-shh/types/index.d.ts",
       "../node_modules/web3/types/index.d.ts",
       "../node_modules/truffle-typings/index.d.ts",
+      "../types/truffle-contracts/index.d.ts",
       "../migrations/1_initial_migration.ts",
-      "../migrations/2_staking_migrations.ts",
+      "../migrations/2_databroker_migration.ts",
+      "../node_modules/@types/accepts/index.d.ts",
+      "../node_modules/@types/connect/index.d.ts",
+      "../node_modules/@types/body-parser/index.d.ts",
+      "../node_modules/@types/content-disposition/index.d.ts",
+      "../node_modules/@types/keygrip/index.d.ts",
+      "../node_modules/@types/range-parser/index.d.ts",
+      "../node_modules/@types/qs/index.d.ts",
+      "../node_modules/@types/express-serve-static-core/index.d.ts",
       "../node_modules/@types/mime/index.d.ts",
       "../node_modules/@types/serve-static/index.d.ts",
       "../node_modules/@types/express/index.d.ts",
@@ -4017,7 +4028,8 @@
       "../../../node_modules/@types/web3/eth/contract.d.ts",
       "../../../node_modules/@types/web3/eth/accounts.d.ts",
       "../../../node_modules/@types/web3/eth/index.d.ts",
-      "../../../node_modules/@types/web3/index.d.ts"
+      "../../../node_modules/@types/web3/index.d.ts",
+      "../test/staking.ts"
     ]
   },
   "version": "3.8.3"

@@ -1,0 +1,136 @@
+{
+  "manifestVersion": "3.2",
+  "admin": {
+    "address": "0x4dF5FF26f6a5F4570eFa0c15100923994D73789E",
+    "txHash": "0x16bcc60517d09234145610657f786b4283ccd1c573c201f9d2f4410fec4fb33e"
+  },
+  "proxies": [
+    {
+      "address": "0xce5239a5c506A9134d0c86645AA28F3B1D1D654a",
+      "txHash": "0xa372ac357b023431e10fa645d5375d4df2fcfec3d3aec58569062e540d8e6460",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xFc1145c8729208a3d99415023D6BE84e45f8C94a",
+      "txHash": "0xe3abe3b0f725ddf68293bb06e381411216bc95c1270334b049ce10ca765c2769",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x566A774C9dDAF1265F07E9242C45D1765B3ED147",
+      "txHash": "0xce10611247d867ec7f4cbc1042032dc514096eb30d855a79808ef37862bf4ea9",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x148553bc94467d128f87dA99aFdf027b940d60Da",
+      "txHash": "0x0d6a50f8b032e8af234bb921df67c7e453f2966f17972053d16dbe8d885fa3f5",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x9B25d8A60968F9Cfc0a22E2cd6FeB78dF12080aF",
+      "txHash": "0x7c9eb5accbf0617133dc3ac6d3d69438dbeeb3ac5b5cd404639f055dabb74bbe",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xC5b99deFEd030Fe84c20DCFc69c1f5Aa1955A4E6",
+      "txHash": "0x6d262f80b949e414092107a7d8a90876a7b8fa70405b29a857c5233464896aa7",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xa2a81FFc1D21c7094c5148121ef3B1d788484B01",
+      "txHash": "0x668181ab98698bd04b8d8d668265400191e57847ebd7ae4bdd7f5edd40570188",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x5230d5E3A141e1bd3BB7562Dfb728002E90050B4",
+      "txHash": "0xa78693fef40bc37d2345a34b462fa5cc44754f4842d3d484c8d00b06b7dd2984",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xA6C3B161CAA63b84BEa677fbEb571Abefe48f276",
+      "txHash": "0xfca22d003401c33e943057b79c92e3f879874aabc238d5e6dc122bacdf7116c3",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xC4c396B195a51d4b5ca6351ca85b1ED58e20C81E",
+      "txHash": "0xd2b79c11294a9c187de0ec996ebc1242e53d290333caa2b2e3893bd4501d464e",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xE084d2a507c045972EDBc853D86d856cCae6D3F9",
+      "txHash": "0x9c4ed37e4b00dc2da098db43a9565ae7640bdb49d759aa108c3ffc28625707d8",
+      "kind": "transparent"
+    }
+  ],
+  "impls": {
+    "70eff770ebdb2e8cf12f3e3911a0c989610097fa8cd3f108d6e76573f3894c59": {
+      "address": "0xa25c0dFE7dff34CEFE4981464654EEFe5861F7BC",
+      "txHash": "0x9e2e6141dbf4bc7b05d78ecea1bff8a5ba3b5a4d8cbe311a10de96b4619265a6",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Ownable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "access/Ownable.sol:20"
+          },
+          {
+            "contract": "Ownable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "access/Ownable.sol:21"
+          },
+          {
+            "contract": "Databroker",
+            "label": "_uniswap",
+            "type": "t_contract(IUniswap)1171",
+            "src": "Databroker.sol:8"
+          },
+          {
+            "contract": "Databroker",
+            "label": "_usdtToken",
+            "type": "t_contract(IERC20)1756",
+            "src": "Databroker.sol:9"
+          },
+          {
+            "contract": "Databroker",
+            "label": "_dtxToken",
+            "type": "t_contract(IERC20)1756",
+            "src": "Databroker.sol:10"
+          },
+          {
+            "contract": "Databroker",
+            "label": "_wyreWalletAddress",
+            "type": "t_address",
+            "src": "Databroker.sol:12"
+          },
+          {
+            "contract": "Databroker",
+            "label": "_dtxStakingAddress",
+            "type": "t_address",
+            "src": "Databroker.sol:13"
+          },
+          {
+            "contract": "Databroker",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "Databroker.sol:14"
+          }
+        ],
+        "types": {
+          "t_contract(IUniswap)1171": {
+            "label": "contract IUniswap"
+          },
+          "t_contract(IERC20)1756": {
+            "label": "contract IERC20"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
+    }
+  }
+}
