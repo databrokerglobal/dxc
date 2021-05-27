@@ -38,30 +38,37 @@ contract('Staking', async accounts => {
         expect(
           await (await dtxInstance.balanceOf(stk.address)).toString()
         ).to.be.equal(web3.utils.toWei('1000'));
-      });
+    });
 
     it('Montly reward should equal to 1000', async () => {
         expect(
           await (await stk.monthlyReward()).toString()
         ).to.be.equal(web3.utils.toWei('1000'));
-      });
+    });
 
     it('Can create a stake', async () => {
         expect(
             await stk.createStake(web3.utils.toWei('1000'), web3.utils.toWei('20')));
 
-      });
+    });
 
     it('Can remove a stake', async () => {
         expect(
             await stk.removeStake(web3.utils.toWei('1000')));
-      });
+    });
 
     it('Total stake should be 1000', async () => {
         await stk.createStake(web3.utils.toWei('1000'), web3.utils.toWei('20'));
         expect(
             await (await stk.monthlyReward()).toString()
             ).to.be.equal(web3.utils.toWei('1000'));
+    });
+
+    it('Random account should not be stakeholder', async () => {
+      const isStakeholder = ((await stk.isStakeholder(accounts[1])));
+      expect(
+          isStakeholder[0]
+          ).to.be.equal(false);
     });
 
     it('Calculate dummy PandL', async () => {
@@ -87,7 +94,16 @@ contract('Staking', async accounts => {
         expect(
             web3.utils.toWei(rewardOf).toString()
             ).to.be.equal(web3.utils.toWei('330000000000000000000').toString());
-      }); 
+    }); 
+
+    it('Total rewards should be correct', async () => {
+
+        await stk.distributeRewards(web3.utils.toWei('30'));  
+        const totalRewards = await stk.totalRewards();     
+        expect(
+            web3.utils.toWei(totalRewards).toString()
+            ).to.be.equal(web3.utils.toWei('660000000000000000000').toString());
+    }); 
 
     it('Withraw all rewards check', async () => {
 
@@ -150,7 +166,7 @@ contract('Staking', async accounts => {
       );
     });
 
-    it("should revert removeStake if the msg.sender does not have stake before or not enough stakes", async () => {
+    it("should revert removeStake if the msg.sender does not have stake before or not enough staked", async () => {
       await expectRevert(
         stk.removeStake(web3.utils.toWei('1000'), {from: accounts[1]}),
         "VM Exception while processing transaction: revert Not enough staked!"
