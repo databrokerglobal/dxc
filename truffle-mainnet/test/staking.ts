@@ -131,20 +131,46 @@ contract('Staking', async accounts => {
     it('Full user workflow', async () => {
       // To enable accounts[1] to trnasfer DTX
       await dtxInstance.increaseAllowance(
+        accounts[0],
+        web3.utils.toWei('1000000000'), {from: accounts[0]}
+      );
+      await dtxInstance.increaseAllowance(
         accounts[1],
-        web3.utils.toWei('1000'), {from: accounts[0]}
+        web3.utils.toWei('100000000'), {from: accounts[0]}
+      );
+      await dtxInstance.increaseAllowance(
+        stk.address,
+        web3.utils.toWei('100000000'), {from: accounts[0]}
+      );
+      await dtxInstance.increaseAllowance(
+        dtxInstance.address,
+        web3.utils.toWei('100000000'), {from: accounts[0]}
       );
 
       await stk.increaseAllowance(
-        accounts[1],
-        web3.utils.toWei('1000')
+        accounts[0],
+        web3.utils.toWei('100000000'), {from: accounts[0]}
       );
-      
+      await stk.increaseAllowance(
+        accounts[1],
+        web3.utils.toWei('100000000'), {from: accounts[0]}
+      );
+      await stk.increaseAllowance(
+        stk.address,
+        web3.utils.toWei('100000000'), {from: accounts[0]}
+      );
+
+      await stk.increaseAllowance(
+        dtxInstance.address,
+        web3.utils.toWei('100000000'), {from: accounts[0]}
+      );
+
+      console.log((await dtxInstance.allowance(accounts[0], accounts[1])).toString());
+      console.log((await stk.allowance(accounts[0], accounts[1])).toString());
+      console.log((await dtxInstance.allowance(accounts[0], stk.address)).toString());
+
       // To enable transferFrom from the staking contract
-      await dtxInstance.increaseAllowance(
-          stk.address,
-          web3.utils.toWei('1000')
-        );
+
 
       // To create a monthly reward
       await dtxInstance.transferFrom(accounts[0],
@@ -154,7 +180,7 @@ contract('Staking', async accounts => {
       await dtxInstance.transferFrom(accounts[0],
         accounts[1], web3.utils.toWei('1000'));
 
-      await stk.createStake(web3.utils.toWei('1000'), web3.utils.toWei('20'), {from: accounts[1]});
+      await stk.createStake(web3.utils.toWei('100'), web3.utils.toWei('20'), {from: accounts[1]});
       await stk.distributeRewards(web3.utils.toWei('30'), {from: accounts[0]} );  
       await stk.withdrawAllReward({from: accounts[0]});
       const rewardOf = await stk.rewardOf(accounts[1].toString()); 
