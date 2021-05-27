@@ -4,6 +4,7 @@ import {
     StakingInstance
 } from '../types/truffle-contracts';
 
+const {expectRevert} = require("@openzeppelin/test-helpers");
 
 const Staking: StakingContract = artifacts.require('Staking');
 const DTX: DTXContract = artifacts.require('DTX');
@@ -128,6 +129,34 @@ contract('Staking', async accounts => {
             ).to.be.equal('0');
     });
 
+    it("should revert distributeRewards if the msg.sender is not the owner", async () => {
+      await expectRevert(
+        stk.distributeRewards(20, {from: accounts[1]}),
+        "Ownable: caller is not the owner"
+      );
+    });
+
+    it("should revert withdrawAllreward if the msg.sender is not the owner", async () => {
+      await expectRevert(
+        stk.withdrawAllReward({from: accounts[1]}),
+        "Ownable: caller is not the owner"
+      );
+    });
+
+    it("should revert createStage if the msg.sender does not have enough allowance", async () => {
+      await expectRevert(
+        stk.createStake(web3.utils.toWei('1000'),web3.utils.toWei('20'), {from: accounts[1]}),
+        "VM Exception while processing transaction: revert ERC20: transfer amount exceeds allowance"
+      );
+    });
+
+    it("should revert removeStake if the msg.sender does not have stake before or not enough stakes", async () => {
+      await expectRevert(
+        stk.removeStake(web3.utils.toWei('1000'), {from: accounts[1]}),
+        "VM Exception while processing transaction: revert Not enough staked!"
+      );
+    });
+
     it('Full user workflow', async () => {
       // To enable accounts[1] to trnasfer DTX
       await dtxInstance.increaseAllowance(
@@ -188,6 +217,6 @@ contract('Staking', async accounts => {
       expect(
           web3.utils.toWei(rewardOf).toString()
           ).to.be.equal('0');
-  });
+    });
   });
 });
