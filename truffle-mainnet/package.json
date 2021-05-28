@@ -7,7 +7,7 @@
     "compile": "npx truffle compile && npx typechain --target truffle-v5 './build/contracts/*.json' && npx tsc --declaration",
     "lint": "npx buidler check",
     "test": "npx buidler test --show-stack-traces",
-    "migrate": "npx truffle compile --all && npx typechain --target truffle-v5 './build/contracts/*.json' && npx tsc --declaration && npx truffle migrate"
+    "migrate": "npx waffle && npx truffle compile --all && npx typechain --target truffle-v5 './build/contracts/*.json' && npx tsc --declaration && npx truffle migrate --reset"
   },
   "author": "Databroker",
   "license": "SEE LICENSE IN mint-license.txt",
@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.1.0",
+    "@openzeppelin/test-helpers": "^0.5.11",
     "@openzeppelin/truffle-upgrades": "^1.7.0",
     "@types/ethereumjs-abi": "^0.6.3",
     "axios": "^0.21.1",
@@ -41,6 +42,10 @@
     "@types/faker": "4.1.11",
     "@types/mocha": "7.0.2",
     "@types/node": "13.13.4",
+    "chai": "^4.3.4",
+    "ethereum-waffle": "^3.3.0",
+    "ethers": "^4.0.48",
+    "mocha": "^8.4.0",
     "prettier": "1.19.1",
     "prettier-plugin-solidity": "1.0.0-alpha.49",
     "solc": "^0.8.4",

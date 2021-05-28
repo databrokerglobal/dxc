@@ -14,7 +14,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "./access/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 
 contract Staking is ERC20, Ownable {
@@ -29,9 +29,8 @@ contract Staking is ERC20, Ownable {
     */
 
      constructor(address _owner, uint256 _supply, address _dtxToken)
-           public payable ERC20("DTXStaking", "DTXS")
+          payable ERC20("DTXStaking", "DTXS")
        {
-           initializeOwner();
            _mint(address(this), _supply);
            dtxToken = IERC20(_dtxToken);
        }
@@ -128,7 +127,7 @@ contract Staking is ERC20, Ownable {
   /**
     * @notice A method for a stakeholder to create a stake.
     * @param _stake The size of the stake to be created.
-    * 
+    *
     * MUST revert if not enough token to stake
     */
    function createStake(uint256 _stake, uint256 _time)

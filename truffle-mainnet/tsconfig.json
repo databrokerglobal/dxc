@@ -28,15 +28,21 @@
   "include": [
     "./scripts",
     "./test",
-    "./migrations"
+    "./migrations",
+    "./solcconfig.json",
+    "./waffle.json",
+    "./build",
+    "./build/IUniswap.json",
+    "./build/Databroker.json",
+    "./build/USDT.json",
+    "./build/DTX.json"
   ],
-  "exclude": [
-    "dist/**/*"
-  ],
+  "exclude": ["dist/**/*"],
   "files": [
     "./buidler.config.ts",
     "./node_modules/@nomiclabs/buidler-truffle5/src/type-extensions.d.ts",
     "./node_modules/@nomiclabs/buidler-web3/src/type-extensions.d.ts",
-    "./solcconfig.json"
+    "./solcconfig.json",
+    "./waffle.json"
   ]
 }

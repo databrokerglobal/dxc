@@ -12,129 +12,135 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./interfaces/IUniswap.sol";
-import "./access/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
 
 contract Databroker is Ownable {
-    IUniswap internal _uniswap;
-    IERC20 internal _usdtToken;
-    IERC20 internal _dtxToken;
+  IUniswap internal _uniswap;
+  IERC20 internal _usdtToken;
+  IERC20 internal _dtxToken;
 
-    address private _wyreWalletAddress;
-    address private _dtxStakingAddress;
-    bool private _initialized;
+  address private _wyreWalletAddress;
+  address private _dtxStakingAddress;
+  bool private _initialized;
 
-    event SwapTokens(
-        address fromToken,
-        address toToken,
-        uint256 amountIn,
-        uint256 amountOut,
-        address receiverAddress
+  event SwapTokens(
+    address fromToken,
+    address toToken,
+    uint256 amountIn,
+    uint256 amountOut,
+    address receiverAddress
+  );
+  event StakingTransfer(address stakingAddress, uint256 amount);
+
+  constructor(
+    address uniswap,
+    address usdtToken,
+    address dtxToken,
+    address wyreWalletAddress,
+    address dtxStakingAddress
+  ) public {
+    require(!_initialized, "Databroker: Already initialized");
+
+    require(
+      wyreWalletAddress != address(0),
+      "Databroker: Zero address for wyre wallet"
     );
-    event StakingTransfer(address stakingAddress, uint256 amount);
+    require(
+      dtxStakingAddress != address(0),
+      "Databroker: Zero address for dtx staking"
+    );
 
-    function initialize(
-        address uniswap,
-        address usdtToken,
-        address dtxToken,
-        address wyreWalletAddress,
-        address dtxStakingAddress
-    ) public {
-        require(!_initialized, "Databroker: Already initialized");
+    _uniswap = IUniswap(uniswap);
+    _usdtToken = IERC20(usdtToken);
+    _dtxToken = IERC20(dtxToken);
+    _wyreWalletAddress = wyreWalletAddress;
+    _dtxStakingAddress = dtxStakingAddress;
+    _initialized = true;
+  }
 
-        require(
-            wyreWalletAddress != address(0),
-            "Databroker: Zero address for wyre wallet"
-        );
-        require(
-            dtxStakingAddress != address(0),
-            "Databroker: Zero address for dtx staking"
-        );
+  function swapTokens(
+    uint256 amountIn,
+    uint256 amountOutMin,
+    address[] memory path,
+    address receiverAddress,
+    uint256 deadline
+  ) public onlyOwner returns (uint256) {
+    // Give approval for the uniswap to swap the USDT token from this contract address
+    IERC20(path[0]).approve(address(_uniswap), amountIn);
 
-        initializeOwner();
+    uint256[] memory amounts = _uniswap.swapExactTokensForTokens(
+      amountIn,
+      amountOutMin,
+      path,
+      receiverAddress,
+      deadline
+    );
 
-        _uniswap = IUniswap(uniswap);
-        _usdtToken = IERC20(usdtToken);
-        _dtxToken = IERC20(dtxToken);
-        _wyreWalletAddress = wyreWalletAddress;
-        _dtxStakingAddress = dtxStakingAddress;
-        _initialized = true;
-    }
+    emit SwapTokens(path[0], path[1], amountIn, amounts[1], receiverAddress);
 
-    function swapTokens(
-        uint256 amountIn,
-        uint256 amountOutMin,
-        address[] memory path,
-        address receiverAddress,
-        uint256 deadline
-    ) public onlyOwner returns (uint256) {
-        // Give approval for the uniswap to swap the USDT token from this contract address
-        IERC20(path[0]).approve(address(_uniswap), amountIn);
+    return amounts[1];
+  }
 
-        uint256[] memory amounts =
-            _uniswap.swapExactTokensForTokens(
-                amountIn,
-                amountOutMin,
-                path,
-                receiverAddress,
-                deadline
-            );
+  function payout(
+    uint256 sellerAmountInDTX,
+    uint256 sellerAmountOutMin,
+    uint256 platformAmountInDTX,
+    address[] memory DTXToUSDTPath,
+    uint256 deadline
+  ) public onlyOwner {
+    require(
+      _dtxToken.balanceOf(address(this)) >= platformAmountInDTX,
+      "Databroker: Insufficient DTX balance of contract"
+    );
 
-        emit SwapTokens(
-            path[0],
-            path[1],
-            amountIn,
-            amounts[1],
-            receiverAddress
-        );
+    // Seller USDT to wyre wallet address
+    swapTokens(
+      sellerAmountInDTX,
+      sellerAmountOutMin,
+      DTXToUSDTPath,
+      _wyreWalletAddress,
+      deadline
+    );
 
-        return amounts[1];
-    }
+    // Platform commission in DTX to staking contract
+    _dtxToken.transfer(_dtxStakingAddress, platformAmountInDTX);
 
-    function payout(
-        uint256 sellerAmountInDTX,
-        uint256 sellerAmountOutMin,
-        uint256 platformAmountInDTX,
-        address[] memory DTXToUSDTPath,
-        uint256 deadline
-    ) public onlyOwner {
-        // Seller USDT to wyre wallet address
-        swapTokens(
-            sellerAmountInDTX,
-            sellerAmountOutMin,
-            DTXToUSDTPath,
-            _wyreWalletAddress,
-            deadline
-        );
+    emit StakingTransfer(_dtxStakingAddress, platformAmountInDTX);
+  }
 
-        // Platform commission in DTX to staking contract
-        _dtxToken.transfer(_dtxStakingAddress, platformAmountInDTX);
+  function updateWyreWalletAddress(address wyreWalletAddress) public onlyOwner {
+    require(
+      wyreWalletAddress != address(0),
+      "Databroker: Zero address for wyre wallet"
+    );
+    _wyreWalletAddress = wyreWalletAddress;
+  }
 
-        emit StakingTransfer(_dtxStakingAddress, platformAmountInDTX);
-    }
+  function updateStakingAddress(address dtxStakingAddress) public onlyOwner {
+    require(
+      dtxStakingAddress != address(0),
+      "Databroker: Zero address for dtx staking"
+    );
+    _dtxStakingAddress = dtxStakingAddress;
+  }
 
-    function updateWyreWalletAddress(address wyreWalletAddress)
-        public
-        onlyOwner
-    {
-        require(
-            wyreWalletAddress != address(0),
-            "Databroker: Zero address for wyre wallet"
-        );
-        _wyreWalletAddress = wyreWalletAddress;
-    }
+  function withdrawDTX(address toAddress, uint256 dtxAmount) public onlyOwner {
+    _dtxToken.transfer(toAddress, dtxAmount);
+  }
 
-    function updateStakingAddress(address dtxStakingAddress) public onlyOwner {
-        require(
-            dtxStakingAddress != address(0),
-            "Databroker: Zero address for dtx staking"
-        );
-        _dtxStakingAddress = dtxStakingAddress;
-    }
+  function withdrawUSDT(address toAddress, uint256 usdtAmount)
+    public
+    onlyOwner
+  {
+    _usdtToken.transfer(toAddress, usdtAmount);
+  }
 
-    function withdrawDTX(address toAddress, uint256 dtxAmount)
-        public
-        onlyOwner
-    {
-        _dtxToken.transfer(toAddress, dtxAmount);
-    }
+  function getWyreWalletAddress() public view onlyOwner returns (address) {
+    return _wyreWalletAddress;
+  }
+
+  function getStakingAddress() public view onlyOwner returns (address) {
+    return _dtxStakingAddress;
+  }
 }
