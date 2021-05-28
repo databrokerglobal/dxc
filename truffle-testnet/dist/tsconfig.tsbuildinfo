@@ -274,8 +274,8 @@
         "signature": "ecba2e44af95b0599c269a92628cec22e752868bce37396740deb51a5c547a26"
       },
       "../node_modules/querystring/index.d.ts": {
-        "version": "0874e3175e0715c9d995b937285315d8ea30b4cc61735edf29eb09cc5e988e2e",
-        "signature": "0874e3175e0715c9d995b937285315d8ea30b4cc61735edf29eb09cc5e988e2e"
+        "version": "46a9fb41a8f3bc7539eeebc15a6e04b9e55d7537a081615ad3614220d34c3e0f",
+        "signature": "46a9fb41a8f3bc7539eeebc15a6e04b9e55d7537a081615ad3614220d34c3e0f"
       },
       "../node_modules/@types/node/url.d.ts": {
         "version": "826d48e49c905cedb906cbde6ccaf758827ff5867d4daa006b5a79e0fb489357",
@@ -334,12 +334,12 @@
         "signature": "54ea442bb9a7ad68d3abf67b001e3b7d14eb8ead7d80e832a205d1fbf7d1ff09"
       },
       "../node_modules/ts-essentials/dist/functions.d.ts": {
-        "version": "8df8edd6bd6f4ac85cd8bad520135f1b7c254b0863c2d53451d7b1f4a03cec58",
-        "signature": "8df8edd6bd6f4ac85cd8bad520135f1b7c254b0863c2d53451d7b1f4a03cec58"
+        "version": "a3a3fc88bc30e36aafe983b438073815acc7cad7c78e21d9047f7c562ffe5211",
+        "signature": "a3a3fc88bc30e36aafe983b438073815acc7cad7c78e21d9047f7c562ffe5211"
       },
       "../node_modules/ts-essentials/dist/index.d.ts": {
-        "version": "050c7c338bf25c9aab8e484de5d29648c67364c62d910c376dcaafac74f3b60b",
-        "signature": "050c7c338bf25c9aab8e484de5d29648c67364c62d910c376dcaafac74f3b60b"
+        "version": "117d53e8b22b4b1bd0d8d0a83f0444baa285f1187b7430de0a3861b6e3a41515",
+        "signature": "117d53e8b22b4b1bd0d8d0a83f0444baa285f1187b7430de0a3861b6e3a41515"
       },
       "../node_modules/@nomiclabs/buidler/internal/core/params/argumenttypes.d.ts": {
         "version": "ee9830f9a5646b3c08ff77f2b1a0eec4baa0acd860f0ed5ccfd667bacdd47d56",
@@ -416,14 +416,14 @@
         "version": "7333e2ecf93b0d7d3781304591fd81ae89c740eb785e2ade8efa2535d1b2901d"
       },
       "../node_modules/@nomiclabs/buidler-truffle5/src/provisioner.ts": {
-        "version": "fc670c32d2ee5fd6f163fd8e531d96f043fda9f167fd23ac2f0cb88602003dca"
+        "version": "92b44460cbbf340e57406b2be71e98623aec713eaf2225825eae009047a6677a"
       },
       "../node_modules/@nomiclabs/buidler-truffle5/src/artifacts.ts": {
-        "version": "00e194a0d791b6c21cc149e5f043ed3bb1477bffa87481570baa54be3e909b80"
+        "version": "bcc713374c65204e8ddf3fb87c4c6ec6dae52ed496f33713e9dbd0f142f87b67"
       },
       "../node_modules/@nomiclabs/buidler-truffle5/src/type-extensions.d.ts": {
-        "version": "dc5972b9ca383be6cdd6e61c3ba977db6c5e0f9b088fb97d761ac44b7a4f1b13",
-        "signature": "dc5972b9ca383be6cdd6e61c3ba977db6c5e0f9b088fb97d761ac44b7a4f1b13"
+        "version": "a3b51f1ab6511b5b3416318359c420c962ea69a30f32e1047c16142b8700050a",
+        "signature": "a3b51f1ab6511b5b3416318359c420c962ea69a30f32e1047c16142b8700050a"
       },
       "../node_modules/@nomiclabs/buidler-web3/src/type-extensions.d.ts": {
         "version": "fe5ecd6b16cbb731673ee5eee012ad48fd510fe96606ecd8384c7e37ccb9f220",
@@ -506,8 +506,16 @@
         "signature": "7185c75f0b599a5636b0559967d0c70053828c24307bfbea24dbeb9cbb5d7e1f"
       },
       "../types/truffle-contracts/index.d.ts": {
-        "version": "35f63c7d785d611309984563957067746a012a98c50ffe1868ac3aebd3a2bdd3",
-        "signature": "35f63c7d785d611309984563957067746a012a98c50ffe1868ac3aebd3a2bdd3"
+        "version": "ad3febc2126836b6c7a9f8f75dc49f85813f881478e12600012821a6269ed245",
+        "signature": "ad3febc2126836b6c7a9f8f75dc49f85813f881478e12600012821a6269ed245"
+      },
+      "../test/dxcdeals.ts": {
+        "version": "56c38bb7026a031a8d66d67dd534e5b317dbca3f2951feacb93abd9912475aa7",
+        "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
+      },
+      "../test/migrations.ts": {
+        "version": "ca08f840f31246103816959f6d022b5f69b4719c735dbff8296881f0b0fbee02",
+        "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
       },
       "../migrations/1_initial_migration.ts": {
         "version": "b86f0433ff224a4e45506e85516f239144e8d89636b702962e9196f457aec6b3",
@@ -634,8 +642,8 @@
         "signature": "8fe9135b86994075c4192f3358a4350389e80d3abec712db2a82061962d9d21c"
       },
       "../node_modules/@types/node-fetch/index.d.ts": {
-        "version": "45807a862f1df7e1e529fee407a0a8715c6e9b98bcca2b4728bf07de782f47f3",
-        "signature": "45807a862f1df7e1e529fee407a0a8715c6e9b98bcca2b4728bf07de782f47f3"
+        "version": "e0014889f31fee76a572b6b15e74b2174cbcf6346ae8ab5c69eb553a10e5c944",
+        "signature": "e0014889f31fee76a572b6b15e74b2174cbcf6346ae8ab5c69eb553a10e5c944"
       },
       "../node_modules/@types/pbkdf2/index.d.ts": {
         "version": "a73a445c1e0a6d0f8b48e8eb22dc9d647896783a7f8991cbbc31c0d94bf1f5a2",
@@ -1649,6 +1657,21 @@
       "../types/truffle-contracts/index.d.ts": [
         "../node_modules/@types/bn.js/index.d.ts",
         "../node_modules/truffle-typings/index.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../test/dxcdeals.ts": [
+        "../node_modules/@types/bn.js/index.d.ts",
+        "../types/truffle-contracts/index.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts"
+      ],
+      "../test/migrations.ts": [
+        "../types/truffle-contracts/index.d.ts",
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/util.d.ts",
@@ -3180,6 +3203,38 @@
       ]
     },
     "semanticDiagnosticsPerFile": [
+      "../node_modules/typescript/lib/lib.es5.d.ts",
+      "../node_modules/typescript/lib/lib.es2015.d.ts",
+      "../node_modules/typescript/lib/lib.es2016.d.ts",
+      "../node_modules/typescript/lib/lib.es2017.d.ts",
+      "../node_modules/typescript/lib/lib.es2018.d.ts",
+      "../node_modules/typescript/lib/lib.dom.d.ts",
+      "../node_modules/typescript/lib/lib.dom.iterable.d.ts",
+      "../node_modules/typescript/lib/lib.webworker.importscripts.d.ts",
+      "../node_modules/typescript/lib/lib.scripthost.d.ts",
+      "../node_modules/typescript/lib/lib.es2015.core.d.ts",
+      "../node_modules/typescript/lib/lib.es2015.collection.d.ts",
+      "../node_modules/typescript/lib/lib.es2015.generator.d.ts",
+      "../node_modules/typescript/lib/lib.es2015.iterable.d.ts",
+      "../node_modules/typescript/lib/lib.es2015.promise.d.ts",
+      "../node_modules/typescript/lib/lib.es2015.proxy.d.ts",
+      "../node_modules/typescript/lib/lib.es2015.reflect.d.ts",
+      "../node_modules/typescript/lib/lib.es2015.symbol.d.ts",
+      "../node_modules/typescript/lib/lib.es2015.symbol.wellknown.d.ts",
+      "../node_modules/typescript/lib/lib.es2016.array.include.d.ts",
+      "../node_modules/typescript/lib/lib.es2017.object.d.ts",
+      "../node_modules/typescript/lib/lib.es2017.sharedmemory.d.ts",
+      "../node_modules/typescript/lib/lib.es2017.string.d.ts",
+      "../node_modules/typescript/lib/lib.es2017.intl.d.ts",
+      "../node_modules/typescript/lib/lib.es2017.typedarrays.d.ts",
+      "../node_modules/typescript/lib/lib.es2018.asyncgenerator.d.ts",
+      "../node_modules/typescript/lib/lib.es2018.asynciterable.d.ts",
+      "../node_modules/typescript/lib/lib.es2018.intl.d.ts",
+      "../node_modules/typescript/lib/lib.es2018.promise.d.ts",
+      "../node_modules/typescript/lib/lib.es2018.regexp.d.ts",
+      "../node_modules/typescript/lib/lib.es2020.bigint.d.ts",
+      "../node_modules/typescript/lib/lib.esnext.intl.d.ts",
+      "../node_modules/typescript/lib/lib.es2018.full.d.ts",
       "../node_modules/@types/mocha/index.d.ts",
       "../node_modules/@types/node/globals.d.ts",
       "../node_modules/@types/node/async_hooks.d.ts",
@@ -3216,7 +3271,6 @@
       "../node_modules/@types/node/tty.d.ts",
       "../node_modules/querystring/decode.d.ts",
       "../node_modules/querystring/encode.d.ts",
-      "../node_modules/querystring/index.d.ts",
       "../node_modules/@types/node/url.d.ts",
       "../node_modules/@types/node/util.d.ts",
       "../node_modules/@types/node/v8.d.ts",
@@ -3231,31 +3285,15 @@
       "../node_modules/@types/node/assert.d.ts",
       "../node_modules/@types/node/ts3.2/index.d.ts",
       "../node_modules/ts-essentials/dist/types.d.ts",
-      "../node_modules/ts-essentials/dist/functions.d.ts",
-      "../node_modules/ts-essentials/dist/index.d.ts",
       "../node_modules/@nomiclabs/buidler/internal/core/params/argumenttypes.d.ts",
-      "../node_modules/@nomiclabs/buidler/types.d.ts",
-      "../node_modules/@nomiclabs/buidler/internal/core/config/config-env.d.ts",
-      "../node_modules/@nomiclabs/buidler/config.d.ts",
       "../solcconfig.json",
-      "../buidler.config.ts",
       "../node_modules/@types/chai/index.d.ts",
       "../node_modules/@nomiclabs/buidler/internal/core/errors-list.d.ts",
       "../node_modules/@nomiclabs/buidler/internal/core/errors.d.ts",
-      "../node_modules/@nomiclabs/buidler/internal/artifacts.d.ts",
       "../node_modules/@nomiclabs/buidler/internal/util/lazy.d.ts",
-      "../node_modules/@nomiclabs/buidler/internal/core/config/extenders.d.ts",
-      "../node_modules/@nomiclabs/buidler/internal/core/tasks/dsl.d.ts",
-      "../node_modules/@nomiclabs/buidler/internal/context.d.ts",
-      "../node_modules/@nomiclabs/buidler/internal/core/plugins.d.ts",
       "../node_modules/@nomiclabs/buidler/internal/constants.d.ts",
-      "../node_modules/@nomiclabs/buidler/plugins.d.ts",
       "../node_modules/@nomiclabs/buidler-truffle5/src/constants.ts",
       "../node_modules/@nomiclabs/buidler-truffle5/src/types.ts",
-      "../node_modules/@nomiclabs/buidler-truffle5/src/provisioner.ts",
-      "../node_modules/@nomiclabs/buidler-truffle5/src/artifacts.ts",
-      "../node_modules/@nomiclabs/buidler-truffle5/src/type-extensions.d.ts",
-      "../node_modules/@nomiclabs/buidler-web3/src/type-extensions.d.ts",
       "../node_modules/@types/bn.js/index.d.ts",
       "../node_modules/web3/node_modules/web3-bzz/types/index.d.ts",
       "../node_modules/web3/node_modules/web3-core-helpers/types/index.d.ts",
@@ -3275,9 +3313,6 @@
       "../node_modules/web3/node_modules/web3-shh/types/index.d.ts",
       "../node_modules/web3/types/index.d.ts",
       "../node_modules/truffle-typings/index.d.ts",
-      "../types/truffle-contracts/index.d.ts",
-      "../migrations/1_initial_migration.ts",
-      "../migrations/2_dxc_deals.ts",
       "../node_modules/@types/accepts/index.d.ts",
       "../node_modules/@types/connect/index.d.ts",
       "../node_modules/@types/body-parser/index.d.ts",
@@ -3307,7 +3342,6 @@
       "../node_modules/@types/mkdirp/index.d.ts",
       "../node_modules/@types/node-fetch/node_modules/form-data/index.d.ts",
       "../node_modules/@types/node-fetch/externals.d.ts",
-      "../node_modules/@types/node-fetch/index.d.ts",
       "../node_modules/@types/pbkdf2/index.d.ts",
       "../node_modules/@types/prettier/index.d.ts",
       "../node_modules/@types/resolve/index.d.ts",
@@ -3316,38 +3350,29 @@
       "../node_modules/@types/websocket/index.d.ts",
       "../node_modules/@types/ws/index.d.ts",
       "../node_modules/@types/zen-observable/index.d.ts",
-      "../node_modules/typescript/lib/lib.es2015.d.ts",
-      "../node_modules/typescript/lib/lib.es2016.d.ts",
-      "../node_modules/typescript/lib/lib.es2017.d.ts",
-      "../node_modules/typescript/lib/lib.es2018.d.ts",
-      "../node_modules/typescript/lib/lib.es2018.full.d.ts",
-      "../node_modules/typescript/lib/lib.es5.d.ts",
-      "../node_modules/typescript/lib/lib.dom.d.ts",
-      "../node_modules/typescript/lib/lib.dom.iterable.d.ts",
-      "../node_modules/typescript/lib/lib.webworker.importscripts.d.ts",
-      "../node_modules/typescript/lib/lib.scripthost.d.ts",
-      "../node_modules/typescript/lib/lib.es2015.core.d.ts",
-      "../node_modules/typescript/lib/lib.es2015.collection.d.ts",
-      "../node_modules/typescript/lib/lib.es2015.generator.d.ts",
-      "../node_modules/typescript/lib/lib.es2015.iterable.d.ts",
-      "../node_modules/typescript/lib/lib.es2015.promise.d.ts",
-      "../node_modules/typescript/lib/lib.es2015.proxy.d.ts",
-      "../node_modules/typescript/lib/lib.es2015.reflect.d.ts",
-      "../node_modules/typescript/lib/lib.es2015.symbol.d.ts",
-      "../node_modules/typescript/lib/lib.es2015.symbol.wellknown.d.ts",
-      "../node_modules/typescript/lib/lib.es2016.array.include.d.ts",
-      "../node_modules/typescript/lib/lib.es2017.object.d.ts",
-      "../node_modules/typescript/lib/lib.es2017.sharedmemory.d.ts",
-      "../node_modules/typescript/lib/lib.es2017.string.d.ts",
-      "../node_modules/typescript/lib/lib.es2017.intl.d.ts",
-      "../node_modules/typescript/lib/lib.es2017.typedarrays.d.ts",
-      "../node_modules/typescript/lib/lib.es2018.asyncgenerator.d.ts",
-      "../node_modules/typescript/lib/lib.es2018.asynciterable.d.ts",
-      "../node_modules/typescript/lib/lib.es2018.intl.d.ts",
-      "../node_modules/typescript/lib/lib.es2018.promise.d.ts",
-      "../node_modules/typescript/lib/lib.es2018.regexp.d.ts",
-      "../node_modules/typescript/lib/lib.es2020.bigint.d.ts",
-      "../node_modules/typescript/lib/lib.esnext.intl.d.ts"
+      "../node_modules/querystring/index.d.ts",
+      "../node_modules/ts-essentials/dist/functions.d.ts",
+      "../node_modules/ts-essentials/dist/index.d.ts",
+      "../node_modules/@nomiclabs/buidler-truffle5/src/provisioner.ts",
+      "../node_modules/@nomiclabs/buidler-truffle5/src/artifacts.ts",
+      "../node_modules/@nomiclabs/buidler-truffle5/src/type-extensions.d.ts",
+      "../types/truffle-contracts/index.d.ts",
+      "../test/dxcdeals.ts",
+      "../test/migrations.ts",
+      "../node_modules/@types/node-fetch/index.d.ts",
+      "../node_modules/@nomiclabs/buidler/types.d.ts",
+      "../node_modules/@nomiclabs/buidler/internal/core/config/config-env.d.ts",
+      "../node_modules/@nomiclabs/buidler/config.d.ts",
+      "../buidler.config.ts",
+      "../node_modules/@nomiclabs/buidler/internal/artifacts.d.ts",
+      "../node_modules/@nomiclabs/buidler/internal/core/config/extenders.d.ts",
+      "../node_modules/@nomiclabs/buidler/internal/core/tasks/dsl.d.ts",
+      "../node_modules/@nomiclabs/buidler/internal/context.d.ts",
+      "../node_modules/@nomiclabs/buidler/internal/core/plugins.d.ts",
+      "../node_modules/@nomiclabs/buidler/plugins.d.ts",
+      "../node_modules/@nomiclabs/buidler-web3/src/type-extensions.d.ts",
+      "../migrations/1_initial_migration.ts",
+      "../migrations/2_dxc_deals.ts"
     ]
   },
   "version": "3.8.3"

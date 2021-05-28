@@ -121,26 +121,18 @@ export interface DXCDealsInstance extends Truffle.ContractInstance {
   declinePayout: {
     (
       dealIndex: number | BN | string,
-      amountOfDTXIn: number | BN | string,
-      amountOutMin: number | BN | string,
       txDetails?: Truffle.TransactionDetails
     ): Promise<Truffle.TransactionResponse>;
     call(
       dealIndex: number | BN | string,
-      amountOfDTXIn: number | BN | string,
-      amountOutMin: number | BN | string,
       txDetails?: Truffle.TransactionDetails
     ): Promise<void>;
     sendTransaction(
       dealIndex: number | BN | string,
-      amountOfDTXIn: number | BN | string,
-      amountOutMin: number | BN | string,
       txDetails?: Truffle.TransactionDetails
     ): Promise<string>;
     estimateGas(
       dealIndex: number | BN | string,
-      amountOfDTXIn: number | BN | string,
-      amountOutMin: number | BN | string,
       txDetails?: Truffle.TransactionDetails
     ): Promise<number>;
   };
@@ -208,7 +200,7 @@ export interface DXCDealsInstance extends Truffle.ContractInstance {
     ): Promise<number>;
   };
 
-  getDeal(
+  getDealByIndex(
     dealIndex: number | BN | string,
     txDetails?: Truffle.TransactionDetails
   ): Promise<{
@@ -265,6 +257,8 @@ export interface DXCDealsInstance extends Truffle.ContractInstance {
   getPlatformPercentage(txDetails?: Truffle.TransactionDetails): Promise<BN>;
 
   getLockPeriod(txDetails?: Truffle.TransactionDetails): Promise<BN>;
+
+  getCurrentDealIndex(txDetails?: Truffle.TransactionDetails): Promise<BN>;
 }
 
 export interface MigrationsInstance extends Truffle.ContractInstance {
