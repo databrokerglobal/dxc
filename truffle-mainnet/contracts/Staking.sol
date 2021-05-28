@@ -136,7 +136,7 @@ contract Staking is ERC20, Ownable {
    {
        // DTX staking
        require(dtxToken.balanceOf(msg.sender) >= _stake, "Not enough DTX to stake");
-       dtxToken.transferFrom(msg.sender, address(this), _stake);
+       dtxToken.transfer(address(this), _stake);
 
        //DTXS
        _burn(address(this), _stake);

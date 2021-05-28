@@ -40,7 +40,7 @@ contract('Staking', async accounts => {
         ).to.be.equal(web3.utils.toWei('1000'));
     });
 
-    it('Montly reward should equal to 1000', async () => {
+    it('Monthly reward should equal to 1000', async () => {
         expect(
           await (await stk.monthlyReward()).toString()
         ).to.be.equal(web3.utils.toWei('1000'));
@@ -48,19 +48,22 @@ contract('Staking', async accounts => {
 
     it('Can create a stake', async () => {
         expect(
-            await stk.createStake(web3.utils.toWei('1000'), web3.utils.toWei('20')));
+            await stk.createStake(web3.utils.toWei('1000'), web3.utils.toWei('20'), {from: accounts[0]}));
 
     });
 
     it('Can remove a stake', async () => {
         expect(
-            await stk.removeStake(web3.utils.toWei('1000')));
+            await stk.removeStake(web3.utils.toWei('1000'), {from: accounts[0]}));
     });
 
     it('Total stake should be 1000', async () => {
+        await dtxInstance.transferFrom(accounts[0],
+          stk.address, web3.utils.toWei('1000'));
+
         await stk.createStake(web3.utils.toWei('1000'), web3.utils.toWei('20'));
-        expect(
-            await (await stk.monthlyReward()).toString()
+        expect( 
+            await (await stk.totalStakes()).toString()
             ).to.be.equal(web3.utils.toWei('1000'));
     });
 
@@ -80,7 +83,11 @@ contract('Staking', async accounts => {
         // PandL = 1000 * (2000/2000) * (30-20/30) 
         // Attention: I have a decimal issue that's why the BN
 
-        await stk.createStake(web3.utils.toWei('1000'), web3.utils.toWei('20'));
+        await stk.createStake(web3.utils.toWei('1000'), web3.utils.toWei('20'), {from: accounts[0]});
+        await dtxInstance.transferFrom(accounts[0],
+          stk.address, web3.utils.toWei('2000'));
+        await stk.calculateReward(accounts[0], web3.utils.toWei('30'));
+
         expect(
             await web3.utils.toWei(await (await stk.calculateReward(accounts[0], web3.utils.toWei('30'))).toString())
             ).to.be.equal(web3.utils.toWei('330000000000000000000'));
@@ -115,7 +122,7 @@ contract('Staking', async accounts => {
             ).to.be.equal('0');
     });
 
-    it('Full user workflow', async () => {
+    it('Full user workflow frow owner account', async () => {
         // To enable accounts[1] to trnasfer DTX
         await dtxInstance.increaseAllowance(
           accounts[1],
@@ -159,10 +166,10 @@ contract('Staking', async accounts => {
       );
     });
 
-    it("should revert createStage if the msg.sender does not have enough allowance", async () => {
+    it("should revert createStaKe if the msg.sender does not have enough allowance", async () => {
       await expectRevert(
-        stk.createStake(web3.utils.toWei('1000'),web3.utils.toWei('20'), {from: accounts[1]}),
-        "VM Exception while processing transaction: revert ERC20: transfer amount exceeds allowance"
+        stk.createStake(web3.utils.toWei('1000'),web3.utils.toWei('20'), {from: accounts[2]}),
+        "VM Exception while processing transaction: revert Not enough DTX to stake"
       );
     });
 
@@ -173,60 +180,31 @@ contract('Staking', async accounts => {
       );
     });
 
-    it('Full user workflow', async () => {
-      // To enable accounts[1] to trnasfer DTX
-      await dtxInstance.increaseAllowance(
-        accounts[0],
-        web3.utils.toWei('1000000000'), {from: accounts[0]}
-      );
-      await dtxInstance.increaseAllowance(
-        accounts[1],
-        web3.utils.toWei('100000000'), {from: accounts[0]}
-      );
-      await dtxInstance.increaseAllowance(
-        stk.address,
-        web3.utils.toWei('100000000'), {from: accounts[0]}
-      );
-      await dtxInstance.increaseAllowance(
-        dtxInstance.address,
-        web3.utils.toWei('100000000'), {from: accounts[0]}
-      );
-
-      await stk.increaseAllowance(
-        accounts[0],
-        web3.utils.toWei('100000000'), {from: accounts[0]}
-      );
-      await stk.increaseAllowance(
-        accounts[1],
-        web3.utils.toWei('100000000'), {from: accounts[0]}
-      );
-      await stk.increaseAllowance(
-        stk.address,
-        web3.utils.toWei('100000000'), {from: accounts[0]}
-      );
-
-      await stk.increaseAllowance(
-        dtxInstance.address,
-        web3.utils.toWei('100000000'), {from: accounts[0]}
-      );
-
-      console.log((await dtxInstance.allowance(accounts[0], accounts[1])).toString());
-      console.log((await stk.allowance(accounts[0], accounts[1])).toString());
-      console.log((await dtxInstance.allowance(accounts[0], stk.address)).toString());
-
-      // To enable transferFrom from the staking contract
-
-
-      // To create a monthly reward
+    it('Full user workflow from different account than owner account', async () => {
       await dtxInstance.transferFrom(accounts[0],
-          stk.address, web3.utils.toWei('1000'));
+        stk.address, web3.utils.toWei('1000'));
 
-      // So that accounts[1] has funds
       await dtxInstance.transferFrom(accounts[0],
-        accounts[1], web3.utils.toWei('1000'));
+          accounts[1], web3.utils.toWei('1000'));
+      
+      await dtxInstance.approve(
+            accounts[1],
+            web3.utils.toWei('2000'), 
+            {from: accounts[0]}
+          );
 
+      await dtxInstance.increaseAllowance(
+            accounts[1],
+            web3.utils.toWei('2000'), 
+            {from: accounts[0]}
+          );
+      await dtxInstance.increaseAllowance(
+            stk.address,
+            web3.utils.toWei('2000'), 
+            {from: accounts[0]}
+          );
       await stk.createStake(web3.utils.toWei('100'), web3.utils.toWei('20'), {from: accounts[1]});
-      await stk.distributeRewards(web3.utils.toWei('30'), {from: accounts[0]} );  
+      await stk.distributeRewards(web3.utils.toWei('30'));  
       await stk.withdrawAllReward({from: accounts[0]});
       const rewardOf = await stk.rewardOf(accounts[1].toString()); 
 
