@@ -10,6 +10,7 @@
     "compile": "npx truffle compile && npx typechain --target truffle-v5 './build/contracts/*.json' && npx tsc --declaration",
     "lint": "npx buidler check",
     "test": "npx buidler test --show-stack-traces",
+    "prettier": "prettier --write 'contracts/**/*.sol'",
     "migrate": "npx truffle compile -all && npx typechain --target truffle-v5 './build/contracts/*.json' && npx tsc --declaration && npx truffle migrate"
   },
   "author": "",
@@ -36,8 +37,8 @@
     "@types/faker": "4.1.11",
     "@types/mocha": "7.0.2",
     "@types/node": "13.13.4",
-    "prettier": "1.19.1",
-    "prettier-plugin-solidity": "1.0.0-alpha.49",
+    "prettier": "^2.3.0",
+    "prettier-plugin-solidity": "^1.0.0-beta.11",
     "solc": "0.5.7",
     "solhint": "3.0.0-rc.8",
     "solhint-plugin-prettier": "0.0.4",
