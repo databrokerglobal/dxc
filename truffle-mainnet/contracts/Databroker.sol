@@ -14,7 +14,6 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./interfaces/IUniswap.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-
 contract Databroker is Ownable {
   IUniswap internal _uniswap;
   IERC20 internal _usdtToken;
@@ -39,7 +38,7 @@ contract Databroker is Ownable {
     address dtxToken,
     address wyreWalletAddress,
     address dtxStakingAddress
-  ) public {
+  ) {
     require(!_initialized, "Databroker: Already initialized");
 
     require(
@@ -69,13 +68,14 @@ contract Databroker is Ownable {
     // Give approval for the uniswap to swap the USDT token from this contract address
     IERC20(path[0]).approve(address(_uniswap), amountIn);
 
-    uint256[] memory amounts = _uniswap.swapExactTokensForTokens(
-      amountIn,
-      amountOutMin,
-      path,
-      receiverAddress,
-      deadline
-    );
+    uint256[] memory amounts =
+      _uniswap.swapExactTokensForTokens(
+        amountIn,
+        amountOutMin,
+        path,
+        receiverAddress,
+        deadline
+      );
 
     emit SwapTokens(path[0], path[1], amountIn, amounts[1], receiverAddress);
 

@@ -30,14 +30,9 @@ describe('Databroker', () => {
     [wallet, testWallet] = new MockProvider().getWallets();
     mockUniswap = await deployMockContract(wallet, IUniswap.abi);
 
-    usdt = await deployContract(wallet, USDT, [
-      utils.parseUnits('999999'),
-    ]);
+    usdt = await deployContract(wallet, USDT, [utils.parseUnits('999999')]);
 
-    dtx = await deployContract(wallet, DTX, [
-      wallet.address,
-      utils.parseUnits('999999'),
-    ]);
+    dtx = await deployContract(wallet, DTX, [utils.parseUnits('999999')]);
 
     databroker = await deployContract(wallet, Databroker, [
       mockUniswap.address,

@@ -7,7 +7,8 @@
     "compile": "npx truffle compile && npx typechain --target truffle-v5 './build/contracts/*.json' && npx tsc --declaration",
     "lint": "npx buidler check",
     "test": "npx buidler test --show-stack-traces",
-    "migrate": "npx waffle && npx truffle compile --all && npx typechain --target truffle-v5 './build/contracts/*.json' && npx tsc --declaration && npx truffle migrate --reset"
+    "prettier": "prettier --write 'contracts/**/*.sol'",
+    "migrate": "npx waffle && npx truffle compile --all && npx typechain --target truffle-v5 './build/contracts/*.json' && npx tsc --declaration && npx truffle migrate"
   },
   "author": "Databroker",
   "license": "SEE LICENSE IN mint-license.txt",
@@ -46,8 +47,8 @@
     "ethereum-waffle": "^3.3.0",
     "ethers": "^4.0.48",
     "mocha": "^8.4.0",
-    "prettier": "1.19.1",
-    "prettier-plugin-solidity": "1.0.0-alpha.49",
+    "prettier": "^2.3.0",
+    "prettier-plugin-solidity": "^1.0.0-beta.11",
     "solc": "^0.8.4",
     "solhint": "3.0.0-rc.8",
     "solhint-plugin-prettier": "0.0.4",
