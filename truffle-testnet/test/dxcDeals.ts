@@ -1,31 +1,31 @@
-import BN from "bn.js";
-import {DXCDealsContract, DXCDealsInstance} from "../types/truffle-contracts";
+import BN from 'bn.js';
+import {DXCDealsContract, DXCDealsInstance} from '../types/truffle-contracts';
 
-const {expectRevert, expectEvent} = require("@openzeppelin/test-helpers");
-const DXCDeals: DXCDealsContract = artifacts.require("./DXCDeals");
+const {expectRevert, expectEvent} = require('@openzeppelin/test-helpers');
+const DXCDeals: DXCDealsContract = artifacts.require('./DXCDeals');
 
-contract("DXCDeals", async accounts => {
+contract('DXCDeals', async accounts => {
   let dxcDeals: DXCDealsInstance;
   const lockPeriod = 30;
   const platformPercentage = 10;
 
-  describe("Deals", async () => {
+  describe('Deals', async () => {
     beforeEach(async () => {
       dxcDeals = await DXCDeals.new();
       assert.isOk(await dxcDeals.initialize(lockPeriod, platformPercentage));
     });
 
-    it("It should revert if contract is re-initialized", async () => {
+    it('It should revert if contract is re-initialized', async () => {
       await expectRevert(
         dxcDeals.initialize(lockPeriod, platformPercentage),
-        "DXCDeals: Already initialized"
+        'DXCDeals: Already initialized'
       );
     });
 
-    it("should create a new deal", async () => {
-      const did = "001";
-      const buyerId = "1";
-      const sellerId = "2";
+    it('should create a new deal', async () => {
+      const did = '001';
+      const buyerId = '1';
+      const sellerId = '2';
       const platformAddress = dxcDeals.address;
       const amountInUSDT: BN = web3.utils.toWei(new BN(1000));
       const amountInDTX: BN = web3.utils.toWei(new BN(50));
@@ -41,13 +41,13 @@ contract("DXCDeals", async accounts => {
 
       const dealIndex: BN = await dxcDeals.getCurrentDealIndex();
 
-      expectEvent(deal, "DealCreated", {dealIndex, did});
+      expectEvent(deal, 'DealCreated', {dealIndex, did});
     });
 
-    it("should be able to decline the payout", async () => {
-      const did = "001";
-      const buyerId = "1";
-      const sellerId = "2";
+    it('should be able to decline the payout', async () => {
+      const did = '001';
+      const buyerId = '1';
+      const sellerId = '2';
       const platformAddress = dxcDeals.address;
       const amountInUSDT: BN = web3.utils.toWei(new BN(1000));
       const amountInDTX: BN = web3.utils.toWei(new BN(50));
@@ -62,34 +62,41 @@ contract("DXCDeals", async accounts => {
       );
 
       const dealIndex: BN = await dxcDeals.getCurrentDealIndex();
+
+      expect(
+        await (await dxcDeals.getAllPendingDeals()).toString()
+      ).to.be.equal('1');
 
       await dxcDeals.declinePayout(dealIndex);
 
       const deal = await dxcDeals.getDealByIndex(dealIndex);
 
       expect(deal.accepted).to.be.equal(false);
+      expect(
+        await (await dxcDeals.getAllPendingDeals()).toString()
+      ).to.be.equal('');
     });
 
-    it("should throw an error if deal index is not valid during declinePayout", async () => {
+    it('should throw an error if deal index is not valid during declinePayout', async () => {
       const amountInUSDT: BN = web3.utils.toWei(new BN(1000));
       const amountInDTX: BN = web3.utils.toWei(new BN(50));
 
       await dxcDeals.createDeal(
-        "001",
-        "1",
-        "2",
+        '001',
+        '1',
+        '2',
         dxcDeals.address,
         amountInUSDT,
         amountInDTX
       );
 
-      await expectRevert(dxcDeals.declinePayout(10), "Invalid deal index");
+      await expectRevert(dxcDeals.declinePayout(10), 'Invalid deal index');
     });
 
-    it("should be able to complete the payout", async () => {
-      const did = "001";
-      const buyerId = "1";
-      const sellerId = "2";
+    it('should be able to complete the payout', async () => {
+      const did = '001';
+      const buyerId = '1';
+      const sellerId = '2';
       const platformAddress = dxcDeals.address;
       const amountInUSDT: BN = web3.utils.toWei(new BN(1000));
       const amountInDTX: BN = web3.utils.toWei(new BN(50));
@@ -105,37 +112,44 @@ contract("DXCDeals", async accounts => {
 
       const dealIndex: BN = await dxcDeals.getCurrentDealIndex();
 
+      expect(
+        await (await dxcDeals.getAllPendingDeals()).toString()
+      ).to.be.equal('1');
+
       await dxcDeals.completePayout(dealIndex);
 
       const deal = await dxcDeals.getDealByIndex(dealIndex);
 
       expect(deal.payoutCompleted).to.be.equal(true);
+      expect(
+        await (await dxcDeals.getAllPendingDeals()).toString()
+      ).to.be.equal('');
     });
 
-    it("should throw an error if deal index is not valid during completePayout", async () => {
+    it('should throw an error if deal index is not valid during completePayout', async () => {
       const amountInUSDT: BN = web3.utils.toWei(new BN(1000));
       const amountInDTX: BN = web3.utils.toWei(new BN(50));
 
       await dxcDeals.createDeal(
-        "001",
-        "1",
-        "2",
+        '001',
+        '1',
+        '2',
         dxcDeals.address,
         amountInUSDT,
         amountInDTX
       );
 
-      await expectRevert(dxcDeals.completePayout(10), "Invalid deal index");
+      await expectRevert(dxcDeals.completePayout(10), 'Invalid deal index');
     });
 
-    it("should revert calculateTransferAmount call if the deal was declined", async () => {
+    it('should revert calculateTransferAmount call if the deal was declined', async () => {
       const amountInUSDT: BN = web3.utils.toWei(new BN(1000));
       const amountInDTX: BN = web3.utils.toWei(new BN(50));
 
       await dxcDeals.createDeal(
-        "001",
-        "1",
-        "2",
+        '001',
+        '1',
+        '2',
         dxcDeals.address,
         amountInUSDT,
         amountInDTX
@@ -147,20 +161,20 @@ contract("DXCDeals", async accounts => {
       await expectRevert(
         dxcDeals.calculateTransferAmount(
           dealIndex,
-          new BN("55135393494483987")
+          new BN('55135393494483987')
         ),
-        "DXCDeals: Deal was declined by the buyer"
+        'DXCDeals: Deal was declined by the buyer'
       );
     });
 
-    it("calculateTransferAmount - when swappedDTXEst > sellerShareInDTX", async () => {
-      const amountInUSDT = new BN("1000000"); // 1 USDT
-      const amountInDTX = new BN("49849900000000000"); // 0.0498499 DTX
+    it('calculateTransferAmount - when swappedDTXEst > sellerShareInDTX', async () => {
+      const amountInUSDT = new BN('1000000'); // 1 USDT
+      const amountInDTX = new BN('49849900000000000'); // 0.0498499 DTX
 
       await dxcDeals.createDeal(
-        "001",
-        "1",
-        "2",
+        '001',
+        '1',
+        '2',
         dxcDeals.address,
         amountInUSDT,
         amountInDTX
@@ -169,21 +183,21 @@ contract("DXCDeals", async accounts => {
 
       const result: [BN, BN] = await dxcDeals.calculateTransferAmount(
         dealIndex,
-        new BN("45135393494483987") // 0.045135393494483987 DTX
+        new BN('45135393494483987') // 0.045135393494483987 DTX
       );
 
-      expect(result[0].toString()).to.be.equal("45135393494483987"); // 0.04513539349 DTX
-      expect(result[1].toString()).to.be.equal("4714506505516013"); // 0.004714506506 DTX
+      expect(result[0].toString()).to.be.equal('45135393494483987'); // 0.04513539349 DTX
+      expect(result[1].toString()).to.be.equal('4714506505516013'); // 0.004714506506 DTX
     });
 
-    it("calculateTransferAmount- when platformShareInDTX < extraDTXToBeAdded", async () => {
-      const amountInUSDT = new BN("1000000"); // 1 USDT
-      const amountInDTX = new BN("49849900000000000"); // 0.0498499 DTX
+    it('calculateTransferAmount- when platformShareInDTX < extraDTXToBeAdded', async () => {
+      const amountInUSDT = new BN('1000000'); // 1 USDT
+      const amountInDTX = new BN('49849900000000000'); // 0.0498499 DTX
 
       await dxcDeals.createDeal(
-        "001",
-        "1",
-        "2",
+        '001',
+        '1',
+        '2',
         dxcDeals.address,
         amountInUSDT,
         amountInDTX
@@ -192,21 +206,21 @@ contract("DXCDeals", async accounts => {
 
       const result: [BN, BN] = await dxcDeals.calculateTransferAmount(
         dealIndex,
-        new BN("50000000000000000") // 0.05 DTX
+        new BN('50000000000000000') // 0.05 DTX
       );
 
-      expect(result[0].toString()).to.be.equal("50000000000000000"); // 0.04513539349 DTX
-      expect(result[1].toString()).to.be.equal("0"); // 0.004714506506 DTX
+      expect(result[0].toString()).to.be.equal('50000000000000000'); // 0.04513539349 DTX
+      expect(result[1].toString()).to.be.equal('0'); // 0.004714506506 DTX
     });
 
-    it("calculateTransferAmount - when swappedDTXEst < sellerShareInDTX", async () => {
-      const amountInUSDT = new BN("1000000"); // 1 USDT
-      const amountInDTX = new BN("49849900000000000"); // 0.0498499 DTX
+    it('calculateTransferAmount - when swappedDTXEst < sellerShareInDTX', async () => {
+      const amountInUSDT = new BN('1000000'); // 1 USDT
+      const amountInDTX = new BN('49849900000000000'); // 0.0498499 DTX
 
       await dxcDeals.createDeal(
-        "001",
-        "1",
-        "2",
+        '001',
+        '1',
+        '2',
         dxcDeals.address,
         amountInUSDT,
         amountInDTX
@@ -215,33 +229,33 @@ contract("DXCDeals", async accounts => {
 
       const result: [BN, BN] = await dxcDeals.calculateTransferAmount(
         dealIndex,
-        new BN("40000000000000000") // 0.04 DTX
+        new BN('40000000000000000') // 0.04 DTX
       );
 
-      expect(result[0].toString()).to.be.equal("40000000000000000"); // 0.04 DTX
-      expect(result[1].toString()).to.be.equal("9849900000000000"); // 0.0098499 DTX
+      expect(result[0].toString()).to.be.equal('40000000000000000'); // 0.04 DTX
+      expect(result[1].toString()).to.be.equal('9849900000000000'); // 0.0098499 DTX
     });
 
-    it("should be able to edit and get the platform percentage", async () => {
-      await dxcDeals.editPlatformPercentage(new BN("20"));
+    it('should be able to edit and get the platform percentage', async () => {
+      await dxcDeals.editPlatformPercentage(new BN('20'));
 
       expect(
         await (await dxcDeals.getPlatformPercentage()).toString()
-      ).to.be.equal("20");
+      ).to.be.equal('20');
     });
 
-    it("should be able to edit and get the lockPeriod", async () => {
-      await dxcDeals.editLockPeriod(new BN("45"));
+    it('should be able to edit and get the lockPeriod', async () => {
+      await dxcDeals.editLockPeriod(new BN('45'));
 
       expect(await (await dxcDeals.getLockPeriod()).toString()).to.be.equal(
-        "45"
+        '45'
       );
     });
 
-    it("should be able to get deal by index", async () => {
-      const did = "001";
-      const buyerId = "1";
-      const sellerId = "2";
+    it('should be able to get deal by index', async () => {
+      const did = '001';
+      const buyerId = '1';
+      const sellerId = '2';
       const platformAddress = dxcDeals.address;
       const amountInUSDT: BN = web3.utils.toWei(new BN(1000));
       const amountInDTX: BN = web3.utils.toWei(new BN(50));
@@ -259,8 +273,8 @@ contract("DXCDeals", async accounts => {
 
       const deal = await dxcDeals.getDealByIndex(dealIndex);
 
-      expect(deal.did.toString()).to.be.equal("001");
-      expect(deal.dealIndex.toString()).to.be.equal("1");
+      expect(deal.did.toString()).to.be.equal('001');
+      expect(deal.dealIndex.toString()).to.be.equal('1');
       expect(deal.platformAddress).to.be.equal(dxcDeals.address);
       expect(deal.amountInDTX.toString()).to.be.equal(amountInDTX.toString());
       expect(deal.amountInUSDT.toString()).to.be.equal(amountInUSDT.toString());
@@ -268,61 +282,61 @@ contract("DXCDeals", async accounts => {
       expect(deal.payoutCompleted).to.be.equal(false);
     });
 
-    it("should be able to get all deals for did", async () => {
+    it('should be able to get all deals for did', async () => {
       const amountInUSDT: BN = web3.utils.toWei(new BN(1000));
       const amountInDTX: BN = web3.utils.toWei(new BN(50));
 
       await dxcDeals.createDeal(
-        "001",
-        "1",
-        "2",
+        '001',
+        '1',
+        '2',
         dxcDeals.address,
         amountInUSDT,
         amountInDTX
       );
 
       await dxcDeals.createDeal(
-        "001",
-        "3",
-        "4",
+        '001',
+        '3',
+        '4',
         dxcDeals.address,
         amountInUSDT,
         amountInDTX
       );
 
-      const result = await dxcDeals.getDealsForDID("001");
+      const result = await dxcDeals.getDealsForDID('001');
 
       expect(result.length).to.be.equal(2);
-      expect(result[0].dealIndex).to.be.equal("1");
-      expect(result[1].dealIndex).to.be.equal("2");
+      expect(result[0].dealIndex).to.be.equal('1');
+      expect(result[1].dealIndex).to.be.equal('2');
     });
 
-    it("should revert createDeals if the msg.sender is not the owner", async () => {
+    it('should revert createDeals if the msg.sender is not the owner', async () => {
       const amountInUSDT: BN = web3.utils.toWei(new BN(1000));
       const amountInDTX: BN = web3.utils.toWei(new BN(50));
 
       await expectRevert(
         dxcDeals.createDeal(
-          "001",
-          "1",
-          "2",
+          '001',
+          '1',
+          '2',
           dxcDeals.address,
           amountInUSDT,
           amountInDTX,
           {from: accounts[1]}
         ),
-        "Ownable: caller is not the owner"
+        'Ownable: caller is not the owner'
       );
     });
 
-    it("should revert declinePayout if the msg.sender is not the owner", async () => {
+    it('should revert declinePayout if the msg.sender is not the owner', async () => {
       const amountInUSDT: BN = web3.utils.toWei(new BN(1000));
       const amountInDTX: BN = web3.utils.toWei(new BN(50));
 
       await dxcDeals.createDeal(
-        "001",
-        "1",
-        "2",
+        '001',
+        '1',
+        '2',
         dxcDeals.address,
         amountInUSDT,
         amountInDTX
@@ -332,18 +346,18 @@ contract("DXCDeals", async accounts => {
 
       await expectRevert(
         dxcDeals.declinePayout(dealIndex, {from: accounts[1]}),
-        "Ownable: caller is not the owner"
+        'Ownable: caller is not the owner'
       );
     });
 
-    it("should revert completePayout if the msg.sender is not the owner", async () => {
+    it('should revert completePayout if the msg.sender is not the owner', async () => {
       const amountInUSDT: BN = web3.utils.toWei(new BN(1000));
       const amountInDTX: BN = web3.utils.toWei(new BN(50));
 
       await dxcDeals.createDeal(
-        "001",
-        "1",
-        "2",
+        '001',
+        '1',
+        '2',
         dxcDeals.address,
         amountInUSDT,
         amountInDTX
@@ -353,18 +367,18 @@ contract("DXCDeals", async accounts => {
 
       await expectRevert(
         dxcDeals.completePayout(dealIndex, {from: accounts[1]}),
-        "Ownable: caller is not the owner"
+        'Ownable: caller is not the owner'
       );
     });
 
-    it("should revert calculateTransferAmount if the msg.sender is not the owner", async () => {
+    it('should revert calculateTransferAmount if the msg.sender is not the owner', async () => {
       const amountInUSDT: BN = web3.utils.toWei(new BN(1000));
       const amountInDTX: BN = web3.utils.toWei(new BN(50));
 
       await dxcDeals.createDeal(
-        "001",
-        "1",
-        "2",
+        '001',
+        '1',
+        '2',
         dxcDeals.address,
         amountInUSDT,
         amountInDTX
@@ -375,28 +389,28 @@ contract("DXCDeals", async accounts => {
       await expectRevert(
         dxcDeals.calculateTransferAmount(
           dealIndex,
-          new BN("55135393494483987"),
+          new BN('55135393494483987'),
           {from: accounts[1]}
         ),
-        "Ownable: caller is not the owner"
+        'Ownable: caller is not the owner'
       );
     });
 
-    it("should revert editPlatformPercentage if the msg.sender is not the owner", async () => {
+    it('should revert editPlatformPercentage if the msg.sender is not the owner', async () => {
       await expectRevert(
         dxcDeals.editPlatformPercentage(20, {
-          from: accounts[1]
+          from: accounts[1],
         }),
-        "Ownable: caller is not the owner"
+        'Ownable: caller is not the owner'
       );
     });
 
-    it("should revert editLockPeriod if the msg.sender is not the owner", async () => {
+    it('should revert editLockPeriod if the msg.sender is not the owner', async () => {
       await expectRevert(
         dxcDeals.editLockPeriod(20, {
-          from: accounts[1]
+          from: accounts[1],
         }),
-        "Ownable: caller is not the owner"
+        'Ownable: caller is not the owner'
       );
     });
   });

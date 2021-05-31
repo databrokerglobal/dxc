@@ -12,6 +12,7 @@ contract DXCDeals is Ownable {
   uint256 private _lockPeriod;
   uint256 private _platformPercentage;
   bool private _initialized;
+  uint256[] private _pendingDeals;
 
   struct Deal {
     string did;
@@ -73,6 +74,7 @@ contract DXCDeals is Ownable {
     _dealsRegistry.push(newDeal);
     _didToDeals[did].push(newDeal);
     _dealIndexToDeal[dealIndex] = newDeal;
+    _pendingDeals.push(dealIndex);
 
     emit DealCreated(dealIndex, did);
 
@@ -86,6 +88,8 @@ contract DXCDeals is Ownable {
   {
     Deal storage deal = _dealIndexToDeal[dealIndex];
     deal.accepted = false;
+
+    removePendingDeal(dealIndex);
   }
 
   function completePayout(uint256 dealIndex)
@@ -95,6 +99,8 @@ contract DXCDeals is Ownable {
   {
     Deal storage deal = _dealIndexToDeal[dealIndex];
     deal.payoutCompleted = true;
+
+    removePendingDeal(dealIndex);
   }
 
   function calculateTransferAmount(
@@ -132,6 +138,31 @@ contract DXCDeals is Ownable {
     }
 
     return (sellerTransferAmountInDTX, finalPlatformCommission);
+  }
+
+  function removePendingDeal(uint256 dealIndex)
+    internal
+    isDealIndexValid(dealIndex)
+  {
+    uint256 atIndex;
+    for (uint256 i = 0; i < _pendingDeals.length; i += 1) {
+      if (dealIndex == _pendingDeals[i]) {
+        atIndex = i;
+        break;
+      }
+    }
+
+    _pendingDeals[atIndex] = _pendingDeals[_pendingDeals.length - 1];
+    _pendingDeals.pop();
+  }
+
+  function getAllPendingDeals()
+    public
+    view
+    onlyOwner
+    returns (uint256[] memory)
+  {
+    return _pendingDeals;
   }
 
   function editPlatformPercentage(uint256 platformPercentage) public onlyOwner {
