@@ -241,16 +241,23 @@ function restartProcess(){
     echo "Restarting DXC ..."
     echo " "
     if test -f "$FILE";
-    then  
-        echo "Press RETURN to pull latest image OR press any other key to further provide new image tag to pull from docker"
+    then
+        echo "Press RETURN to normal restart using existing SETUP OR press any other key to edit settings"
         read -s -n 1 VAR
         if [ "$VAR" = "" ]; 
         then
-            echo "Pull latest image ..."
+            echo "###  Normal Restart ..."
         else
-            getImageTagToPull
+            echo "Press RETURN to pull latest image OR press any other key to provide new image tag to pull from docker hub"
+            read -s -n 1 VAR
+            if [ "$VAR" = "" ]; 
+            then
+                echo "Pull latest image ..."
+            else
+                getImageTagToPull
+            fi
+            createDockerCompose     
         fi
-        createDockerCompose 
         echo ""
         echo "Restarting ..."    
     else
