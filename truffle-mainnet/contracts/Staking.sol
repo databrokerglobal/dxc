@@ -19,13 +19,18 @@ contract Staking is ERC20, Ownable {
   using SafeMath for uint256;
   IERC20 dtxToken;
 
+  address[] public stakeholders;
+  uint256 internal totalStakes;
+  mapping(address => uint256) internal rewards;
+  mapping(address => uint256) private stakes; // address => staked amount
+  mapping(address => uint256) private time; // address to staked time in unix timestamp
+
   /**
    * @notice The constructor for the Staking Token.
    * @param _owner The address to receive all tokens on construction.
    * @param _supply The amount of tokens to mint on construction.
    * @param _dtxToken address of the already deployed contract
    */
-
   constructor(
     address _owner,
     uint256 _supply,
@@ -33,12 +38,8 @@ contract Staking is ERC20, Ownable {
   ) payable ERC20("DTXStaking", "DTXS") {
     _mint(address(this), _supply);
     dtxToken = IERC20(_dtxToken);
+    totalStakes = 0;
   }
-
-  /**
-   *  We usually require to know who are all the stakeholders.
-   */
-  address[] public stakeholders;
 
   /**
    * @notice A method to check if an address is a stakeholder.
@@ -58,8 +59,7 @@ contract Staking is ERC20, Ownable {
    * @param _stakeholder The stakeholder to add.
    * MUST revet if stakeholder already exists
    */
-  function addStakeholder(address _stakeholder) public {
-    (bool _isStakeholder, ) = isStakeholder(_stakeholder);
+  function addStakeholder(address _stakeholder, bool _isStakeholder) internal {
     if (!_isStakeholder) stakeholders.push(_stakeholder);
   }
 
@@ -77,16 +77,6 @@ contract Staking is ERC20, Ownable {
   }
 
   /**
-   * address => staked amount
-   */
-  mapping(address => uint256) public stakes;
-
-  /**
-   * address to staked time in unix timestamp
-   */
-  mapping(address => uint256) public time;
-
-  /**
    * @notice a method to retrieve the stake for a stakeholder.
    * @param _stakeholder The stakeholder to retrieve the stake for.
    * @return uint256 The amount of wei staked.
@@ -95,16 +85,16 @@ contract Staking is ERC20, Ownable {
     return stakes[_stakeholder];
   }
 
-  /**
-   * @notice A method to the aggregated stakes from all stakeholders.
-   * @return uint256 The aggregated stakes from all stakeholders.
-   */
-  function totalStakes() public view returns (uint256) {
-    uint256 _totalStakes = 0;
-    for (uint256 s = 0; s < stakeholders.length; s += 1) {
-      _totalStakes = _totalStakes.add(stakes[stakeholders[s]]);
-    }
-    return _totalStakes;
+  function getTotalStakes() public view returns (uint256) {
+      return totalStakes;
+  }
+
+  function totalTime(uint256 currentTimestamp) public view returns(uint256) {
+      uint256 _totalTime = 0;
+      for(uint256 s = 0; s < stakeholders.length; s += 1) {
+          _totalTime = _totalTime.add(currentTimestamp.sub(time[stakeholders[s]]));
+      }
+      return _totalTime;
   }
 
   /**
@@ -113,25 +103,25 @@ contract Staking is ERC20, Ownable {
    *
    * MUST revert if not enough token to stake
    */
-  function createStake(uint256 _stake, uint256 _time) public {
+  function createStake(address stakeholder, uint256 _stake, uint256 _time, bool isStakeholder) public onlyOwner {
     // DTX staking
-    require(
-      dtxToken.balanceOf(msg.sender) >= _stake,
-      "Not enough DTX to stake"
-    );
-    dtxToken.transfer(address(this), _stake);
+    bool transferResult = dtxToken.transferFrom(stakeholder, address(this), _stake);
+
+    require(transferResult, "DTX transfer failed");
 
     //DTXS
     _burn(address(this), _stake);
-    if (stakes[msg.sender] == 0) {
-      addStakeholder(msg.sender);
+    if (stakes[stakeholder] == 0) {
+      addStakeholder(stakeholder, isStakeholder);
     }
-    stakes[msg.sender] = stakes[msg.sender].add(_stake);
 
-    if (time[msg.sender] == 0) {
-      time[msg.sender] = time[msg.sender].add(_time);
+    stakes[stakeholder] = stakes[stakeholder].add(_stake);
+    totalStakes = totalStakes.add(_stake);
+
+    if (time[stakeholder] == 0) {
+      time[stakeholder] = time[stakeholder].add(_time);
     } else {
-      time[msg.sender] = (time[msg.sender] + _time).div(2);
+      time[stakeholder] = (time[stakeholder] + _time).div(2);
     }
   }
 
@@ -142,17 +132,24 @@ contract Staking is ERC20, Ownable {
    */
   function removeStake(uint256 _stake) public {
     require(stakes[msg.sender] >= _stake, "Not enough staked!");
-    dtxToken.transfer(msg.sender, _stake);
+    bool transferResult = dtxToken.transfer(msg.sender, _stake);
+
+    require(transferResult, "DTX transfer failed");
 
     stakes[msg.sender] = stakes[msg.sender].sub(_stake);
+    totalStakes = totalStakes.sub(_stake);
+
     if (stakes[msg.sender] == 0) {
       removeStakeholder(msg.sender);
       time[msg.sender] = 0;
     }
+    // TOCONFIRM: Do we need to reduce the duration of stake as well?
+    // else {
+    //
+    // }
+
     _mint(address(this), _stake);
   }
-
-  mapping(address => uint256) internal rewards;
 
   /**
    * @notice A method to allow a stakeholder to check his rewards.
@@ -182,8 +179,10 @@ contract Staking is ERC20, Ownable {
    */
 
   function monthlyReward() public view returns (uint256) {
+    require(dtxToken.balanceOf(address(this)) >= totalStakes.add(totalRewards()), "Rewards are not available yet");
+
     uint256 monthlyReward =
-      dtxToken.balanceOf(address(this)).sub(totalStakes());
+      dtxToken.balanceOf(address(this)).sub(totalStakes).sub(totalRewards());
     return monthlyReward;
   }
 
@@ -193,26 +192,31 @@ contract Staking is ERC20, Ownable {
    * But also based on the length that a trader kept his token in the staking program over that month.
    * @param _stakeholder The stakeholder to calculate rewards for.
    */
-  function calculateReward(address _stakeholder, uint256 _time)
-    public
-    view
+  function calculateReward(address _stakeholder, uint256 monthlyReward, uint256 currentTime, uint256 oneMonth, uint256 totalTime)
+    internal
     returns (uint256)
   {
-    uint256 reward =
-      ((dtxToken.balanceOf(address(this)).sub(totalStakes())) *
-        ((stakeOf(_stakeholder).mul(100)).div(totalStakes())) *
-        ((((_time).sub(time[_stakeholder])).mul(100)).div(_time)))
-        .div(10000);
+    uint256 stakeRatio = stakeOf(_stakeholder).mul(100).div(totalStakes);
+    uint256 durationRatio = currentTime.sub(time[_stakeholder]).mul(100).div(totalTime);
+    uint256 stakeShare = monthlyReward.mul(stakeRatio);
+    uint256 durationShare = monthlyReward.mul(durationRatio);
+
+    uint256 reward = ((stakeShare + durationShare).div(2)).div(100);
+
     return reward;
   }
 
   /**
    * @notice A method to distribute rewards to all stakeholders. Should be called at the end of the month.
    */
-  function distributeRewards(uint256 time) public onlyOwner {
+  function distributeRewards(uint256 currentTime, uint256 oneMonth, uint256 totalTime) public onlyOwner {
+    uint256 monthlyReward = monthlyReward();
+
+    require(monthlyReward > 0, "Not enough rewards to distribute");
+
     for (uint256 s = 0; s < stakeholders.length; s += 1) {
       address stakeholder = stakeholders[s];
-      uint256 reward = calculateReward(stakeholder, time);
+      uint256 reward = calculateReward(stakeholder, monthlyReward, currentTime, oneMonth, totalTime);
       rewards[stakeholder] = rewards[stakeholder].add(reward);
     }
   }
@@ -226,7 +230,10 @@ contract Staking is ERC20, Ownable {
     for (uint256 s = 0; s < stakeholders.length; s += 1) {
       address stakeholder = stakeholders[s];
       uint256 reward = rewards[stakeholder];
-      dtxToken.transfer(stakeholder, reward);
+      bool transferResult = dtxToken.transfer(stakeholder, reward);
+
+      require(transferResult, "DTX transfer failed");
+
       rewards[stakeholder] = 0;
       _mint(address(this), reward);
     }
@@ -240,7 +247,10 @@ contract Staking is ERC20, Ownable {
     uint256 reward = rewards[msg.sender];
     require(reward > 0, "No reward to withdraw");
     rewards[msg.sender] = 0;
-    dtxToken.transfer(msg.sender, reward);
+    bool transferResult = dtxToken.transfer(msg.sender, reward);
+
+    require(transferResult, "DTX transfer failed");
+
     _mint(address(this), reward);
   }
 }
