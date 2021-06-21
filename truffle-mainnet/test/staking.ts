@@ -13,17 +13,17 @@ contract('Staking', async accounts => {
     describe('Staking', async () => {
         let dtxInstance: DTXInstance;
         let stk: StakingInstance;
-        
+
 
     before(async () => {
-        dtxInstance = await DTX.new(accounts[0], web3.utils.toWei('10000000'));
+        dtxInstance = await DTX.new(web3.utils.toWei('10000000'));
         stk = await Staking.new(accounts[0], web3.utils.toWei('10000000'), dtxInstance.address);
 
         await dtxInstance.increaseAllowance(
             accounts[0],
             web3.utils.toWei('10000000')
           );
-        
+
         await dtxInstance.increaseAllowance(
             stk.address,
             web3.utils.toWei('10000000')
@@ -62,7 +62,7 @@ contract('Staking', async accounts => {
           stk.address, web3.utils.toWei('1000'));
 
         await stk.createStake(web3.utils.toWei('1000'), web3.utils.toWei('20'));
-        expect( 
+        expect(
             await (await stk.totalStakes()).toString()
             ).to.be.equal(web3.utils.toWei('1000'));
     });
@@ -78,9 +78,9 @@ contract('Staking', async accounts => {
         // Total stake: 2000
         // Monthly reward: 1000
         // Stake of account[0]: 2000
-        // Ratio time staking remained on the program: 
+        // Ratio time staking remained on the program:
         // - Staking time: 10
-        // PandL = 1000 * (2000/2000) * (30-20/30) 
+        // PandL = 1000 * (2000/2000) * (30-20/30)
         // Attention: I have a decimal issue that's why the BN
 
         await stk.createStake(web3.utils.toWei('1000'), web3.utils.toWei('20'), {from: accounts[0]});
@@ -92,31 +92,31 @@ contract('Staking', async accounts => {
             await web3.utils.toWei(await (await stk.calculateReward(accounts[0], web3.utils.toWei('30'))).toString())
             ).to.be.equal(web3.utils.toWei('330000000000000000000'));
     });
-      
+
 
     it('Distributes rewards', async () => {
 
-        await stk.distributeRewards(web3.utils.toWei('30'));  
-        const rewardOf = await stk.rewardOf(accounts[0].toString());        
+        await stk.distributeRewards(web3.utils.toWei('30'));
+        const rewardOf = await stk.rewardOf(accounts[0].toString());
         expect(
             web3.utils.toWei(rewardOf).toString()
             ).to.be.equal(web3.utils.toWei('330000000000000000000').toString());
-    }); 
+    });
 
     it('Total rewards should be correct', async () => {
 
-        await stk.distributeRewards(web3.utils.toWei('30'));  
-        const totalRewards = await stk.totalRewards();     
+        await stk.distributeRewards(web3.utils.toWei('30'));
+        const totalRewards = await stk.totalRewards();
         expect(
             web3.utils.toWei(totalRewards).toString()
             ).to.be.equal(web3.utils.toWei('660000000000000000000').toString());
-    }); 
+    });
 
     it('Withraw all rewards check', async () => {
 
-        await stk.distributeRewards(web3.utils.toWei('30'));  
-        await stk.withdrawAllReward();  
-        const rewardOf = await stk.rewardOf(accounts[0].toString());      
+        await stk.distributeRewards(web3.utils.toWei('30'));
+        await stk.withdrawAllReward();
+        const rewardOf = await stk.rewardOf(accounts[0].toString());
         expect(
             web3.utils.toWei(rewardOf).toString()
             ).to.be.equal('0');
@@ -128,7 +128,7 @@ contract('Staking', async accounts => {
           accounts[1],
           web3.utils.toWei('1000')
         );
-        
+
         // To enable transferFrom from the staking contract
         await dtxInstance.increaseAllowance(
             stk.address,
@@ -143,9 +143,9 @@ contract('Staking', async accounts => {
           accounts[1], web3.utils.toWei('1000'));
 
         await stk.createStake(web3.utils.toWei('1000'), web3.utils.toWei('20'));
-        await stk.distributeRewards(web3.utils.toWei('30'));  
+        await stk.distributeRewards(web3.utils.toWei('30'));
         await stk.withdrawReward();
-        const rewardOf = await stk.rewardOf(accounts[1].toString()); 
+        const rewardOf = await stk.rewardOf(accounts[1].toString());
 
         expect(
             web3.utils.toWei(rewardOf).toString()
@@ -186,27 +186,27 @@ contract('Staking', async accounts => {
 
       await dtxInstance.transferFrom(accounts[0],
           accounts[1], web3.utils.toWei('1000'));
-      
+
       await dtxInstance.approve(
             accounts[1],
-            web3.utils.toWei('2000'), 
+            web3.utils.toWei('2000'),
             {from: accounts[0]}
           );
 
       await dtxInstance.increaseAllowance(
             accounts[1],
-            web3.utils.toWei('2000'), 
+            web3.utils.toWei('2000'),
             {from: accounts[0]}
           );
       await dtxInstance.increaseAllowance(
             stk.address,
-            web3.utils.toWei('2000'), 
+            web3.utils.toWei('2000'),
             {from: accounts[0]}
           );
       await stk.createStake(web3.utils.toWei('100'), web3.utils.toWei('20'), {from: accounts[1]});
-      await stk.distributeRewards(web3.utils.toWei('30'));  
+      await stk.distributeRewards(web3.utils.toWei('30'));
       await stk.withdrawAllReward({from: accounts[0]});
-      const rewardOf = await stk.rewardOf(accounts[1].toString()); 
+      const rewardOf = await stk.rewardOf(accounts[1].toString());
 
       expect(
           web3.utils.toWei(rewardOf).toString()
