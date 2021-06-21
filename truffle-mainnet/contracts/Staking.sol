@@ -144,9 +144,9 @@ contract Staking is ERC20, Ownable {
       time[msg.sender] = 0;
     }
     // TOCONFIRM: Do we need to reduce the duration of stake as well?
-    // else {
-    //
-    // }
+    else {
+      time[msg.sender] = (time[msg.sender] +  block.timestamp).div(2);
+    }
 
     _mint(address(this), _stake);
   }

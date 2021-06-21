@@ -7,10 +7,10 @@ import {
   solidity,
 } from 'ethereum-waffle';
 
-import IUniswap from '../build/IUniswap.json';
-import Databroker from '../build/Databroker.json';
-import USDT from '../build/USDT.json';
-import DTX from '../build/DTX.json';
+import IUniswap from '../build/contracts/IUniswap.json';
+import Databroker from '../build/contracts/Databroker.json';
+import USDT from '../build/contracts/USDT.json';
+import DTX from '../build/contracts/DTX.json';
 
 const {expectRevert} = require('@openzeppelin/test-helpers');
 
