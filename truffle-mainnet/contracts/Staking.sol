@@ -68,7 +68,7 @@ contract Staking is ERC20, Ownable {
    * @param _stakeholder The stakeholder to remove.
    * MUST revert if stakeholder already removed
    */
-  function removeStakeholder(address _stakeholder) public {
+  function removeStakeholder() internal {
     (bool _isStakeholder, uint256 s) = isStakeholder(_stakeholder);
     if (_isStakeholder) {
       stakeholders[s] = stakeholders[stakeholders.length - 1];
@@ -103,7 +103,7 @@ contract Staking is ERC20, Ownable {
    *
    * MUST revert if not enough token to stake
    */
-  function createStake(address stakeholder, uint256 _stake, uint256 _time, bool isStakeholder) public onlyOwner {
+  function createStake(address stakeholder, uint256 _stake, bool isStakeholder) public onlyOwner {
 
     //DTXS
     _burn(address(this), _stake);
@@ -115,9 +115,9 @@ contract Staking is ERC20, Ownable {
     totalStakes = totalStakes.add(_stake);
 
     if (time[stakeholder] == 0) {
-      time[stakeholder] = time[stakeholder].add(_time);
+      time[stakeholder] = time[stakeholder].add(block.timestamp);
     } else {
-      time[stakeholder] = (time[stakeholder] + _time).div(2);
+      time[stakeholder] = (time[stakeholder] + block.timestamp).div(2);
     }
 
     // DTX staking
