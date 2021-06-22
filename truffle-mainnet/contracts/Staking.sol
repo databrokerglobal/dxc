@@ -68,7 +68,7 @@ contract Staking is ERC20, Ownable {
    * @param _stakeholder The stakeholder to remove.
    * MUST revert if stakeholder already removed
    */
-  function removeStakeholder() internal {
+  function removeStakeholder(address _stakeholder) internal {
     (bool _isStakeholder, uint256 s) = isStakeholder(_stakeholder);
     if (_isStakeholder) {
       stakeholders[s] = stakeholders[stakeholders.length - 1];
