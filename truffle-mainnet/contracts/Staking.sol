@@ -105,6 +105,11 @@ contract Staking is ERC20, Ownable {
    */
   function createStake(address stakeholder, uint256 _stake, bool isStakeholder) public onlyOwner {
 
+    // DTX staking
+    bool transferResult = dtxToken.transferFrom(stakeholder, address(this), _stake);
+
+    require(transferResult, "DTX transfer failed");
+
     //DTXS
     _burn(address(this), _stake);
     if (stakes[stakeholder] == 0) {
@@ -120,10 +125,7 @@ contract Staking is ERC20, Ownable {
       time[stakeholder] = (time[stakeholder] + block.timestamp).div(2);
     }
 
-    // DTX staking
-    bool transferResult = dtxToken.transferFrom(stakeholder, address(this), _stake);
 
-    require(transferResult, "DTX transfer failed");
 
   }
 
@@ -133,6 +135,11 @@ contract Staking is ERC20, Ownable {
    * MUST revert if stakeholder did not stake enough
    */
   function removeStake(uint256 _stake) public {
+
+    // DTX staking
+    require(stakes[msg.sender] >= _stake, "Not enough staked!");
+    bool transferResult = dtxToken.transfer(msg.sender, _stake);
+    require(transferResult, "DTX transfer failed");
 
     stakes[msg.sender] = stakes[msg.sender].sub(_stake);
     totalStakes = totalStakes.sub(_stake);
@@ -147,11 +154,6 @@ contract Staking is ERC20, Ownable {
     }
 
     _mint(address(this), _stake);
-
-    // DTX staking
-    require(stakes[msg.sender] >= _stake, "Not enough staked!");
-    bool transferResult = dtxToken.transfer(msg.sender, _stake);
-    require(transferResult, "DTX transfer failed");
 
   }
 
