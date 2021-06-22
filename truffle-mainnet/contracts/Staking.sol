@@ -104,10 +104,6 @@ contract Staking is ERC20, Ownable {
    * MUST revert if not enough token to stake
    */
   function createStake(address stakeholder, uint256 _stake, uint256 _time, bool isStakeholder) public onlyOwner {
-    // DTX staking
-    bool transferResult = dtxToken.transferFrom(stakeholder, address(this), _stake);
-
-    require(transferResult, "DTX transfer failed");
 
     //DTXS
     _burn(address(this), _stake);
@@ -123,6 +119,12 @@ contract Staking is ERC20, Ownable {
     } else {
       time[stakeholder] = (time[stakeholder] + _time).div(2);
     }
+
+    // DTX staking
+    bool transferResult = dtxToken.transferFrom(stakeholder, address(this), _stake);
+
+    require(transferResult, "DTX transfer failed");
+
   }
 
   /**
@@ -131,10 +133,6 @@ contract Staking is ERC20, Ownable {
    * MUST revert if stakeholder did not stake enough
    */
   function removeStake(uint256 _stake) public {
-    require(stakes[msg.sender] >= _stake, "Not enough staked!");
-    bool transferResult = dtxToken.transfer(msg.sender, _stake);
-
-    require(transferResult, "DTX transfer failed");
 
     stakes[msg.sender] = stakes[msg.sender].sub(_stake);
     totalStakes = totalStakes.sub(_stake);
@@ -149,6 +147,12 @@ contract Staking is ERC20, Ownable {
     }
 
     _mint(address(this), _stake);
+
+    // DTX staking
+    require(stakes[msg.sender] >= _stake, "Not enough staked!");
+    bool transferResult = dtxToken.transfer(msg.sender, _stake);
+    require(transferResult, "DTX transfer failed");
+
   }
 
   /**
@@ -181,9 +185,9 @@ contract Staking is ERC20, Ownable {
   function monthlyReward() public view returns (uint256) {
     require(dtxToken.balanceOf(address(this)) >= totalStakes.add(totalRewards()), "Rewards are not available yet");
 
-    uint256 monthlyReward =
+    uint256 monthReward =
       dtxToken.balanceOf(address(this)).sub(totalStakes).sub(totalRewards());
-    return monthlyReward;
+    return monthReward;
   }
 
   /**
@@ -192,14 +196,15 @@ contract Staking is ERC20, Ownable {
    * But also based on the length that a trader kept his token in the staking program over that month.
    * @param _stakeholder The stakeholder to calculate rewards for.
    */
-  function calculateReward(address _stakeholder, uint256 monthlyReward, uint256 currentTime, uint256 oneMonth, uint256 totalTime)
+  function calculateReward(address _stakeholder, uint256 totalReward, uint256 currentTime, uint256 totalTimeStakeholder)
     internal
+    view
     returns (uint256)
   {
     uint256 stakeRatio = stakeOf(_stakeholder).mul(100).div(totalStakes);
-    uint256 durationRatio = currentTime.sub(time[_stakeholder]).mul(100).div(totalTime);
-    uint256 stakeShare = monthlyReward.mul(stakeRatio);
-    uint256 durationShare = monthlyReward.mul(durationRatio);
+    uint256 durationRatio = currentTime.sub(time[_stakeholder]).mul(100).div(totalTimeStakeholder);
+    uint256 stakeShare = totalReward.mul(stakeRatio);
+    uint256 durationShare = totalReward.mul(durationRatio);
 
     uint256 reward = ((stakeShare + durationShare).div(2)).div(100);
 
@@ -209,14 +214,14 @@ contract Staking is ERC20, Ownable {
   /**
    * @notice A method to distribute rewards to all stakeholders. Should be called at the end of the month.
    */
-  function distributeRewards(uint256 currentTime, uint256 oneMonth, uint256 totalTime) public onlyOwner {
+  function distributeRewards(uint256 currentTime, uint256 totalTime) public onlyOwner {
     uint256 monthlyReward = monthlyReward();
 
     require(monthlyReward > 0, "Not enough rewards to distribute");
 
     for (uint256 s = 0; s < stakeholders.length; s += 1) {
       address stakeholder = stakeholders[s];
-      uint256 reward = calculateReward(stakeholder, monthlyReward, currentTime, oneMonth, totalTime);
+      uint256 reward = calculateReward(stakeholder, monthlyReward, currentTime, totalTime);
       rewards[stakeholder] = rewards[stakeholder].add(reward);
     }
   }
