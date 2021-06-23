@@ -59,7 +59,9 @@ contract Staking is ERC20, Ownable {
    * @param _stakeholder The stakeholder to add.
    * MUST revet if stakeholder already exists
    */
-  function addStakeholder(address _stakeholder, bool _isStakeholder) internal {
+  function addStakeholder(address _stakeholder) internal {
+    (bool _isStakeholder, ) = isStakeholder(_stakeholder);
+
     if (!_isStakeholder) stakeholders.push(_stakeholder);
   }
 
@@ -103,7 +105,7 @@ contract Staking is ERC20, Ownable {
    *
    * MUST revert if not enough token to stake
    */
-  function createStake(address stakeholder, uint256 _stake, bool isStakeholder) public onlyOwner {
+  function createStake(address stakeholder, uint256 _stake) public {
 
     // DTX staking
     bool transferResult = dtxToken.transferFrom(stakeholder, address(this), _stake);
@@ -113,7 +115,7 @@ contract Staking is ERC20, Ownable {
     //DTXS
     _burn(address(this), _stake);
     if (stakes[stakeholder] == 0) {
-      addStakeholder(stakeholder, isStakeholder);
+      addStakeholder(stakeholder);
     }
 
     stakes[stakeholder] = stakes[stakeholder].add(_stake);
