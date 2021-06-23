@@ -32,10 +32,11 @@
     "./solcconfig.json",
     "./waffle.json",
     "./build",
-    "./build/IUniswap.json",
-    "./build/Databroker.json",
-    "./build/USDT.json",
-    "./build/DTX.json"
+    "./build/contracts/IUniswap.json",
+    "./build/contracts/Databroker.json",
+    "./build/contracts/USDT.json",
+    "./build/contracts/DTX.json",
+    "./build/contracts/Staking.json"
   ],
   "exclude": ["dist/**/*"],
   "files": [

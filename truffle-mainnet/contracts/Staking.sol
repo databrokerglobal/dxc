@@ -99,6 +99,10 @@ contract Staking is ERC20, Ownable {
       return _totalTime;
   }
 
+  function getTime(address stakeholder) public view returns(uint256) {
+    return time[stakeholder];
+  } 
+
   /**
    * @notice A method for a stakeholder to create a stake.
    * @param _stake The size of the stake to be created.
@@ -126,9 +130,6 @@ contract Staking is ERC20, Ownable {
     } else {
       time[stakeholder] = (time[stakeholder] + block.timestamp).div(2);
     }
-
-
-
   }
 
   /**
