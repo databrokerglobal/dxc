@@ -91,6 +91,10 @@ contract Staking is ERC20, Ownable {
       return totalStakes;
   }
 
+  function getTimestamp() public view returns(uint256) {
+    return block.timestamp;
+  }
+
   function totalTime(uint256 currentTimestamp) public view returns(uint256) {
       uint256 _totalTime = 0;
       for(uint256 s = 0; s < stakeholders.length; s += 1) {

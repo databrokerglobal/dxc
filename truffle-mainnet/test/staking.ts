@@ -78,6 +78,8 @@ describe('Staking', async () => {
     it('Total stake should be 50', async () => {
       await dtxInstance.transferFrom(wallet.address,
         stk.address, web3.utils.toWei('1000'));
+      const blockTime = await stk.getTimestamp();
+      console.log(blockTime.toString());
 
       await stk.createStake(
         wallet.address,
@@ -162,6 +164,19 @@ describe('Staking', async () => {
         expect(
             true
             ).to.be.equal(true);
+    });
+
+    it('Should forward in time', async () => {
+      const time1 = await stk.getTimestamp();
+      console.log(time1.toString());
+
+      const timeTravel = require("./truffleTestHelper");
+      await timeTravel(86000 * 2);
+      const time2 = await stk.getTimestamp();
+      console.log(time2.toString());
+      expect(
+        true
+        ).to.be.equal(true);
     });
 
 
