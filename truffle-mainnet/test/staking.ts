@@ -172,8 +172,10 @@ describe('Staking', async () => {
 
       const timeTravel = require("./truffleTestHelper");
       await timeTravel(86000 * 2);
+      
       const time2 = await stk.getTimestamp();
       console.log(time2.toString());
+
       expect(
         true
         ).to.be.equal(true);
