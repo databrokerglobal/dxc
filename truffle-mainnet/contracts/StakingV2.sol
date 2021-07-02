@@ -16,7 +16,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract Staking is ERC20, Ownable {
+contract StakingV2 is ERC20, Ownable {
   using SafeMath for uint256;
   using Counters for Counters.Counter;
 
@@ -26,16 +26,19 @@ contract Staking is ERC20, Ownable {
   struct Stake {
     uint256 lockedDTX;
     uint256 startTimestamp;
-    // uint256 payoutTimestamp;
   }
 
   address[] private stakeholders;
-  uint256 private lastPayoutTimestamp;
-  uint256 private totalStakes;
+  uint256 public lastPayoutTimestamp; // TODO: Make private
+  uint256 public totalStakes; // TODO: Make private
 
-  mapping(address => Stake) private stakeholderToStake;
-  mapping(address => uint256) private claimRewards;
-  mapping(uint256 => mapping(address => uint256)) private payoutCredits;
+  mapping(address => Stake) private stakeholderToStake;  // TODO: Make private
+  mapping(address => uint256) private claimRewards;  // TODO: Make private
+  mapping(uint256 => mapping(address => uint256)) private payoutCredits;  // TODO: Make private
+
+  event CreateStake(address indexed stakeholder, uint256 amount);
+  event RemoveStake(address indexed stakeholder, uint256 amount);
+
 
   /**
    * @notice The constructor for the Staking Token.
@@ -50,7 +53,8 @@ contract Staking is ERC20, Ownable {
   ) payable ERC20("DTXStaking", "DTXS") {
     _mint(address(this), _supply);
     dtxToken = IERC20(_dtxToken);
-    totalStakes = 0;
+    // totalStakes = 0;
+    // lastPayoutTimestamp = 0;
   }
 
   function isStakeholder(address stakeholder)
@@ -78,6 +82,14 @@ contract Staking is ERC20, Ownable {
     }
   }
 
+  function getLockedStakeDetails(address stakeholder) public view onlyOwner returns(uint256, uint256){
+    return (stakeholderToStake[stakeholder].lockedDTX, stakeholderToStake[stakeholder].startTimestamp);
+  }
+
+  function getPayoutCredits(uint256 payoutCycle, address stakeholder) public view onlyOwner returns(uint256) {
+    return payoutCredits[payoutCycle][stakeholder];
+  }
+
   function createStake(address stakeholder, uint256 stake) public {
     bool transferResult = dtxToken.transferFrom(
       stakeholder,
@@ -88,14 +100,22 @@ contract Staking is ERC20, Ownable {
     require(transferResult, "DTX transfer failed");
 
     _burn(address(this), stake);
+    totalStakes += stake;
 
     (bool _isStakeholder, ) = isStakeholder(stakeholder);
     uint256 currTimestamp = block.timestamp;
+    uint256 stakeStartTime;
+
+    if(lastPayoutTimestamp > stakeholderToStake[stakeholder].startTimestamp) {
+      stakeStartTime = lastPayoutTimestamp;
+    } else {
+      stakeStartTime = stakeholderToStake[stakeholder].startTimestamp;
+    }
 
     if(_isStakeholder) {
       // update the payout credit for existing stake and stake duration
       payoutCredits[payoutCounter.current()][stakeholder] = payoutCredits[payoutCounter.current()][stakeholder].add(
-        (stakeholderToStake[stakeholder].lockedDTX).mul((currTimestamp).sub(stakeholderToStake[stakeholder].startTimestamp))
+        (stakeholderToStake[stakeholder].lockedDTX).mul((currTimestamp).sub(stakeStartTime))
       );
 
       // update the stake
@@ -110,7 +130,7 @@ contract Staking is ERC20, Ownable {
       });
     }
 
-    totalStakes.add(stake);
+    emit CreateStake(stakeholder, stake);
   }
 
   function removeStake(uint256 stake) public {
@@ -123,25 +143,55 @@ contract Staking is ERC20, Ownable {
     require(transferResult, "DTX transfer failed");
 
     uint256 currTimestamp = block.timestamp;
+    uint256 stakeStartTime;
+
+    if(lastPayoutTimestamp > stakeholderToStake[msg.sender].startTimestamp) {
+      stakeStartTime = lastPayoutTimestamp;
+    } else {
+      stakeStartTime = stakeholderToStake[msg.sender].startTimestamp;
+    }
 
     // update the payout credit for existing stake and stake duration
-    payoutCredits[payoutCounter.current()][stakeholder] = payoutCredits[payoutCounter.current()][stakeholder].add(
-      (stakeholderToStake[stakeholder].lockedDTX).mul((currTimestamp).sub(stakeholderToStake[stakeholder].startTimestamp))
+    payoutCredits[payoutCounter.current()][msg.sender] = payoutCredits[payoutCounter.current()][msg.sender].add(
+      (stakeholderToStake[msg.sender].lockedDTX).mul((currTimestamp).sub(stakeStartTime))
     );
     // update the stake
-    stakeholderToStake[stakeholder].lockedDTX = (stakeholderToStake[stakeholder].lockedDTX).sub(stake);
+    stakeholderToStake[msg.sender].lockedDTX = (stakeholderToStake[msg.sender].lockedDTX).sub(stake);
+    stakeholderToStake[msg.sender].startTimestamp = currTimestamp;
 
-    if(stakeholderToStake[stakeholder].lockedDTX == 0) {
+    if(stakeholderToStake[msg.sender].lockedDTX == 0) {
       removeStakeholder(msg.sender);
     }
-    totalStakes.sub(stake);
-    _mint(address(this), _stake);
+    totalStakes -= stake; // TODO: Why .sub is not updating the totalStakes in Remix
+    _mint(address(this), stake);
+
+    emit RemoveStake(msg.sender, stake);
+  }
+
+  function stakeOf(address stakeholder) public view returns (uint256) {
+    return stakeholderToStake[stakeholder].lockedDTX;
+  }
+
+  function getTotalStakes() public view returns (uint256) {
+    return totalStakes;
+  }
+
+  function totalCredits() public view returns (uint256) {
+    uint256 totalCredits = 0;
+    for (uint256 s = 0; s < stakeholders.length; s += 1) {
+      totalCredits = totalCredits.add(payoutCredits[payoutCounter.current()][stakeholders[s]]);
+    }
+    return totalCredits;
+  }
+
+  function rewardOf(address stakeholder) public view returns (uint256) {
+    return claimRewards[stakeholder];
   }
 
   function totalRewards() public view returns (uint256) {
     uint256 totalRewards = 0;
-    for (uint256 s = 0; s < stakeholders.length; s += 1) {
-      totalRewards = totalRewards.add(payoutCredits[payoutCounter.current()][stakeholders[s]]);
+    for(uint256 s = 0; s < stakeholders.length; s += 1) {
+      totalRewards = totalRewards.add(claimRewards[stakeholders[s]]);
     }
     return totalRewards;
   }
@@ -156,36 +206,86 @@ contract Staking is ERC20, Ownable {
     return monthReward;
   }
 
-  /*
-  function calculateReward(address stakeholder, uint256 monthlyReward) internal returns(uint256) {
-    // uint256 existingStake = stakeholderToStake[stakeholder].lockedDTX;
+  function calculatePayoutCredit(address stakeholder) internal returns(uint256) {
     uint256 currTimestamp = block.timestamp;
+    uint256 stakeStartTime;
 
-    // update the payout credit for existing stake and stake duration
+    if(lastPayoutTimestamp > stakeholderToStake[stakeholder].startTimestamp) {
+      stakeStartTime = lastPayoutTimestamp;
+    } else {
+      stakeStartTime = stakeholderToStake[stakeholder].startTimestamp;
+    }
+
     payoutCredits[payoutCounter.current()][stakeholder] = payoutCredits[payoutCounter.current()][stakeholder].add(
-      (stakeholderToStake[stakeholder].lockedDTX).mul((currTimestamp).sub(stakeholderToStake[stakeholder].startTimestamp))
+      (stakeholderToStake[stakeholder].lockedDTX).mul((currTimestamp).sub(stakeStartTime))
     );
-    // update the stake
-    stakeholderToStake[stakeholder].lockedDTX = 0;
-
-    uint256 stakeholderRatio = (payoutCredits[payoutCounter.current()][stakeholder]).mul(1000).div(totalRewards());
-    return monthlyReward().mul(stakeholderRatio).div(1000);
   }
 
-  function distributeRewards(uint256 currentTime, uint256 totalTime) public onlyOwner {
+  function calculateReward(address stakeholder, uint256 monthlyReward) internal returns(uint256) {
+    uint256 stakeholderRatio = (payoutCredits[payoutCounter.current()][stakeholder]).mul(1000).div(totalCredits());
+
+    return (monthlyReward.mul(stakeholderRatio)).div(1000);
+  }
+
+  function distributeRewards() public onlyOwner {
     uint256 monthlyReward = monthlyReward();
 
     require(monthlyReward > 0, "Not enough rewards to distribute");
 
+    // update payout credits
+    for (uint256 s = 0; s < stakeholders.length; s += 1) {
+      address stakeholder = stakeholders[s];
+      calculatePayoutCredit(stakeholder);
+    }
+
+    // Calculate rewards
     for (uint256 s = 0; s < stakeholders.length; s += 1) {
       address stakeholder = stakeholders[s];
       uint256 rewards = calculateReward(stakeholder, monthlyReward);
       claimRewards[stakeholder] = claimRewards[stakeholder].add(rewards);
     }
 
-    // Increase payoutCounter
     payoutCounter.increment();
+    lastPayoutTimestamp = block.timestamp;
   }
-  */
+
+  function withdrawAllReward() public onlyOwner {
+    for (uint256 s = 0; s < stakeholders.length; s += 1) {
+      address stakeholder = stakeholders[s];
+      uint256 reward = claimRewards[stakeholder];
+      bool transferResult = dtxToken.transfer(stakeholder, reward);
+
+      require(transferResult, "DTX transfer failed");
+
+      claimRewards[stakeholder] = 0;
+      _mint(address(this), reward);
+    }
+  }
+
+  function withdrawReward() public {
+    uint256 reward = claimRewards[msg.sender];
+    require(reward > 0, "No reward to withdraw");
+    claimRewards[msg.sender] = 0;
+    bool transferResult = dtxToken.transfer(msg.sender, reward);
+
+    require(transferResult, "DTX transfer failed");
+
+    _mint(address(this), reward);
+  }
 }
+
+/*
+    A1 = 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4
+    A2 = 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2
+    A3 = 0xCA35b7d915458EF540aDe6068dFe2F44E8fa733c
+
+    18 0's - 000000000000000000
+
+    "0x5B38Da6a701c568545dCfcB03FcB875f56beddC4","1000000000000000000000000000000000000","0xd8b934580fcE35a11B58C6D73aDeE468a2833fa8"
+
+    ##### Scenario 1 #####
+    450000 + 550000 =  1000000
+    920000 + 1079000 = 1999000
+    470000 + 529000
+*/
 
