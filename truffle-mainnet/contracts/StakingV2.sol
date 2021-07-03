@@ -159,9 +159,6 @@ contract StakingV2 is ERC20, Ownable {
     stakeholderToStake[msg.sender].lockedDTX = (stakeholderToStake[msg.sender].lockedDTX).sub(stake);
     stakeholderToStake[msg.sender].startTimestamp = currTimestamp;
 
-    if(stakeholderToStake[msg.sender].lockedDTX == 0) {
-      removeStakeholder(msg.sender);
-    }
     totalStakes -= stake; // TODO: Why .sub is not updating the totalStakes in Remix
     _mint(address(this), stake);
 
@@ -176,10 +173,10 @@ contract StakingV2 is ERC20, Ownable {
     return totalStakes;
   }
 
-  function totalCredits() public view returns (uint256) {
+  function totalCredits(uint256 payoutCycle) public view onlyOwner returns (uint256) {
     uint256 totalCredits = 0;
     for (uint256 s = 0; s < stakeholders.length; s += 1) {
-      totalCredits = totalCredits.add(payoutCredits[payoutCounter.current()][stakeholders[s]]);
+      totalCredits = totalCredits.add(payoutCredits[payoutCycle][stakeholders[s]]);
     }
     return totalCredits;
   }
@@ -206,9 +203,14 @@ contract StakingV2 is ERC20, Ownable {
     return monthReward;
   }
 
-  function calculatePayoutCredit(address stakeholder) internal returns(uint256) {
+  function calculatePayoutCredit(address stakeholder) internal returns(bool) {
     uint256 currTimestamp = block.timestamp;
     uint256 stakeStartTime;
+
+    if(payoutCredits[payoutCounter.current()][stakeholder] == 0 && stakeholderToStake[stakeholder].lockedDTX == 0) {
+      removeStakeholder(stakeholder);
+      return true;
+    }
 
     if(lastPayoutTimestamp > stakeholderToStake[stakeholder].startTimestamp) {
       stakeStartTime = lastPayoutTimestamp;
@@ -219,18 +221,22 @@ contract StakingV2 is ERC20, Ownable {
     payoutCredits[payoutCounter.current()][stakeholder] = payoutCredits[payoutCounter.current()][stakeholder].add(
       (stakeholderToStake[stakeholder].lockedDTX).mul((currTimestamp).sub(stakeStartTime))
     );
+
+    return true;
   }
 
-  function calculateReward(address stakeholder, uint256 monthlyReward) internal returns(uint256) {
-    uint256 stakeholderRatio = (payoutCredits[payoutCounter.current()][stakeholder]).mul(1000).div(totalCredits());
+  function calculateReward(address stakeholder, uint256 monthlyReward, uint256 totalCredits) internal returns(uint256) {
+    uint256 stakeholderRatio = (payoutCredits[payoutCounter.current()][stakeholder]).mul(1000).div(totalCredits);
 
     return (monthlyReward.mul(stakeholderRatio)).div(1000);
   }
 
   function distributeRewards() public onlyOwner {
     uint256 monthlyReward = monthlyReward();
+    uint256 totalCredits = totalCredits(payoutCounter.current());
 
     require(monthlyReward > 0, "Not enough rewards to distribute");
+    require(totalCredits > 0, "Total credits is 0");
 
     // update payout credits
     for (uint256 s = 0; s < stakeholders.length; s += 1) {
@@ -241,7 +247,7 @@ contract StakingV2 is ERC20, Ownable {
     // Calculate rewards
     for (uint256 s = 0; s < stakeholders.length; s += 1) {
       address stakeholder = stakeholders[s];
-      uint256 rewards = calculateReward(stakeholder, monthlyReward);
+      uint256 rewards = calculateReward(stakeholder, monthlyReward, totalCredits);
       claimRewards[stakeholder] = claimRewards[stakeholder].add(rewards);
     }
 
