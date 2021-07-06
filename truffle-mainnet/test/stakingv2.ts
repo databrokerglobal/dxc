@@ -10,6 +10,39 @@ describe('Staking V2', async () => {
   let stakingInstance: any;
   let dtxInstance: any;
 
+  async function getExpectedReward(
+    staker: string,
+    owner: string,
+    existingPayoutCredits: string,
+    payoutDay: string,
+    payoutCycle: number,
+    rewardForMonth: string
+  ) {
+    const lockedDTX = (
+      await stakingInstance.getLockedStakeDetails(staker, { from: owner })
+    )[0].toString();
+
+    const stakeStartTimestamp = (
+      await stakingInstance.getLockedStakeDetails(staker, { from: owner })
+    )[1].toString();
+
+    const expectedPayoutCredits =
+      parseInt(existingPayoutCredits) +
+      (parseInt(payoutDay) - parseInt(stakeStartTimestamp)) *
+        parseInt(lockedDTX);
+
+    const totalPayoutCredits = (
+      await stakingInstance.totalCredits(payoutCycle, { from: owner })
+    ).toString();
+
+    const stakeholderRatio = Math.trunc(
+      (expectedPayoutCredits * 1000000000000000000) /
+        parseInt(totalPayoutCredits)
+    );
+
+    return (parseInt(rewardForMonth) * stakeholderRatio) / 1000000000000000000;
+  }
+
   beforeEach(async () => {
     const [owner, staker1, staker2, staker3, staker4, staker5] = accounts;
     dtxInstance = await DTX.new(utils.parseUnits('999999'), {
@@ -53,7 +86,7 @@ describe('Staking V2', async () => {
     expect((await stakingInstance.stakeOf(accounts[0])).toString()).to.be.equal(
       web3.utils.toWei('100')
     );
-    expect((await stakingInstance.totalStakes()).toString()).to.be.equal(
+    expect((await stakingInstance.getTotalStakes()).toString()).to.be.equal(
       web3.utils.toWei('100')
     );
   });
@@ -367,9 +400,9 @@ describe('Staking V2', async () => {
       expectedRewardForStaker1 / 1000000000000000000
     );
 
-    expect(parseInt(actualRewardOfStaker1)).to.be.equal(
-      expectedRewardForStaker1
-    );
+    expect(
+      Math.trunc(parseInt(actualRewardOfStaker1) / 1000000000000000000)
+    ).to.be.equal(Math.trunc(expectedRewardForStaker1 / 1000000000000000000));
 
     // Staker2
     const expectedRewardForStaker2 = await getExpectedReward(
@@ -388,9 +421,9 @@ describe('Staking V2', async () => {
       expectedRewardForStaker2 / 1000000000000000000
     );
 
-    expect(parseInt(actualRewardOfStaker2)).to.be.equal(
-      expectedRewardForStaker2
-    );
+    expect(
+      Math.trunc(parseInt(actualRewardOfStaker2) / 1000000000000000000)
+    ).to.be.equal(Math.trunc(expectedRewardForStaker2 / 1000000000000000000));
 
     // Staker3
     const expectedRewardForStaker3 = await getExpectedReward(
@@ -409,9 +442,9 @@ describe('Staking V2', async () => {
       Math.trunc(expectedRewardForStaker3 / 1000000000000000000)
     );
 
-    expect(parseInt(actualRewardOfStaker3) / 1000000000000000000).to.be.equal(
-      Math.trunc(expectedRewardForStaker3 / 1000000000000000000)
-    );
+    expect(
+      Math.trunc(parseInt(actualRewardOfStaker3) / 1000000000000000000)
+    ).to.be.equal(Math.trunc(expectedRewardForStaker3 / 1000000000000000000));
 
     // Staker4
     const expectedRewardForStaker4 = await getExpectedReward(
@@ -433,8 +466,13 @@ describe('Staking V2', async () => {
       )
     );
 
-    expect(parseInt(actualRewardOfStaker4)).to.be.equal(
-      expectedRewardForStaker4 + parseInt(web3.utils.toWei('5000')) // Previous month reward
+    expect(
+      Math.trunc(parseInt(actualRewardOfStaker4) / 1000000000000000000)
+    ).to.be.equal(
+      Math.trunc(
+        (expectedRewardForStaker4 + parseInt(web3.utils.toWei('5000'))) / // Previous month reward
+          1000000000000000000
+      )
     );
 
     // Staker5
@@ -454,40 +492,239 @@ describe('Staking V2', async () => {
       expectedRewardForStaker5 / 1000000000000000000
     );
 
-    expect(parseInt(actualRewardOfStaker5)).to.be.equal(
-      expectedRewardForStaker5
+    expect(
+      Math.trunc(parseInt(actualRewardOfStaker5) / 1000000000000000000)
+    ).to.be.equal(Math.trunc(expectedRewardForStaker5 / 1000000000000000000));
+  });
+
+  it('staker should be a stakeholder if their lockedDTX is 0 but staker has some payout credits', async () => {
+    const [owner, staker1, staker2] = accounts;
+    const firstStakeTimestamp = (await time.latest()).toString();
+
+    // approve staker's DTX
+    await dtxInstance.approve(
+      stakingInstance.address,
+      web3.utils.toWei('100'),
+      { from: staker1 }
+    );
+    await stakingInstance.createStake(staker1, web3.utils.toWei('100'), {
+      from: staker1,
+    });
+
+    // approve staker's DTX
+    await dtxInstance.approve(
+      stakingInstance.address,
+      web3.utils.toWei('100'),
+      { from: staker2 }
+    );
+    await stakingInstance.createStake(staker2, web3.utils.toWei('100'), {
+      from: staker2,
+    });
+
+    // Time travel 15 days ahead
+    await time.increase(time.duration.days(15));
+    const removeStakeTimestamp = (await time.latest()).toString();
+
+    await stakingInstance.removeStake(web3.utils.toWei('100'), {
+      from: staker1,
+    });
+
+    const newLockedDTXOfStaker1 = (
+      await stakingInstance.getLockedStakeDetails(staker1, {
+        from: owner,
+      })
+    )[0].toString();
+
+    expect(newLockedDTXOfStaker1).to.be.equal(web3.utils.toWei('0'));
+
+    // Assert updated payout credit
+    const payoutCreditsOfStaker1 = (
+      await stakingInstance.getPayoutCredits(0, staker1, {
+        from: owner,
+      })
+    ).toString();
+    const expectedPayoutCredits =
+      (removeStakeTimestamp - firstStakeTimestamp) * web3.utils.toWei('100');
+
+    expect(parseInt(payoutCreditsOfStaker1)).to.be.equal(expectedPayoutCredits);
+
+    // assert staker1 is stakeholder
+    expect(
+      (await stakingInstance.isStakeholder(staker1))[0].toString()
+    ).to.be.equal('true');
+
+    // Time travel 15 more days ahead to end of month
+    await time.increase(time.duration.days(15));
+    // const lastDayOfMonth = (await time.latest()).toString();
+
+    // Add platform commission
+    await dtxInstance.transfer(
+      stakingInstance.address,
+      web3.utils.toWei('5000'),
+      { from: owner }
+    );
+    await stakingInstance.distributeRewards({ from: owner });
+
+    // staker 1 should still be stakeholder
+    expect(
+      (await stakingInstance.isStakeholder(staker1))[0].toString()
+    ).to.be.equal('true');
+
+    // sstaker1 shouldn't be stakeholder after next distribute reward
+    await dtxInstance.transfer(
+      stakingInstance.address,
+      web3.utils.toWei('5000'),
+      { from: owner }
+    );
+
+    // Next month
+    await time.increase(time.duration.days(30));
+
+    await stakingInstance.distributeRewards({ from: owner });
+
+    expect(
+      (await stakingInstance.getTotalStakeholders({ from: owner })).toString()
+    ).to.be.equal('1');
+    expect(
+      (await stakingInstance.isStakeholder(staker1))[0].toString()
+    ).to.be.equal('false');
+    expect(
+      (await stakingInstance.isStakeholder(staker2))[0].toString()
+    ).to.be.equal('true');
+  });
+
+  it('withdrawAllReward', async () => {
+    const [owner, staker1, staker2] = accounts;
+
+    // approve staker1 DTX
+    await dtxInstance.approve(
+      stakingInstance.address,
+      web3.utils.toWei('1000'),
+      { from: staker1 }
+    );
+    await stakingInstance.createStake(staker1, web3.utils.toWei('1000'), {
+      from: staker1,
+    });
+
+    // approve staker2 DTX
+    await dtxInstance.approve(
+      stakingInstance.address,
+      web3.utils.toWei('1000'),
+      { from: staker2 }
+    );
+    await stakingInstance.createStake(staker2, web3.utils.toWei('1000'), {
+      from: staker2,
+    });
+
+    // End of month
+    await time.increase(time.duration.days(30));
+
+    await dtxInstance.transfer(
+      stakingInstance.address,
+      web3.utils.toWei('10000'),
+      { from: owner }
+    );
+
+    await stakingInstance.distributeRewards({ from: owner });
+
+    // asset balane before withdrawAllReward
+    expect((await dtxInstance.balanceOf(staker1)).toString()).to.be.equal(
+      web3.utils.toWei('0')
+    );
+    expect((await dtxInstance.balanceOf(staker2)).toString()).to.be.equal(
+      web3.utils.toWei('0')
+    );
+
+    await stakingInstance.withdrawAllReward({ from: owner });
+
+    // asset balane after withdrawAllReward
+    expect((await dtxInstance.balanceOf(staker1)).toString()).to.be.equal(
+      web3.utils.toWei('5000')
+    );
+    expect((await dtxInstance.balanceOf(staker2)).toString()).to.be.equal(
+      web3.utils.toWei('5000')
     );
   });
 
-  async function getExpectedReward(
-    staker: string,
-    owner: string,
-    existingPayoutCredits: string,
-    payoutDay: string,
-    payoutCycle: number,
-    rewardForMonth: string
-  ) {
-    const lockedDTX = (
-      await stakingInstance.getLockedStakeDetails(staker, { from: owner })
-    )[0].toString();
+  it('withdrawReward', async () => {
+    const [owner, staker1, staker2] = accounts;
 
-    const stakeStartTimestamp = (
-      await stakingInstance.getLockedStakeDetails(staker, { from: owner })
-    )[1].toString();
+    // approve staker1 DTX
+    await dtxInstance.approve(
+      stakingInstance.address,
+      web3.utils.toWei('1000'),
+      { from: staker1 }
+    );
+    await stakingInstance.createStake(staker1, web3.utils.toWei('1000'), {
+      from: staker1,
+    });
 
-    const expectedPayoutCredits =
-      parseInt(existingPayoutCredits) +
-      (parseInt(payoutDay) - parseInt(stakeStartTimestamp)) *
-        parseInt(lockedDTX);
+    // approve staker2 DTX
+    await dtxInstance.approve(
+      stakingInstance.address,
+      web3.utils.toWei('1000'),
+      { from: staker2 }
+    );
+    await stakingInstance.createStake(staker2, web3.utils.toWei('1000'), {
+      from: staker2,
+    });
 
-    const totalPayoutCredits = (
-      await stakingInstance.totalCredits(payoutCycle, { from: owner })
-    ).toString();
+    // End of month
+    await time.increase(time.duration.days(30));
 
-    const stakeholderRatio = Math.trunc(
-      (expectedPayoutCredits * 1000) / parseInt(totalPayoutCredits)
+    await dtxInstance.transfer(
+      stakingInstance.address,
+      web3.utils.toWei('10000'),
+      { from: owner }
     );
 
-    return (parseInt(rewardForMonth) * stakeholderRatio) / 1000;
-  }
+    await stakingInstance.distributeRewards({ from: owner });
+
+    // asset balane before withdrawAllReward
+    expect((await dtxInstance.balanceOf(staker1)).toString()).to.be.equal(
+      web3.utils.toWei('0')
+    );
+    expect((await dtxInstance.balanceOf(staker2)).toString()).to.be.equal(
+      web3.utils.toWei('0')
+    );
+
+    await stakingInstance.withdrawReward({ from: staker1 });
+    await stakingInstance.withdrawReward({ from: staker2 });
+
+    // asset balane after withdrawAllReward
+    expect((await dtxInstance.balanceOf(staker1)).toString()).to.be.equal(
+      web3.utils.toWei('5000')
+    );
+    expect((await dtxInstance.balanceOf(staker2)).toString()).to.be.equal(
+      web3.utils.toWei('5000')
+    );
+  });
+
+  it('getTotalStakeholders', async () => {
+    const [owner, staker1, staker2] = accounts;
+
+    // approve staker1 DTX
+    await dtxInstance.approve(
+      stakingInstance.address,
+      web3.utils.toWei('1000'),
+      { from: staker1 }
+    );
+    await stakingInstance.createStake(staker1, web3.utils.toWei('1000'), {
+      from: staker1,
+    });
+
+    // approve staker2 DTX
+    await dtxInstance.approve(
+      stakingInstance.address,
+      web3.utils.toWei('1000'),
+      { from: staker2 }
+    );
+    await stakingInstance.createStake(staker2, web3.utils.toWei('1000'), {
+      from: staker2,
+    });
+
+    expect(
+      (await stakingInstance.getTotalStakeholders({ from: owner })).toString()
+    ).to.be.equal('2');
+  });
 });
